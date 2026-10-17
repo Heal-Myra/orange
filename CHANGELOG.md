@@ -5,7 +5,9 @@
 - Privacy consent screen after first sign-in (DPDP Act, 2023).
 - Entries and targets save to the person's own rows in Supabase (Mumbai) and on the device; offline-first.
 - Account screen (person icon on Today): sign out, see where data is saved, delete my data.
-- EAS Workflow: every push to main runs tests and deploys the web version to EAS Hosting.
+- EAS Workflow: every push to main runs tests and deploys the web version to EAS Hosting (https://project-heal.expo.app).
+- Verified by the founder on iPhone, 17 Oct 2026: email-link sign-in, consent, and saving to Supabase (Mumbai).
+- Account page shows the exact error if saving fails, and has a Back button (needed after a page reload).
 
 ## 0.1.1 — 17 October 2026
 - Linked to the Expo project (owner healmyra, project ID 354c8819-…).

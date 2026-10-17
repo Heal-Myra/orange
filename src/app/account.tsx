@@ -30,6 +30,7 @@ export default function Account() {
 
   return (
     <Screen showDay={false}>
+      <Button kind="plain" title="‹ Back to Today" onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))} />
       <Card>
         <Heading>{session ? 'Signed in' : 'Not signed in'}</Heading>
         <Text style={{ color: colors.ink }}>{session?.user.email ?? 'You are using Project Heal on this device only.'}</Text>
