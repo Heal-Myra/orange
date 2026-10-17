@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.1 — 17 October 2026
+- Sign-in by pasting the email link, for the iPhone home-screen app (which cannot receive tapped email links).
+- Short meal names from photos; meal list shows IFCT vs estimate.
+
 ## 0.3.0 — 17 October 2026 (Milestone 4 begins: AI features, not yet switched on)
 - Server function `heal-ai` (Supabase, Mumbai) with five AI features: meal photo to macros grounded in IFCT 2017,
   daily guidance, Gita verse explanation in English or Hindi, social-media content classifier, dharma reflection.
