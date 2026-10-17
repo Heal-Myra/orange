@@ -39,3 +39,13 @@ Docs: https://docs.expo.dev/eas/index.md
 - If `ios/` and `android/` directories do not exist, they are generated (Continuous Native Generation). Never create or edit them by hand — configure native behavior in `app.json` and config plugins.
 - Expo Go only includes its bundled native modules. After adding a library with native code, the app needs a development build: `npx expo run:ios|android` locally, or `eas build --profile development`.
 - Prefer recommended Expo modules over third-party libraries, and check your available skills before adding dependencies. Docs: https://docs.expo.dev/versions/latest/index.md
+
+## Project Heal — rules for every session (read first)
+
+- **The founder is new to technology.** Any instruction for them: plain words a 10-year-old would follow, ONE small step at a time, say where to click and what they will see, then WAIT for "done". Never ask for passwords or secret keys in chat.
+- **Memory between sessions:** this repository (README, CHANGELOG, `docs/decisions/`) plus the "Project Heal" project on Claude (build plan, Orange Book). End every session by updating CHANGELOG and, for any real decision, adding a `docs/decisions/NNNN-*.md`.
+- **Guiding document:** The Orange Book (Edition 1.2). Key rules: understanding over tracking; understand before recommending; nature first, evidence-aware; no medical claims; AI explains its reasons; truthfulness and fairness.
+- **Scoring** lives in `src/lib/scoring.ts` and is documented in `docs/scoring.md`. Change both together and keep `npm test` passing.
+- **Secrets** (Claude API key, Supabase service key) live only in Supabase / EAS secrets, never in this repository or the app.
+- **Bundled data** in `assets/data/` is licensed (see `docs/decisions/0002-data-architecture.md`). Do not add modern Gita translations — they are under copyright.
+- Before declaring work done: `npm test`, `npm run typecheck`.
