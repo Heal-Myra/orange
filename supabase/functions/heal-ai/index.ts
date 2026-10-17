@@ -13,8 +13,10 @@ import ifct from './ifct2017.json' with { type: 'json' };
 //   gemini: Google Gemini. Its free tier may use inputs to improve Google's products,
 //           so use it only for testing with the founder's own data, never real users.
 const PROVIDER = (Deno.env.get('AI_PROVIDER') ?? 'anthropic').toLowerCase();
-const ANTHROPIC_KEY = Deno.env.get('ANTHROPIC_API_KEY');
-const GEMINI_KEY = Deno.env.get('GEMINI_API_KEY');
+// Keys pasted into the dashboard sometimes carry spaces, line breaks or quote marks; strip them.
+const clean = (v: string | undefined) => v?.trim().replace(/^["'`]+|["'`]+$/g, '').trim() || undefined;
+const ANTHROPIC_KEY = clean(Deno.env.get('ANTHROPIC_API_KEY'));
+const GEMINI_KEY = clean(Deno.env.get('GEMINI_API_KEY'));
 const MODELS = {
   anthropic: { smart: Deno.env.get('ANTHROPIC_MODEL_SMART') ?? 'claude-sonnet-5-5', quick: Deno.env.get('ANTHROPIC_MODEL_QUICK') ?? 'claude-haiku-5-5' },
   gemini: { smart: Deno.env.get('GEMINI_MODEL') ?? 'gemini-3.8-flash', quick: Deno.env.get('GEMINI_MODEL') ?? 'gemini-3.8-flash' },
@@ -81,7 +83,10 @@ async function ask(tier: 'smart' | 'quick', system: string, text: string, image?
     body: JSON.stringify({ model: MODELS.anthropic[tier], max_tokens: 2000, system, messages: [{ role: 'user', content }] }),
   });
   const data = await res.json();
-  if (!res.ok) throw new Error(data?.error?.message ?? `Claude error ${res.status}`);
+  if (!res.ok) {
+    if (res.status === 401) throw new Error('The AI key was not accepted by Anthropic (invalid x-api-key). Check ANTHROPIC_API_KEY in Supabase secrets.');
+    throw new Error(data?.error?.message ?? `Claude error ${res.status}`);
+  }
   return (data.content ?? []).filter((c: { type: string }) => c.type === 'text').map((c: { text: string }) => c.text).join('\n').trim();
 }
 
