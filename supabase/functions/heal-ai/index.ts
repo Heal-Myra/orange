@@ -17,6 +17,8 @@ const PROVIDER = (Deno.env.get('AI_PROVIDER') ?? 'anthropic').toLowerCase();
 const clean = (v: string | undefined) => v?.trim().replace(/^["'`]+|["'`]+$/g, '').trim() || undefined;
 const ANTHROPIC_KEY = clean(Deno.env.get('ANTHROPIC_API_KEY'));
 const GEMINI_KEY = clean(Deno.env.get('GEMINI_API_KEY'));
+// Needed when the Anthropic key is not tied to one workspace (the Console says which workspace to bill).
+const ANTHROPIC_WORKSPACE = clean(Deno.env.get('ANTHROPIC_WORKSPACE_ID'));
 const MODELS = {
   anthropic: { smart: Deno.env.get('ANTHROPIC_MODEL_SMART') ?? 'claude-sonnet-5-5', quick: Deno.env.get('ANTHROPIC_MODEL_QUICK') ?? 'claude-haiku-5-5' },
   gemini: { smart: Deno.env.get('GEMINI_MODEL') ?? 'gemini-3.8-flash', quick: Deno.env.get('GEMINI_MODEL') ?? 'gemini-3.8-flash' },
@@ -79,7 +81,10 @@ async function ask(tier: 'smart' | 'quick', system: string, text: string, image?
   content.push({ type: 'text', text });
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
-    headers: { 'x-api-key': ANTHROPIC_KEY!, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
+    headers: {
+      'x-api-key': ANTHROPIC_KEY!, 'anthropic-version': '2023-06-01', 'content-type': 'application/json',
+      ...(ANTHROPIC_WORKSPACE ? { 'anthropic-workspace-id': ANTHROPIC_WORKSPACE } : {}),
+    },
     body: JSON.stringify({ model: MODELS.anthropic[tier], max_tokens: 2000, system, messages: [{ role: 'user', content }] }),
   });
   const data = await res.json();

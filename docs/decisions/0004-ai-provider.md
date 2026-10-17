@@ -12,7 +12,7 @@ Date: 17 October 2026 · Decided by: founder, with Claude
   may use inputs to improve Google's products — free tier is for the founder's own testing only.
 
 ## Secrets (set in Supabase → Edge Functions → Secrets, never in this repository)
-`AI_PROVIDER`, `ANTHROPIC_API_KEY` or `GEMINI_API_KEY`, `AI_ALLOWED_EMAILS`, optional `AI_DAILY_LIMIT`,
+`AI_PROVIDER`, `ANTHROPIC_API_KEY` (+ `ANTHROPIC_WORKSPACE_ID` when the key is not workspace-scoped) or `GEMINI_API_KEY`, `AI_ALLOWED_EMAILS`, optional `AI_DAILY_LIMIT`,
 `GEMINI_MODEL`, `ANTHROPIC_MODEL_SMART`, `ANTHROPIC_MODEL_QUICK`.
 
 ## Deploy
