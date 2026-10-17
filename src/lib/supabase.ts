@@ -17,7 +17,8 @@ export const supabase: SupabaseClient | null = url && key
         ...(Platform.OS !== 'web' ? { storage: AsyncStorage } : {}),
         autoRefreshToken: true,
         persistSession: true,
-        detectSessionInUrl: false,
+        // On the web, opening the sign-in link from the email lands back here and signs the person in.
+        detectSessionInUrl: Platform.OS === 'web',
       },
     })
   : null;

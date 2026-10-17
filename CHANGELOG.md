@@ -1,7 +1,7 @@
 # Changelog
 
 ## 0.2.0 — 17 October 2026 (Milestone 2: Accounts and online saving)
-- Sign in with a 6-digit email code; option to use the app without an account.
+- Sign in with an email link (or a 6-digit code where the email shows one); option to use the app without an account.
 - Privacy consent screen after first sign-in (DPDP Act, 2023).
 - Entries and targets save to the person's own rows in Supabase (Mumbai) and on the device; offline-first.
 - Account screen (person icon on Today): sign out, see where data is saved, delete my data.

@@ -2,6 +2,7 @@
 
 import type { Session } from '@supabase/supabase-js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { supabase } from './supabase';
 
@@ -65,7 +66,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     sendCode: async email => {
       if (!supabase) return 'Online accounts are not set up in this version.';
-      const { error } = await supabase.auth.signInWithOtp({ email: email.trim().toLowerCase() });
+      const redirect = Platform.OS === 'web' && typeof window !== 'undefined' ? window.location.origin : undefined;
+      const { error } = await supabase.auth.signInWithOtp({ email: email.trim().toLowerCase(), options: { emailRedirectTo: redirect } });
       return error ? explain(error.message) : null;
     },
 

@@ -42,17 +42,18 @@ export default function SignIn() {
         {!sentTo ? (
           <>
             <Text style={{ fontSize: 18, fontWeight: '600', color: colors.ink }}>Sign in or create your account</Text>
-            <Note>We'll email you a 6-digit code. No password needed.</Note>
+            <Note>We'll email you a sign-in link. No password needed.</Note>
             <Text style={s.fieldLabel}>Your email</Text>
             <TextInput style={s.input} value={email} onChangeText={setEmail} placeholder="you@example.com" placeholderTextColor={colors.muted}
               autoCapitalize="none" autoCorrect={false} keyboardType="email-address" textContentType="emailAddress" autoComplete="email" />
-            <Button title={busy ? 'Sending…' : 'Email me a code'} onPress={send} disabled={!emailOk || busy} />
+            <Button title={busy ? 'Sending…' : 'Email me a sign-in link'} onPress={send} disabled={!emailOk || busy} />
           </>
         ) : (
           <>
             <Text style={{ fontSize: 18, fontWeight: '600', color: colors.ink }}>Check your email</Text>
-            <Note>We sent a 6-digit code to {sentTo}. It can take a minute; look in Spam too.</Note>
-            <Text style={s.fieldLabel}>6-digit code</Text>
+            <Note>We sent an email to {sentTo}. Open it on this phone and tap the sign-in link. It can take a minute; look in Spam too.</Note>
+            <Note>If the email shows a 6-digit code instead, type it here:</Note>
+            <Text style={s.fieldLabel}>6-digit code (if your email has one)</Text>
             <TextInput style={[s.input, { fontSize: 24, letterSpacing: 6 }]} value={code} onChangeText={t => setCode(t.replace(/\D/g, '').slice(0, 6))}
               placeholder="123456" placeholderTextColor={colors.muted} keyboardType="number-pad" textContentType="oneTimeCode" autoComplete="one-time-code" />
             <Button title={busy ? 'Checking…' : 'Sign in'} onPress={verify} disabled={code.length !== 6 || busy} />

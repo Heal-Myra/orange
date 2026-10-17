@@ -3,7 +3,8 @@
 Date: 17 October 2026 · Decided by: founder, with Claude
 
 ## Decision
-- Sign-in with a 6-digit **email code** (Supabase email OTP). No passwords for people to forget.
+- Sign-in by **email link** (Supabase magic link), with a 6-digit code box as a second way in. No passwords for people to forget.
+- Supabase's free email service no longer allows editing templates without custom SMTP, and only sends to members of the Supabase organisation. Before public launch, set up a custom email service (SMTP, e.g. Resend) and switch the template to show the 6-digit code.
 - After first sign-in, a **privacy consent** screen (DPDP Act, 2023). Consent time and version are stored in `profiles`.
 - Entries always save on the device first, then to the person's own rows in Supabase (Mumbai) when signed in and consented.
 - People may use the app **without an account**; data then stays on that device.
@@ -15,4 +16,4 @@ row-level security limits every row to its owner. Secret keys are never stored i
 
 ## Founder setup done in the dashboard
 - Tables and security rules from `supabase/migrations/0001_init.sql` (run in the SQL Editor, 17 Oct 2026).
-- Magic Link email template changed to send `{{ .Token }}` (the 6-digit code).
+- Auth → URL Configuration: Site URL and redirect URL must include the web app address (https://project-heal.expo.app).
