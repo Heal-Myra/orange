@@ -7,6 +7,8 @@
 - App: "Snap a meal" on Body (every number editable before adding), guidance on Today, Explain + Reflect on Soul,
   "Pick the category for me" on Mind. All AI needs sign-in.
 - Deploy job for the function in the EAS workflow; new table `ai_requests` for the daily cap.
+- Switched on 17 Oct 2026: provider Claude (paid API), secrets set in Supabase, `ai_requests` created, deploy token in Expo.
+- Consent screen names Anthropic as the AI processor.
 
 ## 0.2.0 — 17 October 2026 (Milestone 2: Accounts and online saving)
 - Sign in with an email link (or a 6-digit code where the email shows one); option to use the app without an account.

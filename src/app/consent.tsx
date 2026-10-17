@@ -11,6 +11,7 @@ const POINTS = [
   ['What we keep', 'What you log in Project Heal: activity, sleep, meals, meditation, social-media time, practices and reflections, plus your daily scores and targets.'],
   ['Why', 'Only to show your well-being scores and give you guidance. We never sell your data or use it for advertising.'],
   ['Where', 'In a secure database in Mumbai, India. Only you can see your entries.'],
+  ['AI features', 'When you use a meal photo, guidance, verse explanation or reflection, only what that feature needs is sent to Anthropic (the maker of Claude) to produce the answer. Anthropic does not use it to train its AI.'],
   ['Your choices', 'You can stop at any time, and delete your data from the Account screen.'],
   ['Not medical advice', 'Project Heal is a working model to help you understand yourself. It does not diagnose or treat any condition.'],
 ];
