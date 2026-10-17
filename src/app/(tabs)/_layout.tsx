@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Tabs } from 'expo-router';
+import { Link, Tabs } from 'expo-router';
+import { Pressable } from 'react-native';
 import type { ComponentProps } from 'react';
 import type { ColorValue } from 'react-native';
 import { colors } from '../../theme';
@@ -23,7 +24,14 @@ export default function TabLayout() {
         tabBarInactiveTintColor: colors.muted,
       }}
     >
-      <Tabs.Screen name="index" options={{ ...tab('Today', 'sunny-outline', colors.accent), headerTitle: 'Project Heal' }} />
+      <Tabs.Screen name="index" options={{ ...tab('Today', 'sunny-outline', colors.accent), headerTitle: 'Project Heal',
+        headerRight: () => (
+          <Link href="/account" asChild>
+            <Pressable accessibilityLabel="Your account" hitSlop={10} style={{ paddingHorizontal: 16 }}>
+              <Ionicons name="person-circle-outline" size={26} color={colors.ink} />
+            </Pressable>
+          </Link>
+        ) }} />
       <Tabs.Screen name="body" options={tab('Body', 'leaf-outline', colors.body)} />
       <Tabs.Screen name="mind" options={tab('Mind', 'bulb-outline', colors.mind)} />
       <Tabs.Screen name="soul" options={tab('Soul', 'flame-outline', colors.soul)} />

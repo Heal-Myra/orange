@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.0 — 17 October 2026 (Milestone 2: Accounts and online saving)
+- Sign in with a 6-digit email code; option to use the app without an account.
+- Privacy consent screen after first sign-in (DPDP Act, 2023).
+- Entries and targets save to the person's own rows in Supabase (Mumbai) and on the device; offline-first.
+- Account screen (person icon on Today): sign out, see where data is saved, delete my data.
+- EAS Workflow: every push to main runs tests and deploys the web version to EAS Hosting.
+
 ## 0.1.1 — 17 October 2026
 - Linked to the Expo project (owner healmyra, project ID 354c8819-…).
 - Added EAS build profiles (`eas.json`) for development, preview and production builds.

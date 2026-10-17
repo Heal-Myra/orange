@@ -1,0 +1,25 @@
+# Every push to main: run the scoring tests, then publish the web version of the app to EAS Hosting
+# so the founder can try it on his iPhone at https://project-heal.expo.app
+name: Test and deploy web
+
+on:
+  push:
+    branches: ['main']
+
+jobs:
+  test:
+    steps:
+      - uses: eas/checkout
+      - uses: eas/install_node_modules
+      - name: Scoring tests
+        run: npm test
+      - name: Type check
+        run: npx tsc --noEmit
+
+  deploy_web:
+    needs: [test]
+    type: deploy
+    environment: production
+    params:
+      alias: project-heal
+      prod: true

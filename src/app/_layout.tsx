@@ -1,14 +1,43 @@
-import { Stack } from 'expo-router';
+import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { useEffect } from 'react';
+import { AuthProvider, useAuth } from '../lib/auth';
 import { HealProvider } from '../lib/store';
+import { colors } from '../theme';
+
+/** Sends people to sign-in or the privacy screen when they need it. */
+function Gate() {
+  const { ready, online, session, guest, consented } = useAuth();
+  const segments = useSegments();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!ready) return;
+    const here = segments[0] as string | undefined;
+    const needsSignIn = online && !session && !guest;
+    const needsConsent = !!session && !consented;
+    if (needsSignIn && here !== 'sign-in') router.replace('/sign-in');
+    else if (!needsSignIn && needsConsent && here !== 'consent') router.replace('/consent');
+    else if (!needsSignIn && !needsConsent && (here === 'sign-in' || here === 'consent')) router.replace('/');
+  }, [ready, online, session, guest, consented, segments, router]);
+
+  return (
+    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }}>
+      <Stack.Screen name="(tabs)" />
+      <Stack.Screen name="sign-in" />
+      <Stack.Screen name="consent" />
+      <Stack.Screen name="account" options={{ headerShown: true, title: 'Your account', presentation: 'modal' }} />
+    </Stack>
+  );
+}
 
 export default function RootLayout() {
   return (
-    <HealProvider>
-      <StatusBar style="dark" />
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(tabs)" />
-      </Stack>
-    </HealProvider>
+    <AuthProvider>
+      <HealProvider>
+        <StatusBar style="dark" />
+        <Gate />
+      </HealProvider>
+    </AuthProvider>
   );
 }
