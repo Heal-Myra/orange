@@ -115,7 +115,7 @@ async function mealPhoto(image: Image, hint: string) {
 ${hint ? `The person adds: "${hint}"` : ''}
 Break each item into its main raw ingredients with grams (include cooking oil or ghee). Also give your own estimate for the whole item.
 Reply with JSON only:
-{"items":[{"name":string,"grams":number,"ingredients":[{"ingredient":"plain raw name, e.g. wheat flour atta, bengal gram dal, ghee","grams":number}],
+{"items":[{"name":"short everyday name, at most 4 words, e.g. Roti, Moong dal, Aloo capsicum sabzi","grams":number,"ingredients":[{"ingredient":"plain raw name, e.g. wheat flour atta, bengal gram dal, ghee","grams":number}],
   "estimate":{"kcal":number,"protein_g":number,"carbs_g":number,"fat_g":number}}],
  "confidence":"low"|"medium"|"high","note":"one sentence on what was hardest to estimate",
  "insight":"one or two kind sentences on what this meal gives the body and one natural, food-first tweak"}

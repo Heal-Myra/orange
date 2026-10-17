@@ -9,6 +9,8 @@
 - Deploy job for the function in the EAS workflow; new table `ai_requests` for the daily cap.
 - Switched on 17 Oct 2026: provider Claude (paid API), secrets set in Supabase, `ai_requests` created, deploy token in Expo.
 - Consent screen names Anthropic as the AI processor.
+- Verified on the founder's iPhone, 17 Oct: Gita explanation and meal photo (roti, dal, sabzi) work.
+- Meal names from photos kept short; meal list shows whether numbers came from IFCT or an estimate.
 
 ## 0.2.0 — 17 October 2026 (Milestone 2: Accounts and online saving)
 - Sign in with an email link (or a 6-digit code where the email shows one); option to use the app without an account.
