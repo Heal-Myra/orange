@@ -16,9 +16,12 @@ Guiding document: *The Orange Book* (kept in the Project Heal project on Claude)
 | `docs/` | How things work and why decisions were made. |
 | `CHANGELOG.md` | A diary of what changed in each version. |
 
+## Try it
+Web version (updated automatically on every change): https://project-heal.expo.app
+
 ## Milestones
 1. **Foundations** — screens, scoring, bundled knowledge. ✅
-2. Accounts and online saving (Supabase).
+2. **Accounts and online saving** (Supabase, Mumbai). ✅ code done
 3. Automatic health data from Apple Health and Health Connect.
 4. AI: meal photos to macros, daily guidance, Gita explanations.
 5. Beta testing on phones, then the app stores.
