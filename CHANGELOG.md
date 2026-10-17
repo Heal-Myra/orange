@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.1 — 17 October 2026
+- Linked to the Expo project (owner healmyra, project ID 354c8819-…).
+- Added EAS build profiles (`eas.json`) for development, preview and production builds.
+- Added web support and a web preview published as a Claude artifact, so the founder can try the app on an iPhone before the Apple Developer account exists.
+
 ## 0.1.0 — 17 October 2026 (Milestone 1: Foundations)
 - New Expo app (SDK 58) with five tabs: Today, Body, Mind, Soul, Library.
 - Scoring engine for Body, Mind and Soul with 14 automated tests.

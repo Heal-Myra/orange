@@ -21,7 +21,9 @@
       "package": "in.happyorange.heal"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "output": "single",
+      "bundler": "metro"
     },
     "plugins": [
       "expo-router",
@@ -31,6 +33,11 @@
     "experiments": {
       "typedRoutes": true
     },
-    "owner": "healmyra"
+    "owner": "healmyra",
+    "extra": {
+      "eas": {
+        "projectId": "354c8819-fcf8-4359-8165-35e3738f2dc8"
+      }
+    }
   }
 }
