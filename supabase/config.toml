@@ -1,0 +1,5 @@
+# Supabase project settings used when deploying from CI.
+project_id = "vjhzlszubdinmesfvmex"
+
+[functions.heal-ai]
+verify_jwt = true

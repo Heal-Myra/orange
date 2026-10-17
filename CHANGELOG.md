@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.0 — 17 October 2026 (Milestone 4 begins: AI features, not yet switched on)
+- Server function `heal-ai` (Supabase, Mumbai) with five AI features: meal photo to macros grounded in IFCT 2017,
+  daily guidance, Gita verse explanation in English or Hindi, social-media content classifier, dharma reflection.
+- Works with Claude or Google Gemini (one setting); daily cap and tester allow-list built in.
+- App: "Snap a meal" on Body (every number editable before adding), guidance on Today, Explain + Reflect on Soul,
+  "Pick the category for me" on Mind. All AI needs sign-in.
+- Deploy job for the function in the EAS workflow; new table `ai_requests` for the daily cap.
+
 ## 0.2.0 — 17 October 2026 (Milestone 2: Accounts and online saving)
 - Sign in with an email link (or a 6-digit code where the email shows one); option to use the app without an account.
 - Privacy consent screen after first sign-in (DPDP Act, 2023).

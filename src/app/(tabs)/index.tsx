@@ -1,6 +1,7 @@
 // Today: the well-being score (Body + Mind + Soul, out of 300) and what makes it up.
 
 import { Text, View } from 'react-native';
+import { GuidanceCard } from '../../components/AiBits';
 import { Card, Heading, Meter, Note, Screen, Score, s } from '../../components/ui';
 import { band, wellBeing } from '../../lib/scoring';
 import { useHeal } from '../../lib/store';
@@ -20,6 +21,8 @@ export default function Today() {
         <Text style={{ color: colors.muted }}>of 300</Text>
         <Text style={{ marginTop: 6, fontWeight: '600', color: w.logged ? bandColor : colors.muted }}>{label}</Text>
       </Card>
+
+      <GuidanceCard />
 
       <Card>
         <Heading right={<Score value={w.body?.total} max={100} />}>Body</Heading>

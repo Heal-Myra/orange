@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
+import { ClassifyHelper } from '../../components/AiBits';
 import { Button, Card, Check, Heading, Meter, Note, NumberField, Screen, Score, s } from '../../components/ui';
 import { CONTENT_CATEGORIES, mindScore } from '../../lib/scoring';
 import { useHeal } from '../../lib/store';
@@ -48,6 +49,7 @@ export default function Mind() {
             <Text style={s.fieldLabel}>What kind of content was it?</Text>
             <Chips options={CONTENT_CATEGORIES.map(c => c.id)} labels={Object.fromEntries(CONTENT_CATEGORIES.map(c => [c.id, c.name]))}
               value={category} onChange={v => setCategory(v as ContentCategoryId)} />
+            <ClassifyHelper onPick={setCategory} />
             <NumberField label="Minutes" value={minutes} onChange={setMinutes} placeholder="30" />
             <Button title="Add session" onPress={add} />
           </View>

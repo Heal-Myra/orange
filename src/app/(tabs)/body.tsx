@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
+import { MealPhoto } from '../../components/MealPhoto';
 import { Button, Card, Heading, Meter, Note, NumberField, Screen, Score, Segmented, TextField, s } from '../../components/ui';
 import { foodByCode, per100g, searchFoods } from '../../lib/ifct';
 import { bodyScore, mealTotals } from '../../lib/scoring';
@@ -47,6 +48,8 @@ export default function Body() {
           </View>
         )) : <Note>No meals logged.</Note>}
       </Card>
+
+      <MealPhoto />
 
       <IfctAdd />
     </Screen>

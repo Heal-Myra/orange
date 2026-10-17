@@ -32,7 +32,15 @@
           "asyncRoutes": false
         }
       ],
-      "expo-font"
+      "expo-font",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Project Heal uses your photos to estimate the nutrition of your meals.",
+          "cameraPermission": "Project Heal uses the camera to photograph your meals and estimate their nutrition.",
+          "microphonePermission": false
+        }
+      ]
     ],
     "scheme": "projectheal",
     "experiments": {

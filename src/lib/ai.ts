@@ -1,0 +1,40 @@
+// Talks to the "heal-ai" server function in Supabase. The AI key never lives in the app.
+// Every AI feature needs the person to be signed in, so the daily cap and privacy rules apply.
+
+import { FunctionsHttpError } from '@supabase/supabase-js';
+import { supabase } from './supabase';
+import type { ContentCategoryId } from './types';
+
+export interface MealItem { name: string; grams: number; kcal: number; protein_g: number; carbs_g: number; fat_g: number; basis: 'IFCT' | 'estimate' }
+export interface MealResult { items: MealItem[]; confidence: string; note: string; insight: string }
+export interface Guidance { headline: string; body: string[]; mind: string[]; soul: string[] }
+export interface Reflection { principle: string; alignment: number; reflection: string }
+
+async function call<T>(action: string, payload: Record<string, unknown>): Promise<T> {
+  if (!supabase) throw new Error('AI features need the online version of the app.');
+  const { data: session } = await supabase.auth.getSession();
+  if (!session.session) throw new Error('Please sign in to use AI features.');
+  const { data, error } = await supabase.functions.invoke('heal-ai', { body: { action, payload } });
+  if (error) {
+    // The function sends a friendly message in its JSON body; show that when we can.
+    if (error instanceof FunctionsHttpError) {
+      const body = await error.context.json().catch(() => null);
+      if (body?.error) throw new Error(body.error);
+    }
+    throw new Error('Could not reach the AI just now. Check your connection and try again.');
+  }
+  if (data?.error) throw new Error(data.error);
+  return data.result as T;
+}
+
+export const analyseMeal = (image_base64: string, media_type: string, hint: string) =>
+  call<MealResult>('meal_photo', { image_base64, media_type, hint });
+
+export const dailyGuidance = (context: string) => call<Guidance>('guidance', { context });
+
+export const explainVerse = (v: { chapter: number; verse: number; sanskrit: string; transliteration: string }, lang: 'en' | 'hi') =>
+  call<{ text: string }>('explain_verse', { ...v, lang });
+
+export const classifyMedia = (text: string) => call<{ category: ContentCategoryId; reason: string }>('classify_media', { text });
+
+export const reflectOnAction = (text: string) => call<Reflection>('reflect_action', { text });

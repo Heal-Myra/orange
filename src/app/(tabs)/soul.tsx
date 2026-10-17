@@ -1,7 +1,8 @@
 // Soul / inner life: verse of the day and the eight practices, led by truthfulness and fairness (The Orange Book).
 
 import { Text } from 'react-native';
-import { Card, Check, Heading, Label, Note, Screen, Score } from '../../components/ui';
+import { ExplainVerse, ReflectCard } from '../../components/AiBits';
+import { Card, Check, Heading, Label, Screen, Score } from '../../components/ui';
 import { verseOfDay } from '../../lib/gita';
 import { PRACTICES, soulScore } from '../../lib/scoring';
 import { useHeal } from '../../lib/store';
@@ -18,7 +19,7 @@ export default function Soul() {
         <Label>Verse of the day · Bhagavad Gita {v.chapter}.{v.verse}</Label>
         <Text style={{ fontSize: 19, lineHeight: 30, color: colors.ink }}>{v.sanskrit}</Text>
         <Text style={{ fontStyle: 'italic', color: colors.muted }}>{v.transliteration}</Text>
-        <Note>Explanations in English and Hindi arrive with the AI features in Milestone 4.</Note>
+        <ExplainVerse verse={v} />
       </Card>
 
       <Card>
@@ -28,6 +29,8 @@ export default function Soul() {
             title={p.name} detail={p.meaning} points={p.points} tag={p.orangeBook ? 'ORANGE BOOK' : undefined} />
         ))}
       </Card>
+
+      <ReflectCard />
     </Screen>
   );
 }

@@ -23,3 +23,18 @@ jobs:
     params:
       alias: project-heal
       prod: true
+
+  deploy_ai:
+    # Publishes the AI server function (supabase/functions/heal-ai) to the Supabase project in Mumbai.
+    # Needs a SUPABASE_ACCESS_TOKEN secret in the Expo project's environment variables (production).
+    needs: [test]
+    environment: production
+    steps:
+      - uses: eas/checkout
+      - name: Deploy AI function to Supabase
+        run: |
+          if [ -z "$SUPABASE_ACCESS_TOKEN" ]; then
+            echo "SUPABASE_ACCESS_TOKEN is not set yet; skipping the AI function deploy."
+            exit 0
+          fi
+          npx -y supabase@2.121.0 functions deploy heal-ai --project-ref vjhzlszubdinmesfvmex --use-api

@@ -56,6 +56,7 @@ export interface DayLog {
   mind: { meditationMin?: number; attention?: boolean; learning?: boolean };
   dharma: Partial<Record<PracticeId, boolean>>;
   actions: ReflectedAction[];
+  guidance?: { headline: string; body: string[]; mind: string[]; soul: string[]; at: string };
 }
 
 export interface Profile {
