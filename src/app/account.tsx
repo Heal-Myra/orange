@@ -17,7 +17,7 @@ const SYNC_TEXT = {
 
 export default function Account() {
   const { session, online, signOut, deleteMyData } = useAuth();
-  const { sync, clearDevice } = useHeal();
+  const { sync, syncError, clearDevice } = useHeal();
   const [confirm, setConfirm] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
@@ -34,6 +34,7 @@ export default function Account() {
         <Heading>{session ? 'Signed in' : 'Not signed in'}</Heading>
         <Text style={{ color: colors.ink }}>{session?.user.email ?? 'You are using Project Heal on this device only.'}</Text>
         <Note>{SYNC_TEXT[sync]}</Note>
+        {sync === 'error' && syncError ? <Text selectable style={{ color: colors.bad, fontSize: 12 }}>Details for Claude: {syncError}</Text> : null}
         {session
           ? <Button kind="plain" title="Sign out" onPress={async () => { await signOut(); router.replace('/sign-in'); }} />
           : online ? <Button title="Sign in to save online" onPress={() => router.replace('/sign-in')} /> : null}

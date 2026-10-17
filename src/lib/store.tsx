@@ -23,6 +23,7 @@ interface HealState {
   days: Record<string, DayLog>;
   profile: Profile;
   sync: SyncStatus;
+  syncError: string | null;
   setDate: (iso: string) => void;
   goDay: (delta: number) => void;
   update: (change: (d: DayLog) => void) => void;
@@ -60,6 +61,12 @@ export function HealProvider({ children }: { children: ReactNode }) {
   const [days, setDays] = useState<Record<string, DayLog>>({});
   const [profile, setProfileState] = useState<Profile>(DEFAULT_PROFILE);
   const [sync, setSync] = useState<SyncStatus>('device');
+  const [syncError, setSyncError] = useState<string | null>(null);
+  const fail = useCallback((where: string, e: unknown) => {
+    const msg = e && typeof e === 'object' && 'message' in e ? String((e as { message: unknown }).message) : String(e);
+    setSyncError(`${where}: ${msg}`);
+    setSync('error');
+  }, []);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pushTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
@@ -92,7 +99,8 @@ export function HealProvider({ children }: { children: ReactNode }) {
         supabase.from('profiles').select('*').eq('user_id', userId).maybeSingle(),
       ]);
       if (cancelled) return;
-      if (logs.error || prof.error) { setSync('error'); return; }
+      if (logs.error) { fail('load days', logs.error); return; }
+      if (prof.error) { fail('load profile', prof.error); return; }
 
       const remote: Record<string, DayLog> = {};
       for (const r of logs.data ?? []) remote[r.day as string] = { ...emptyDay(r.day as string), ...(r.log as DayLog) };
@@ -107,16 +115,16 @@ export function HealProvider({ children }: { children: ReactNode }) {
       const onlyLocal = Object.values(days).filter(d => !remote[d.date]);
       if (onlyLocal.length) {
         const up = await supabase.from('day_logs').upsert(onlyLocal.map(d => toRow(userId, d, mergedProfile)));
-        if (up.error) { setSync('error'); return; }
+        if (up.error) { fail('upload days', up.error); return; }
       }
       const merged = { ...remote };
       for (const d of onlyLocal) merged[d.date] = d;
       if (!cancelled) {
         setDays(merged);
         persistLocal({ days: merged, profile: mergedProfile });
-        setSync('saved');
+        setSync('saved'); setSyncError(null);
       }
-    })().catch(() => !cancelled && setSync('error'));
+    })().catch(e => !cancelled && fail('sync', e));
     return () => { cancelled = true; };
     // Runs when the person signs in or out, not on every edit.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -128,9 +136,9 @@ export function HealProvider({ children }: { children: ReactNode }) {
     setSync('syncing');
     pushTimers.current[d.date] = setTimeout(async () => {
       const { error } = await supabase!.from('day_logs').upsert(toRow(userId, d, p));
-      setSync(error ? 'error' : 'saved');
+      if (error) fail('save day', error); else { setSync('saved'); setSyncError(null); }
     }, 800);
-  }, [userId]);
+  }, [userId, fail]);
 
   const update = useCallback((change: (d: DayLog) => void) => {
     setDays(prev => {
@@ -148,9 +156,9 @@ export function HealProvider({ children }: { children: ReactNode }) {
     persistLocal({ days, profile: p });
     if (userId && supabase) {
       setSync('syncing');
-      supabase.from('profiles').upsert(profileRow(userId, p)).then(({ error }) => setSync(error ? 'error' : 'saved'));
+      supabase.from('profiles').upsert(profileRow(userId, p)).then(({ error }) => { if (error) fail('save targets', error); else setSync('saved'); });
     }
-  }, [days, persistLocal, userId]);
+  }, [days, persistLocal, userId, fail]);
 
   const clearDevice = useCallback(async () => {
     setDays({});
@@ -159,10 +167,10 @@ export function HealProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo<HealState>(() => ({
-    ready, date, days, profile, sync, update, setProfile, setDate, clearDevice,
+    ready, date, days, profile, sync, syncError, update, setProfile, setDate, clearDevice,
     day: days[date] ?? emptyDay(date),
     goDay: (delta: number) => setDate(d => { const n = shiftISO(d, delta); return n > todayISO() ? d : n; }),
-  }), [ready, date, days, profile, sync, update, setProfile, clearDevice]);
+  }), [ready, date, days, profile, sync, syncError, update, setProfile, clearDevice]);
 
   return <HealContext.Provider value={value}>{children}</HealContext.Provider>;
 }
