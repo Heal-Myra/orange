@@ -1,16 +1,17 @@
-// Colours follow the prototype: earth green for Body, sky blue for Mind, saffron for Soul (Happy Orange).
+// Happy Orange theme (19 Oct 2026): soft orange background, white cards, deep orange buttons.
+// Pillar colours: earth green for Body, sky blue for Mind, saffron for Soul.
 
 export const colors = {
-  bg: '#F1F2F7',
+  bg: '#FFD9B3',
   surface: '#FFFFFF',
-  sunk: '#E8EAF2',
+  sunk: '#FBE3CC',
   ink: '#1A1C2B',
   muted: '#5D6278',
-  line: '#D9DCE7',
+  line: '#EFD3B8',
   body: '#2F8A57',
   mind: '#3566D6',
   soul: '#D9821A',
-  accent: '#272B66',
+  accent: '#C2500A',
   onAccent: '#FFFFFF',
   good: '#2F8A57',
   warn: '#B7791F',

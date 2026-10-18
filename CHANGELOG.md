@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.4.1 — 19 October 2026
+- Orange theme: soft orange background, white cards, deep orange buttons (text contrast checked).
+
 ## 0.4.0 — 18 October 2026 (Tao Te Ching week)
 - New weekly practice inspired by the Tao Te Ching (written by the founder): a different practice each day, with a private note and a tick.
   Mind days: Mon observation, Tue breathing, Thu listening, Fri emptiness, Sun "Who knows?". Soul days: Wed antidote, Sat letting go of a dry leaf.
