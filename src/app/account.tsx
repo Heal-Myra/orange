@@ -16,7 +16,7 @@ const SYNC_TEXT = {
 } as const;
 
 export default function Account() {
-  const { session, online, signOut, deleteMyData } = useAuth();
+  const { session, online, signOut, deleteMyData, leaveGuest } = useAuth();
   const { sync, syncError, clearDevice } = useHeal();
   const [confirm, setConfirm] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -38,7 +38,7 @@ export default function Account() {
         {sync === 'error' && syncError ? <Text selectable style={{ color: colors.bad, fontSize: 12 }}>Details for Claude: {syncError}</Text> : null}
         {session
           ? <Button kind="plain" title="Sign out" onPress={async () => { await signOut(); router.replace('/sign-in'); }} />
-          : online ? <Button title="Sign in to save online" onPress={() => router.replace('/sign-in')} /> : null}
+          : online ? <Button title="Sign in to save online" onPress={async () => { await leaveGuest(); router.replace('/sign-in'); }} /> : null}
       </Card>
 
       {session && (

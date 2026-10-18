@@ -20,6 +20,7 @@ interface AuthState {
   verifyLink: (link: string) => Promise<string | null>;
   giveConsent: () => Promise<string | null>;
   continueAsGuest: () => void;
+  leaveGuest: () => Promise<void>; // guest decides to sign in after all
   signOut: () => Promise<void>;
   deleteMyData: () => Promise<string | null>;
 }
@@ -113,6 +114,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     continueAsGuest: () => {
       setGuest(true);
       AsyncStorage.setItem(GUEST_KEY, '1').catch(() => {});
+    },
+
+    leaveGuest: async () => {
+      await AsyncStorage.removeItem(GUEST_KEY).catch(() => {});
+      setGuest(false);
     },
 
     signOut: async () => {
