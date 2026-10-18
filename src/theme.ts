@@ -1,22 +1,24 @@
-// Happy Orange theme (19 Oct 2026): a soft orange-fruit (tangerine) background
-// with frosted-glass cards (translucent white, blurred on the web) in the style of Apple's glass design.
-// Pillar colours: green Body, blue Mind, burnt saffron Soul.
+// Happy Orange theme "Marigold & leaf" (chosen by the founder, 19 Oct 2026):
+// marigold yellow background for happiness, leaf green for health (buttons, progress, ticks),
+// a deep orange for the Happy Orange name, and frosted-glass cards in the style of Apple's glass design.
+// Pillar colours: leaf green Body, blue Mind, burnt saffron Soul.
 // Text contrast was checked against the orange and the glass cards.
 
 export const colors = {
-  bg: '#FFBE85',
+  bg: '#FFE0A3',
   surface: 'rgba(255,255,255,0.40)', // glass card
   field: 'rgba(255,255,255,0.60)', // text boxes
   sunk: 'rgba(255,255,255,0.45)', // meter tracks
   ink: '#1A1C2B',
   muted: '#4A3A30',
   line: 'rgba(255,255,255,0.65)',
-  body: '#1F6B40',
+  body: '#276B2B',
   mind: '#2A55B8',
   soul: '#9A3B12',
-  accent: '#A33A1F',
+  accent: '#276B2B',
   onAccent: '#FFFFFF',
-  good: '#1F6B40',
+  brand: '#B4450A', // the orange of the Happy Orange name
+  good: '#276B2B',
   warn: '#7C4A03',
   bad: '#A11D1D',
 };

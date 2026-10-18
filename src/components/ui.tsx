@@ -149,7 +149,7 @@ export const s = StyleSheet.create({
   dayBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: space.md },
   dayBtn: { padding: space.sm },
   dayText: { fontSize: 16, fontWeight: '600', color: colors.ink, minWidth: 130, textAlign: 'center' },
-  card: { backgroundColor: colors.surface, borderRadius: radius.lg + 4, borderWidth: 1, borderColor: colors.line, padding: space.lg, gap: space.md, ...(Platform.OS === 'web' ? glass : {}), boxShadow: '0 8px 24px rgba(120, 60, 0, 0.12)' },
+  card: { backgroundColor: colors.surface, borderRadius: radius.lg + 4, borderWidth: 1, borderColor: colors.line, padding: space.lg, gap: space.md, ...(Platform.OS === 'web' ? glass : {}), boxShadow: '0 8px 24px rgba(110, 80, 0, 0.12)' },
   headingRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: space.sm },
   heading: { fontSize: 20, fontWeight: '600', color: colors.ink, flexShrink: 1 },
   note: { fontSize: 13, color: colors.muted, lineHeight: 19 },

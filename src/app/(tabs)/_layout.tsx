@@ -20,11 +20,11 @@ export default function TabLayout() {
         headerStyle: { backgroundColor: colors.bg },
         headerShadowVisible: false,
         headerTitleStyle: { color: colors.ink, fontWeight: '600' },
-        tabBarStyle: { backgroundColor: '#FFDEC2', borderTopColor: colors.line },
+        tabBarStyle: { backgroundColor: '#FFEFCC', borderTopColor: colors.line },
         tabBarInactiveTintColor: colors.muted,
       }}
     >
-      <Tabs.Screen name="index" options={{ ...tab('Today', 'sunny-outline', colors.accent), headerTitle: 'Happy Orange',
+      <Tabs.Screen name="index" options={{ ...tab('Today', 'sunny-outline', colors.accent), headerTitle: 'Happy Orange', headerTitleStyle: { color: colors.brand, fontWeight: '700' },
         headerRight: () => (
           <Link href="/account" asChild>
             <Pressable accessibilityLabel="Your account" hitSlop={10} style={{ paddingHorizontal: 16 }}>

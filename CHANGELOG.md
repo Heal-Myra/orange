@@ -1,7 +1,7 @@
 # Changelog
 
 ## 0.4.1 — 19 October 2026
-- Orange theme: soft orange-fruit (tangerine) background, frosted-glass cards, warm orange-brown buttons (text contrast checked). A vivid orange was tried and felt too strong.
+- Theme "Marigold & leaf" (founder's choice): marigold-yellow background for happiness, leaf-green buttons, progress and ticks for health, deep-orange Happy Orange name, frosted-glass cards. Orange variants were tried first.
 
 ## 0.4.0 — 18 October 2026 (Tao Te Ching week)
 - New weekly practice inspired by the Tao Te Ching (written by the founder): a different practice each day, with a private note and a tick.
