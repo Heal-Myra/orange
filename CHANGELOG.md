@@ -3,6 +3,7 @@
 ## 0.3.2 — 18 October 2026
 - The app is now called **Happy Orange** everywhere people see it (sign-in, Today, consent, account, camera/photo permissions, AI guide). Web address stays project-heal.expo.app for now.
 - Removed the old "paste the sign-in link" box; sign-in is by the 6-digit code only.
+- New home: https://app.happyorange.in (Cloudflare Pages). See docs/decisions/0006-web-hosting.md.
 - Fix: "Sign in to save online" on the Account screen did nothing for people who had chosen "Use without an account" (the app sent them straight back to Today).
 - Clearer message when the hourly limit on sign-in emails is reached.
 - Sign-in emails now come from Happy Orange <hello@happyorange.in> (Resend) and contain a 6-digit code; the sign-in screen asks for the code. See docs/decisions/0005-email-sending.md.

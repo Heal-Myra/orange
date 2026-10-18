@@ -17,7 +17,7 @@ Guiding document: *The Orange Book* (kept in the Project Heal project on Claude)
 | `CHANGELOG.md` | A diary of what changed in each version. |
 
 ## Try it
-Web version (updated automatically on every change): https://project-heal.expo.app
+Web version (updated automatically on every change): https://app.happyorange.in (backup: https://happyorange.pages.dev)
 
 ## Milestones
 1. **Foundations** — screens, scoring, bundled knowledge. ✅
