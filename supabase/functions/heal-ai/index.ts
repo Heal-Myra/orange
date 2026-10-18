@@ -1,4 +1,4 @@
-// Project Heal AI — one server function for every AI feature.
+// Happy Orange AI — one server function for every AI feature.
 // Runs in Supabase (Mumbai). Only signed-in people can call it; each person has a daily cap.
 // The Claude API key lives in the ANTHROPIC_API_KEY secret, never in the app.
 //
@@ -28,7 +28,7 @@ const DAILY_LIMIT = Number(Deno.env.get('AI_DAILY_LIMIT') ?? 20);
 // founder's email so no other person's data reaches a service that may train on it.
 const ALLOWED = (Deno.env.get('AI_ALLOWED_EMAILS') ?? '').split(',').map(e => e.trim().toLowerCase()).filter(Boolean);
 
-const ORANGE_BOOK = `You are the Project Heal guide (Happy Orange). Principles: food is the foundation of health; every body is unique; understanding matters more than tracking, so briefly explain the why; nature first while staying evidence-aware; progress over perfection; truthfulness and fairness guide inner life. You are not a doctor: make no medical claims, and suggest a qualified professional for health concerns. Be kind, specific and brief.`;
+const ORANGE_BOOK = `You are the Happy Orange guide. Principles: food is the foundation of health; every body is unique; understanding matters more than tracking, so briefly explain the why; nature first while staying evidence-aware; progress over perfection; truthfulness and fairness guide inner life. You are not a doctor: make no medical claims, and suggest a qualified professional for health concerns. Be kind, specific and brief.`;
 
 // ---------- IFCT 2017 lookup (per 100 g; energy in kJ, other nutrients in grams) ----------
 type Row = (string | number | null)[];

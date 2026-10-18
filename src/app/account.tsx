@@ -33,7 +33,7 @@ export default function Account() {
       <Button kind="plain" title="‹ Back to Today" onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))} />
       <Card>
         <Heading>{session ? 'Signed in' : 'Not signed in'}</Heading>
-        <Text style={{ color: colors.ink }}>{session?.user.email ?? 'You are using Project Heal on this device only.'}</Text>
+        <Text style={{ color: colors.ink }}>{session?.user.email ?? 'You are using Happy Orange on this device only.'}</Text>
         <Note>{SYNC_TEXT[sync]}</Note>
         {sync === 'error' && syncError ? <Text selectable style={{ color: colors.bad, fontSize: 12 }}>Details for Claude: {syncError}</Text> : null}
         {session

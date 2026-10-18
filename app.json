@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Project Heal",
+    "name": "Happy Orange",
     "slug": "project-heal",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -21,6 +21,8 @@
       "package": "in.happyorange.heal"
     },
     "web": {
+      "name": "Happy Orange",
+      "shortName": "Happy Orange",
       "favicon": "./assets/favicon.png",
       "output": "single",
       "bundler": "metro"
@@ -36,8 +38,8 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "Project Heal uses your photos to estimate the nutrition of your meals.",
-          "cameraPermission": "Project Heal uses the camera to photograph your meals and estimate their nutrition.",
+          "photosPermission": "Happy Orange uses your photos to estimate the nutrition of your meals.",
+          "cameraPermission": "Happy Orange uses the camera to photograph your meals and estimate their nutrition.",
           "microphonePermission": false
         }
       ]

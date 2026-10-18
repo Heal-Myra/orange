@@ -42,7 +42,7 @@ export default function SignIn() {
   return (
     <Screen showDay={false}>
       <View style={{ gap: 6, paddingTop: 32 }}>
-        <Text style={{ fontSize: 30, color: colors.ink, fontWeight: '600' }}>Project Heal</Text>
+        <Text style={{ fontSize: 30, color: colors.ink, fontWeight: '600' }}>Happy Orange</Text>
         <Text style={{ fontSize: 15, color: colors.muted }}>Body, mind and inner life in harmony</Text>
       </View>
 

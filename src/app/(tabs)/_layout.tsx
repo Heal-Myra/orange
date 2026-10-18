@@ -24,7 +24,7 @@ export default function TabLayout() {
         tabBarInactiveTintColor: colors.muted,
       }}
     >
-      <Tabs.Screen name="index" options={{ ...tab('Today', 'sunny-outline', colors.accent), headerTitle: 'Project Heal',
+      <Tabs.Screen name="index" options={{ ...tab('Today', 'sunny-outline', colors.accent), headerTitle: 'Happy Orange',
         headerRight: () => (
           <Link href="/account" asChild>
             <Pressable accessibilityLabel="Your account" hitSlop={10} style={{ paddingHorizontal: 16 }}>
