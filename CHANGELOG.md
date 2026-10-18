@@ -1,7 +1,7 @@
 # Changelog
 
 ## 0.4.1 — 19 October 2026
-- Today: the well-being score is now one ring made of three parts (Body, Mind, Soul) that together complete the circle; each part fills by its score, and tapping a part opens that tab. Uses react-native-svg.
+- Today: the well-being score is now one circle of three flowing sections (Body, Mind, Soul) that meet along water-like S-curves with no gaps; each section fills from the inside like liquid in proportion to its score, and tapping a section opens that tab. The separate Body/Mind/Soul cards were removed from Today (the detail lives on each tab). Uses react-native-svg.
 - **Myra**, the in-app assistant: a floating "Myra" button on every tab opens a chat. She knows the app's tabs and scoring, sees a summary of your own targets, today and the last 7 days, and suggests questions for the tab you came from. Needs sign-in; each message counts towards the daily AI limit. Chat is kept on the device (last 40 messages).
 - Theme "Marigold & leaf" (founder's choice): marigold-yellow background for happiness, leaf-green buttons, progress and ticks for health, deep-orange Happy Orange name, frosted-glass cards. Orange variants were tried first.
 
