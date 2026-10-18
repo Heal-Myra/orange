@@ -31,6 +31,7 @@ const AuthContext = createContext<AuthState | null>(null);
 function explain(message: string): string {
   const m = message.toLowerCase();
   if (m.includes('expired') || m.includes('invalid')) return 'That code is wrong or has expired. Check the latest email, or ask for a new code.';
+  if (m.includes('email rate limit')) return 'Too many sign-in emails were sent in the last hour. Please check your inbox for the last one, or try again in about an hour.';
   if (m.includes('rate') || m.includes('seconds')) return 'Please wait a minute before asking for another code.';
   if (m.includes('network') || m.includes('fetch')) return 'Could not reach the internet. Check your connection and try again.';
   return message;
