@@ -2,6 +2,7 @@
 
 import { Text, View } from 'react-native';
 import { GuidanceCard } from '../../components/AiBits';
+import { WellBeingRing } from '../../components/WellBeingRing';
 import { Card, Heading, Meter, Note, Screen, Score, s } from '../../components/ui';
 import { band, wellBeing } from '../../lib/scoring';
 import { useHeal } from '../../lib/store';
@@ -16,10 +17,7 @@ export default function Today() {
   return (
     <Screen>
       <Card style={{ alignItems: 'center', gap: 4 }}>
-        <Text style={s.label}>Well-being</Text>
-        <Text style={{ fontSize: 56, color: colors.ink, fontVariant: ['tabular-nums'] }}>{Math.round(w.total)}</Text>
-        <Text style={{ color: colors.muted }}>of 300</Text>
-        <Text style={{ marginTop: 6, fontWeight: '600', color: w.logged ? bandColor : colors.muted }}>{label}</Text>
+        <WellBeingRing w={w} label={label} labelColor={w.logged ? bandColor : colors.muted} />
       </Card>
 
       <GuidanceCard />
