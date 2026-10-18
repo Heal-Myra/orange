@@ -3,6 +3,7 @@
 ## 0.3.2 — 18 October 2026
 - Fix: "Sign in to save online" on the Account screen did nothing for people who had chosen "Use without an account" (the app sent them straight back to Today).
 - Clearer message when the hourly limit on sign-in emails is reached.
+- Sign-in emails now come from Happy Orange <hello@happyorange.in> (Resend) and contain a 6-digit code; the sign-in screen asks for the code. See docs/decisions/0005-email-sending.md.
 
 ## 0.3.1 — 17 October 2026
 - Sign-in by pasting the email link, for the iPhone home-screen app (which cannot receive tapped email links).
