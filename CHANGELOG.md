@@ -6,6 +6,7 @@
   The card appears on the Mind or Soul tab; doing it adds 10 points to that pillar (capped at 100). Sunday shows the end-of-week review with Monday's note.
 - Library: new **Tao** section with the core teaching (returning and gentleness), the whole week, the end-of-week review and "when a door will not open".
 - AI guidance now knows today's Tao practice and can suggest it.
+- Fix: icons showed as empty boxes on app.happyorange.in (Cloudflare skips folders named node_modules); the web build now renames that folder.
 
 ## 0.3.2 — 18 October 2026
 - The app is now called **Happy Orange** everywhere people see it (sign-in, Today, consent, account, camera/photo permissions, AI guide). Web address stays project-heal.expo.app for now.
