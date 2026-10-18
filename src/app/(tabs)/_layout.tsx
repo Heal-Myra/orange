@@ -20,7 +20,7 @@ export default function TabLayout() {
         headerStyle: { backgroundColor: colors.bg },
         headerShadowVisible: false,
         headerTitleStyle: { color: colors.ink, fontWeight: '600' },
-        tabBarStyle: { backgroundColor: colors.surface, borderTopColor: colors.line },
+        tabBarStyle: { backgroundColor: '#F6A77B', borderTopColor: colors.line },
         tabBarInactiveTintColor: colors.muted,
       }}
     >

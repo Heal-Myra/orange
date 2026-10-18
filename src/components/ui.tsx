@@ -2,11 +2,11 @@
 
 import { Ionicons } from '@expo/vector-icons';
 import type { ReactNode } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View, type StyleProp, type ViewStyle } from 'react-native';
+import { Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View, type StyleProp, type ViewStyle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { formatDay, todayISO } from '../lib/dates';
 import { useHeal } from '../lib/store';
-import { colors, radius, space } from '../theme';
+import { colors, glass, radius, space } from '../theme';
 
 export function Screen({ children, showDay = true }: { children: ReactNode; showDay?: boolean }) {
   return (
@@ -149,7 +149,7 @@ export const s = StyleSheet.create({
   dayBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: space.md },
   dayBtn: { padding: space.sm },
   dayText: { fontSize: 16, fontWeight: '600', color: colors.ink, minWidth: 130, textAlign: 'center' },
-  card: { backgroundColor: colors.surface, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.line, padding: space.lg, gap: space.md },
+  card: { backgroundColor: colors.surface, borderRadius: radius.lg + 4, borderWidth: 1, borderColor: colors.line, padding: space.lg, gap: space.md, ...(Platform.OS === 'web' ? glass : {}), boxShadow: '0 8px 24px rgba(80, 30, 0, 0.18)' },
   headingRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: space.sm },
   heading: { fontSize: 20, fontWeight: '600', color: colors.ink, flexShrink: 1 },
   note: { fontSize: 13, color: colors.muted, lineHeight: 19 },
@@ -162,7 +162,7 @@ export const s = StyleSheet.create({
   fill: { height: '100%', borderRadius: 99 },
   field: { gap: 4, flex: 1, minWidth: 120 },
   fieldLabel: { fontSize: 13, fontWeight: '600', color: colors.muted },
-  input: { borderWidth: 1, borderColor: colors.line, borderRadius: radius.sm, paddingHorizontal: 10, paddingVertical: 9, fontSize: 16, color: colors.ink, backgroundColor: colors.bg },
+  input: { borderWidth: 1, borderColor: colors.line, borderRadius: radius.sm, paddingHorizontal: 10, paddingVertical: 9, fontSize: 16, color: colors.ink, backgroundColor: colors.field },
   check: { flexDirection: 'row', alignItems: 'center', gap: space.md, borderWidth: 1, borderColor: colors.line, borderRadius: radius.md, padding: space.md, backgroundColor: colors.surface },
   checkTitle: { fontSize: 16, fontWeight: '600', color: colors.ink },
   checkDetail: { fontSize: 13, color: colors.muted },
