@@ -2,6 +2,7 @@
 
 import { Text } from 'react-native';
 import { ExplainVerse, ReflectCard } from '../../components/AiBits';
+import { TaoCard } from '../../components/TaoCard';
 import { Card, Check, Heading, Label, Screen, Score } from '../../components/ui';
 import { verseOfDay } from '../../lib/gita';
 import { PRACTICES, soulScore } from '../../lib/scoring';
@@ -29,6 +30,8 @@ export default function Soul() {
             title={p.name} detail={p.meaning} points={p.points} tag={p.orangeBook ? 'ORANGE BOOK' : undefined} />
         ))}
       </Card>
+
+      <TaoCard on="soul" />
 
       <ReflectCard />
     </Screen>

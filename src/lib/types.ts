@@ -56,6 +56,7 @@ export interface DayLog {
   mind: { meditationMin?: number; attention?: boolean; learning?: boolean };
   dharma: Partial<Record<PracticeId, boolean>>;
   actions: ReflectedAction[];
+  tao?: { done?: boolean; note?: string }; // the day's Tao Te Ching practice (src/lib/tao.ts)
   guidance?: { headline: string; body: string[]; mind: string[]; soul: string[]; at: string };
 }
 

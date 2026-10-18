@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { ClassifyHelper } from '../../components/AiBits';
+import { TaoCard } from '../../components/TaoCard';
 import { Button, Card, Check, Heading, Meter, Note, NumberField, Screen, Score, s } from '../../components/ui';
 import { CONTENT_CATEGORIES, mindScore } from '../../lib/scoring';
 import { useHeal } from '../../lib/store';
@@ -62,6 +63,8 @@ export default function Mind() {
         ))}
         <Note>Quality earns up to 35 points and staying within your {profile.mediaLimit}-minute limit earns up to 25.</Note>
       </Card>
+
+      <TaoCard on="mind" />
     </Screen>
   );
 }

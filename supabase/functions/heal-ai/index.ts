@@ -28,7 +28,7 @@ const DAILY_LIMIT = Number(Deno.env.get('AI_DAILY_LIMIT') ?? 20);
 // founder's email so no other person's data reaches a service that may train on it.
 const ALLOWED = (Deno.env.get('AI_ALLOWED_EMAILS') ?? '').split(',').map(e => e.trim().toLowerCase()).filter(Boolean);
 
-const ORANGE_BOOK = `You are the Happy Orange guide. Principles: food is the foundation of health; every body is unique; understanding matters more than tracking, so briefly explain the why; nature first while staying evidence-aware; progress over perfection; truthfulness and fairness guide inner life. You are not a doctor: make no medical claims, and suggest a qualified professional for health concerns. Be kind, specific and brief.`;
+const ORANGE_BOOK = `You are the Happy Orange guide. Principles: food is the foundation of health; every body is unique; understanding matters more than tracking, so briefly explain the why; nature first while staying evidence-aware; progress over perfection; truthfulness and fairness guide inner life. The app also teaches a weekly practice inspired by the Tao Te Ching: returning is the movement of the Tao and gentleness is its action; peace comes from stopping and letting go, not from chasing. You are not a doctor: make no medical claims, and suggest a qualified professional for health concerns. Be kind, specific and brief.`;
 
 // ---------- IFCT 2017 lookup (per 100 g; energy in kJ, other nutrients in grams) ----------
 type Row = (string | number | null)[];
@@ -172,8 +172,8 @@ ${String(p.context ?? '').slice(0, 6000)}
 Give practical guidance for the rest of today and tomorrow morning. Reply with JSON only:
 {"headline":"one sentence naming the single most useful shift",
  "body":["food suggestion with a short why","movement or sleep suggestion"],
- "mind":["meditation or attention suggestion with a duration","learning or content-diet suggestion"],
- "soul":["truthfulness, fairness or service suggestion; name the verse of the day if it fits","suggestion"]}
+ "mind":["meditation or attention suggestion with a duration","learning or content-diet suggestion; draw on today's Tao practice when it fits"],
+ "soul":["truthfulness, fairness or service suggestion; name the verse of the day if it fits","suggestion drawing on the Gita or today's Tao practice (returning, gentleness, letting go)"]}
 Each suggestion under 28 words.`));
     }
     case 'explain_verse': {

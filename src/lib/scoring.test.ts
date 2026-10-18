@@ -113,3 +113,39 @@ describe('band', () => {
     expect(band(50)).toBe('Needs care');
   });
 });
+
+describe('Tao practice', () => {
+  // 2026-10-19 is a Monday (observation, Mind); 2026-10-21 is a Wednesday (antidote, Soul).
+  it('adds 10 to Mind on a Mind day, nothing to Soul', () => {
+    const d = emptyDay('2026-10-19');
+    d.tao = { done: true };
+    expect(mindScore(d, P)!.total).toBe(10);
+    expect(soulScore(d)).toBeNull();
+  });
+
+  it('adds 10 to Soul on a Soul day, nothing to Mind', () => {
+    const d = emptyDay('2026-10-21');
+    d.tao = { done: true };
+    expect(soulScore(d)!.total).toBe(10);
+    expect(mindScore(d, P)).toBeNull();
+  });
+
+  it('never takes Mind or Soul above 100', () => {
+    const m = emptyDay('2026-10-19');
+    m.tao = { done: true };
+    m.mind = { meditationMin: 20, attention: true, learning: true };
+    m.noMedia = true;
+    expect(mindScore(m, P)!.total).toBe(100);
+    const s = emptyDay('2026-10-21');
+    s.tao = { done: true };
+    s.dharma = { satya: true, nyaya: true, kartavya: true, seva: true, ahimsa: true, daana: true, santosha: true, kritajnata: true };
+    expect(soulScore(s)!.total).toBe(100);
+  });
+
+  it('does nothing when only a note is written', () => {
+    const d = emptyDay('2026-10-19');
+    d.tao = { note: 'chasing approval' };
+    expect(mindScore(d, P)).toBeNull();
+    expect(soulScore(d)).toBeNull();
+  });
+});

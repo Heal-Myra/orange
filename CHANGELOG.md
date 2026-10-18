@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.0 — 18 October 2026 (Tao Te Ching week)
+- New weekly practice inspired by the Tao Te Ching (written by the founder): a different practice each day, with a private note and a tick.
+  Mind days: Mon observation, Tue breathing, Thu listening, Fri emptiness, Sun "Who knows?". Soul days: Wed antidote, Sat letting go of a dry leaf.
+  The card appears on the Mind or Soul tab; doing it adds 10 points to that pillar (capped at 100). Sunday shows the end-of-week review with Monday's note.
+- Library: new **Tao** section with the core teaching (returning and gentleness), the whole week, the end-of-week review and "when a door will not open".
+- AI guidance now knows today's Tao practice and can suggest it.
+
 ## 0.3.2 — 18 October 2026
 - The app is now called **Happy Orange** everywhere people see it (sign-in, Today, consent, account, camera/photo permissions, AI guide). Web address stays project-heal.expo.app for now.
 - Removed the old "paste the sign-in link" box; sign-in is by the 6-digit code only.

@@ -6,6 +6,7 @@ import { classifyMedia, dailyGuidance, explainVerse, reflectOnAction } from '../
 import { useAuth } from '../lib/auth';
 import { shiftISO } from '../lib/dates';
 import { verseOfDay, type Verse } from '../lib/gita';
+import { TAO_FOR_AI, taoForDate } from '../lib/tao';
 import { CONTENT_CATEGORIES, PRACTICES, mealTotals, wellBeing } from '../lib/scoring';
 import { useHeal } from '../lib/store';
 import type { ContentCategoryId } from '../lib/types';
@@ -37,6 +38,8 @@ export function GuidanceCard() {
       `Soul practices kept: ${PRACTICES.filter(p => day.dharma[p.id]).map(p => p.name).join(', ') || 'none logged'}. Reflections: ${day.actions.map(a => a.text).join(' | ') || 'none'}.`,
       `Scores out of 100: body ${w.body ? Math.round(w.body.total) : 'not logged'}, mind ${w.mind ? Math.round(w.mind.total) : 'not logged'}, soul ${w.soul ? Math.round(w.soul.total) : 'not logged'}.`,
       `Verse of the day: Bhagavad Gita ${v.chapter}.${v.verse} (${v.transliteration.replace(/\n/g, ' ')}).`,
+      `Today's Tao practice (${taoForDate(date).pillar}): ${taoForDate(date).title}: ${taoForDate(date).practice[0]} Done: ${day.tao?.done ? 'yes' : 'not yet'}.`,
+      TAO_FOR_AI,
       `Last 7 days:\n${week}`,
     ].join('\n');
     try {

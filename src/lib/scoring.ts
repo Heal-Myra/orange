@@ -3,6 +3,7 @@
 // A working model to help people understand themselves, not a medical measure
 // (The Orange Book, Chapter 2). Weights are documented in docs/scoring.md.
 
+import { TAO_POINTS, taoForDate } from './tao';
 import type { ContentCategoryId, DayLog, Meal, PracticeId, Profile } from './types';
 
 export const CONTENT_CATEGORIES: { id: ContentCategoryId; name: string; weight: number }[] = [
@@ -83,12 +84,14 @@ export interface MindScore {
   content: number | null; // /60, null when social media not logged
   minutes: number;
   quality: number | null; // 0–1 share of nourishing content
+  tao: number; // points from the day's Tao practice
 }
 
-/** Mind: meditation, attention, learning (40) + social-media content diet (60). */
+/** Mind: meditation, attention, learning (40) + social-media content diet (60) + Tao practice bonus, capped at 100. */
 export function mindScore(d: DayLog, P: Profile): MindScore | null {
   const m = d.mind;
-  const hasPractice = m.meditationMin != null || !!m.attention || !!m.learning;
+  const tao = taoPoints(d, 'mind');
+  const hasPractice = m.meditationMin != null || !!m.attention || !!m.learning || tao > 0;
   const practices = 20 * c01((m.meditationMin ?? 0) / P.meditation) + (m.attention ? 10 : 0) + (m.learning ? 10 : 0);
 
   let content: number | null = null, minutes = 0, quality: number | null = null;
@@ -104,20 +107,25 @@ export function mindScore(d: DayLog, P: Profile): MindScore | null {
     }
   }
   if (!hasPractice && content == null) return null;
-  return { total: practices + (content ?? 0), practices, content, minutes, quality };
+  return { total: Math.min(100, practices + (content ?? 0) + tao), practices, content, minutes, quality, tao };
 }
+
+/** Points from the day's Tao practice, for the pillar it belongs to. */
+const taoPoints = (d: DayLog, pillar: 'mind' | 'soul') =>
+  d.tao?.done && taoForDate(d.date).pillar === pillar ? TAO_POINTS : 0;
 
 const weightOf = (id: ContentCategoryId) => CONTENT_CATEGORIES.find(c => c.id === id)?.weight ?? 0.5;
 
-export interface SoulScore { total: number; base: number; bonus: number; count: number }
+export interface SoulScore { total: number; base: number; bonus: number; count: number; tao: number }
 
-/** Soul / inner life: eight practices worth 100, plus or minus up to 10 from reflected actions. */
+/** Soul / inner life: eight practices worth 100, plus or minus up to 10 from reflected actions, plus the Tao practice bonus; 0–100. */
 export function soulScore(d: DayLog): SoulScore | null {
   const kept = PRACTICES.filter(p => d.dharma[p.id]);
-  if (!kept.length && !d.actions.length) return null;
+  const tao = taoPoints(d, 'soul');
+  if (!kept.length && !d.actions.length && !tao) return null;
   const base = kept.reduce((s, p) => s + p.points, 0);
   const bonus = clamp(d.actions.reduce((s, a) => s + (a.alignment || 0), 0) * 2.5, -10, 10);
-  return { total: clamp(base + bonus, 0, 100), base, bonus, count: kept.length };
+  return { total: clamp(base + bonus + tao, 0, 100), base, bonus, count: kept.length, tao };
 }
 
 export interface WellBeing { body: BodyScore | null; mind: MindScore | null; soul: SoulScore | null; total: number; logged: number }

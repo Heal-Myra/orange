@@ -1,22 +1,24 @@
-// Library: the knowledge bundled inside the app — IFCT 2017, the Bhagavad Gita and the exercise library.
+// Library: the knowledge bundled inside the app — IFCT 2017, the Bhagavad Gita, the Tao Te Ching week and the exercise library.
 
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { Card, Heading, Label, Note, Screen, Segmented, TextField, s } from '../../components/ui';
+import { TaoWeek } from '../../components/TaoCard';
 import { searchExercises } from '../../lib/exercises';
 import { chapters, versesOf } from '../../lib/gita';
+import { TAO_CORE, WEEK_REVIEW } from '../../lib/tao';
 import { IFCT_COLUMNS, foodByCode, formatAmount, nutrient, per100g, searchFoods } from '../../lib/ifct';
 import { colors } from '../../theme';
 
-type Section = 'food' | 'gita' | 'exercise';
+type Section = 'food' | 'gita' | 'tao' | 'exercise';
 
 export default function Library() {
   const [section, setSection] = useState<Section>('food');
   return (
     <Screen showDay={false}>
       <Segmented<Section> value={section} onChange={setSection}
-        options={[{ label: 'Food', value: 'food' }, { label: 'Gita', value: 'gita' }, { label: 'Exercises', value: 'exercise' }]} />
-      {section === 'food' ? <FoodLibrary /> : section === 'gita' ? <GitaLibrary /> : <ExerciseLibrary />}
+        options={[{ label: 'Food', value: 'food' }, { label: 'Gita', value: 'gita' }, { label: 'Tao', value: 'tao' }, { label: 'Exercises', value: 'exercise' }]} />
+      {section === 'food' ? <FoodLibrary /> : section === 'gita' ? <GitaLibrary /> : section === 'tao' ? <TaoLibrary /> : <ExerciseLibrary />}
     </Screen>
   );
 }
@@ -82,6 +84,36 @@ function GitaLibrary() {
             <Text style={{ fontStyle: 'italic', color: colors.muted }}>{v.transliteration}</Text>
           </View>
         ))}
+      </Card>
+    </>
+  );
+}
+
+function TaoLibrary() {
+  return (
+    <>
+      <Card>
+        <Heading>Tao Te Ching: a week of practice</Heading>
+        <Text style={{ fontSize: 17, color: colors.ink, fontWeight: '600', lineHeight: 24 }}>{TAO_CORE.summary}</Text>
+        <Text style={{ color: colors.ink, lineHeight: 21 }}>{TAO_CORE.returning}</Text>
+        <Text style={{ color: colors.ink, lineHeight: 21 }}>{TAO_CORE.gentleness}</Text>
+        {TAO_CORE.reflection.map((p, i) => <Text key={i} style={{ color: colors.ink, lineHeight: 21 }}>{p}</Text>)}
+      </Card>
+      <Card>
+        <Heading>The week</Heading>
+        <Note>Each day's practice appears on the Mind or Soul tab. Doing it adds 10 points to that pillar.</Note>
+        <TaoWeek />
+      </Card>
+      <Card>
+        <Heading>At the end of the week</Heading>
+        <Text style={{ color: colors.ink, lineHeight: 21 }}>{WEEK_REVIEW.intro}</Text>
+        {WEEK_REVIEW.cracks.map((c, i) => <Text key={i} style={{ color: colors.ink }}>• {c}</Text>)}
+      </Card>
+      <Card>
+        <Heading>When a door will not open</Heading>
+        <Text style={{ color: colors.ink, lineHeight: 21 }}>{TAO_CORE.stuckIntro}</Text>
+        {TAO_CORE.stuck.map((c, i) => <Text key={i} style={{ color: colors.ink }}>{i + 1}. {c}</Text>)}
+        <Note>A practice guide inspired by the Tao Te Ching, written for Happy Orange. Not a translation of the text.</Note>
       </Card>
     </>
   );
