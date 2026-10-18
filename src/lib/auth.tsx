@@ -17,7 +17,6 @@ interface AuthState {
   consented: boolean;
   sendCode: (email: string) => Promise<string | null>;
   verifyCode: (email: string, code: string) => Promise<string | null>;
-  verifyLink: (link: string) => Promise<string | null>;
   giveConsent: () => Promise<string | null>;
   continueAsGuest: () => void;
   leaveGuest: () => Promise<void>; // guest decides to sign in after all
@@ -77,25 +76,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     verifyCode: async (email, code) => {
       if (!supabase) return 'Online accounts are not set up in this version.';
       const { error } = await supabase.auth.verifyOtp({ email: email.trim().toLowerCase(), token: code.trim(), type: 'email' });
-      if (error) return explain(error.message);
-      await AsyncStorage.removeItem(GUEST_KEY).catch(() => {});
-      setGuest(false);
-      return null;
-    },
-
-    // For places the email link cannot open, such as an iPhone home-screen app:
-    // the person copies the link from the email and pastes it in the app.
-    verifyLink: async link => {
-      if (!supabase) return 'Online accounts are not set up in this version.';
-      let url: URL;
-      try { url = new URL(link.trim()); } catch { return 'That does not look like a link. Copy the whole sign-in link from the email.'; }
-      // Some email apps wrap links (for example google.com/url?q=…); unwrap them.
-      const inner = url.searchParams.get('q') ?? url.searchParams.get('url');
-      if (inner && !url.searchParams.get('token')) { try { url = new URL(inner); } catch { /* keep the outer link */ } }
-      const tokenHash = url.searchParams.get('token') ?? url.searchParams.get('token_hash');
-      if (!tokenHash) return 'This link has no sign-in code in it. Copy the "Log In" link from the newest email.';
-      const type = (url.searchParams.get('type') ?? 'magiclink') as 'magiclink' | 'signup' | 'email' | 'invite';
-      const { error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type });
       if (error) return explain(error.message);
       await AsyncStorage.removeItem(GUEST_KEY).catch(() => {});
       setGuest(false);

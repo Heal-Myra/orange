@@ -7,8 +7,7 @@ import { useAuth } from '../lib/auth';
 import { colors } from '../theme';
 
 export default function SignIn() {
-  const { sendCode, verifyCode, verifyLink, continueAsGuest } = useAuth();
-  const [link, setLink] = useState('');
+  const { sendCode, verifyCode, continueAsGuest } = useAuth();
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
   const [sentTo, setSentTo] = useState<string | null>(null);
@@ -28,13 +27,6 @@ export default function SignIn() {
     if (!sentTo) return;
     setBusy(true); setMessage(null);
     const err = await verifyCode(sentTo, code);
-    setBusy(false);
-    if (err) setMessage(err);
-  };
-
-  const useLink = async () => {
-    setBusy(true); setMessage(null);
-    const err = await verifyLink(link);
     setBusy(false);
     if (err) setMessage(err);
   };
@@ -64,12 +56,6 @@ export default function SignIn() {
             <TextInput style={[s.input, { fontSize: 24, letterSpacing: 6 }]} value={code} onChangeText={t => setCode(t.replace(/\D/g, '').slice(0, 6))}
               placeholder="123456" placeholderTextColor={colors.muted} keyboardType="number-pad" textContentType="oneTimeCode" autoComplete="one-time-code" />
             <Button title={busy ? 'Checking…' : 'Sign in'} onPress={verify} disabled={code.length !== 6 || busy} />
-            <View style={{ gap: 6, borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 12 }}>
-              <Note>No code in the email, only a link? Press and hold the link, choose "Copy Link", then paste it here.</Note>
-              <TextInput style={s.input} value={link} onChangeText={setLink} placeholder="Paste the sign-in link" placeholderTextColor={colors.muted}
-                autoCapitalize="none" autoCorrect={false} />
-              <Button kind="plain" title={busy ? 'Signing in…' : 'Sign in with this link'} onPress={useLink} disabled={!link.trim() || busy} />
-            </View>
             <Pressable onPress={() => { setSentTo(null); setMessage(null); }}>
               <Text style={{ color: colors.accent, fontWeight: '600' }}>Use a different email</Text>
             </Pressable>
