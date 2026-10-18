@@ -4,10 +4,9 @@ import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { classifyMedia, dailyGuidance, explainVerse, reflectOnAction } from '../lib/ai';
 import { useAuth } from '../lib/auth';
-import { shiftISO } from '../lib/dates';
-import { verseOfDay, type Verse } from '../lib/gita';
-import { TAO_FOR_AI, taoForDate } from '../lib/tao';
-import { CONTENT_CATEGORIES, PRACTICES, mealTotals, wellBeing } from '../lib/scoring';
+import { buildContext } from '../lib/context';
+import type { Verse } from '../lib/gita';
+import { CONTENT_CATEGORIES } from '../lib/scoring';
 import { useHeal } from '../lib/store';
 import type { ContentCategoryId } from '../lib/types';
 import { colors } from '../theme';
@@ -25,23 +24,7 @@ export function GuidanceCard() {
 
   const run = async () => {
     setBusy(true); setMessage(null);
-    const w = wellBeing(day, profile), t = mealTotals(day.meals), v = verseOfDay(date);
-    const week = Array.from({ length: 7 }, (_, i) => shiftISO(date, -i - 1)).filter(d => days[d]).map(d => {
-      const x = wellBeing(days[d], profile);
-      return `${d}: body ${x.body ? Math.round(x.body.total) : '-'}, mind ${x.mind ? Math.round(x.mind.total) : '-'}, soul ${x.soul ? Math.round(x.soul.total) : '-'}`;
-    }).join('\n') || 'no earlier days logged';
-    const context = [
-      `Targets: ${profile.kcal} kcal, ${profile.protein} g protein, ${profile.steps} steps, ${profile.active} active min, ${profile.meditation} min meditation, social media ≤ ${profile.mediaLimit} min.`,
-      `Today (${date}): steps ${day.activity.steps ?? 'not logged'}, active ${day.activity.activeMin ?? 'not logged'} min, sleep ${day.sleep.hours ?? 'not logged'} h (quality ${day.sleep.quality ?? '-'}/5).`,
-      `Food: ${day.meals.map(m => m.name).join(', ') || 'nothing logged'}; totals ${Math.round(t.kcal)} kcal, P ${Math.round(t.p)} g, C ${Math.round(t.c)} g, F ${Math.round(t.f)} g.`,
-      `Mind: meditation ${day.mind.meditationMin ?? 'not logged'} min, attention block ${day.mind.attention ? 'yes' : 'no'}, learning ${day.mind.learning ? 'yes' : 'no'}; social media ${day.noMedia ? 'none' : day.media.map(m => `${m.minutes} min ${m.platform} (${m.category})`).join('; ') || 'not logged'}.`,
-      `Soul practices kept: ${PRACTICES.filter(p => day.dharma[p.id]).map(p => p.name).join(', ') || 'none logged'}. Reflections: ${day.actions.map(a => a.text).join(' | ') || 'none'}.`,
-      `Scores out of 100: body ${w.body ? Math.round(w.body.total) : 'not logged'}, mind ${w.mind ? Math.round(w.mind.total) : 'not logged'}, soul ${w.soul ? Math.round(w.soul.total) : 'not logged'}.`,
-      `Verse of the day: Bhagavad Gita ${v.chapter}.${v.verse} (${v.transliteration.replace(/\n/g, ' ')}).`,
-      `Today's Tao practice (${taoForDate(date).pillar}): ${taoForDate(date).title}: ${taoForDate(date).practice[0]} Done: ${day.tao?.done ? 'yes' : 'not yet'}.`,
-      TAO_FOR_AI,
-      `Last 7 days:\n${week}`,
-    ].join('\n');
+    const context = buildContext(day, days, date, profile);
     try {
       const r = await dailyGuidance(context);
       update(d => { d.guidance = { ...r, at: new Date().toISOString() }; });

@@ -38,3 +38,9 @@ export const explainVerse = (v: { chapter: number; verse: number; sanskrit: stri
 export const classifyMedia = (text: string) => call<{ category: ContentCategoryId; reason: string }>('classify_media', { text });
 
 export const reflectOnAction = (text: string) => call<Reflection>('reflect_action', { text });
+
+export interface ChatMessage { role: 'user' | 'myra'; text: string }
+
+/** Myra, the in-app assistant: answers using the person's own summary and the screen they are on. */
+export const askMyra = (messages: ChatMessage[], context: string, page: string) =>
+  call<{ text: string }>('myra', { messages: messages.slice(-12), context, page });

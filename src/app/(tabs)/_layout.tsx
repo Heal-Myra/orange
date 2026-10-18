@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Link, Tabs } from 'expo-router';
-import { Pressable } from 'react-native';
+import { Pressable, View } from 'react-native';
+import { MyraButton } from '../../components/MyraButton';
 import type { ComponentProps } from 'react';
 import type { ColorValue } from 'react-native';
 import { colors } from '../../theme';
@@ -15,6 +16,7 @@ const tab = (title: string, icon: IconName, tint: string) => ({
 
 export default function TabLayout() {
   return (
+    <View style={{ flex: 1 }}>
     <Tabs
       screenOptions={{
         headerStyle: { backgroundColor: colors.bg },
@@ -37,5 +39,7 @@ export default function TabLayout() {
       <Tabs.Screen name="soul" options={tab('Soul', 'flame-outline', colors.soul)} />
       <Tabs.Screen name="library" options={tab('Library', 'library-outline', colors.accent)} />
     </Tabs>
+    <MyraButton />
+    </View>
   );
 }

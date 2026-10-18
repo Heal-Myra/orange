@@ -1,6 +1,7 @@
 # Changelog
 
 ## 0.4.1 — 19 October 2026
+- **Myra**, the in-app assistant: a floating "Myra" button on every tab opens a chat. She knows the app's tabs and scoring, sees a summary of your own targets, today and the last 7 days, and suggests questions for the tab you came from. Needs sign-in; each message counts towards the daily AI limit. Chat is kept on the device (last 40 messages).
 - Theme "Marigold & leaf" (founder's choice): marigold-yellow background for happiness, leaf-green buttons, progress and ticks for health, deep-orange Happy Orange name, frosted-glass cards. Orange variants were tried first.
 
 ## 0.4.0 — 18 October 2026 (Tao Te Ching week)

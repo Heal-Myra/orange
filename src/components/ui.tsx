@@ -145,7 +145,7 @@ export function Segmented<T extends string | number>({ options, value, onChange 
 
 export const s = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.bg },
-  scroll: { padding: space.lg, gap: space.lg, paddingBottom: 48 },
+  scroll: { padding: space.lg, gap: space.lg, paddingBottom: 120 }, // room for the Myra button
   dayBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: space.md },
   dayBtn: { padding: space.sm },
   dayText: { fontSize: 16, fontWeight: '600', color: colors.ink, minWidth: 130, textAlign: 'center' },
