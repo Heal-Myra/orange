@@ -27,6 +27,7 @@ function Gate() {
       <Stack.Screen name="sign-in" />
       <Stack.Screen name="consent" />
       <Stack.Screen name="account" options={{ headerShown: true, title: 'Your account', presentation: 'modal' }} />
+      <Stack.Screen name="admin" options={{ headerShown: true, title: 'Admin', presentation: 'modal', headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
       <Stack.Screen name="feedback" options={{ headerShown: true, title: 'Send feedback', presentation: 'modal', headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
       <Stack.Screen name="myra" options={{ headerShown: true, title: 'Myra', presentation: 'modal', headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
     </Stack>

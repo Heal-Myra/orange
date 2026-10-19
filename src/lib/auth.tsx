@@ -15,6 +15,7 @@ interface AuthState {
   session: Session | null;
   guest: boolean; // chose to use the app on this device only
   consented: boolean;
+  admin: boolean; // listed in app_admins (sees Account → Admin)
   sendCode: (email: string) => Promise<string | null>;
   verifyCode: (email: string, code: string) => Promise<string | null>;
   giveConsent: () => Promise<string | null>;
@@ -41,11 +42,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [guest, setGuest] = useState(false);
   const [consented, setConsented] = useState(false);
+  const [admin, setAdmin] = useState(false);
 
   const loadConsent = useCallback(async (s: Session | null) => {
-    if (!s || !supabase) { setConsented(false); return; }
+    if (!s || !supabase) { setConsented(false); setAdmin(false); return; }
     const { data } = await supabase.from('profiles').select('consent_at').eq('user_id', s.user.id).maybeSingle();
     setConsented(!!data?.consent_at);
+    // Admin? (table app_admins, migration 0004; quietly false if not set up)
+    const adm = await supabase.from('app_admins').select('email').maybeSingle();
+    setAdmin(!adm.error && !!adm.data);
+    // Ask for AI access automatically the first time someone signs in (an admin approves it in the app).
+    const acc = await supabase.from('ai_access').select('status').maybeSingle();
+    if (!acc.error && !acc.data) await supabase.from('ai_access').insert({ email: (s.user.email ?? '').toLowerCase() });
   }, []);
 
   useEffect(() => {
@@ -64,7 +72,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [loadConsent]);
 
   const value = useMemo<AuthState>(() => ({
-    ready, session, guest, consented, online: !!supabase,
+    ready, session, guest, consented, admin, online: !!supabase,
 
     sendCode: async email => {
       if (!supabase) return 'Online accounts are not set up in this version.';
@@ -115,13 +123,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const a = await supabase.from('day_logs').delete().eq('user_id', uid);
       if (a.error) return explain(a.error.message);
       await supabase.from('feedback').delete().eq('user_id', uid); // ignore if the table is not set up yet
+      await supabase.from('ai_access').delete().eq('user_id', uid);
       const b = await supabase.from('profiles').delete().eq('user_id', uid);
       if (b.error) return explain(b.error.message);
       await supabase.auth.signOut();
       setConsented(false);
       return null;
     },
-  }), [ready, session, guest, consented]);
+  }), [ready, session, guest, consented, admin]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

@@ -258,8 +258,14 @@ export default {
     if (PROVIDER === 'gemini' && !ALLOWED.length) {
       return Response.json({ error: 'The free AI is only for testing. Set AI_ALLOWED_EMAILS before using it.' }, { status: 403 });
     }
+    // Access: on the AI_ALLOWED_EMAILS list, or approved by an admin in the app (table ai_access, migration 0004).
     if (ALLOWED.length && !ALLOWED.includes(email)) {
-      return Response.json({ error: 'AI features are being tested and are not open to everyone yet.' }, { status: 403 });
+      const { data: access } = await ctx.supabase.from('ai_access').select('status').maybeSingle();
+      if (access?.status !== 'approved') {
+        return Response.json({ error: access?.status === 'declined'
+          ? 'AI features are not open for your account during testing.'
+          : 'Your request for AI features is waiting for approval by the Happy Orange team. You will be able to use them as soon as it is approved.' }, { status: 403 });
+      }
     }
     let body: { action?: string; payload?: Record<string, unknown> };
     try { body = await req.json(); } catch { return Response.json({ error: 'Bad request.' }, { status: 400 }); }

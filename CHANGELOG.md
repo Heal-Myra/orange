@@ -1,6 +1,7 @@
 # Changelog
 
 ## 0.5.0 — 19 October 2026 (founder's new layout for Body, Mind and Soul)
+- Admin panel (Account → Admin, founder only): approve or decline AI access requests and read all feedback. People request AI access automatically on first sign-in; the AI server accepts anyone on AI_ALLOWED_EMAILS or approved in the app (migration 0004: app_admins, ai_access, is_admin()).
 - Send feedback: a feedback screen (mood 1–5, which part, message) from the Account screen and from Myra; saved to the new `feedback` table (migration 0003). Deleting my data also deletes my feedback.
 - Log a meal: three big buttons, Photo, Speak and Type. Photo opens the camera/photos straight away; Speak listens and works out the meal by itself (Android/Chrome now; on iPhone it comes with the native app, by founder's choice); Type shows the box.
 - Fix: on iPhone the in-app Speak button could hang (Safari speech recognition); iPhone now uses the keyboard microphone, and listening always stops after 15 seconds elsewhere.
