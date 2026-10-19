@@ -5,12 +5,13 @@
 import * as ImageManipulator from 'expo-image-manipulator';
 import * as ImagePicker from 'expo-image-picker';
 import { useRef, useState } from 'react';
-import { Image, Platform, Text, TextInput, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { Image, Platform, Pressable, Text, TextInput, View } from 'react-native';
 import { analyseMeal, analyseMealText, type MealItem } from '../lib/ai';
 import { useAuth } from '../lib/auth';
 import { useHeal } from '../lib/store';
 import { colors } from '../theme';
-import { Button, Card, Heading, Note, Segmented, TextField, s } from './ui';
+import { Button, Card, Heading, Note, TextField, s } from './ui';
 
 export async function shrink(uri: string, fallback: string | null | undefined, mime: string | null | undefined) {
   try {
@@ -40,13 +41,13 @@ function speechRecognition(): (new () => any) | null {
 export function MealPhoto() {
   const { session } = useAuth();
   const { update } = useHeal();
-  const [mode, setMode] = useState<'words' | 'photo'>('words');
+  const [mode, setMode] = useState<'photo' | 'speak' | 'type' | null>(null);
   const [words, setWords] = useState('');
   const [listening, setListening] = useState(false);
   const rec = useRef<any>(null);
   const [source, setSource] = useState<'photo' | 'words'>('words');
   const [uri, setUri] = useState<string | null>(null);
-  const [hint, setHint] = useState('');
+  const hint = '';
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [items, setItems] = useState<MealItem[] | null>(null);
@@ -77,11 +78,12 @@ export function MealPhoto() {
     } finally { setBusy(false); }
   };
 
-  const describe = async () => {
-    if (!words.trim()) return;
+  const describe = async (said?: string) => {
+    const text = (said ?? words).trim();
+    if (!text) return;
     setMessage('Working out your meal…'); setItems(null); setBusy(true); setSource('words'); setUri(null);
     try {
-      const r = await analyseMealText(words);
+      const r = await analyseMealText(text);
       setItems(r.items);
       setInsight(r.insight);
       setNote([r.confidence && `Confidence: ${r.confidence}.`, r.note].filter(Boolean).join(' '));
@@ -102,7 +104,7 @@ export function MealPhoto() {
     let r: any;
     try { r = new Speech(); } catch { setMessage('Speaking is not available here. Tap the microphone on your keyboard instead.'); return; }
     r.lang = 'en-IN'; r.interimResults = false; r.maxAlternatives = 1;
-    r.onresult = (e: any) => { const t = e.results?.[0]?.[0]?.transcript ?? ''; if (t) setWords(w => (w ? w + ', ' : '') + t); };
+    r.onresult = (e: any) => { const t = e.results?.[0]?.[0]?.transcript ?? ''; if (t) { setWords(t); describe(t); } };
     r.onerror = () => { setMessage('Could not hear that. You can also tap the microphone on your keyboard.'); stopListening(); };
     r.onend = () => setListening(false);
     rec.current = r; setListening(true);
@@ -124,36 +126,51 @@ export function MealPhoto() {
       });
     });
     setMessage(`Added ${items.length} item${items.length > 1 ? 's' : ''} to your day.`);
-    setItems(null); setUri(null); setHint(''); setInsight(''); setWords('');
+    setItems(null); setUri(null); setInsight(''); setWords(''); setMode(null);
   };
 
   return (
     <Card>
       <Heading>Log a meal</Heading>
-      <Note>Describe it in your own words, or use a photo. The AI names each dish and its ingredients; the numbers come from IFCT 2017 wherever an ingredient matches.</Note>
       {!session ? <Note>Sign in to log meals this way.</Note> : (
         <>
-          <Segmented<'words' | 'photo'> value={mode} onChange={setMode} options={[{ label: 'Type or speak', value: 'words' }, { label: 'Photo', value: 'photo' }]} />
-          {mode === 'words' ? (
+          <View style={{ flexDirection: 'row', gap: 10 }}>
+            {([['photo', 'camera-outline', 'Photo'], ['speak', 'mic-outline', 'Speak'], ['type', 'create-outline', 'Type']] as const).map(([m, icon, label]) => (
+              <Pressable key={m} accessibilityRole="button" accessibilityLabel={`${label} your meal`} disabled={busy}
+                onPress={() => {
+                  setMode(m); setMessage(null);
+                  if (m === 'photo') pick(Platform.OS !== 'web');
+                  if (m === 'speak' && Speech && !listening) speak();
+                }}
+                style={({ pressed }) => ({
+                  flex: 1, alignItems: 'center', gap: 6, paddingVertical: 16, borderRadius: 16, borderWidth: 1,
+                  borderColor: mode === m ? colors.accent : colors.line, backgroundColor: mode === m ? colors.accent + '14' : colors.surface,
+                  opacity: pressed || busy ? 0.7 : 1,
+                })}>
+                <Ionicons name={icon} size={28} color={mode === m ? colors.accent : colors.ink} />
+                <Text style={{ fontWeight: '600', color: colors.ink }}>{label}</Text>
+              </Pressable>
+            ))}
+          </View>
+
+          {mode === 'speak' && (Speech ? (
+            <View style={{ alignItems: 'center', gap: 8 }}>
+              <Text style={{ fontSize: 16, color: colors.ink }}>{listening ? 'Listening… say what you ate' : words ? `"${words}"` : 'Tap Speak to try again.'}</Text>
+              {listening ? <Button kind="plain" title="Stop" onPress={stopListening} /> : null}
+            </View>
+          ) : (
+            <Note>Speaking is coming with the Happy Orange iPhone app very soon. For now, tap Photo or Type.</Note>
+          ))}
+
+          {mode === 'type' && (
             <>
               <TextField label="What did you eat?" value={words} onChangeText={setWords} multiline
                 placeholder="e.g. 2 rotis with ghee, 1 katori moong dal, bhindi sabzi, a cup of chai with sugar" />
-              <View style={s.row}>
-                <Button title={busy ? 'Working…' : 'Work it out'} onPress={describe} disabled={busy || !words.trim()} />
-                {Speech ? <Button kind="plain" title={listening ? '■ Stop' : '🎤 Speak'} onPress={speak} disabled={busy} /> : null}
-              </View>
-              <Note>{Speech ? 'Tap Speak and say what you ate,' : 'To speak instead of typing, tap the box, then the microphone 🎤 on your keyboard, and say what you ate,'} for example "two rotis, dal and a bowl of curd".</Note>
+              <Button title={busy ? 'Working…' : 'Work it out'} onPress={() => describe()} disabled={busy || !words.trim()} />
             </>
-          ) : (
-        <>
-          <TextField label="Anything the photo won't show? (optional)" value={hint} onChangeText={setHint}
-            placeholder="e.g. 2 rotis with ghee, moong dal, chai with sugar" />
-          <View style={s.row}>
-            {Platform.OS !== 'web' && <Button title="Take photo" onPress={() => pick(true)} disabled={busy} />}
-            <Button kind={Platform.OS === 'web' ? 'primary' : 'plain'} title={Platform.OS === 'web' ? 'Take or choose photo' : 'Choose photo'} onPress={() => pick(false)} disabled={busy} />
-          </View>
-        </>
           )}
+
+          {!mode && <Note>Numbers come from IFCT 2017 wherever an ingredient matches. You can check and change everything before adding.</Note>}
         </>
       )}
       {uri ? <Image source={{ uri }} style={{ width: '100%', aspectRatio: 4 / 3, borderRadius: 10, backgroundColor: colors.sunk }} resizeMode="cover" /> : null}

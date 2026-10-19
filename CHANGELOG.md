@@ -1,6 +1,7 @@
 # Changelog
 
 ## 0.5.0 — 19 October 2026 (founder's new layout for Body, Mind and Soul)
+- Log a meal: three big buttons, Photo, Speak and Type. Photo opens the camera/photos straight away; Speak listens and works out the meal by itself (Android/Chrome now; on iPhone it comes with the native app, by founder's choice); Type shows the box.
 - Fix: on iPhone the in-app Speak button could hang (Safari speech recognition); iPhone now uses the keyboard microphone, and listening always stops after 15 seconds elsewhere.
 - Body: "Log a meal" — type or speak what you ate (e.g. "2 rotis, dal, bhindi"), or use a photo; the AI splits it into items and the numbers come from IFCT 2017. Speaking uses the browser's speech recognition where available, otherwise the keyboard microphone.
 - Mind: Tao card first; a guided meditation timer (5/10/20 min, breathing cue) that records the minutes actually sat; "Phone activity" reads social-media minutes from a Screen Time screenshot (editable before adding); one "Other activities" card for attention, learning and sessions typed by hand.
