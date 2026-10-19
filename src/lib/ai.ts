@@ -49,3 +49,9 @@ export interface ChatMessage { role: 'user' | 'myra'; text: string }
 /** Myra, the in-app assistant: answers using the person's own summary and the screen they are on. */
 export const askMyra = (messages: ChatMessage[], context: string, page: string) =>
   call<{ text: string }>('myra', { messages: messages.slice(-12), context, page });
+
+/** Founder's rule (19 Oct 2026): every suggestion shown to the person is one line of at most 10 words. */
+export const oneLine = (text: string, max = 10): string => {
+  const words = String(text ?? '').replace(/\s+/g, ' ').trim().split(' ').filter(Boolean);
+  return words.length <= max ? words.join(' ') : words.slice(0, max).join(' ').replace(/[,;:]$/, '') + '…';
+};

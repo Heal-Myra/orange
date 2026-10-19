@@ -123,7 +123,7 @@ Reply with JSON only:
 {"items":[{"name":"short everyday name, at most 4 words, e.g. Roti, Moong dal, Aloo capsicum sabzi","grams":number,"ingredients":[{"ingredient":"plain raw name, e.g. wheat flour atta, bengal gram dal, ghee","grams":number}],
   "estimate":{"kcal":number,"protein_g":number,"carbs_g":number,"fat_g":number}}],
  "confidence":"low"|"medium"|"high","note":"one sentence on what was hardest to estimate",
- "insight":"one or two kind sentences on what this meal gives the body and one natural, food-first tweak"}
+ "insight":"one natural, food-first tweak as ONE line of at most 10 words"}
 If there is no food: {"items":[],"confidence":"low","note":"${image ? 'No food found in the photo.' : 'No food found in the description.'}","insight":""}`, image ?? undefined));
 
   const items = Array.isArray(step1.items) ? step1.items : [];
@@ -191,11 +191,11 @@ If this is not a Screen Time screenshot: {"sessions":[],"period":"unclear","note
 `Here is today's data and the last 7 days for one person:
 ${String(p.context ?? '').slice(0, 6000)}
 Give practical guidance for the rest of today and tomorrow morning. Reply with JSON only:
-{"headline":"one sentence naming the single most useful shift",
- "body":["food suggestion with a short why","movement or sleep suggestion"],
- "mind":["meditation or attention suggestion with a duration","learning or content-diet suggestion; draw on today's Tao practice when it fits"],
- "soul":["truthfulness, fairness or service suggestion; name the verse of the day if it fits","suggestion drawing on the Gita or today's Tao practice (returning, gentleness, letting go)"]}
-Each suggestion under 28 words.`));
+{"headline":"the single most useful shift today",
+ "body":["one food, movement or sleep suggestion"],
+ "mind":["one meditation, attention or content suggestion; use today's Tao practice when it fits"],
+ "soul":["one truthfulness, service, Gita or Tao suggestion"]}
+STRICT: the headline and every suggestion is ONE line of at most 10 words, e.g. "Walk 15 minutes after lunch to steady your sugar." Exactly one suggestion per list.`));
     }
     case 'explain_verse': {
       const hindi = p.lang === 'hi';
@@ -203,14 +203,14 @@ Each suggestion under 28 words.`));
 `Explain Bhagavad Gita chapter ${Number(p.chapter)}, verse ${Number(p.verse)} in simple ${hindi ? 'Hindi (Devanagari script)' : 'English'}.
 Sanskrit: ${String(p.sanskrit ?? '').slice(0, 800)}
 Transliteration: ${String(p.transliteration ?? '').slice(0, 800)}
-First give the verse's meaning faithfully in your own words in 2–3 sentences (do not copy any published translation). Then two sentences on how a person today can live this teaching, linked where natural to body, mind or inner life. Plain text, no headings.`);
+First give the verse's meaning faithfully in your own words in 2–3 sentences (do not copy any published translation). Then, on its own last line, one way to live it today in at most 10 words. Plain text, no headings.`);
       return { text };
     }
     case 'classify_media': {
       return parseJson(await ask('quick', ORANGE_BOOK,
 `Classify this social-media session into exactly one category by its effect on the mind: ${CATEGORIES}.
 Session: "${String(p.text ?? '').slice(0, 600)}"
-Reply with JSON only: {"category":"<one of the categories>","reason":"one short sentence"}`));
+Reply with JSON only: {"category":"<one of the categories>","reason":"at most 10 words"}`));
     }
     case 'reflect_action': {
       return parseJson(await ask('smart', ORANGE_BOOK,
@@ -219,7 +219,7 @@ Action: "${String(p.text ?? '').slice(0, 600)}"
 Do not judge the person. Reply with JSON only:
 {"principle":"the single most relevant principle, e.g. Satya, Nyaya, Ahimsa, Seva, Kartavya, Daana, Santosha",
  "alignment":integer from -2 (clearly against dharma) to 2 (clearly in line),
- "reflection":"two short, kind sentences; if the action fell short, one way to make amends or do better"}`));
+ "reflection":"ONE kind line of at most 10 words; if it fell short, one way to do better"}`));
     }
     case 'myra': {
       const page = String(p.page ?? 'today').slice(0, 40);
@@ -235,7 +235,7 @@ The app has five tabs:
 - Library: IFCT 2017 food lookup, all 18 Gita chapters, the Tao Te Ching week, and an exercise library.
 - The floating Myra button on every tab opens this chat.
 Scoring: Body = movement 40 + sleep 30 + food 30. Mind = meditation 20 + attention 10 + learning 10 + content quality 35 + content quantity 25, plus 10 for a Mind-day Tao practice (max 100). Soul = eight practices 50 (half of each weight: Satya 10, Nyaya 7.5, Kartavya 7.5, Seva 7.5, Ahimsa 5, Daana 5, Santosha 5, Kritajnata 2.5) + Gita verse studied 20 + gratitude 5 each up to 15 + thought 15, plus 10 for a Soul-day Tao practice (0 to 100).
-When asked where to do something, name the tab and the card. When analysing, use only the data below; if something is not logged, say so and suggest logging it. Keep replies short: two to five sentences, or a few short bullet points. Plain text, no headings.
+When asked where to do something, name the tab and the card. When analysing, use only the data below; if something is not logged, say so and suggest logging it. Keep replies short: two to five sentences. Any suggestion or recommendation you give is ONE line of at most 10 words. Plain text, no headings.
 The person is on the ${page} tab.
 Their data:
 ${String(p.context ?? '').slice(0, 6000)}`,

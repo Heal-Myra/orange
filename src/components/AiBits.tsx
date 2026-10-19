@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
-import { classifyMedia, dailyGuidance, explainVerse, reflectOnAction } from '../lib/ai';
+import { classifyMedia, dailyGuidance, explainVerse, oneLine, reflectOnAction } from '../lib/ai';
 import { useAuth } from '../lib/auth';
 import { buildContext } from '../lib/context';
 import type { Verse } from '../lib/gita';
@@ -10,7 +10,7 @@ import { CONTENT_CATEGORIES } from '../lib/scoring';
 import { useHeal } from '../lib/store';
 import type { ContentCategoryId } from '../lib/types';
 import { colors } from '../theme';
-import { Button, Card, Heading, Label, Note, TextField } from './ui';
+import { Button, Card, Heading, Note, TextField } from './ui';
 
 const errText = (e: unknown) => (e instanceof Error ? e.message : 'Something went wrong. Try again.');
 
@@ -36,13 +36,13 @@ export function GuidanceCard() {
       <Heading>Today's guidance</Heading>
       {g ? (
         <>
-          <Text style={{ fontSize: 17, color: colors.ink, fontWeight: '600' }}>{g.headline}</Text>
-          {([['Body', colors.body, g.body], ['Mind', colors.mind, g.mind], ['Soul', colors.soul, g.soul]] as const).map(([name, color, list]) => (
-            <View key={name} style={{ gap: 4, borderLeftWidth: 3, borderLeftColor: color, paddingLeft: 10 }}>
-              <Label>{name}</Label>
-              {list.map((x, i) => <Text key={i} style={{ color: colors.ink, lineHeight: 21 }}>• {x}</Text>)}
+          <Text style={{ fontSize: 17, color: colors.insight, fontWeight: '600' }}>{oneLine(g.headline)}</Text>
+          {([['Body', colors.body, g.body], ['Mind', colors.mind, g.mind], ['Soul', colors.soul, g.soul]] as const).map(([name, color, list]) => list[0] ? (
+            <View key={name} style={{ flexDirection: 'row', gap: 8, alignItems: 'baseline' }}>
+              <Text style={{ color, fontWeight: '700', fontSize: 13, width: 40 }}>{name}</Text>
+              <Text numberOfLines={1} style={{ color: colors.ink, flex: 1 }}>{oneLine(list[0])}</Text>
             </View>
-          ))}
+          ) : null)}
         </>
       ) : <Note>Log what you can, then ask for guidance. It changes as your day changes.</Note>}
       {session
@@ -121,7 +121,7 @@ export function ReflectCard() {
           <Text style={{ color: a.alignment > 0 ? colors.good : a.alignment < 0 ? colors.bad : colors.muted, fontSize: 13 }}>
             {a.principle} · {a.alignment > 0 ? '+' : ''}{a.alignment}
           </Text>
-          {a.reflection ? <Text style={{ color: colors.muted, lineHeight: 20 }}>{a.reflection}</Text> : null}
+          {a.reflection ? <Text style={{ color: colors.insight }}>{oneLine(a.reflection)}</Text> : null}
           <Pressable onPress={() => update(d => { d.actions.splice(i, 1); })}><Text style={{ color: colors.bad }}>Remove</Text></Pressable>
         </View>
       ))}
@@ -142,7 +142,7 @@ export function ClassifyHelper({ onPick }: { onPick: (c: ContentCategoryId) => v
     try {
       const r = await classifyMedia(text);
       const cat = CONTENT_CATEGORIES.find(c => c.id === r.category);
-      if (cat) { onPick(cat.id); setMessage(`${cat.name}: ${r.reason}`); } else setMessage('Could not tell. Please pick a category yourself.');
+      if (cat) { onPick(cat.id); setMessage(`${cat.name}: ${oneLine(r.reason)}`); } else setMessage('Could not tell. Please pick a category yourself.');
     } catch (e) { setMessage(errText(e)); } finally { setBusy(false); }
   };
 

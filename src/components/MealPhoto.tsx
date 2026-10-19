@@ -7,7 +7,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { useRef, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { Image, Platform, Pressable, Text, TextInput, View } from 'react-native';
-import { analyseMeal, analyseMealText, type MealItem } from '../lib/ai';
+import { analyseMeal, analyseMealText, oneLine, type MealItem } from '../lib/ai';
 import { useAuth } from '../lib/auth';
 import { useHeal } from '../lib/store';
 import { colors } from '../theme';
@@ -175,7 +175,7 @@ export function MealPhoto() {
       )}
       {uri ? <Image source={{ uri }} style={{ width: '100%', aspectRatio: 4 / 3, borderRadius: 10, backgroundColor: colors.sunk }} resizeMode="cover" /> : null}
       {message ? <Text style={{ color: colors.muted }}>{message}</Text> : null}
-      {insight ? <Text style={{ color: colors.ink, borderLeftWidth: 3, borderLeftColor: colors.insight, paddingLeft: 10 }}>{insight}</Text> : null}
+      {insight ? <Text style={{ color: colors.insight, fontWeight: '600' }}>{oneLine(insight)}</Text> : null}
       {items?.map((it, i) => (
         <View key={i} style={{ gap: 6, borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 8 }}>
           <View style={[s.headingRow]}>
