@@ -1,39 +1,25 @@
-// Soul / inner life: verse of the day and the eight practices, led by truthfulness and fairness (The Orange Book).
+// Soul / inner life: study the Gita verse of the day, the thought of the day, gratitude,
+// the Tao practice on Soul days, and one simple check for the eight practices (led by truthfulness and fairness).
 
-import { Text } from 'react-native';
-import { ExplainVerse, ReflectCard } from '../../components/AiBits';
+import { GratitudeCard, PracticesCheck, ThoughtCard, VerseStudyCard } from '../../components/SoulCards';
 import { TaoCard } from '../../components/TaoCard';
-import { Card, Check, Heading, Label, Screen, Score } from '../../components/ui';
-import { verseOfDay } from '../../lib/gita';
-import { PRACTICES, soulScore } from '../../lib/scoring';
+import { Card, Heading, Screen, Score } from '../../components/ui';
+import { soulScore } from '../../lib/scoring';
 import { useHeal } from '../../lib/store';
-import { colors } from '../../theme';
 
 export default function Soul() {
-  const { day, date, update } = useHeal();
+  const { day } = useHeal();
   const score = soulScore(day);
-  const v = verseOfDay(date);
-
   return (
     <Screen>
-      <Card style={{ borderLeftWidth: 4, borderLeftColor: colors.soul }}>
-        <Label>Verse of the day · Bhagavad Gita {v.chapter}.{v.verse}</Label>
-        <Text style={{ fontSize: 19, lineHeight: 30, color: colors.ink }}>{v.sanskrit}</Text>
-        <Text style={{ fontStyle: 'italic', color: colors.muted }}>{v.transliteration}</Text>
-        <ExplainVerse verse={v} />
+      <Card style={{ paddingVertical: 12 }}>
+        <Heading right={<Score value={score?.total} max={100} />}>Soul today</Heading>
       </Card>
-
-      <Card>
-        <Heading right={<Score value={score?.total} max={100} />}>Practices kept today</Heading>
-        {PRACTICES.map(p => (
-          <Check key={p.id} checked={!!day.dharma[p.id]} onToggle={() => update(d => { d.dharma[p.id] = !d.dharma[p.id]; })}
-            title={p.name} detail={p.meaning} points={p.points} tag={p.orangeBook ? 'ORANGE BOOK' : undefined} />
-        ))}
-      </Card>
-
+      <VerseStudyCard />
+      <ThoughtCard />
+      <GratitudeCard />
       <TaoCard on="soul" />
-
-      <ReflectCard />
+      <PracticesCheck />
     </Screen>
   );
 }

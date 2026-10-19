@@ -42,7 +42,7 @@ export default function Body() {
           <View key={i} style={[s.headingRow, { borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 8 }]}>
             <View style={{ flex: 1 }}>
               <Text style={{ fontWeight: '600', color: colors.ink }}>{m.name}</Text>
-              <Text style={s.note}>{Math.round(m.kcal)} kcal · P {Math.round(m.p)} g · C {Math.round(m.c)} g · F {Math.round(m.f)} g{m.source === 'ifct' ? ' · IFCT' : m.source === 'photo+ifct' ? ' · photo, IFCT' : m.source === 'photo' ? ' · photo, estimate' : ''}</Text>
+              <Text style={s.note}>{Math.round(m.kcal)} kcal · P {Math.round(m.p)} g · C {Math.round(m.c)} g · F {Math.round(m.f)} g{m.source === 'ifct' ? ' · IFCT' : m.source === 'photo+ifct' ? ' · photo, IFCT' : m.source === 'photo' ? ' · photo, estimate' : m.source === 'words+ifct' ? ' · described, IFCT' : m.source === 'words' ? ' · described, estimate' : ''}</Text>
             </View>
             <Pressable onPress={() => update(d => { d.meals.splice(i, 1); })} hitSlop={8}><Text style={{ color: colors.bad }}>Remove</Text></Pressable>
           </View>

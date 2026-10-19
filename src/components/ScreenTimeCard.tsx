@@ -1,0 +1,93 @@
+// Phone activity: read social-media minutes from a Screen Time (iPhone) or Digital Wellbeing (Android) screenshot.
+// Websites cannot read Screen Time directly, so a screenshot is the practical way. Every number can be checked and changed.
+
+import * as ImagePicker from 'expo-image-picker';
+import { useState } from 'react';
+import { Pressable, Text, TextInput, View } from 'react-native';
+import { readScreenTime } from '../lib/ai';
+import { useAuth } from '../lib/auth';
+import { CONTENT_CATEGORIES, mindScore } from '../lib/scoring';
+import { useHeal } from '../lib/store';
+import type { ContentCategoryId, MediaSession } from '../lib/types';
+import { colors } from '../theme';
+import { shrink } from './MealPhoto';
+import { Button, Card, Check, Heading, Note, Score, s } from './ui';
+
+const nameOf = (id: ContentCategoryId) => CONTENT_CATEGORIES.find(c => c.id === id)?.name ?? id;
+
+export function ScreenTimeCard() {
+  const { session } = useAuth();
+  const { day, profile, update } = useHeal();
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const [rows, setRows] = useState<(MediaSession & { app: string })[] | null>(null);
+  const [open, setOpen] = useState<number | null>(null);
+  const score = mindScore(day, profile);
+  const total = day.media.reduce((t, m) => t + m.minutes, 0);
+
+  const pick = async () => {
+    setMessage(null); setRows(null);
+    const res = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.8, base64: true });
+    if (res.canceled) return;
+    const a = res.assets[0];
+    setBusy(true); setMessage('Reading your Screen Time…');
+    try {
+      const img = await shrink(a.uri, a.base64, a.mimeType);
+      const r = await readScreenTime(img.data, img.type);
+      setRows(r.sessions.map(x => ({ platform: x.platform, app: x.app, minutes: Math.round(x.minutes), category: x.category, source: 'screen' as const })));
+      setMessage(r.sessions.length ? `${r.period === 'daily average' ? 'Using the daily average. ' : ''}Check the minutes and the kind of content, then add.` : r.note);
+    } catch (e) { setMessage(e instanceof Error ? e.message : 'Something went wrong. Try again.'); }
+    finally { setBusy(false); }
+  };
+
+  const add = () => {
+    if (!rows?.length) return;
+    update(d => {
+      d.noMedia = false;
+      d.media = [...d.media.filter(m => m.source !== 'screen'), ...rows.filter(r => r.minutes > 0).map(({ app: _app, ...m }) => m)];
+    });
+    setRows(null); setMessage('Added. Your content diet score is updated.');
+  };
+
+  return (
+    <Card>
+      <Heading right={<Score value={score?.content ?? undefined} max={60} />}>Phone activity</Heading>
+      <Note>Take a screenshot of Screen Time (iPhone: Settings → Screen Time → See All App & Website Activity) and choose it here. The app reads your social-media minutes for you.</Note>
+      <Check color={colors.mind} checked={day.noMedia} onToggle={() => update(d => { d.noMedia = !d.noMedia; if (d.noMedia) d.media = []; })} title="I used no social media today" />
+      {!day.noMedia && (session
+        ? <Button title={busy ? 'Reading…' : 'Choose Screen Time screenshot'} onPress={pick} disabled={busy} />
+        : <Note>Sign in to read a screenshot. You can still add sessions by hand below.</Note>)}
+      {message ? <Text style={{ color: colors.muted }}>{message}</Text> : null}
+      {rows?.map((r, i) => (
+        <View key={i} style={{ gap: 6, borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 8 }}>
+          <View style={s.headingRow}>
+            <Text style={{ flex: 1, color: colors.ink, fontWeight: '600' }}>{r.app || r.platform}</Text>
+            <TextInput style={[s.input, { width: 70, textAlign: 'right' }]} keyboardType="number-pad" defaultValue={String(r.minutes)}
+              onEndEditing={e => setRows(list => list && list.map((x, n) => n === i ? { ...x, minutes: parseInt(e.nativeEvent.text, 10) || 0 } : x))} />
+            <Text style={{ color: colors.muted }}>min</Text>
+          </View>
+          <Pressable onPress={() => setOpen(open === i ? null : i)}>
+            <Text style={{ color: colors.accent, fontWeight: '600' }}>{nameOf(r.category)} ▾</Text>
+          </Pressable>
+          {open === i && (
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+              {CONTENT_CATEGORIES.map(c => (
+                <Pressable key={c.id} onPress={() => { setRows(list => list && list.map((x, n) => n === i ? { ...x, category: c.id } : x)); setOpen(null); }}
+                  style={{ paddingVertical: 5, paddingHorizontal: 10, borderRadius: 99, borderWidth: 1, borderColor: c.id === r.category ? colors.mind : colors.line, backgroundColor: colors.surface }}>
+                  <Text style={{ color: colors.ink, fontSize: 13 }}>{c.name}</Text>
+                </Pressable>
+              ))}
+            </View>
+          )}
+        </View>
+      ))}
+      {rows?.length ? (
+        <View style={s.row}>
+          <Button title="Add to my day" onPress={add} />
+          <Button kind="plain" title="Discard" onPress={() => { setRows(null); setMessage(null); }} />
+        </View>
+      ) : null}
+      {!day.noMedia && day.media.length > 0 && !rows ? <Note>Today: {total} minutes of social media logged ({profile.mediaLimit}-minute limit).</Note> : null}
+    </Card>
+  );
+}

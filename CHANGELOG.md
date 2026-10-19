@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.0 — 19 October 2026 (founder's new layout for Body, Mind and Soul)
+- Body: "Log a meal" — type or speak what you ate (e.g. "2 rotis, dal, bhindi"), or use a photo; the AI splits it into items and the numbers come from IFCT 2017. Speaking uses the browser's speech recognition where available, otherwise the keyboard microphone.
+- Mind: Tao card first; a guided meditation timer (5/10/20 min, breathing cue) that records the minutes actually sat; "Phone activity" reads social-media minutes from a Screen Time screenshot (editable before adding); one "Other activities" card for attention, learning and sessions typed by hand.
+- Soul: study the Gita verse of the day (read, open the meaning, write a line, tick studied); thought of the day with your own thought; gratitude (three things); the eight practices as one check ("tap only where you slipped" or "I kept all eight"). The separate reflection card was retired from the tab.
+- Soul scoring: practices 50 (half weights), verse 20, gratitude 15, thought 15, plus Tao Soul days; see docs/scoring.md. Myra and daily guidance know the new layout.
+
 ## 0.4.1 — 19 October 2026
 - Today: the well-being score is now one circle of three flowing sections (Body, Mind, Soul) that meet along water-like S-curves with no gaps; each section fills from the inside like liquid in proportion to its score, and tapping a section opens that tab. The separate Body/Mind/Soul cards were removed from Today (the detail lives on each tab). Uses react-native-svg.
 - **Myra**, the in-app assistant: a floating "Myra" button on every tab opens a chat. She knows the app's tabs and scoring, sees a summary of your own targets, today and the last 7 days, and suggests questions for the tab you came from. Needs sign-in; each message counts towards the daily AI limit. Chat is kept on the device (last 40 messages).

@@ -83,15 +83,39 @@ describe('mind', () => {
 });
 
 describe('soul', () => {
-  it('adds the points of kept practices', () => {
+  it('gives half of each kept practice\'s weight (eight practices worth 50)', () => {
     const d = day();
     d.dharma = { satya: true, nyaya: true };
-    expect(soulScore(d)!.total).toBe(35);
+    expect(soulScore(d)!.total).toBe(17.5);
+  });
+
+  it('adds 20 for the verse, 5 per gratitude (max 15) and 15 for a thought', () => {
+    const d = day();
+    d.soul = { verseStudied: true, gratitude: ['family', 'health', 'rain', 'tea'], thought: 'Be gentle today' };
+    const s = soulScore(d)!;
+    expect(s.verse).toBe(20);
+    expect(s.gratitude).toBe(15);
+    expect(s.thought).toBe(15);
+    expect(s.total).toBe(50);
+  });
+
+  it('reaches 100 with all practices kept and all three cards done', () => {
+    const d = day();
+    d.dharma = { satya: true, nyaya: true, kartavya: true, seva: true, ahimsa: true, daana: true, santosha: true, kritajnata: true };
+    d.soul = { checked: true, verseStudied: true, gratitude: ['a', 'b', 'c'], thought: 'Let go' };
+    expect(soulScore(d)!.total).toBe(100);
+  });
+
+  it('counts answering the check even when every practice slipped', () => {
+    const d = day();
+    d.soul = { checked: true };
+    expect(soulScore(d)!.total).toBe(0);
   });
 
   it('caps the reflection bonus at plus 10 and the total at 100', () => {
     const d = day();
     d.dharma = { satya: true, nyaya: true, kartavya: true, seva: true, ahimsa: true, daana: true, santosha: true, kritajnata: true };
+    d.soul = { verseStudied: true, gratitude: ['a', 'b', 'c'], thought: 'Let go' };
     d.actions = Array.from({ length: 5 }, () => ({ text: 'helped', principle: 'Seva', alignment: 2 }));
     const s = soulScore(d)!;
     expect(s.bonus).toBe(10);
@@ -139,6 +163,7 @@ describe('Tao practice', () => {
     const s = emptyDay('2026-10-21');
     s.tao = { done: true };
     s.dharma = { satya: true, nyaya: true, kartavya: true, seva: true, ahimsa: true, daana: true, santosha: true, kritajnata: true };
+    s.soul = { verseStudied: true, gratitude: ['a', 'b', 'c'], thought: 'Let go' };
     expect(soulScore(s)!.total).toBe(100);
   });
 

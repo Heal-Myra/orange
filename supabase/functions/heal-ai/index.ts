@@ -109,17 +109,22 @@ const r1 = (v: number) => Math.round(v * 10) / 10;
  * 2. The server finds IFCT candidates for each ingredient; the AI picks the right one;
  *    the server does the arithmetic. Ingredients with no good IFCT match keep the AI's estimate.
  */
-async function mealPhoto(image: Image, hint: string) {
+/** Meal to nutrition, from a photo or from words the person typed or spoke. Numbers come from IFCT 2017 where ingredients match. */
+async function mealAnalyse(image: Image | null, hint: string) {
+  const what = image
+    ? `Identify every food or drink in this photo and estimate the portion on the plate. Assume Indian home cooking where dishes look Indian, with typical household oil or ghee.
+${hint ? `The person adds: "${hint}"` : ''}`
+    : `The person describes what they ate or drank (typed or spoken, so expect spelling mistakes and Hindi or regional words): "${hint}"
+List each item. Use the quantities they give (e.g. "2 rotis", "1 katori dal"); otherwise assume typical Indian household portions and household oil or ghee.`;
   const step1 = parseJson(await ask('smart', `${ORANGE_BOOK} You are also a careful nutrition analyst.`,
-`Identify every food or drink in this photo and estimate the portion on the plate. Assume Indian home cooking where dishes look Indian, with typical household oil or ghee.
-${hint ? `The person adds: "${hint}"` : ''}
+`${what}
 Break each item into its main raw ingredients with grams (include cooking oil or ghee). Also give your own estimate for the whole item.
 Reply with JSON only:
 {"items":[{"name":"short everyday name, at most 4 words, e.g. Roti, Moong dal, Aloo capsicum sabzi","grams":number,"ingredients":[{"ingredient":"plain raw name, e.g. wheat flour atta, bengal gram dal, ghee","grams":number}],
   "estimate":{"kcal":number,"protein_g":number,"carbs_g":number,"fat_g":number}}],
  "confidence":"low"|"medium"|"high","note":"one sentence on what was hardest to estimate",
  "insight":"one or two kind sentences on what this meal gives the body and one natural, food-first tweak"}
-If no food is visible: {"items":[],"confidence":"low","note":"No food found in the photo.","insight":""}`, image));
+If there is no food: {"items":[],"confidence":"low","note":"${image ? 'No food found in the photo.' : 'No food found in the description.'}","insight":""}`, image ?? undefined));
 
   const items = Array.isArray(step1.items) ? step1.items : [];
   const ingredients: { item: number; ingredient: string; grams: number; candidates: ReturnType<typeof searchIfct> }[] = [];
@@ -158,13 +163,29 @@ Reply with JSON only: {"picks":{"0":"CODE or null","1":"CODE or null"}}`));
   };
 }
 
-// ---------- The five AI features ----------
+// ---------- The AI features ----------
 const CATEGORIES = 'learning, spiritual, inspiring, connect, news, fun, scrolling, negative';
 
 async function run(action: string, p: Record<string, unknown>) {
   switch (action) {
     case 'meal_photo':
-      return mealPhoto({ media_type: String(p.media_type ?? 'image/jpeg'), data: String(p.image_base64 ?? '') }, String(p.hint ?? '').slice(0, 300));
+      return mealAnalyse({ media_type: String(p.media_type ?? 'image/jpeg'), data: String(p.image_base64 ?? '') }, String(p.hint ?? '').slice(0, 300));
+    case 'meal_text': {
+      const text = String(p.text ?? '').trim().slice(0, 600);
+      if (!text) throw new Error('Tell me what you ate first.');
+      return mealAnalyse(null, text);
+    }
+    case 'screen_time': {
+      return parseJson(await ask('smart', ORANGE_BOOK,
+`This is a screenshot of a phone's Screen Time (iPhone) or Digital Wellbeing (Android) screen. Read the time spent per app.
+Include only social media, video, messaging and news apps (e.g. Instagram, YouTube, WhatsApp, Facebook, X/Twitter, LinkedIn, Snapchat, Telegram, Reddit, ShareChat, Moj, news apps). Skip tools such as Settings, Camera, Maps, Phone, banking.
+For each, give the platform (one of Instagram, YouTube, WhatsApp, Facebook, X, LinkedIn, or Other), whole minutes, and the most likely kind of content from: ${CATEGORIES}
+(typical defaults: Instagram scrolling, YouTube fun, WhatsApp connect, LinkedIn news, Facebook scrolling, X news; the person can change it).
+If the screenshot shows a week, use the daily average if shown, otherwise divide by 7.
+Reply with JSON only: {"sessions":[{"platform":"Instagram","app":"name as shown","minutes":number,"category":"one of the categories"}],"period":"today"|"daily average"|"unclear","note":"one short sentence"}
+If this is not a Screen Time screenshot: {"sessions":[],"period":"unclear","note":"This does not look like a Screen Time screenshot."}`,
+        { media_type: String(p.media_type ?? 'image/jpeg'), data: String(p.image_base64 ?? '') }));
+    }
     case 'guidance': {
       return parseJson(await ask('smart', ORANGE_BOOK,
 `Here is today's data and the last 7 days for one person:
@@ -208,11 +229,12 @@ Do not judge the person. Reply with JSON only:
 You are Myra, the friendly assistant inside the Happy Orange app. You help the person find their way around the app, understand their scores and data, and answer questions about food, movement, sleep, mind and inner life.
 The app has five tabs:
 - Today: the well-being score out of 300 (Body + Mind + Soul, 100 each), daily guidance, and the person icon (top right) for the account, sign-out and deleting data.
-- Body: steps, active minutes, sleep hours and quality, meals (add from IFCT 2017 by grams, or "Snap a meal" to estimate from a photo).
-- Mind: meditation minutes, attention block, learning, social-media sessions by platform and kind of content (a helper can pick the category), and on Mon, Tue, Thu, Fri and Sun the day's Tao practice.
-- Soul: Bhagavad Gita verse of the day with an English or Hindi explanation, eight practices (Satya, Nyaya, Kartavya, Seva, Ahimsa, Daana, Santosha, Kritajnata), reflections on actions, and on Wed and Sat the day's Tao practice.
+- Body: steps, active minutes, sleep hours and quality, and "Log a meal": type or speak what you ate (e.g. "2 rotis and dal") or use a photo; numbers come from IFCT 2017. Foods can also be added from IFCT by grams.
+- Mind: the day's Tao practice (on Mon, Tue, Thu, Fri, Sun), a guided meditation timer that records the minutes actually sat, "Phone activity" (choose a Screen Time screenshot and the app reads social-media minutes), and one card for attention, learning and social-media sessions added by hand.
+- Soul: study the Gita verse of the day (read, open the English or Hindi meaning, write a line, tick studied), the thought of the day (write your own), gratitude (three things), the day's Tao practice (on Wed and Sat), and one check for the eight practices (Satya, Nyaya, Kartavya, Seva, Ahimsa, Daana, Santosha, Kritajnata): tap only the ones where you slipped, or "No, I kept all eight".
 - Library: IFCT 2017 food lookup, all 18 Gita chapters, the Tao Te Ching week, and an exercise library.
-Scoring: Body = movement 40 + sleep 30 + food 30. Mind = meditation 20 + attention 10 + learning 10 + content quality 35 + content quantity 25, plus 10 for a Mind-day Tao practice (max 100). Soul = the eight practices (20,15,15,15,10,10,10,5) plus or minus up to 10 from reflections, plus 10 for a Soul-day Tao practice (0 to 100).
+- The floating Myra button on every tab opens this chat.
+Scoring: Body = movement 40 + sleep 30 + food 30. Mind = meditation 20 + attention 10 + learning 10 + content quality 35 + content quantity 25, plus 10 for a Mind-day Tao practice (max 100). Soul = eight practices 50 (half of each weight: Satya 10, Nyaya 7.5, Kartavya 7.5, Seva 7.5, Ahimsa 5, Daana 5, Santosha 5, Kritajnata 2.5) + Gita verse studied 20 + gratitude 5 each up to 15 + thought 15, plus 10 for a Soul-day Tao practice (0 to 100).
 When asked where to do something, name the tab and the card. When analysing, use only the data below; if something is not logged, say so and suggest logging it. Keep replies short: two to five sentences, or a few short bullet points. Plain text, no headings.
 The person is on the ${page} tab.
 Their data:

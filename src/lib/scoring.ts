@@ -116,16 +116,34 @@ const taoPoints = (d: DayLog, pillar: 'mind' | 'soul') =>
 
 const weightOf = (id: ContentCategoryId) => CONTENT_CATEGORIES.find(c => c.id === id)?.weight ?? 0.5;
 
-export interface SoulScore { total: number; base: number; bonus: number; count: number; tao: number }
+export interface SoulScore {
+  total: number;
+  practices: number; // /50 from the eight-practices check
+  verse: number;     // /20 for studying the Gita verse of the day
+  gratitude: number; // /15, 5 per thing
+  thought: number;   // /15 for writing a thought for the day
+  bonus: number;     // ±10 from reflected actions
+  tao: number;       // Soul-day Tao practice
+  count: number;     // practices kept
+}
 
-/** Soul / inner life: eight practices worth 100, plus or minus up to 10 from reflected actions, plus the Tao practice bonus; 0–100. */
+/**
+ * Soul / inner life (0–100): eight practices check 50 (each practice's weight halved), Gita verse studied 20,
+ * gratitude 15 (5 each, up to three), thought for the day 15, plus or minus up to 10 from reflected actions,
+ * plus the Soul-day Tao practice.
+ */
 export function soulScore(d: DayLog): SoulScore | null {
   const kept = PRACTICES.filter(p => d.dharma[p.id]);
   const tao = taoPoints(d, 'soul');
-  if (!kept.length && !d.actions.length && !tao) return null;
-  const base = kept.reduce((s, p) => s + p.points, 0);
+  const so = d.soul ?? {};
+  const grateful = (so.gratitude ?? []).filter(g => g.trim()).length;
+  const verse = so.verseStudied ? 20 : 0;
+  const gratitude = Math.min(3, grateful) * 5;
+  const thought = (so.thought ?? '').trim().length >= 3 ? 15 : 0;
+  if (!kept.length && !d.actions.length && !tao && !so.checked && !verse && !gratitude && !thought) return null;
+  const practices = kept.reduce((s, p) => s + p.points, 0) / 2;
   const bonus = clamp(d.actions.reduce((s, a) => s + (a.alignment || 0), 0) * 2.5, -10, 10);
-  return { total: clamp(base + bonus + tao, 0, 100), base, bonus, count: kept.length, tao };
+  return { total: clamp(practices + verse + gratitude + thought + bonus + tao, 0, 100), practices, verse, gratitude, thought, bonus, tao, count: kept.length };
 }
 
 export interface WellBeing { body: BodyScore | null; mind: MindScore | null; soul: SoulScore | null; total: number; logged: number }

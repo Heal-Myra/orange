@@ -1,7 +1,7 @@
 // Shared data shapes for Project Heal.
 // One DayLog holds everything a person logs for one calendar day.
 
-export type MealSource = 'manual' | 'ifct' | 'photo' | 'photo+ifct';
+export type MealSource = 'manual' | 'ifct' | 'photo' | 'photo+ifct' | 'words' | 'words+ifct';
 
 export interface Meal {
   name: string;
@@ -27,6 +27,7 @@ export interface MediaSession {
   platform: string;
   minutes: number;
   category: ContentCategoryId;
+  source?: 'screen' | 'manual'; // 'screen' = read from a Screen Time screenshot
 }
 
 export type PracticeId =
@@ -57,6 +58,13 @@ export interface DayLog {
   dharma: Partial<Record<PracticeId, boolean>>;
   actions: ReflectedAction[];
   tao?: { done?: boolean; note?: string }; // the day's Tao Te Ching practice (src/lib/tao.ts)
+  soul?: {
+    checked?: boolean;      // answered the eight-practices check today
+    verseStudied?: boolean; // studied the Gita verse of the day
+    verseNote?: string;     // what the verse means to me
+    gratitude?: string[];   // up to three things I am grateful for
+    thought?: string;       // my thought for the day
+  };
   guidance?: { headline: string; body: string[]; mind: string[]; soul: string[]; at: string };
 }
 

@@ -30,6 +30,11 @@ async function call<T>(action: string, payload: Record<string, unknown>): Promis
 export const analyseMeal = (image_base64: string, media_type: string, hint: string) =>
   call<MealResult>('meal_photo', { image_base64, media_type, hint });
 
+export const analyseMealText = (text: string) => call<MealResult>('meal_text', { text });
+
+export interface ScreenTimeResult { sessions: { platform: string; app: string; minutes: number; category: ContentCategoryId }[]; period: string; note: string }
+export const readScreenTime = (image_base64: string, media_type: string) => call<ScreenTimeResult>('screen_time', { image_base64, media_type });
+
 export const dailyGuidance = (context: string) => call<Guidance>('guidance', { context });
 
 export const explainVerse = (v: { chapter: number; verse: number; sanskrit: string; transliteration: string }, lang: 'en' | 'hi') =>
