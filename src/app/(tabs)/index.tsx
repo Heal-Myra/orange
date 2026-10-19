@@ -16,7 +16,7 @@ export default function Today() {
   const bandColor = w.total >= 180 ? colors.good : w.total >= 120 ? colors.warn : colors.bad;
 
   return (
-    <Screen>
+    <Screen feedback="Today">
       <Card style={{ alignItems: 'center' }}>
         <WellBeingRing w={w} label={label} labelColor={w.logged ? bandColor : colors.muted} />
       </Card>

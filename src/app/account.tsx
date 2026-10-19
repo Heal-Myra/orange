@@ -1,4 +1,4 @@
-// Account: who is signed in, where data is saved, sign out, delete my data.
+// Profile: who is signed in, where data is saved, sign out, delete my data.
 
 import { router } from 'expo-router';
 import { useState } from 'react';
@@ -19,7 +19,7 @@ How to start (2 minutes):
 
 The AI features (meal photos, guidance, Myra the assistant) switch on as soon as I approve you, usually within a day.
 
-Please use it once a day, and tap the person icon → Send feedback whenever something works, confuses you, or you wish it did more. Every message reaches me.
+Please use it once a day, and write in the feedback box at the top of any page whenever something works, confuses you, or you wish it did more. Every message reaches me.
 
 Thank you! 🙏`;
 
@@ -69,12 +69,6 @@ export default function Account() {
           <Button kind="plain" title="Invite a friend to test" onPress={invite} />
         </Card>
       )}
-
-      <Card>
-        <Heading>Help us improve</Heading>
-        <Note>Tell the Happy Orange team what works and what does not.</Note>
-        <Button title="Send feedback" onPress={() => router.push('/feedback')} />
-      </Card>
 
       {session && (
         <Card>

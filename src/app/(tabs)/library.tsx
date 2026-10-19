@@ -15,7 +15,7 @@ type Section = 'food' | 'gita' | 'tao' | 'exercise';
 export default function Library() {
   const [section, setSection] = useState<Section>('food');
   return (
-    <Screen showDay={false}>
+    <Screen showDay={false} feedback="Library">
       <Segmented<Section> value={section} onChange={setSection}
         options={[{ label: 'Food', value: 'food' }, { label: 'Gita', value: 'gita' }, { label: 'Tao', value: 'tao' }, { label: 'Exercises', value: 'exercise' }]} />
       {section === 'food' ? <FoodLibrary /> : section === 'gita' ? <GitaLibrary /> : section === 'tao' ? <TaoLibrary /> : <ExerciseLibrary />}

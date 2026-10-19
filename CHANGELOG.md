@@ -1,6 +1,7 @@
 # Changelog
 
 ## 0.5.0 — 19 October 2026 (founder's new layout for Body, Mind and Soul)
+- Testing: a feedback box at the top of every tab (Today, Body, Mind, Soul, Library) sends straight to the team with the page name; the feedback card was removed from Profile. "Person icon" is now labelled **Profile** everywhere.
 - "Invite a friend to test" (Account → Admin card): opens the phone's share menu with the invitation written, so people are picked from contacts in WhatsApp or Messages.
 - Admin panel (Account → Admin, founder only): approve or decline AI access requests and read all feedback. People request AI access automatically on first sign-in; the AI server accepts anyone on AI_ALLOWED_EMAILS or approved in the app (migration 0004: app_admins, ai_access, is_admin()).
 - Send feedback: a feedback screen (mood 1–5, which part, message) from the Account screen and from Myra; saved to the new `feedback` table (migration 0003). Deleting my data also deletes my feedback.

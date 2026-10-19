@@ -6,13 +6,15 @@ import { Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View, typ
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { formatDay, todayISO } from '../lib/dates';
 import { useHeal } from '../lib/store';
+import { FeedbackBox } from './FeedbackBox';
 import { colors, glass, radius, space } from '../theme';
 
-export function Screen({ children, showDay = true }: { children: ReactNode; showDay?: boolean }) {
+export function Screen({ children, showDay = true, feedback }: { children: ReactNode; showDay?: boolean; feedback?: string }) {
   return (
     <SafeAreaView style={s.safe} edges={['left', 'right']}>
       <ScrollView contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled">
         {showDay && <DayBar />}
+        {feedback ? <FeedbackBox area={feedback} /> : null}
         {children}
       </ScrollView>
     </SafeAreaView>

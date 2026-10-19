@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Link, Tabs } from 'expo-router';
-import { Pressable, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import { MyraButton } from '../../components/MyraButton';
 import type { ComponentProps } from 'react';
 import type { ColorValue } from 'react-native';
@@ -29,8 +29,9 @@ export default function TabLayout() {
       <Tabs.Screen name="index" options={{ ...tab('Today', 'sunny-outline', colors.accent), headerTitle: 'Happy Orange', headerTitleStyle: { color: colors.brand, fontWeight: '700' },
         headerRight: () => (
           <Link href="/account" asChild>
-            <Pressable accessibilityLabel="Your account" hitSlop={10} style={{ paddingHorizontal: 16 }}>
+            <Pressable accessibilityLabel="Profile" hitSlop={10} style={{ paddingHorizontal: 16, alignItems: 'center' }}>
               <Ionicons name="person-circle-outline" size={26} color={colors.ink} />
+              <Text style={{ fontSize: 10, color: colors.ink }}>Profile</Text>
             </Pressable>
           </Link>
         ) }} />

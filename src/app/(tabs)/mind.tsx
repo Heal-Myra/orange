@@ -32,7 +32,7 @@ export default function Mind() {
   };
 
   return (
-    <Screen>
+    <Screen feedback="Mind">
       <Card style={{ paddingVertical: 12 }}>
         <Heading right={<Score value={score?.total} max={100} />}>Mind today</Heading>
       </Card>

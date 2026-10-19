@@ -11,7 +11,7 @@ export default function Soul() {
   const { day } = useHeal();
   const score = soulScore(day);
   return (
-    <Screen>
+    <Screen feedback="Soul">
       <Card style={{ paddingVertical: 12 }}>
         <Heading right={<Score value={score?.total} max={100} />}>Soul today</Heading>
       </Card>

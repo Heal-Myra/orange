@@ -94,7 +94,7 @@ export default function Myra() {
                 {messages.length > 1 ? <Pressable onPress={clear}><Text style={{ color: colors.accent, fontWeight: '600', fontSize: 13 }}>Clear chat</Text></Pressable> : null}
               </View>
             </>
-          ) : <Note>Sign in to talk to Myra (person icon on Today → Sign in).</Note>}
+          ) : <Note>Sign in to talk to Myra (Profile, top right of Today → Sign in).</Note>}
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>

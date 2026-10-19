@@ -16,7 +16,7 @@ export default function Body() {
   const totals = mealTotals(day.meals);
 
   return (
-    <Screen>
+    <Screen feedback="Body">
       <Card>
         <Heading right={<Score value={score ? score.movement + score.sleep : null} max={70} />}>Movement & sleep</Heading>
         <View style={s.row}>
