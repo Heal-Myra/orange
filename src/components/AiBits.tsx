@@ -33,7 +33,7 @@ export function GuidanceCard() {
 
   return (
     <Card style={{ borderLeftWidth: 4, borderLeftColor: colors.insight }}>
-      <Heading>Today's guidance</Heading>
+      <Heading>Myra recommends</Heading>
       {g ? (
         <>
           <Text style={{ fontSize: 17, color: colors.insight, fontWeight: '600' }}>{oneLine(g.headline)}</Text>
@@ -44,10 +44,10 @@ export function GuidanceCard() {
             </View>
           ) : null)}
         </>
-      ) : <Note>Log what you can, then ask for guidance. It changes as your day changes.</Note>}
+      ) : <Note>Log what you can, then ask Myra. Her picks change with your day.</Note>}
       {session
-        ? <Button kind="insight" title={busy ? 'Thinking…' : g ? 'Refresh guidance' : 'Get guidance'} onPress={run} disabled={busy} />
-        : <Note>Sign in to get guidance.</Note>}
+        ? <Button kind="insight" title={busy ? 'Thinking…' : g ? 'Refresh' : 'Get recommendations'} onPress={run} disabled={busy} />
+        : <Note>Sign in to get Myra's recommendations.</Note>}
       {message ? <Text style={{ color: colors.bad }}>{message}</Text> : null}
       <Note>A working model to help you understand yourself, not medical advice.</Note>
     </Card>
