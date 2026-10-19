@@ -2,11 +2,19 @@
 
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Text, View } from 'react-native';
+import { Share, Text, View } from 'react-native';
 import { Button, Card, Heading, Note, Screen } from '../components/ui';
 import { useAuth } from '../lib/auth';
 import { useHeal } from '../lib/store';
 import { colors } from '../theme';
+
+// The tester invitation (founder's wording, 19 Oct 2026). Shared through the phone's own share menu,
+// so people are picked from the contacts in WhatsApp, Messages or any other app.
+const INVITE = `Hi! I’m building Happy Orange, an app that helps you restore healthy body and mind to connect with your inner self. Could you test it for a week? 🍊
+
+Open app.happyorange.in on your phone, add it to your home screen, and sign in with your email (you'll get a 6-digit code). AI features switch on once I approve you.
+
+Use it daily and tap the person icon → Send feedback to tell me what you think. Thanks a lot!`;
 
 const SYNC_TEXT = {
   device: 'Saved on this device only.',
@@ -20,6 +28,11 @@ export default function Account() {
   const { sync, syncError, clearDevice } = useHeal();
   const [confirm, setConfirm] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+
+  const invite = async () => {
+    try { await Share.share({ message: INVITE }); }
+    catch { setMessage('Sharing is not available here. Copy the link app.happyorange.in and send it yourself.'); }
+  };
 
   const remove = async () => {
     const err = await deleteMyData();
@@ -46,6 +59,7 @@ export default function Account() {
           <Heading>Admin</Heading>
           <Note>Approve AI access for testers and read their feedback.</Note>
           <Button title="Open admin" onPress={() => router.push('/admin')} />
+          <Button kind="plain" title="Invite a friend to test" onPress={invite} />
         </Card>
       )}
 
