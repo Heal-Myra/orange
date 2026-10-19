@@ -4,6 +4,7 @@
 - New theme chosen by the founder from three reference apps: white-grey page, white cards with a soft shadow, rounded buttons, calm teal for buttons and ticks; Body leaf green, Mind teal, Soul amber. The marigold background and glass cards are retired.
 - Happy Orange's signature coral (#C0513A) marks everything the app itself produces: the Happy Orange name, scores, Today's guidance, AI reads (meal Calculate, Screen Time), verse explanations, reflections, category picks, and Myra. See docs/decisions/0007-colour-system.md.
 - Founder's rule: every suggestion is **one line of at most 10 words**. Today's guidance is now a headline plus one line each for Body, Mind and Soul; meal tips, reflections, category reasons, the "live it today" line of verse explanations and Myra's recommendations follow the same rule (AI prompt plus an app-side trim, `oneLine` in src/lib/ai.ts).
+- Body tab order: Log a meal first, then Movement & sleep, then today's Food totals, then the IFCT search.
 - Today's guidance card is now **Myra recommends**. It refreshes by itself (no button needed): when the part of the day changes (morning, afternoon, evening, night) and when today's data changes (meals, steps or workouts from a fitness app, meditation…), at most once every 20 minutes for data changes. A small Refresh link remains.
 - Every suggestion is a direct instruction starting with a verb, with a number where it helps ("Walk 10 minutes after lunch."), never "try" or "consider". The AI is told the local time and only recommends what is still possible today and not already done.
 

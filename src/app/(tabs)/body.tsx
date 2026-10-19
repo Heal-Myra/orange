@@ -17,6 +17,8 @@ export default function Body() {
 
   return (
     <Screen feedback="Body">
+      <MealPhoto />
+
       <Card>
         <Heading right={<Score value={score ? score.movement + score.sleep : null} max={70} />}>Movement & sleep</Heading>
         <View style={s.row}>
@@ -48,8 +50,6 @@ export default function Body() {
           </View>
         )) : <Note>No meals logged.</Note>}
       </Card>
-
-      <MealPhoto />
 
       <IfctAdd />
     </Screen>
