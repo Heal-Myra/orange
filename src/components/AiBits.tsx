@@ -54,7 +54,7 @@ export function GuidanceCard() {
   const time = g ? new Date(g.at).toTimeString().slice(0, 5) : '';
 
   return (
-    <Card style={{ borderLeftWidth: 4, borderLeftColor: colors.insight }}>
+    <Card>
       <Heading>Myra recommends</Heading>
       {g ? (
         <>
@@ -68,6 +68,7 @@ export function GuidanceCard() {
         </>
       ) : session ? <Note>{busy ? 'Myra is looking at your day…' : 'Myra will suggest your next steps here.'}</Note> : null}
       {!session ? <Note>Sign in to get Myra's recommendations.</Note> : null}
+      {session && !g && !busy && isToday ? <Button kind="insight" title="Get recommendations" onPress={run} /> : null}
       {session && g ? (
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
           <Note>{busy ? 'Updating…' : `Updated ${time} · changes with your day`}</Note>

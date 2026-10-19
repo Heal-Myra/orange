@@ -1,100 +1,82 @@
-// The Today circle: three flowing sections (Body, Mind, Soul) that meet without gaps and together complete one circle.
-// The borders between them are gentle S-curves, like water. Each section fills from the inside outwards, like liquid,
-// in proportion to its score out of 100. Tapping a section (or its label) opens that tab. The total out of 300 is in the middle.
+// The Today circle, in the founder's chosen look "A. Calm Teal" (19 Oct 2026):
+// a soft tinted disc holding a thin ring of three rounded arcs (Body, Mind, Soul). Each arc fills in
+// proportion to its score out of 100; the total out of 300 sits in the middle in Happy Orange coral.
+// Below the circle, three coloured tiles open the Body, Mind and Soul tabs.
 
 import { router } from 'expo-router';
 import { Pressable, Text, View, useWindowDimensions } from 'react-native';
-import Svg, { ClipPath, Circle, Defs, G, Path } from 'react-native-svg';
+import Svg, { G, Path } from 'react-native-svg';
 import type { WellBeing } from '../lib/scoring';
 import { colors } from '../theme';
 
-const BASE = 320;   // designed at 320 px wide, scaled down on narrow phones
-const WAVE = 9;     // how far (in degrees) the S-shaped borders swing
-const STEPS = 48;   // points per curve; enough to look smooth
+const BASE = 210; // designed at 210 px, scaled down on narrow phones
+const SPAN = 110; // degrees per arc, leaving small gaps between them
 
-type Key = 'body' | 'mind' | 'soul';
-type Part = { key: Key; name: string; color: string; start: number; value: number | undefined; route: '/body' | '/mind' | '/soul' };
+type Part = { key: 'body' | 'mind' | 'soul'; name: string; color: string; start: number; value: number | undefined; route: '/body' | '/mind' | '/soul' };
 
 export function WellBeingRing({ w, label, labelColor }: { w: WellBeing; label: string; labelColor: string }) {
   const { width } = useWindowDimensions();
-  const SIZE = Math.min(BASE, width - 64), k = SIZE / BASE;
-  const C = SIZE / 2, R_OUT = 150 * k, R_IN = 84 * k;
+  const SIZE = Math.min(BASE, width - 96), k = SIZE / BASE;
+  const C = SIZE / 2, R = 84 * k, STROKE = 22 * k;
 
-  const pt = (deg: number, r: number) => {
+  const pt = (deg: number) => {
     const a = ((deg - 90) * Math.PI) / 180;
-    return `${(C + r * Math.cos(a)).toFixed(2)} ${(C + r * Math.sin(a)).toFixed(2)}`;
+    return `${(C + R * Math.cos(a)).toFixed(2)} ${(C + R * Math.sin(a)).toFixed(2)}`;
   };
-  // The border at angle `at`, walked from the outer edge (t = 1) to the inner edge (t = 0) or back.
-  const seam = (at: number, outward: boolean) => Array.from({ length: STEPS + 1 }, (_, i) => {
-    const t = outward ? i / STEPS : 1 - i / STEPS;
-    return `L ${pt(at + WAVE * Math.sin(2 * Math.PI * t), R_IN + (R_OUT - R_IN) * t)}`;
-  }).join(' ');
-  const arcPts = (from: number, to: number, r: number) => Array.from({ length: STEPS + 1 }, (_, i) => `L ${pt(from + ((to - from) * i) / STEPS, r)}`).join(' ');
+  const arc = (from: number, to: number) => `M ${pt(from)} A ${R} ${R} 0 ${to - from > 180 ? 1 : 0} 1 ${pt(to)}`;
 
-  const section = (from: number, to: number) =>
-    `M ${pt(from, R_OUT)} ${arcPts(from, to, R_OUT)} ${seam(to, false)} ${arcPts(to, from, R_IN)} ${seam(from, true)} Z`;
-
-  // Body top right, Mind bottom, Soul top left. Each covers 120°; neighbours share the same wavy border.
-  const parts: Part[] = [
-    { key: 'body', name: 'Body', color: colors.body, start: -60, value: w.body?.total, route: '/body' },
-    { key: 'mind', name: 'Mind', color: colors.mind, start: 60, value: w.mind?.total, route: '/mind' },
-    { key: 'soul', name: 'Soul', color: colors.soul, start: 180, value: w.soul?.total, route: '/soul' },
-  ];
+  const parts = partsOf(w);
 
   return (
-    <View style={{ alignItems: 'center', gap: 8 }}>
-      <View style={{ width: SIZE, height: SIZE }}>
-        <Svg width={SIZE} height={SIZE}>
-          <Defs>
-            {parts.map(p => {
-              const filled = Math.max(0, Math.min(100, p.value ?? 0)) / 100;
-              return (
-                <ClipPath key={p.key} id={`fill-${p.key}`}>
-                  <Circle cx={C} cy={C} r={R_IN + (R_OUT - R_IN) * filled} />
-                </ClipPath>
-              );
-            })}
-          </Defs>
-          {parts.map(p => {
-            const d = section(p.start, p.start + 120);
-            const go = () => router.navigate(p.route);
-            return (
-              <G key={p.key} onPress={go}>
-                <Path d={d} fill={p.color} fillOpacity={0.2} />
-                {(p.value ?? 0) > 0 ? <Path d={d} fill={p.color} fillOpacity={0.9} clipPath={`url(#fill-${p.key})`} /> : null}
-                <Path d={d} fill="none" stroke="#FFFFFF" strokeOpacity={0.7} strokeWidth={1.5} />
-              </G>
-            );
-          })}
-        </Svg>
-
-        {/* Total in the middle */}
-        <View pointerEvents="none" style={{ position: 'absolute', left: 0, top: 0, width: SIZE, height: SIZE, alignItems: 'center', justifyContent: 'center' }}>
-          <Text style={{ fontSize: 10, letterSpacing: 1, fontWeight: '700', color: colors.muted }}>WELL-BEING</Text>
-          <Text style={{ fontSize: 40 * k, color: colors.insight, fontVariant: ['tabular-nums'], lineHeight: 46 * k }}>{Math.round(w.total)}</Text>
-          <Text style={{ color: colors.muted, fontSize: 12 }}>of 300</Text>
-          <View style={{ width: 120 * k, marginTop: 2 }}>
-            <Text style={{ fontWeight: '600', fontSize: 12, color: labelColor, textAlign: 'center' }}>{label}</Text>
+    <View style={{ gap: 14 }}>
+      <View style={{ alignItems: 'center' }}>
+        <View style={{ width: SIZE + 24 * k, height: SIZE + 24 * k, borderRadius: 999, backgroundColor: colors.tint, alignItems: 'center', justifyContent: 'center' }}>
+          <View style={{ width: SIZE, height: SIZE }}>
+            <Svg width={SIZE} height={SIZE}>
+              {parts.map(p => {
+                const filled = Math.max(0, Math.min(100, p.value ?? 0)) / 100;
+                return (
+                  <G key={p.key} onPress={() => router.navigate(p.route)}>
+                    <Path d={arc(p.start, p.start + SPAN)} stroke={p.color} strokeOpacity={0.2} strokeWidth={STROKE} strokeLinecap="round" fill="none" />
+                    {filled > 0 ? <Path d={arc(p.start, p.start + Math.max(1, SPAN * filled))} stroke={p.color} strokeWidth={STROKE} strokeLinecap="round" fill="none" /> : null}
+                  </G>
+                );
+              })}
+            </Svg>
+            <View pointerEvents="none" style={{ position: 'absolute', left: 0, top: 0, width: SIZE, height: SIZE, alignItems: 'center', justifyContent: 'center' }}>
+              <Text style={{ fontSize: 44 * k, color: colors.insight, fontVariant: ['tabular-nums'], lineHeight: 50 * k }}>{Math.round(w.total)}</Text>
+              <Text style={{ color: colors.muted, fontSize: 12 }}>of 300</Text>
+            </View>
           </View>
         </View>
-
-        {/* A tappable label in the middle of each section */}
-        {parts.map(p => {
-          const a = ((p.start + 60 - 90) * Math.PI) / 180, r = (R_IN + R_OUT) / 2;
-          const x = C + r * Math.cos(a), y = C + r * Math.sin(a);
-          return (
-            <Pressable key={p.key} accessibilityRole="button"
-              accessibilityLabel={`${p.name}: ${p.value == null ? 'not logged' : Math.round(p.value) + ' of 100'}. Open the ${p.name} tab.`}
-              onPress={() => router.navigate(p.route)} hitSlop={10}
-              style={{ position: 'absolute', left: x - 32, top: y - 21, width: 64, height: 42, alignItems: 'center', justifyContent: 'center',
-                backgroundColor: 'rgba(255,255,255,0.82)', borderRadius: 14 }}>
-              <Text style={{ fontSize: 12, fontWeight: '700', color: p.color }}>{p.name}</Text>
-              <Text style={{ fontSize: 13, color: colors.ink, fontVariant: ['tabular-nums'] }}>{p.value == null ? '–' : Math.round(p.value)}</Text>
-            </Pressable>
-          );
-        })}
+        <Text style={{ fontWeight: '600', fontSize: 13, color: labelColor, marginTop: 10 }}>{label}</Text>
       </View>
-      <Text style={{ fontSize: 12, color: colors.muted }}>Tap Body, Mind or Soul to open it</Text>
+
+    </View>
+  );
+}
+
+// Body top right, Mind bottom, Soul left.
+const partsOf = (w: WellBeing): Part[] => [
+  { key: 'body', name: 'Body', color: colors.body, start: -55, value: w.body?.total, route: '/body' },
+  { key: 'mind', name: 'Mind', color: colors.mind, start: 65, value: w.mind?.total, route: '/mind' },
+  { key: 'soul', name: 'Soul', color: colors.soul, start: 185, value: w.soul?.total, route: '/soul' },
+];
+
+/** Three coloured tiles under the circle; each opens its tab. */
+export function PillarTiles({ w }: { w: WellBeing }) {
+  const parts = partsOf(w);
+  return (
+    <View style={{ flexDirection: 'row', gap: 8 }}>
+      {parts.map(p => (
+        <Pressable key={p.key} accessibilityRole="button"
+          accessibilityLabel={`${p.name}: ${p.value == null ? 'not logged' : Math.round(p.value) + ' of 100'}. Open the ${p.name} tab.`}
+          onPress={() => router.navigate(p.route)}
+          style={({ pressed }) => ({ flex: 1, backgroundColor: p.color, borderRadius: 16, paddingVertical: 12, alignItems: 'center', opacity: pressed ? 0.85 : 1 })}>
+          <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 17 }}>{p.name}</Text>
+          <Text style={{ color: '#FFFFFF', fontSize: 13, fontVariant: ['tabular-nums'], opacity: 0.95 }}>{p.value == null ? '–' : `${Math.round(p.value)}/100`}</Text>
+        </Pressable>
+      ))}
     </View>
   );
 }

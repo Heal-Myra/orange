@@ -4,7 +4,8 @@ Date: 19 October 2026. Decided by: the founder.
 
 ## Decision
 - Look "A. Calm Teal", based on three apps the founder likes (a meditation app, a health tracker and an AI wellbeing coach): a white-grey page (#F5F8F9), white cards with a soft shadow, one calm teal (#2A7C83) for ordinary buttons, ticks and links.
-- Pillars: Body leaf green #4C7A27, Mind teal #2A7C83, Soul amber #A85F1A.
+- Pillars (updated 09:43, exactly as look A): Body green #6A9A3B, Mind teal #3C9AA2, Soul soft orange #E0794F. These carry large bold labels and shapes; small text uses ink, muted or the darker green #4C7A27.
+- Today layout (look A): greeting ("Good morning, Name"), the circle on a soft teal disc (#E6F3F4) with three rounded arcs and the total in coral, three coloured tiles (Body / Mind / Soul with scores) that open each tab, then Myra recommends with a coral button.
 - **Signature coral #C0513A = Happy Orange's own output.** Anything the app itself produces (the name, scores, guidance, AI analysis, explanations, Myra) uses coral, so a person can always tell what is Happy Orange's proprietary suggestion or analysis versus what they entered themselves. Token: `colors.insight`, button `kind="insight"`.
 
 ## Why

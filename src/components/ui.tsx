@@ -9,10 +9,11 @@ import { useHeal } from '../lib/store';
 import { FeedbackBox } from './FeedbackBox';
 import { colors, radius, shadow, space } from '../theme';
 
-export function Screen({ children, showDay = true, feedback }: { children: ReactNode; showDay?: boolean; feedback?: string }) {
+export function Screen({ children, showDay = true, feedback, top }: { children: ReactNode; showDay?: boolean; feedback?: string; top?: ReactNode }) {
   return (
     <SafeAreaView style={s.safe} edges={['left', 'right']}>
       <ScrollView contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled">
+        {top}
         {showDay && <DayBar />}
         {feedback ? <FeedbackBox area={feedback} /> : null}
         {children}

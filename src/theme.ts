@@ -2,7 +2,8 @@
 // a clean white-grey page, white cards with a soft shadow, one calm teal for buttons and ticks,
 // and one warm coral, Happy Orange's signature: everything Happy Orange itself produces (the name, scores,
 // guidance, AI reads, explanations, Myra) is coral, so people can tell it is Happy Orange's own output.
-// Pillar colours: leaf green Body, teal Mind, amber Soul. Every text colour reads at 4.5:1 or more on white.
+// Pillar colours exactly as in look A: green Body, teal Mind, soft orange Soul (founder, 19 Oct 2026, 09:43).
+// Body text, notes and buttons read at 4.5:1 or more; pillar colours carry large bold labels (3:1 or more).
 
 export const colors = {
   bg: '#F5F8F9',
@@ -12,15 +13,16 @@ export const colors = {
   ink: '#1F2A30',
   muted: '#5F6B70',
   line: '#E2E9EB',
-  body: '#4C7A27',
-  mind: '#2A7C83',
-  soul: '#A85F1A',
+  body: '#6A9A3B',
+  mind: '#3C9AA2',
+  soul: '#E0794F',
+  tint: '#E6F3F4', // the soft disc behind the Today circle
   accent: '#2A7C83', // main buttons, ticks, links
   onAccent: '#FFFFFF',
   insight: '#C0513A', // Happy Orange's signature: anything the app itself produces (guidance, scores, AI reads, Myra)
   onInsight: '#FFFFFF',
   brand: '#C0513A', // the Happy Orange name (same signature coral)
-  good: '#4C7A27',
+  good: '#4C7A27', // darker green, for small text
   warn: '#8A5A00',
   bad: '#B3261E',
 };
