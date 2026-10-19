@@ -1,10 +1,11 @@
 // AI pieces used on the Today, Mind and Soul screens.
 
-import { useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { classifyMedia, dailyGuidance, explainVerse, oneLine, reflectOnAction } from '../lib/ai';
 import { useAuth } from '../lib/auth';
-import { buildContext } from '../lib/context';
+import { buildContext, daySignature, partOfDay } from '../lib/context';
+import { todayISO } from '../lib/dates';
 import type { Verse } from '../lib/gita';
 import { CONTENT_CATEGORIES } from '../lib/scoring';
 import { useHeal } from '../lib/store';
@@ -14,22 +15,43 @@ import { Button, Card, Heading, Note, TextField } from './ui';
 
 const errText = (e: unknown) => (e instanceof Error ? e.message : 'Something went wrong. Try again.');
 
-/** Today: daily guidance built from today and the last 7 days. */
+/** Today: "Myra recommends". Refreshes by itself when the part of the day changes (morning, afternoon, evening, night)
+ *  or when what is logged today changes (a meal, steps from a fitness app, meditation...), so the person never has to ask. */
 export function GuidanceCard() {
   const { session } = useAuth();
   const { day, days, date, profile, update } = useHeal();
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [tick, setTick] = useState(0);
+  const tried = useRef<string>('');
   const g = day.guidance;
+  const isToday = date === todayISO();
+  const part = partOfDay();
+  const sig = daySignature(day);
 
-  const run = async () => {
+  const run = useCallback(async () => {
     setBusy(true); setMessage(null);
     const context = buildContext(day, days, date, profile);
     try {
       const r = await dailyGuidance(context);
-      update(d => { d.guidance = { ...r, at: new Date().toISOString() }; });
+      update(d => { d.guidance = { ...r, at: new Date().toISOString(), part: partOfDay(), sig: daySignature(d) }; });
     } catch (e) { setMessage(errText(e)); } finally { setBusy(false); }
-  };
+  }, [day, days, date, profile, update]);
+
+  // Look again every 10 minutes, so a new part of the day is noticed even if nothing is tapped.
+  useEffect(() => { const t = setInterval(() => setTick(x => x + 1), 10 * 60 * 1000); return () => clearInterval(t); }, []);
+
+  useEffect(() => {
+    if (!session || !isToday || busy) return;
+    const ageMin = g ? (Date.now() - new Date(g.at).getTime()) / 60000 : Infinity;
+    const stale = !g || g.part !== part || (g.sig !== sig && ageMin > 20);
+    const key = `${date}|${part}|${sig}`;
+    if (!stale || tried.current === key) return; // one attempt per situation, so errors never loop
+    const t = setTimeout(() => { tried.current = key; run(); }, 4000); // wait until the person stops typing
+    return () => clearTimeout(t);
+  }, [session, isToday, busy, g, part, sig, date, run, tick]);
+
+  const time = g ? new Date(g.at).toTimeString().slice(0, 5) : '';
 
   return (
     <Card style={{ borderLeftWidth: 4, borderLeftColor: colors.insight }}>
@@ -44,12 +66,16 @@ export function GuidanceCard() {
             </View>
           ) : null)}
         </>
-      ) : <Note>Log what you can, then ask Myra. Her picks change with your day.</Note>}
-      {session
-        ? <Button kind="insight" title={busy ? 'Thinking…' : g ? 'Refresh' : 'Get recommendations'} onPress={run} disabled={busy} />
-        : <Note>Sign in to get Myra's recommendations.</Note>}
+      ) : session ? <Note>{busy ? 'Myra is looking at your day…' : 'Myra will suggest your next steps here.'}</Note> : null}
+      {!session ? <Note>Sign in to get Myra's recommendations.</Note> : null}
+      {session && g ? (
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Note>{busy ? 'Updating…' : `Updated ${time} · changes with your day`}</Note>
+          {!busy && isToday ? <Pressable onPress={run} hitSlop={8}><Text style={{ color: colors.insight, fontWeight: '600', fontSize: 13 }}>Refresh</Text></Pressable> : null}
+        </View>
+      ) : null}
       {message ? <Text style={{ color: colors.bad }}>{message}</Text> : null}
-      <Note>A working model to help you understand yourself, not medical advice.</Note>
+      <Note>Not medical advice.</Note>
     </Card>
   );
 }

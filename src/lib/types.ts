@@ -65,7 +65,8 @@ export interface DayLog {
     gratitude?: string[];   // up to three things I am grateful for
     thought?: string;       // my thought for the day
   };
-  guidance?: { headline: string; body: string[]; mind: string[]; soul: string[]; at: string };
+  // Myra recommends. part = part of the day it was made for; sig = fingerprint of the day's data it was made from.
+  guidance?: { headline: string; body: string[]; mind: string[]; soul: string[]; at: string; part?: string; sig?: string };
 }
 
 export interface Profile {

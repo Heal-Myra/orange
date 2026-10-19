@@ -123,7 +123,7 @@ Reply with JSON only:
 {"items":[{"name":"short everyday name, at most 4 words, e.g. Roti, Moong dal, Aloo capsicum sabzi","grams":number,"ingredients":[{"ingredient":"plain raw name, e.g. wheat flour atta, bengal gram dal, ghee","grams":number}],
   "estimate":{"kcal":number,"protein_g":number,"carbs_g":number,"fat_g":number}}],
  "confidence":"low"|"medium"|"high","note":"one sentence on what was hardest to estimate",
- "insight":"one natural, food-first tweak as ONE line of at most 10 words"}
+ "insight":"one natural, food-first tweak as ONE direct instruction of at most 10 words, e.g. Add curd to the next meal."}
 If there is no food: {"items":[],"confidence":"low","note":"${image ? 'No food found in the photo.' : 'No food found in the description.'}","insight":""}`, image ?? undefined));
 
   const items = Array.isArray(step1.items) ? step1.items : [];
@@ -190,12 +190,14 @@ If this is not a Screen Time screenshot: {"sessions":[],"period":"unclear","note
       return parseJson(await ask('smart', ORANGE_BOOK,
 `Here is today's data and the last 7 days for one person:
 ${String(p.context ?? '').slice(0, 6000)}
-Give practical guidance for the rest of today and tomorrow morning. Reply with JSON only:
+Tell the person what to do next, for the rest of today from the time shown (if it is night, for tonight and tomorrow morning).
+Base it on the time of day, what they have already done or missed today, their pattern over the last 7 days, and any data from fitness apps. Never recommend something already done.
+Reply with JSON only:
 {"headline":"the single most useful shift today",
  "body":["one food, movement or sleep suggestion"],
  "mind":["one meditation, attention or content suggestion; use today's Tao practice when it fits"],
  "soul":["one truthfulness, service, Gita or Tao suggestion"]}
-STRICT: the headline and every suggestion is ONE line of at most 10 words, e.g. "Walk 15 minutes after lunch to steady your sugar." Exactly one suggestion per list.`));
+STRICT: the headline and every suggestion is ONE line of at most 10 words, written as a direct instruction that starts with a verb, with a number where it helps: e.g. "Walk 10 minutes after lunch.", "Sit for 5 minutes of breathing before 6 pm.", "Eat dal with dinner for protein." Never use "try", "consider", "maybe", "you could" or "it may help". Exactly one suggestion per list.`));
     }
     case 'explain_verse': {
       const hindi = p.lang === 'hi';
@@ -235,7 +237,7 @@ The app has five tabs:
 - Library: IFCT 2017 food lookup, all 18 Gita chapters, the Tao Te Ching week, and an exercise library.
 - The floating Myra button on every tab opens this chat.
 Scoring: Body = movement 40 + sleep 30 + food 30. Mind = meditation 20 + attention 10 + learning 10 + content quality 35 + content quantity 25, plus 10 for a Mind-day Tao practice (max 100). Soul = eight practices 50 (half of each weight: Satya 10, Nyaya 7.5, Kartavya 7.5, Seva 7.5, Ahimsa 5, Daana 5, Santosha 5, Kritajnata 2.5) + Gita verse studied 20 + gratitude 5 each up to 15 + thought 15, plus 10 for a Soul-day Tao practice (0 to 100).
-When asked where to do something, name the tab and the card. When analysing, use only the data below; if something is not logged, say so and suggest logging it. Keep replies short: two to five sentences. Any suggestion or recommendation you give is ONE line of at most 10 words. Plain text, no headings.
+When asked where to do something, name the tab and the card. When analysing, use only the data below; if something is not logged, say so and suggest logging it. Keep replies short: two to five sentences. Any suggestion or recommendation you give is ONE line of at most 10 words, as a direct instruction starting with a verb ("Walk 10 minutes after lunch."), never "try" or "consider". Plain text, no headings.
 The person is on the ${page} tab.
 Their data:
 ${String(p.context ?? '').slice(0, 6000)}`,
