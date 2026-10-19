@@ -19,9 +19,7 @@ How to start (2 minutes):
 
 The AI features (meal photos, guidance and Myra, the assistant) open up for you soon after you sign up.
 
-Write in the feedback box at the top of any page whenever something works, confuses you, or you wish it did more. Every message reaches me.
-
-Thank you! 🙏`;
+Write in the feedback box at the top of the page if you have any suggestions. Will try my best to integrate in the system!`;
 
 const SYNC_TEXT = {
   device: 'Saved on this device only.',
