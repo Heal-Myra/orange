@@ -24,9 +24,15 @@ export async function shrink(uri: string, fallback: string | null | undefined, m
   throw new Error('Could not read that photo. Try another one.');
 }
 
-/** Speech to text in the browser where available (Chrome; Safari on recent iPhones). */
+/**
+ * Speech to text in the browser, where it works reliably (Chrome, Android).
+ * Not offered on iPhone/iPad: Safari's speech recognition often hangs, especially in home-screen apps,
+ * and the keyboard's own microphone (dictation) works better there.
+ */
 function speechRecognition(): (new () => any) | null {
-  if (Platform.OS !== 'web' || typeof window === 'undefined') return null;
+  if (Platform.OS !== 'web' || typeof window === 'undefined' || typeof navigator === 'undefined') return null;
+  const ios = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (ios) return null;
   const w = window as unknown as Record<string, unknown>;
   return (w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null) as (new () => any) | null;
 }
@@ -86,15 +92,23 @@ export function MealPhoto() {
   };
 
   const Speech = speechRecognition();
+  const stopListening = () => {
+    try { rec.current?.abort?.(); } catch { /* already stopped */ }
+    rec.current = null; setListening(false);
+  };
   const speak = () => {
     if (!Speech) return;
-    if (listening) { rec.current?.stop(); return; }
-    const r = new Speech();
+    if (listening) { stopListening(); return; }
+    let r: any;
+    try { r = new Speech(); } catch { setMessage('Speaking is not available here. Tap the microphone on your keyboard instead.'); return; }
     r.lang = 'en-IN'; r.interimResults = false; r.maxAlternatives = 1;
-    r.onresult = (e: any) => { const t = e.results?.[0]?.[0]?.transcript ?? ''; setWords(w => (w ? w + ', ' : '') + t); };
-    r.onerror = () => setMessage('Could not hear that. You can also tap the microphone on your keyboard.');
+    r.onresult = (e: any) => { const t = e.results?.[0]?.[0]?.transcript ?? ''; if (t) setWords(w => (w ? w + ', ' : '') + t); };
+    r.onerror = () => { setMessage('Could not hear that. You can also tap the microphone on your keyboard.'); stopListening(); };
     r.onend = () => setListening(false);
-    rec.current = r; setListening(true); r.start();
+    rec.current = r; setListening(true);
+    try { r.start(); } catch { stopListening(); setMessage('Speaking is not available here. Tap the microphone on your keyboard instead.'); return; }
+    // Never stay stuck: stop listening after 15 seconds whatever happens.
+    setTimeout(() => { if (rec.current === r) stopListening(); }, 15_000);
   };
 
   const edit = (i: number, key: keyof MealItem, value: string) => setItems(list => list && list.map((it, n) => n !== i ? it : {
@@ -128,7 +142,7 @@ export function MealPhoto() {
                 <Button title={busy ? 'Working…' : 'Work it out'} onPress={describe} disabled={busy || !words.trim()} />
                 {Speech ? <Button kind="plain" title={listening ? '■ Stop' : '🎤 Speak'} onPress={speak} disabled={busy} /> : null}
               </View>
-              <Note>{Speech ? 'Tap Speak and say what you ate,' : 'To speak instead of typing, tap the microphone on your keyboard,'} for example "two rotis, dal and a bowl of curd".</Note>
+              <Note>{Speech ? 'Tap Speak and say what you ate,' : 'To speak instead of typing, tap the box, then the microphone 🎤 on your keyboard, and say what you ate,'} for example "two rotis, dal and a bowl of curd".</Note>
             </>
           ) : (
         <>
