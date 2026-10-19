@@ -14,11 +14,11 @@ export function MyraButton() {
     <Pressable accessibilityLabel="Ask Myra, your assistant" onPress={() => router.push({ pathname: '/myra', params: { from: page } })}
       style={({ pressed }) => ({
         position: 'absolute', right: 16, bottom: insets.bottom + 64, flexDirection: 'row', alignItems: 'center', gap: 6,
-        backgroundColor: colors.accent, paddingVertical: 10, paddingHorizontal: 14, borderRadius: 99, opacity: pressed ? 0.8 : 1,
+        backgroundColor: colors.insight, paddingVertical: 10, paddingHorizontal: 14, borderRadius: 99, opacity: pressed ? 0.8 : 1,
         boxShadow: '0 6px 16px rgba(0,0,0,0.18)',
       })}>
-      <Ionicons name="sparkles" size={16} color={colors.onAccent} />
-      <Text style={{ color: colors.onAccent, fontWeight: '700', fontSize: 15 }}>Myra</Text>
+      <Ionicons name="sparkles" size={16} color={colors.onInsight} />
+      <Text style={{ color: colors.onInsight, fontWeight: '700', fontSize: 15 }}>Myra</Text>
     </Pressable>
   );
 }

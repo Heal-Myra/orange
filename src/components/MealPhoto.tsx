@@ -166,7 +166,7 @@ export function MealPhoto() {
             <>
               <TextField label="What did you eat?" value={words} onChangeText={setWords} multiline
                 placeholder="e.g. 2 rotis with ghee, 1 katori moong dal, bhindi sabzi, a cup of chai with sugar" />
-              <Button title={busy ? 'Calculating…' : 'Calculate'} onPress={() => describe()} disabled={busy || !words.trim()} />
+              <Button kind="insight" title={busy ? 'Calculating…' : 'Calculate'} onPress={() => describe()} disabled={busy || !words.trim()} />
             </>
           )}
 
@@ -175,7 +175,7 @@ export function MealPhoto() {
       )}
       {uri ? <Image source={{ uri }} style={{ width: '100%', aspectRatio: 4 / 3, borderRadius: 10, backgroundColor: colors.sunk }} resizeMode="cover" /> : null}
       {message ? <Text style={{ color: colors.muted }}>{message}</Text> : null}
-      {insight ? <Text style={{ color: colors.ink, borderLeftWidth: 3, borderLeftColor: colors.body, paddingLeft: 10 }}>{insight}</Text> : null}
+      {insight ? <Text style={{ color: colors.ink, borderLeftWidth: 3, borderLeftColor: colors.insight, paddingLeft: 10 }}>{insight}</Text> : null}
       {items?.map((it, i) => (
         <View key={i} style={{ gap: 6, borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 8 }}>
           <View style={[s.headingRow]}>

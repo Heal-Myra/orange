@@ -1,30 +1,32 @@
-// Happy Orange theme "Marigold & leaf" (chosen by the founder, 19 Oct 2026):
-// marigold yellow background for happiness, leaf green for health (buttons, progress, ticks),
-// a deep orange for the Happy Orange name, and frosted-glass cards in the style of Apple's glass design.
-// Pillar colours: leaf green Body, blue Mind, burnt saffron Soul.
-// Text contrast was checked against the orange and the glass cards.
+// Happy Orange theme "Calm Teal" (chosen by the founder, 19 Oct 2026, from his three reference apps):
+// a clean white-grey page, white cards with a soft shadow, one calm teal for buttons and ticks,
+// and one warm coral, Happy Orange's signature: everything Happy Orange itself produces (the name, scores,
+// guidance, AI reads, explanations, Myra) is coral, so people can tell it is Happy Orange's own output.
+// Pillar colours: leaf green Body, teal Mind, amber Soul. Every text colour reads at 4.5:1 or more on white.
 
 export const colors = {
-  bg: '#FFE0A3',
-  surface: 'rgba(255,255,255,0.40)', // glass card
-  field: 'rgba(255,255,255,0.60)', // text boxes
-  sunk: 'rgba(255,255,255,0.45)', // meter tracks
-  ink: '#1A1C2B',
-  muted: '#4A3A30',
-  line: 'rgba(255,255,255,0.65)',
-  body: '#276B2B',
-  mind: '#2A55B8',
-  soul: '#9A3B12',
-  accent: '#276B2B',
+  bg: '#F5F8F9',
+  surface: '#FFFFFF', // cards
+  field: '#F7FAFB', // text boxes
+  sunk: '#E8EFF1', // meter tracks
+  ink: '#1F2A30',
+  muted: '#5F6B70',
+  line: '#E2E9EB',
+  body: '#4C7A27',
+  mind: '#2A7C83',
+  soul: '#A85F1A',
+  accent: '#2A7C83', // main buttons, ticks, links
   onAccent: '#FFFFFF',
-  brand: '#B4450A', // the orange of the Happy Orange name
-  good: '#276B2B',
-  warn: '#7C4A03',
-  bad: '#A11D1D',
+  insight: '#C0513A', // Happy Orange's signature: anything the app itself produces (guidance, scores, AI reads, Myra)
+  onInsight: '#FFFFFF',
+  brand: '#C0513A', // the Happy Orange name (same signature coral)
+  good: '#4C7A27',
+  warn: '#8A5A00',
+  bad: '#B3261E',
 };
 
-/** Frosted-glass blur, applied on the web (native apps ignore it). */
-export const glass = { backdropFilter: 'blur(18px) saturate(140%)', WebkitBackdropFilter: 'blur(18px) saturate(140%)' } as object;
+/** Soft card shadow. */
+export const shadow = '0 2px 12px rgba(31, 42, 48, 0.07)';
 
 export const space = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24 };
 export const radius = { sm: 8, md: 12, lg: 16 };

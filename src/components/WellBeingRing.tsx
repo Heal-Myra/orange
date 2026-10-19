@@ -71,7 +71,7 @@ export function WellBeingRing({ w, label, labelColor }: { w: WellBeing; label: s
         {/* Total in the middle */}
         <View pointerEvents="none" style={{ position: 'absolute', left: 0, top: 0, width: SIZE, height: SIZE, alignItems: 'center', justifyContent: 'center' }}>
           <Text style={{ fontSize: 10, letterSpacing: 1, fontWeight: '700', color: colors.muted }}>WELL-BEING</Text>
-          <Text style={{ fontSize: 40 * k, color: colors.ink, fontVariant: ['tabular-nums'], lineHeight: 46 * k }}>{Math.round(w.total)}</Text>
+          <Text style={{ fontSize: 40 * k, color: colors.insight, fontVariant: ['tabular-nums'], lineHeight: 46 * k }}>{Math.round(w.total)}</Text>
           <Text style={{ color: colors.muted, fontSize: 12 }}>of 300</Text>
           <View style={{ width: 120 * k, marginTop: 2 }}>
             <Text style={{ fontWeight: '600', fontSize: 12, color: labelColor, textAlign: 'center' }}>{label}</Text>

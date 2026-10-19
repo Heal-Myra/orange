@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.1 — 19 October 2026 (new look: "Calm Teal" with a Happy Orange coral signature)
+- New theme chosen by the founder from three reference apps: white-grey page, white cards with a soft shadow, rounded buttons, calm teal for buttons and ticks; Body leaf green, Mind teal, Soul amber. The marigold background and glass cards are retired.
+- Happy Orange's signature coral (#C0513A) marks everything the app itself produces: the Happy Orange name, scores, Today's guidance, AI reads (meal Calculate, Screen Time), verse explanations, reflections, category picks, and Myra. See docs/decisions/0007-colour-system.md.
+
 ## 0.5.0 — 19 October 2026 (founder's new layout for Body, Mind and Soul)
 - Testing: a feedback box at the top of every tab (Today, Body, Mind, Soul, Library) sends straight to the team with the page name; the feedback card was removed from Profile. "Person icon" is now labelled **Profile** everywhere.
 - "Invite a friend to test" (Account → Admin card): opens the phone's share menu with the invitation written, so people are picked from contacts in WhatsApp or Messages.

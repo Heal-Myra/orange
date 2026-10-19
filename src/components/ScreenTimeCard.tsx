@@ -55,7 +55,7 @@ export function ScreenTimeCard() {
       <Note>Take a screenshot of Screen Time (iPhone: Settings → Screen Time → See All App & Website Activity) and choose it here. The app reads your social-media minutes for you.</Note>
       <Check color={colors.mind} checked={day.noMedia} onToggle={() => update(d => { d.noMedia = !d.noMedia; if (d.noMedia) d.media = []; })} title="I used no social media today" />
       {!day.noMedia && (session
-        ? <Button title={busy ? 'Reading…' : 'Choose Screen Time screenshot'} onPress={pick} disabled={busy} />
+        ? <Button kind="insight" title={busy ? 'Reading…' : 'Choose Screen Time screenshot'} onPress={pick} disabled={busy} />
         : <Note>Sign in to read a screenshot. You can still add sessions by hand below.</Note>)}
       {message ? <Text style={{ color: colors.muted }}>{message}</Text> : null}
       {rows?.map((r, i) => (

@@ -71,8 +71,8 @@ export default function Myra() {
           {session && messages.length <= 2 && !busy && (
             <View style={{ gap: 8, paddingTop: 4 }}>
               {SUGGESTIONS[page].map(q => (
-                <Pressable key={q} onPress={() => send(q)} style={{ alignSelf: 'flex-start', paddingVertical: 8, paddingHorizontal: 12, borderRadius: 99, borderWidth: 1, borderColor: colors.accent, backgroundColor: colors.surface }}>
-                  <Text style={{ color: colors.accent, fontWeight: '600' }}>{q}</Text>
+                <Pressable key={q} onPress={() => send(q)} style={{ alignSelf: 'flex-start', paddingVertical: 8, paddingHorizontal: 12, borderRadius: 99, borderWidth: 1, borderColor: colors.insight, backgroundColor: colors.surface }}>
+                  <Text style={{ color: colors.insight, fontWeight: '600' }}>{q}</Text>
                 </Pressable>
               ))}
             </View>
@@ -85,7 +85,7 @@ export default function Myra() {
               <View style={{ flexDirection: 'row', gap: 8, alignItems: 'flex-end' }}>
                 <TextInput style={[s.input, { flex: 1, maxHeight: 120 }]} value={text} onChangeText={setText} placeholder="Ask Myra anything…"
                   placeholderTextColor={colors.muted} multiline onSubmitEditing={() => send(text)} />
-                <Button title="Send" onPress={() => send(text)} disabled={!text.trim() || busy} />
+                <Button kind="insight" title="Send" onPress={() => send(text)} disabled={!text.trim() || busy} />
               </View>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                 <Pressable onPress={() => router.push({ pathname: '/feedback', params: { from: page } })}>

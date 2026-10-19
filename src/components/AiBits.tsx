@@ -32,7 +32,7 @@ export function GuidanceCard() {
   };
 
   return (
-    <Card>
+    <Card style={{ borderLeftWidth: 4, borderLeftColor: colors.insight }}>
       <Heading>Today's guidance</Heading>
       {g ? (
         <>
@@ -46,7 +46,7 @@ export function GuidanceCard() {
         </>
       ) : <Note>Log what you can, then ask for guidance. It changes as your day changes.</Note>}
       {session
-        ? <Button title={busy ? 'Thinking…' : g ? 'Refresh guidance' : 'Get guidance'} onPress={run} disabled={busy} />
+        ? <Button kind="insight" title={busy ? 'Thinking…' : g ? 'Refresh guidance' : 'Get guidance'} onPress={run} disabled={busy} />
         : <Note>Sign in to get guidance.</Note>}
       {message ? <Text style={{ color: colors.bad }}>{message}</Text> : null}
       <Note>A working model to help you understand yourself, not medical advice.</Note>
@@ -73,11 +73,11 @@ export function ExplainVerse({ verse }: { verse: Verse }) {
   return (
     <View style={{ gap: 8 }}>
       <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
-        <Button kind="plain" title={busy === 'en' ? 'Explaining…' : 'Explain'} onPress={() => run('en')} disabled={!!busy} />
-        <Button kind="plain" title={busy === 'hi' ? 'समझा रहे हैं…' : 'हिंदी में समझाएँ'} onPress={() => run('hi')} disabled={!!busy} />
+        <Button kind="insight" title={busy === 'en' ? 'Explaining…' : 'Explain'} onPress={() => run('en')} disabled={!!busy} />
+        <Button kind="insight" title={busy === 'hi' ? 'समझा रहे हैं…' : 'हिंदी में समझाएँ'} onPress={() => run('hi')} disabled={!!busy} />
       </View>
       {(['en', 'hi'] as const).map(l => text[l] ? (
-        <Text key={l} style={{ color: colors.ink, lineHeight: 22, borderLeftWidth: 3, borderLeftColor: colors.soul, paddingLeft: 10 }}>{text[l]}</Text>
+        <Text key={l} style={{ color: colors.ink, lineHeight: 22, borderLeftWidth: 3, borderLeftColor: colors.insight, paddingLeft: 10 }}>{text[l]}</Text>
       ) : null)}
       {message ? <Text style={{ color: colors.bad }}>{message}</Text> : null}
     </View>
@@ -111,7 +111,7 @@ export function ReflectCard() {
         <>
           <TextField label="What did you do?" value={text} onChangeText={setText} multiline
             placeholder="e.g. Lost my temper with my driver, later apologised and paid him for the extra hour" />
-          <Button title={busy ? 'Reflecting…' : 'Reflect'} onPress={run} disabled={busy || !text.trim()} />
+          <Button kind="insight" title={busy ? 'Reflecting…' : 'Reflect'} onPress={run} disabled={busy || !text.trim()} />
         </>
       ) : <Note>Sign in to use reflections.</Note>}
       {message ? <Text style={{ color: colors.bad }}>{message}</Text> : null}
@@ -150,7 +150,7 @@ export function ClassifyHelper({ onPick }: { onPick: (c: ContentCategoryId) => v
     <View style={{ gap: 8 }}>
       <TextField label="Not sure of the category? Describe what you watched" value={text} onChangeText={setText} multiline
         placeholder="e.g. Cooking reels, then a 20-minute video on stock market basics" />
-      <Button kind="plain" title={busy ? 'Thinking…' : 'Pick the category for me'} onPress={run} disabled={busy || !text.trim()} />
+      <Button kind="insight" title={busy ? 'Thinking…' : 'Pick the category for me'} onPress={run} disabled={busy || !text.trim()} />
       {message ? <Text style={{ color: colors.muted }}>{message}</Text> : null}
     </View>
   );

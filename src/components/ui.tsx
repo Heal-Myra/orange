@@ -2,12 +2,12 @@
 
 import { Ionicons } from '@expo/vector-icons';
 import type { ReactNode } from 'react';
-import { Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View, type StyleProp, type ViewStyle } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, TextInput, View, type StyleProp, type ViewStyle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { formatDay, todayISO } from '../lib/dates';
 import { useHeal } from '../lib/store';
 import { FeedbackBox } from './FeedbackBox';
-import { colors, glass, radius, space } from '../theme';
+import { colors, radius, shadow, space } from '../theme';
 
 export function Screen({ children, showDay = true, feedback }: { children: ReactNode; showDay?: boolean; feedback?: string }) {
   return (
@@ -124,11 +124,11 @@ export function Check({ checked, onToggle, title, detail, points, color = colors
   );
 }
 
-export function Button({ title, onPress, kind = 'primary', disabled }: { title: string; onPress: () => void; kind?: 'primary' | 'plain'; disabled?: boolean }) {
+export function Button({ title, onPress, kind = 'primary', disabled }: { title: string; onPress: () => void; kind?: 'primary' | 'plain' | 'insight'; disabled?: boolean }) {
   return (
     <Pressable accessibilityRole="button" onPress={onPress} disabled={disabled}
-      style={({ pressed }) => [s.btn, kind === 'primary' ? s.btnPrimary : s.btnPlain, (pressed || disabled) && { opacity: 0.6 }]}>
-      <Text style={[s.btnText, kind === 'primary' && { color: colors.onAccent }]}>{title}</Text>
+      style={({ pressed }) => [s.btn, kind === 'primary' ? s.btnPrimary : kind === 'insight' ? s.btnInsight : s.btnPlain, (pressed || disabled) && { opacity: 0.6 }]}>
+      <Text style={[s.btnText, kind !== 'plain' && { color: colors.onAccent }]}>{title}</Text>
     </Pressable>
   );
 }
@@ -151,12 +151,12 @@ export const s = StyleSheet.create({
   dayBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: space.md },
   dayBtn: { padding: space.sm },
   dayText: { fontSize: 16, fontWeight: '600', color: colors.ink, minWidth: 130, textAlign: 'center' },
-  card: { backgroundColor: colors.surface, borderRadius: radius.lg + 4, borderWidth: 1, borderColor: colors.line, padding: space.lg, gap: space.md, ...(Platform.OS === 'web' ? glass : {}), boxShadow: '0 8px 24px rgba(110, 80, 0, 0.12)' },
+  card: { backgroundColor: colors.surface, borderRadius: radius.lg + 4, borderWidth: 1, borderColor: colors.line, padding: space.lg, gap: space.md, boxShadow: shadow },
   headingRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: space.sm },
   heading: { fontSize: 20, fontWeight: '600', color: colors.ink, flexShrink: 1 },
   note: { fontSize: 13, color: colors.muted, lineHeight: 19 },
   label: { fontSize: 11, letterSpacing: 1, textTransform: 'uppercase', color: colors.muted, fontWeight: '700' },
-  score: { fontSize: 20, fontVariant: ['tabular-nums'], color: colors.ink },
+  score: { fontSize: 20, fontVariant: ['tabular-nums'], color: colors.insight }, // scores are Happy Orange output
   scoreMax: { fontSize: 13, color: colors.muted },
   meterLabel: { fontSize: 14, color: colors.ink },
   meterRight: { fontSize: 13, color: colors.muted, fontVariant: ['tabular-nums'] },
@@ -170,8 +170,9 @@ export const s = StyleSheet.create({
   checkDetail: { fontSize: 13, color: colors.muted },
   tag: { fontSize: 11, fontWeight: '700' },
   points: { fontSize: 14, color: colors.muted, fontVariant: ['tabular-nums'] },
-  btn: { borderRadius: radius.sm, paddingVertical: 11, paddingHorizontal: 16, alignItems: 'center' },
+  btn: { borderRadius: 99, paddingVertical: 11, paddingHorizontal: 16, alignItems: 'center' },
   btnPrimary: { backgroundColor: colors.accent },
+  btnInsight: { backgroundColor: colors.insight }, // suggestions and analytics
   btnPlain: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.line },
   btnText: { fontSize: 15, fontWeight: '600', color: colors.ink },
   seg: { flexDirection: 'row', borderWidth: 1, borderColor: colors.line, borderRadius: radius.sm, overflow: 'hidden', alignSelf: 'flex-start' },
