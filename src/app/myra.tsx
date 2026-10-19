@@ -2,7 +2,7 @@
 // Uses the heal-ai server function (needs sign-in; counts towards the daily AI cap).
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, View, type ScrollViewInstance } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -81,13 +81,16 @@ export default function Myra() {
         <View style={{ padding: 12, gap: 8, borderTopWidth: 1, borderTopColor: colors.line }}>
           {session ? (
             <>
+              <Note>Myra can make mistakes. Not medical advice.</Note>
               <View style={{ flexDirection: 'row', gap: 8, alignItems: 'flex-end' }}>
                 <TextInput style={[s.input, { flex: 1, maxHeight: 120 }]} value={text} onChangeText={setText} placeholder="Ask Myra anything…"
                   placeholderTextColor={colors.muted} multiline onSubmitEditing={() => send(text)} />
                 <Button title="Send" onPress={() => send(text)} disabled={!text.trim() || busy} />
               </View>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                <Note>Myra can make mistakes. Not medical advice.</Note>
+                <Pressable onPress={() => router.push({ pathname: '/feedback', params: { from: page } })}>
+                  <Text style={{ color: colors.accent, fontWeight: '600', fontSize: 13 }}>Send feedback</Text>
+                </Pressable>
                 {messages.length > 1 ? <Pressable onPress={clear}><Text style={{ color: colors.accent, fontWeight: '600', fontSize: 13 }}>Clear chat</Text></Pressable> : null}
               </View>
             </>

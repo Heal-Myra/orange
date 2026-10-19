@@ -1,6 +1,7 @@
 # Changelog
 
 ## 0.5.0 — 19 October 2026 (founder's new layout for Body, Mind and Soul)
+- Send feedback: a feedback screen (mood 1–5, which part, message) from the Account screen and from Myra; saved to the new `feedback` table (migration 0003). Deleting my data also deletes my feedback.
 - Log a meal: three big buttons, Photo, Speak and Type. Photo opens the camera/photos straight away; Speak listens and works out the meal by itself (Android/Chrome now; on iPhone it comes with the native app, by founder's choice); Type shows the box.
 - Fix: on iPhone the in-app Speak button could hang (Safari speech recognition); iPhone now uses the keyboard microphone, and listening always stops after 15 seconds elsewhere.
 - Body: "Log a meal" — type or speak what you ate (e.g. "2 rotis, dal, bhindi"), or use a photo; the AI splits it into items and the numbers come from IFCT 2017. Speaking uses the browser's speech recognition where available, otherwise the keyboard microphone.

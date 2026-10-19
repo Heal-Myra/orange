@@ -41,6 +41,12 @@ export default function Account() {
           : online ? <Button title="Sign in to save online" onPress={async () => { await leaveGuest(); router.replace('/sign-in'); }} /> : null}
       </Card>
 
+      <Card>
+        <Heading>Help us improve</Heading>
+        <Note>Tell the Happy Orange team what works and what does not.</Note>
+        <Button title="Send feedback" onPress={() => router.push('/feedback')} />
+      </Card>
+
       {session && (
         <Card>
           <Heading>Delete my data</Heading>

@@ -114,6 +114,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const uid = session.user.id;
       const a = await supabase.from('day_logs').delete().eq('user_id', uid);
       if (a.error) return explain(a.error.message);
+      await supabase.from('feedback').delete().eq('user_id', uid); // ignore if the table is not set up yet
       const b = await supabase.from('profiles').delete().eq('user_id', uid);
       if (b.error) return explain(b.error.message);
       await supabase.auth.signOut();
