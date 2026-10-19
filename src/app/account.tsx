@@ -17,9 +17,9 @@ How to start (2 minutes):
 2. Add it to your home screen: iPhone: Share → Add to Home Screen. Android: ⋮ → Add to Home screen.
 3. Open it, type your email and enter the 6-digit code you receive (check Spam if it doesn't arrive).
 
-The AI features (meal photos, guidance, Myra the assistant) switch on as soon as I approve you, usually within a day.
+The smart features (meal photos, guidance and Myra, the assistant) open up for you within a day of signing in.
 
-Please use it once a day, and write in the feedback box at the top of any page whenever something works, confuses you, or you wish it did more. Every message reaches me.
+Write in the feedback box at the top of any page whenever something works, confuses you, or you wish it did more. Every message reaches me.
 
 Thank you! 🙏`;
 
