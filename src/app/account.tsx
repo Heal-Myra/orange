@@ -10,11 +10,18 @@ import { colors } from '../theme';
 
 // The tester invitation (founder's wording, 19 Oct 2026). Shared through the phone's own share menu,
 // so people are picked from the contacts in WhatsApp, Messages or any other app.
-const INVITE = `Hi! I’m building Happy Orange, an app that helps you restore healthy body and mind to connect with your inner self. Could you test it for a week? 🍊
+const INVITE = `Hi! 🍊 I’m building Happy Orange, an app that helps you restore healthy body and mind to connect with your inner self. Would you test it for me for a week and tell me honestly what you think?
 
-Open app.happyorange.in on your phone, add it to your home screen, and sign in with your email (you'll get a 6-digit code). AI features switch on once I approve you.
+How to start (2 minutes):
+1. On your phone, open app.happyorange.in in Safari (iPhone) or Chrome (Android).
+2. Add it to your home screen: iPhone: Share → Add to Home Screen. Android: ⋮ → Add to Home screen.
+3. Open it, type your email and enter the 6-digit code you receive (check Spam if it doesn't arrive).
 
-Use it daily and tap the person icon → Send feedback to tell me what you think. Thanks a lot!`;
+The AI features (meal photos, guidance, Myra the assistant) switch on as soon as I approve you, usually within a day.
+
+Please use it once a day, and tap the person icon → Send feedback whenever something works, confuses you, or you wish it did more. Every message reaches me.
+
+Thank you! 🙏`;
 
 const SYNC_TEXT = {
   device: 'Saved on this device only.',
