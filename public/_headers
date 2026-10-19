@@ -1,0 +1,11 @@
+# Cloudflare Pages: phones must always check for a new version of the app page,
+# so testers see updates as soon as they reopen the app (founder, 19 Oct 2026).
+/*
+  Cache-Control: no-cache
+# Code and icon files have a new name on every build, so they can be kept for a long time.
+/_expo/*
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable
+/assets/*
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable

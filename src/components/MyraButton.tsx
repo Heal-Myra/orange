@@ -13,7 +13,7 @@ export function MyraButton() {
   return (
     <Pressable accessibilityLabel="Ask Myra, your assistant" onPress={() => router.push({ pathname: '/myra', params: { from: page } })}
       style={({ pressed }) => ({
-        position: 'absolute', right: 16, bottom: insets.bottom + 64, flexDirection: 'row', alignItems: 'center', gap: 6,
+        position: 'absolute', right: 16, bottom: insets.bottom + 80, flexDirection: 'row', alignItems: 'center', gap: 6,
         backgroundColor: colors.insight, paddingVertical: 10, paddingHorizontal: 14, borderRadius: 99, opacity: pressed ? 0.8 : 1,
         boxShadow: '0 6px 16px rgba(0,0,0,0.18)',
       })}>
