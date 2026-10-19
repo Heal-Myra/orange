@@ -81,7 +81,7 @@ export function MealPhoto() {
   const describe = async (said?: string) => {
     const text = (said ?? words).trim();
     if (!text) return;
-    setMessage('Working out your meal…'); setItems(null); setBusy(true); setSource('words'); setUri(null);
+    setMessage('Calculating your meal…'); setItems(null); setBusy(true); setSource('words'); setUri(null);
     try {
       const r = await analyseMealText(text);
       setItems(r.items);
@@ -166,7 +166,7 @@ export function MealPhoto() {
             <>
               <TextField label="What did you eat?" value={words} onChangeText={setWords} multiline
                 placeholder="e.g. 2 rotis with ghee, 1 katori moong dal, bhindi sabzi, a cup of chai with sugar" />
-              <Button title={busy ? 'Working…' : 'Work it out'} onPress={() => describe()} disabled={busy || !words.trim()} />
+              <Button title={busy ? 'Calculating…' : 'Calculate'} onPress={() => describe()} disabled={busy || !words.trim()} />
             </>
           )}
 
