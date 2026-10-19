@@ -17,7 +17,21 @@ export default function Body() {
 
   return (
     <Screen feedback="Body">
-      <MealPhoto />
+      <MealPhoto right={<Score value={score?.nutrition} max={30} />}>
+        <View style={{ gap: 8, borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 10 }}>
+          <Meter label="Calories" value={totals.kcal} max={profile.kcal} color={colors.body} right={`${Math.round(totals.kcal)} / ${profile.kcal} kcal`} />
+          <Meter label="Protein" value={totals.p} max={profile.protein} color={colors.body} right={`${Math.round(totals.p)} / ${profile.protein} g`} />
+          {day.meals.length ? day.meals.map((m, i) => (
+            <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <Text numberOfLines={1} style={{ flex: 1, color: colors.ink }}>{m.name}</Text>
+              <Text style={s.note}>{Math.round(m.kcal)} kcal · P {Math.round(m.p)} g</Text>
+              <Pressable accessibilityLabel={`Remove ${m.name}`} onPress={() => update(d => { d.meals.splice(i, 1); })} hitSlop={10}>
+                <Text style={{ color: colors.muted, fontSize: 16 }}>✕</Text>
+              </Pressable>
+            </View>
+          )) : <Note>No meals yet today.</Note>}
+        </View>
+      </MealPhoto>
 
       <Card>
         <Heading right={<Score value={score ? score.movement + score.sleep : null} max={70} />}>Movement & sleep</Heading>
@@ -36,20 +50,6 @@ export default function Body() {
         <Meter label="Active minutes" value={day.activity.activeMin ?? 0} max={profile.active} color={colors.body} />
       </Card>
 
-      <Card>
-        <Heading right={<Score value={score?.nutrition} max={30} />}>Food</Heading>
-        <Meter label="Calories" value={totals.kcal} max={profile.kcal} color={colors.body} right={`${Math.round(totals.kcal)} / ${profile.kcal} kcal`} />
-        <Meter label="Protein" value={totals.p} max={profile.protein} color={colors.body} right={`${Math.round(totals.p)} / ${profile.protein} g`} />
-        {day.meals.length ? day.meals.map((m, i) => (
-          <View key={i} style={[s.headingRow, { borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 8 }]}>
-            <View style={{ flex: 1 }}>
-              <Text style={{ fontWeight: '600', color: colors.ink }}>{m.name}</Text>
-              <Text style={s.note}>{Math.round(m.kcal)} kcal · P {Math.round(m.p)} g · C {Math.round(m.c)} g · F {Math.round(m.f)} g{m.source === 'ifct' ? ' · IFCT' : m.source === 'photo+ifct' ? ' · photo, IFCT' : m.source === 'photo' ? ' · photo, estimate' : m.source === 'words+ifct' ? ' · described, IFCT' : m.source === 'words' ? ' · described, estimate' : ''}</Text>
-            </View>
-            <Pressable onPress={() => update(d => { d.meals.splice(i, 1); })} hitSlop={8}><Text style={{ color: colors.bad }}>Remove</Text></Pressable>
-          </View>
-        )) : <Note>No meals logged.</Note>}
-      </Card>
 
       <IfctAdd />
     </Screen>

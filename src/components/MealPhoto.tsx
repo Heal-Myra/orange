@@ -4,7 +4,7 @@
 
 import * as ImageManipulator from 'expo-image-manipulator';
 import * as ImagePicker from 'expo-image-picker';
-import { useRef, useState } from 'react';
+import { useRef, useState, type ReactNode } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { Image, Platform, Pressable, Text, TextInput, View } from 'react-native';
 import { analyseMeal, analyseMealText, oneLine, type MealItem } from '../lib/ai';
@@ -38,7 +38,8 @@ function speechRecognition(): (new () => any) | null {
   return (w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null) as (new () => any) | null;
 }
 
-export function MealPhoto() {
+/** One Food card: log a meal (photo, speak, type) on top, today's meals and totals underneath. */
+export function MealPhoto({ right, children }: { right?: ReactNode; children?: ReactNode }) {
   const { session } = useAuth();
   const { update } = useHeal();
   const [mode, setMode] = useState<'photo' | 'speak' | 'type' | null>(null);
@@ -131,7 +132,7 @@ export function MealPhoto() {
 
   return (
     <Card>
-      <Heading>Log a meal</Heading>
+      <Heading right={right}>Food</Heading>
       {!session ? <Note>Sign in to log meals this way.</Note> : (
         <>
           <View style={{ flexDirection: 'row', gap: 10 }}>
@@ -170,7 +171,6 @@ export function MealPhoto() {
             </>
           )}
 
-          {!mode && <Note>Numbers come from IFCT 2017 wherever an ingredient matches. You can check and change everything before adding.</Note>}
         </>
       )}
       {uri ? <Image source={{ uri }} style={{ width: '100%', aspectRatio: 4 / 3, borderRadius: 10, backgroundColor: colors.sunk }} resizeMode="cover" /> : null}
@@ -199,6 +199,7 @@ export function MealPhoto() {
           <Button kind="plain" title="Discard" onPress={() => { setItems(null); setUri(null); setMessage(null); setInsight(''); }} />
         </View>
       ) : null}
+      {children}
     </Card>
   );
 }
