@@ -2,6 +2,7 @@
 
 ## 0.8.1 — 20 October 2026 (app icon)
 - New app icon (founder chose design A): a ripe coral orange with a brown stem and one green leaf on the soft white-grey page colour. Same picture for the iPhone icon, Android adaptive icon (foreground, background, monochrome), splash and website favicon. Source drawing: `assets/icon-source.svg`.
+- Website: Safari "Add to Home Screen" showed a grey "H" because the site had no home-screen icon. Added `public/apple-touch-icon.png`, a web manifest (`public/manifest.json`, icons 192/512) and a page template `public/index.html` that links them.
 
 ## 0.8.0 — 20 October 2026 (iPhone app, getting ready)
 - Expo free plan's 60 CI minutes for October were used up (reset 1 Nov). The EAS web deploy and test job are removed (Cloudflare publishes the website; tests run before each push); the AI server deploy now runs only when `supabase/functions/**` changes.
