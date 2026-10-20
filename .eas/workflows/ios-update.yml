@@ -1,0 +1,17 @@
+# Quick update: sends new screens, cards, text and colours straight into the installed iPhone app (no new build).
+# Runs when the 'update' branch is pushed (Claude pushes main to it when a change is ready for testers).
+# Only works for JavaScript changes. A new native library, permission or the app icon needs a full build
+# (the 'testflight' branch) and a higher "version" in app.json, because runtimeVersion follows the app version.
+name: iPhone quick update
+
+on:
+  push:
+    branches: ['update']
+
+jobs:
+  update_ios:
+    type: update
+    environment: production
+    params:
+      channel: production
+      platform: ios

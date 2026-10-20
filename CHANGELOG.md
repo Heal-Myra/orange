@@ -1,6 +1,8 @@
 # Changelog
 
-## 0.8.1 — 20 October 2026 (app icon)
+## 0.8.1 — 20 October 2026 (app icon, quick updates)
+- Quick updates (EAS Update): `expo-updates`, `production` channel, workflow `.eas/workflows/ios-update.yml` on the `update` branch. Founder chose to stay on the Expo free plan for now. See docs/decisions/0012-quick-updates.md. Active from the next full build.
+- iPhone build 4 (smiling-orange icon) built and submitted from the founder's PC, using `--non-interactive` so the build never asks for an Apple login (the Apple key on Expo is used instead).
 - New app icon, final (founder, 20 Oct 2026, design "4G"): a minimalist coral orange with a green leaf and a small white side smile toward the lower right, on the soft white-grey page colour. Same picture for the iPhone icon, Android adaptive icon (foreground, background, monochrome), splash and website favicon. Source drawing: `assets/icon-source.svg`. (Explored and set aside: a realistic textured orange, a face with eyes and cheeks, and an orange character eating a slice.)
 - Website: Safari "Add to Home Screen" showed a grey "H" because the site had no home-screen icon. Added `public/apple-touch-icon.png`, a web manifest (`public/manifest.json`, icons 192/512) and a page template `public/index.html` that links them.
 
