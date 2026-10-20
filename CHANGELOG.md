@@ -1,6 +1,7 @@
 # Changelog
 
 ## 0.8.0 — 20 October 2026 (iPhone app, getting ready)
+- Expo free plan's 60 CI minutes for October were used up (reset 1 Nov). The EAS web deploy and test job are removed (Cloudflare publishes the website; tests run before each push); the AI server deploy now runs only when `supabase/functions/**` changes.
 - Build 2: Apple requires NSHealthUpdateUsageDescription whenever the HealthKit entitlement is present (ITMS-90683), even for read-only apps; added an honest sentence.
 - iPhone app settings: Apple Health permission (read steps, exercise minutes, sleep), microphone and speech permission for Speak, encryption declaration, iPhone only (no iPad layout yet).
 - Apple Health: "Connect Apple Health" card on Body; once connected, Sleep and Movement fill in by themselves (on open, on return to the app, every 15 minutes).
