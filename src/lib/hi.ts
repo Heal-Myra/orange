@@ -562,4 +562,6 @@ export const HI: Record<string, string> = {
   'Resting heart rate': 'आराम में धड़कन',
   'Heart rate variability': 'धड़कन में बदलाव (HRV)',
   'Cardio fitness (VO₂ max)': 'कार्डियो फ़िटनेस (VO₂ max)',
+  '+{n} of 40 so far.': 'अब तक 40 में से +{n}।',
+  'All three together earn 40 points.': 'तीनों मिलकर 40 अंक देते हैं।',
 };

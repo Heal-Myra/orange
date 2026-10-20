@@ -1,5 +1,5 @@
 // Soul tab cards: Gita verse to study, thought of the day, gratitude, and one simple check for the eight practices.
-// Points (docs/scoring.md): meditation 35, Daily Wisdom 35, gratitude 10 each up to 30 (thought card removed 21 Oct 2026).
+// Points (docs/scoring.md): gratitude 40, meditation 30, Daily Wisdom 30 (founder, 21 Oct 2026).
 
 import { Pressable, Text, View } from 'react-native';
 import { useAuth } from '../lib/auth';
@@ -48,7 +48,7 @@ export function VerseStudyCard() {
       <TextField key={date + 'verse'} label={tr('What it means to me today')} value={so.verseNote ?? ''} multiline
         onChangeText={t => update(d => { d.soul = { ...d.soul, verseNote: t }; })} placeholder={tr('One line is enough')} />
       <Check checked={!!so.verseStudied} onToggle={() => update(d => { d.soul = { ...d.soul, verseStudied: !d.soul?.verseStudied }; })}
-        title={tr('I studied today\'s wisdom')} points={35} />
+        title={tr('I studied today\'s wisdom')} points={30} />
     </Card>
   );
 }
@@ -84,7 +84,7 @@ export function GratitudeCard() {
         <TextField key={date + 'g' + i} label={`${i + 1}.`} value={list[i] ?? ''} onChangeText={t => set(i, t)}
           placeholder={[tr('Someone who helped me'), tr('Something my body did for me'), tr('A small joy today')][i]} />
       ))}
-      <Note>{filled ? tr('+{n} so far (10 each).', { n: Math.min(3, filled) * 10 }) : tr('10 points each, up to 30.')}</Note>
+      <Note>{filled ? tr('+{n} of 40 so far.', { n: Math.round((40 * Math.min(3, filled)) / 3) }) : tr('All three together earn 40 points.')}</Note>
     </Card>
   );
 }

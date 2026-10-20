@@ -28,11 +28,11 @@ A day with no social media earns the full 70 content points.
 Rebalanced 20 Oct 2026: the founder took the eight-practices check and the Tao card off Soul. The eight practices are kept in the Library for the future, when the app can understand them from a person's day without a checklist.
 | Part | Points | How |
 | --- | --- | --- |
-| Breathing & meditation | 35 | minutes in the app's timer, or mindful minutes from Apple Health (the larger), ÷ daily target |
-| Daily Wisdom studied | 35 | Read the day's passage (from the person's chosen tradition), open its meaning, tick "studied" |
-| Gratitude | 30 | 10 for each thing written, up to three |
+| Breathing & meditation | 30 | minutes in the app's timer, or mindful minutes from Apple Health (the larger), ÷ daily target |
+| Daily Wisdom studied | 30 | Read the day's passage (from the person's chosen tradition), open its meaning, tick "studied" |
+| Gratitude | 40 | shared equally by up to three things written (about 13 each) |
 
-21 Oct 2026: the founder removed the Thought of the day card; its 15 points moved to meditation (+5) and Daily Wisdom (+10).
+21 Oct 2026: the founder removed the Thought of the day card and set gratitude 40, meditation 30, Daily Wisdom 30.
 
 Reflected actions (older entries) add or subtract up to 10 points. Soul stays between 0 and 100.
 
