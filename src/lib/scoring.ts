@@ -129,8 +129,7 @@ export interface SoulScore {
 }
 
 /**
- * Soul / inner life (0–100), rebalanced 20 Oct 2026 when the founder took the eight-practices check and the Tao card
- * Soul (founder, 21 Oct 2026): gratitude 10 each up to four (40) + breathing and meditation 30 + Daily Wisdom
+ * Soul / inner life (0–100). Founder, 21 Oct 2026: gratitude 10 each up to four (40) + breathing and meditation 30 + Daily Wisdom
  * studied 30. Older reflected actions add or subtract up to 10.
  */
 export function soulScore(d: DayLog, P: Profile = DEFAULT_PROFILE): SoulScore | null {
