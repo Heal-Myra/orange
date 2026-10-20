@@ -136,11 +136,12 @@ export interface SoulScore {
 export function soulScore(d: DayLog, P: Profile = DEFAULT_PROFILE): SoulScore | null {
   const so = d.soul ?? {};
   const grateful = (so.gratitude ?? []).filter(g => g.trim()).length;
-  const meditation = 30 * c01((d.mind.meditationMin ?? 0) / P.meditation);
-  const verse = so.verseStudied ? 25 : 0;
+  // Thought of the day removed (founder, 21 Oct 2026); its 15 points went to meditation (+5) and Daily Wisdom (+10).
+  const meditation = 35 * c01((d.mind.meditationMin ?? 0) / P.meditation);
+  const verse = so.verseStudied ? 35 : 0;
   const gratitude = Math.min(3, grateful) * 10;
-  const thought = (so.thought ?? '').trim().length >= 3 ? 15 : 0;
-  if (!d.actions.length && !verse && !gratitude && !thought && d.mind.meditationMin == null) return null;
+  const thought = 0;
+  if (!d.actions.length && !verse && !gratitude && d.mind.meditationMin == null) return null;
   const bonus = clamp(d.actions.reduce((s, a) => s + (a.alignment || 0), 0) * 2.5, -10, 10);
   return { total: clamp(meditation + verse + gratitude + thought + bonus, 0, 100), meditation, verse, gratitude, thought, bonus };
 }

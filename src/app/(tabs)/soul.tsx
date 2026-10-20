@@ -2,7 +2,7 @@
 // verse of the day), then the thought of the day.
 // The eight-practices check and the Tao card were taken off Soul by the founder (20 Oct 2026); Tao now lives on Mind.
 
-import { GratitudeCard, ThoughtCard, VerseStudyCard } from '../../components/SoulCards';
+import { GratitudeCard, VerseStudyCard } from '../../components/SoulCards';
 import { MeditationTimer } from '../../components/MeditationTimer';
 import { Card, Heading, Screen, Score } from '../../components/ui';
 import { soulScore } from '../../lib/scoring';
@@ -20,7 +20,6 @@ export default function Soul() {
       <GratitudeCard />
       <MeditationTimer />
       <VerseStudyCard />
-      <ThoughtCard />
     </Screen>
   );
 }

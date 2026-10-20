@@ -1,5 +1,5 @@
 // Soul tab cards: Gita verse to study, thought of the day, gratitude, and one simple check for the eight practices.
-// Points (docs/scoring.md): meditation 30, verse 25, gratitude 10 each up to 30, thought 15.
+// Points (docs/scoring.md): meditation 35, Daily Wisdom 35, gratitude 10 each up to 30 (thought card removed 21 Oct 2026).
 
 import { Pressable, Text, View } from 'react-native';
 import { useAuth } from '../lib/auth';
@@ -48,7 +48,7 @@ export function VerseStudyCard() {
       <TextField key={date + 'verse'} label={tr('What it means to me today')} value={so.verseNote ?? ''} multiline
         onChangeText={t => update(d => { d.soul = { ...d.soul, verseNote: t }; })} placeholder={tr('One line is enough')} />
       <Check checked={!!so.verseStudied} onToggle={() => update(d => { d.soul = { ...d.soul, verseStudied: !d.soul?.verseStudied }; })}
-        title={tr('I studied today\'s wisdom')} points={25} />
+        title={tr('I studied today\'s wisdom')} points={35} />
     </Card>
   );
 }

@@ -98,18 +98,18 @@ describe('soul', () => {
   it('adds up to 30 for breathing and meditation against the daily target', () => {
     const d = day();
     d.mind = { meditationMin: P.meditation / 2 };
-    expect(soulScore(d, P)!.meditation).toBe(15);
+    expect(soulScore(d, P)!.meditation).toBe(17.5);
     expect(mindScore(d, P)).toBeNull();
   });
 
-  it('adds 25 for the verse, 10 per gratitude (max 30) and 15 for a thought', () => {
+  it('adds 35 for Daily Wisdom and 10 per gratitude (max 30); a thought no longer counts', () => {
     const d = day();
     d.soul = { verseStudied: true, gratitude: ['family', 'health', 'rain', 'tea'], thought: 'Be gentle today' };
     const s = soulScore(d)!;
-    expect(s.verse).toBe(25);
+    expect(s.verse).toBe(35);
     expect(s.gratitude).toBe(30);
-    expect(s.thought).toBe(15);
-    expect(s.total).toBe(70);
+    expect(s.thought).toBe(0);
+    expect(s.total).toBe(65);
   });
 
   it('reaches 100 with all practices kept, meditation done and all three cards done', () => {
