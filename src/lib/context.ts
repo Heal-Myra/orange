@@ -26,7 +26,7 @@ export function buildContext(day: DayLog, days: Record<string, DayLog>, date: st
     aboutLine(profile.me),
     healthLine(day),
     `Food: ${day.meals.map(m => m.name).join(', ') || 'nothing logged'}; totals ${Math.round(t.kcal)} kcal, P ${Math.round(t.p)} g, C ${Math.round(t.c)} g, F ${Math.round(t.f)} g.`,
-    `Mind: attention block ${day.mind.attention ? 'yes' : 'no'}, learning ${day.mind.learning ? 'yes' : 'no'}; social media ${day.noMedia ? 'none' : day.media.map(m => `${m.minutes} min ${m.platform} (${m.category})`).join('; ') || 'not logged'}.`,
+    `Mind: focus tasks done today ${day.mind.focusDone ?? 0} of up to 2; social media ${day.noMedia ? 'none' : day.media.map(m => `${m.minutes} min ${m.platform} (${m.category})`).join('; ') || 'not logged'}.`,
     `Soul: breathing and meditation ${day.mind.meditationMin ?? 'not done yet'} min; Gita verse studied ${day.soul?.verseStudied ? 'yes' : 'not yet'}; gratitude ${(day.soul?.gratitude ?? []).filter(g => g?.trim()).length} of 3; thought for the day ${day.soul?.thought?.trim() ? 'written' : 'not yet'}.`,
     `Scores out of 100: body ${w.body ? Math.round(w.body.total) : 'not logged'}, mind ${w.mind ? Math.round(w.mind.total) : 'not logged'}, soul ${w.soul ? Math.round(w.soul.total) : 'not logged'}; well-being ${Math.round(w.total)} of 300.`,
     dailyWisdomLine(tradition, date, `Bhagavad Gita ${v.chapter}.${v.verse} (${v.transliteration.replace(/\n/g, ' ')})`),

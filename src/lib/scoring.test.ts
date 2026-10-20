@@ -49,13 +49,19 @@ describe('body', () => {
 });
 
 describe('mind', () => {
-  it('scores practices alone when social media is not logged (meditation now counts in Soul)', () => {
+  it('scores focus tasks done when social media is not logged', () => {
     const d = day();
-    d.mind = { meditationMin: 20, attention: true, learning: true };
+    d.mind = { meditationMin: 20, focusDone: 3 };
     const m = mindScore(d, P)!;
     expect(m.practices).toBe(30);
     expect(m.content).toBeNull();
     expect(m.total).toBe(30);
+  });
+
+  it('gives 15 points for one focus task done', () => {
+    const d = day();
+    d.mind = { focusDone: 1 };
+    expect(mindScore(d, P)!.practices).toBe(15);
   });
 
   it('gives the full content score for a day without social media', () => {

@@ -1,6 +1,6 @@
 // Mind: the Tao practice, guided meditation (minutes recorded by the app), phone activity from a Screen Time
-// screenshot, and one card for everything typed by hand (attention, learning, extra social-media sessions).
-// Scoring: attention 15 + learning 15 + content diet 70, plus the Tao practice on Mind days (meditation is on Soul).
+// screenshot (with any sessions added by hand). Attention and Learning were removed (founder, 21 Oct 2026).
+// Scoring: Myra's focus tasks done 15 each (up to 30) + content diet 70, plus the Tao practice on Mind days.
 
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
@@ -8,7 +8,7 @@ import { ClassifyHelper } from '../../components/AiBits';
 import { ScreenTimeCard } from '../../components/ScreenTimeCard';
 import { TaoCard } from '../../components/TaoCard';
 import { TasksCard } from '../../components/TasksCard';
-import { Button, Card, Check, Heading, Note, NumberField, Screen, Score, s } from '../../components/ui';
+import { Button, Card, Heading, Note, NumberField, Screen, Score, s } from '../../components/ui';
 import { CONTENT_CATEGORIES, mindScore } from '../../lib/scoring';
 import { useHeal } from '../../lib/store';
 import type { ContentCategoryId } from '../../lib/types';
@@ -42,15 +42,7 @@ export default function Mind() {
 
       <TaoCard on="mind" />
 
-      <ScreenTimeCard />
-
-      <Card>
-        <Heading>{tr('Other activities')}</Heading>
-        <Check color={colors.mind} checked={!!day.mind.attention} onToggle={() => update(d => { d.mind.attention = !d.mind.attention; })}
-          title={tr('Attention')} detail={tr('Did a focused, phone-free block of single-tasking')} points={15} />
-        <Check color={colors.mind} checked={!!day.mind.learning} onToggle={() => update(d => { d.mind.learning = !d.mind.learning; })}
-          title={tr('Learning')} detail={tr('Learned something: a book, course, skill or wisdom text')} points={15} />
-
+      <ScreenTimeCard>
         {day.media.map((m, i) => (
           <View key={i} style={[s.headingRow, { borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 8 }]}>
             <Text style={{ flex: 1, color: colors.ink }}>{m.platform} · {tr(CONTENT_CATEGORIES.find(c => c.id === m.category)?.name ?? '')} · {m.minutes} {tr('min')}{m.source === 'screen' ? ' · from screenshot' : ''}</Text>
@@ -74,7 +66,7 @@ export default function Mind() {
           </View>
         ) : <Button kind="plain" title={tr('+ Add a social-media session by hand')} onPress={() => setAdding(true)} />)}
         <Note>{tr('Content quality earns up to 40 points and staying within your {limit}-minute limit earns up to 30.', { limit: profile.mediaLimit })}</Note>
-      </Card>
+      </ScreenTimeCard>
     </Screen>
   );
 }

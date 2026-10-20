@@ -1,6 +1,7 @@
 # Changelog
 
 ## 0.9.0 — 21 October 2026 (About you, more Apple Health)
+- Mind: the "Other activities" card is removed (founder). Attention and Learning ticks are gone; their 30 points now come from the to-do list: 15 for each of Myra's 1–2 focus tasks ticked off (`mind.focusDone`). Hand-added social-media sessions moved into the Phone activity card. docs/scoring.md updated.
 - "About you" after sign-up (skippable) and in Profile: weight, height, sex, age, goal (lose/keep/gain, kg, by when). Sets food, protein, steps and active-minute targets with safe limits; Myra steers toward the goal. See docs/decisions/0013-about-you-and-more-health-data.md. Needs migration 0007 (`profiles.about`).
 - Apple Health: weight, body fat, resting heart rate, HRV, VO2 max, active energy, mindful minutes, workouts and sleep stages. Shown on Body ("Your body", sleep stages, workouts); a new scale weight updates the targets; mindful minutes count as meditation. People already connected see Apple's sheet once more for the new items.
 - Myra's refresh fingerprint ignores small changes, so she no longer refreshes every 20 minutes.

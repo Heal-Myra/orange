@@ -6,6 +6,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useAuth } from './auth';
+import { useHeal } from './store';
 import { shiftISO, todayISO } from './dates';
 import { supabase } from './supabase';
 import { FOCUS_MAX, defaultFocus, reschedule, sortOpen, type Area, type Task } from './taskPlan';
@@ -46,6 +47,7 @@ const fromRow = (r: Record<string, unknown>): Task => ({
 export function TasksProvider({ children }: { children: ReactNode }) {
   const { session, consented } = useAuth();
   const userId = session && consented ? session.user.id : null;
+  const { updateOn } = useHeal();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [focusRec, setFocusRec] = useState<{ date: string; ids: string[] }>({ date: '', ids: [] });
   const [ready, setReady] = useState(false);
@@ -128,7 +130,11 @@ export function TasksProvider({ children }: { children: ReactNode }) {
         const joins = (!due || due <= today) && focusRec.date === today && focusRec.ids.length < FOCUS_MAX;
         change(ts => [...ts, joins ? t : t.due ? t : { ...t, due: shiftISO(today, 1) }], joins ? { date: today, ids: [...focusRec.ids, t.id] } : undefined);
       },
-      complete: id => change(ts => ts.map(t => t.id === id ? { ...t, doneAt: new Date().toISOString() } : t)),
+      complete: id => {
+        // A focus task done today earns Mind points (15 each, up to 30).
+        if (focusRec.date === today && focusRec.ids.includes(id)) updateOn(today, d => { d.mind.focusDone = (d.mind.focusDone ?? 0) + 1; });
+        change(ts => ts.map(t => t.id === id ? { ...t, doneAt: new Date().toISOString() } : t));
+      },
       moveTo: (id, due) => change(ts => ts.map(t => t.id === id ? { ...t, due, moved: t.moved + 1 } : t),
         focusRec.ids.includes(id) ? { date: focusRec.date, ids: focusRec.ids.filter(x => x !== id) } : undefined),
       remove: id => {
@@ -137,7 +143,7 @@ export function TasksProvider({ children }: { children: ReactNode }) {
       },
       setFocus,
     };
-  }, [tasks, focusRec, today, cloudReady, change, setFocus, userId]);
+  }, [tasks, focusRec, today, cloudReady, change, setFocus, userId, updateOn]);
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

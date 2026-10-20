@@ -87,13 +87,15 @@ export interface MindScore {
   tao: number; // points from the day's Tao practice
 }
 
-/** Mind: meditation, attention, learning (40) + social-media content diet (60) + Tao practice bonus, capped at 100. */
+/** Mind: focus tasks done (30) + social-media content diet (70) + Tao practice bonus, capped at 100. */
 export function mindScore(d: DayLog, P: Profile): MindScore | null {
   const m = d.mind;
   const tao = taoPoints(d, 'mind');
-  // Meditation moved to Soul (founder, 20 Oct 2026). Mind = attention 15 + learning 15 + content diet 70.
-  const hasPractice = !!m.attention || !!m.learning || tao > 0;
-  const practices = (m.attention ? 15 : 0) + (m.learning ? 15 : 0);
+  // Mind = Myra's focus tasks done (15 each, up to 30) + content diet 70 (founder, 21 Oct 2026).
+  // Attention and Learning ticks were removed; older days that have them still count, within the same 30.
+  const done = Math.min(2, m.focusDone ?? 0);
+  const practices = Math.min(30, done * 15 + (m.attention ? 15 : 0) + (m.learning ? 15 : 0));
+  const hasPractice = practices > 0 || tao > 0;
 
   let content: number | null = null, minutes = 0, quality: number | null = null;
   if (d.noMedia) {

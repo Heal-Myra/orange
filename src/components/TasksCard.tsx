@@ -8,7 +8,8 @@ import { Pressable, Text, TextInput, View } from 'react-native';
 import { shiftISO, todayISO } from '../lib/dates';
 import { AREAS, areaName, useTasks, type Area, type Task } from '../lib/tasks';
 import { colors } from '../theme';
-import { Button, Card, Heading, Note, s } from './ui';
+import { Button, Card, Heading, Note, Score, s } from './ui';
+import { useHeal } from '../lib/store';
 import { tr } from '../lib/i18n';
 
 const WHEN = [
@@ -29,14 +30,15 @@ const shortDate = (iso: string) => {
 
 export function TasksCard() {
   const { open, focus, doneToday } = useTasks();
+  const { day } = useHeal();
   const [area, setArea] = useState<Area>('family');
   const shown = open.filter(t => t.area === area);
   const focusIds = focus.map(t => t.id);
 
   return (
     <Card>
-      <Heading>{tr('Clear your mind')}</Heading>
-      <Note>{tr('Write it down and let Myra pick one or two a day.')}</Note>
+      <Heading right={<Score value={Math.min(2, day.mind.focusDone ?? 0) * 15} max={30} />}>{tr('Clear your mind')}</Heading>
+      <Note>{tr('Write it down and let Myra pick one or two a day. Each focus task you finish earns 15 points.')}</Note>
 
       {/* Three groups */}
       <View style={{ flexDirection: 'row', gap: 8 }}>

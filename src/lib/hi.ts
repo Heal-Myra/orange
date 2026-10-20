@@ -535,4 +535,5 @@ export const HI: Record<string, string> = {
   'Cool-down': 'कूल-डाउन',
   'Workout': 'वर्कआउट',
   'Your details': 'आपकी जानकारी',
+  'Write it down and let Myra pick one or two a day. Each focus task you finish earns 15 points.': 'लिख लें और Myra को रोज़ एक-दो चुनने दें। हर पूरा किया फ़ोकस काम 15 अंक देता है।',
 };

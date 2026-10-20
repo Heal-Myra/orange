@@ -12,11 +12,11 @@ The code is in `src/lib/scoring.ts`; tests are in `src/lib/scoring.test.ts`.
 | Food | 30 | 12 for calories near target, 12 for protein met, 3 for fat at 20–35 % of energy, 3 for carbs at 40–62 % |
 
 ## Mind (100)
-Attention, learning and what the mind is fed. Meditation moved to Soul on 20 Oct 2026 (founder's decision).
+A clear mind and what the mind is fed. Meditation moved to Soul on 20 Oct 2026; on 21 Oct 2026 the founder removed the
+Attention and Learning ticks and gave their 30 points to the to-do list ("Clear your mind").
 | Part | Points | How |
 | --- | --- | --- |
-| Attention | 15 | a focused, phone-free single-tasking block |
-| Learning | 15 | learned something: a book, course, skill or wisdom text |
+| Focus tasks done | 30 | 15 for each of Myra's 1–2 focus tasks ticked off today (older days with Attention/Learning keep those points, within 30) |
 | Content quality | 40 | social-media minutes weighted by category (learning, spiritual 100 % … outrage, gossip 0 %) |
 | Content quantity | 30 | full within the daily limit, falling to 0 at three times the limit |
 
@@ -28,7 +28,7 @@ A day with no social media earns the full 70 content points.
 Rebalanced 20 Oct 2026: the founder took the eight-practices check and the Tao card off Soul. The eight practices are kept in the Library for the future, when the app can understand them from a person's day without a checklist.
 | Part | Points | How |
 | --- | --- | --- |
-| Breathing & meditation | 30 | minutes sat in the app's timer ÷ daily target |
+| Breathing & meditation | 30 | minutes in the app's timer, or mindful minutes from Apple Health (the larger), ÷ daily target |
 | Gita verse studied | 25 | Read the verse of the day, open its meaning, tick "studied" |
 | Gratitude | 30 | 10 for each thing written, up to three |
 | Thought of the day | 15 | Write your own thought to carry |

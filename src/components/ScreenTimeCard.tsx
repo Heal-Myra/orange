@@ -2,7 +2,7 @@
 // Websites cannot read Screen Time directly, so a screenshot is the practical way. Every number can be checked and changed.
 
 import * as ImagePicker from 'expo-image-picker';
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Pressable, Text, TextInput, View } from 'react-native';
 import { readScreenTime } from '../lib/ai';
 import { useAuth } from '../lib/auth';
@@ -16,7 +16,7 @@ import { tr } from '../lib/i18n';
 
 const nameOf = (id: ContentCategoryId) => CONTENT_CATEGORIES.find(c => c.id === id)?.name ?? id;
 
-export function ScreenTimeCard() {
+export function ScreenTimeCard({ children }: { children?: ReactNode }) {
   const { session } = useAuth();
   const { day, profile, update } = useHeal();
   const [busy, setBusy] = useState(false);
@@ -89,6 +89,7 @@ export function ScreenTimeCard() {
         </View>
       ) : null}
       {!day.noMedia && day.media.length > 0 && !rows ? <Note>{tr('Today: {total} minutes of social media logged ({limit}-minute limit).', { total, limit: profile.mediaLimit })}</Note> : null}
+      {children}
     </Card>
   );
 }
