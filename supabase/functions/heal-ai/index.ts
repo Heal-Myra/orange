@@ -109,7 +109,7 @@ async function askAI(tier: 'smart' | 'quick', system: string, text: string, imag
 
 const BAD_FORMAT = 'The AI reply was not in the expected format. Please try again.';
 
-/** Removes // and /* */ comments outside strings, and trailing commas before } or ]. */
+/** Removes line comments and block comments outside strings, and trailing commas before } or ]. */
 function stripSlips(src: string) {
   let out = '', inStr = false;
   for (let i = 0; i < src.length; i++) {
