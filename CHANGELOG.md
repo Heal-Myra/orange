@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.0 — 20 October 2026 ("Clear your mind")
+- New to-do list on the Mind tab, in three groups: Family, Work, Better me. Add a task (with Today / Tomorrow / This week / Next week, or let Myra choose), tick to finish, tap the calendar to move it, or remove it.
+- Each day Myra picks one or two tasks as today's **Focus**, shown inside Myra recommends on Today; the rest are spread out automatically, two a day. A task moved three times gets a gentle "make it smaller, or let it go?".
+- The Library moved into Profile; the app now has four tabs: Today, Body, Mind, Soul.
+- New table `tasks` (migration 0005); see docs/decisions/0008-clear-your-mind.md.
+
 ## 0.5.2 — 20 October 2026
 - Myra recommends: the header, one small coral headline, then three separate blocks stacked one under another (Body, Mind, Soul), each with its colour on the left. All lines are small text of at most 10 words and no longer cut off with "…".
 - AI server: if any recommendation comes back longer than 10 words, it is shortened once more before it reaches the phone.

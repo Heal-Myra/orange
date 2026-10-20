@@ -124,6 +124,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (a.error) return explain(a.error.message);
       await supabase.from('feedback').delete().eq('user_id', uid); // ignore if the table is not set up yet
       await supabase.from('ai_access').delete().eq('user_id', uid);
+      await supabase.from('tasks').delete().eq('user_id', uid); // to-do list (migration 0005)
+      await AsyncStorage.removeItem('heal.tasks.v1').catch(() => {});
       const b = await supabase.from('profiles').delete().eq('user_id', uid);
       if (b.error) return explain(b.error.message);
       await supabase.auth.signOut();

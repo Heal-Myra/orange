@@ -8,6 +8,7 @@ import { ClassifyHelper } from '../../components/AiBits';
 import { MeditationTimer } from '../../components/MeditationTimer';
 import { ScreenTimeCard } from '../../components/ScreenTimeCard';
 import { TaoCard } from '../../components/TaoCard';
+import { TasksCard } from '../../components/TasksCard';
 import { Button, Card, Check, Heading, Note, NumberField, Screen, Score, s } from '../../components/ui';
 import { CONTENT_CATEGORIES, mindScore } from '../../lib/scoring';
 import { useHeal } from '../../lib/store';
@@ -36,6 +37,8 @@ export default function Mind() {
       <Card style={{ paddingVertical: 12 }}>
         <Heading right={<Score value={score?.total} max={100} />}>Mind today</Heading>
       </Card>
+
+      <TasksCard />
 
       <TaoCard on="mind" />
 

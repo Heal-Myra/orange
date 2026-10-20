@@ -66,7 +66,7 @@ export interface DayLog {
     thought?: string;       // my thought for the day
   };
   // Myra recommends. part = part of the day it was made for; sig = fingerprint of the day's data it was made from.
-  guidance?: { headline: string; body: string[]; mind: string[]; soul: string[]; at: string; part?: string; sig?: string };
+  guidance?: { headline: string; body: string[]; mind: string[]; soul: string[]; focus?: string[]; at: string; part?: string; sig?: string };
 }
 
 export interface Profile {

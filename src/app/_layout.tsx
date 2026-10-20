@@ -3,6 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { AuthProvider, useAuth } from '../lib/auth';
 import { HealProvider } from '../lib/store';
+import { TasksProvider } from '../lib/tasks';
 import { colors } from '../theme';
 
 /** Sends people to sign-in or the privacy screen when they need it. */
@@ -29,6 +30,7 @@ function Gate() {
       <Stack.Screen name="account" options={{ headerShown: true, title: 'Profile', presentation: 'modal', headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
       <Stack.Screen name="admin" options={{ headerShown: true, title: 'Admin', presentation: 'modal', headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
       <Stack.Screen name="feedback" options={{ headerShown: true, title: 'Send feedback', presentation: 'modal', headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
+      <Stack.Screen name="library" options={{ headerShown: true, title: 'Library', headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
       <Stack.Screen name="myra" options={{ headerShown: true, title: 'Myra', presentation: 'modal', headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
     </Stack>
   );
@@ -38,8 +40,10 @@ export default function RootLayout() {
   return (
     <AuthProvider>
       <HealProvider>
-        <StatusBar style="dark" />
-        <Gate />
+        <TasksProvider>
+          <StatusBar style="dark" />
+          <Gate />
+        </TasksProvider>
       </HealProvider>
     </AuthProvider>
   );

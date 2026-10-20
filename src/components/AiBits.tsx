@@ -5,6 +5,8 @@ import { Pressable, Text, View } from 'react-native';
 import { classifyMedia, dailyGuidance, explainVerse, oneLine, reflectOnAction } from '../lib/ai';
 import { useAuth } from '../lib/auth';
 import { buildContext, daySignature, partOfDay } from '../lib/context';
+import { tasksForAI, useTasks } from '../lib/tasks';
+import { FocusBlock } from './TasksCard';
 import { todayISO } from '../lib/dates';
 import type { Verse } from '../lib/gita';
 import { CONTENT_CATEGORIES } from '../lib/scoring';
@@ -20,6 +22,7 @@ const errText = (e: unknown) => (e instanceof Error ? e.message : 'Something wen
 export function GuidanceCard() {
   const { session } = useAuth();
   const { day, days, date, profile, update } = useHeal();
+  const { open, setFocus } = useTasks();
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [tick, setTick] = useState(0);
@@ -31,12 +34,13 @@ export function GuidanceCard() {
 
   const run = useCallback(async () => {
     setBusy(true); setMessage(null);
-    const context = buildContext(day, days, date, profile);
+    const context = buildContext(day, days, date, profile, tasksForAI(open, todayISO()));
     try {
       const r = await dailyGuidance(context);
       update(d => { d.guidance = { ...r, at: new Date().toISOString(), part: partOfDay(), sig: daySignature(d) }; });
+      if (Array.isArray(r.focus) && r.focus.length && date === todayISO()) setFocus(r.focus.map(String)); // Myra's pick
     } catch (e) { setMessage(errText(e)); } finally { setBusy(false); }
-  }, [day, days, date, profile, update]);
+  }, [day, days, date, profile, update, open, setFocus]);
 
   // Look again every 10 minutes, so a new part of the day is noticed even if nothing is tapped.
   useEffect(() => { const t = setInterval(() => setTick(x => x + 1), 10 * 60 * 1000); return () => clearInterval(t); }, []);
@@ -69,7 +73,11 @@ export function GuidanceCard() {
           <Text style={{ color, fontWeight: '700', fontSize: 14, width: 44 }}>{name}</Text>
           <Text style={{ color: colors.ink, flex: 1, fontSize: 14, lineHeight: 20 }}>{oneLine(list[0])}</Text>
         </Card>
-      ) : null) : (
+      ) : null) : null}
+
+      {isToday ? <FocusBlock /> : null}
+
+      {g ? null : (
         <Card>
           {!session ? <Note>Sign in to get Myra's recommendations.</Note>
             : <Note>{busy ? 'Myra is looking at your day…' : 'Myra will suggest your next steps here.'}</Note>}

@@ -7,7 +7,7 @@ import { PRACTICES, mealTotals, wellBeing } from './scoring';
 import { TAO_FOR_AI, taoForDate } from './tao';
 import type { DayLog, Profile } from './types';
 
-export function buildContext(day: DayLog, days: Record<string, DayLog>, date: string, profile: Profile): string {
+export function buildContext(day: DayLog, days: Record<string, DayLog>, date: string, profile: Profile, tasks?: string): string {
   const w = wellBeing(day, profile), t = mealTotals(day.meals), v = verseOfDay(date), tao = taoForDate(date);
   const week = Array.from({ length: 7 }, (_, i) => shiftISO(date, -i - 1)).filter(d => days[d]).map(d => {
     const x = wellBeing(days[d], profile);
@@ -28,6 +28,7 @@ export function buildContext(day: DayLog, days: Record<string, DayLog>, date: st
     `Verse of the day: Bhagavad Gita ${v.chapter}.${v.verse} (${v.transliteration.replace(/\n/g, ' ')}).`,
     `Today's Tao practice (${tao.pillar}): ${tao.title}: ${tao.practice[0]} Done: ${day.tao?.done ? 'yes' : 'not yet'}.`,
     TAO_FOR_AI,
+    tasks ?? '',
     `Last 7 days:\n${week}`,
   ].join('\n');
 }

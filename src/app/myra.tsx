@@ -11,6 +11,8 @@ import { askMyra, type ChatMessage } from '../lib/ai';
 import { useAuth } from '../lib/auth';
 import { buildContext } from '../lib/context';
 import { useHeal } from '../lib/store';
+import { todayISO } from '../lib/dates';
+import { tasksForAI, useTasks } from '../lib/tasks';
 import { colors } from '../theme';
 
 const KEY = 'heal.myra';
@@ -29,6 +31,7 @@ export default function Myra() {
   const page = typeof from === 'string' && SUGGESTIONS[from] ? from : 'today';
   const { session } = useAuth();
   const { day, days, date, profile } = useHeal();
+  const { open } = useTasks();
   const [messages, setMessages] = useState<ChatMessage[]>([HELLO]);
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
@@ -45,7 +48,7 @@ export default function Myra() {
     const next: ChatMessage[] = [...messages, { role: 'user', text: question }];
     setMessages(next); setText(''); setBusy(true);
     try {
-      const r = await askMyra(next.filter(m => m !== HELLO), buildContext(day, days, date, profile), page);
+      const r = await askMyra(next.filter(m => m !== HELLO), buildContext(day, days, date, profile, tasksForAI(open, todayISO())), page);
       const done: ChatMessage[] = [...next, { role: 'myra', text: r.text }];
       setMessages(done); save(done);
     } catch (e) {

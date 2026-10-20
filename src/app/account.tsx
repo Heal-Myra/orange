@@ -2,7 +2,8 @@
 
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Share, Text, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { Pressable, Share, Text, View } from 'react-native';
 import { Button, Card, Heading, Note, Screen } from '../components/ui';
 import { useAuth } from '../lib/auth';
 import { useHeal } from '../lib/store';
@@ -58,6 +59,17 @@ export default function Account() {
           ? <Button kind="plain" title="Sign out" onPress={async () => { await signOut(); router.replace('/sign-in'); }} />
           : online ? <Button title="Sign in to save online" onPress={async () => { await leaveGuest(); router.replace('/sign-in'); }} /> : null}
       </Card>
+
+      <Pressable onPress={() => router.push('/library')}>
+        <Card style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+          <Ionicons name="library-outline" size={24} color={colors.accent} />
+          <View style={{ flex: 1 }}>
+            <Text style={{ fontSize: 17, fontWeight: '600', color: colors.ink }}>Library</Text>
+            <Note>Indian foods, Gita, Tao Te Ching and exercises</Note>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color={colors.muted} />
+        </Card>
+      </Pressable>
 
       {admin && (
         <Card>

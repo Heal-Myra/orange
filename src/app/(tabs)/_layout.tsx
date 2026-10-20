@@ -41,7 +41,6 @@ export default function TabLayout() {
       <Tabs.Screen name="body" options={tab('Body', 'leaf-outline', colors.body)} />
       <Tabs.Screen name="mind" options={tab('Mind', 'bulb-outline', colors.mind)} />
       <Tabs.Screen name="soul" options={tab('Soul', 'flame-outline', colors.soul)} />
-      <Tabs.Screen name="library" options={tab('Library', 'library-outline', colors.accent)} />
     </Tabs>
     <MyraButton />
     </View>

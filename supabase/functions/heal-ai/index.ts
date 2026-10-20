@@ -196,7 +196,9 @@ Reply with JSON only:
 {"headline":"the single most useful shift today",
  "body":["one food, movement or sleep suggestion"],
  "mind":["one meditation, attention or content suggestion; use today's Tao practice when it fits"],
- "soul":["one truthfulness, service, Gita or Tao suggestion"]}
+ "soul":["one truthfulness, service, Gita or Tao suggestion"],
+ "focus":["id of a to-do task", "optional second id"]}
+For "focus": from the person's to-do list (if any), pick ONE or TWO task ids for today: overdue or due today first, then what matters most for their family, work or growth; on a tired or low-sleep day pick fewer and lighter ones. Use only ids from the list; [] if the list is empty.
 STRICT: the headline and every suggestion is ONE line of at most 10 words, written as a direct instruction that starts with a verb, with a number where it helps: e.g. "Walk 10 minutes after lunch.", "Sit for 5 minutes of breathing before 6 pm.", "Eat dal with dinner for protein." Never use "try", "consider", "maybe", "you could" or "it may help". Exactly one suggestion per list.`));
       // Founder's rule: every line at most 10 words. If the model ran long, ask once more to shorten.
       const words = (x: unknown) => String(x ?? '').trim().split(/\s+/).filter(Boolean).length;
@@ -206,7 +208,7 @@ STRICT: the headline and every suggestion is ONE line of at most 10 words, writt
           const short = parseJson(await ask('quick', ORANGE_BOOK,
 `Shorten each line of this JSON to at most 10 words. Keep the meaning, start each with a verb, keep numbers. Reply with the same JSON shape only.
 ${JSON.stringify({ headline: g.headline, body: [g.body?.[0]], mind: [g.mind?.[0]], soul: [g.soul?.[0]] })}`));
-          if (short?.headline) return short;
+          if (short?.headline) return { ...short, focus: g.focus ?? [] };
         } catch { /* keep the first answer */ }
       }
       return g;
@@ -241,12 +243,13 @@ Do not judge the person. Reply with JSON only:
         .map((m: { role?: string; text?: string }) => `${m.role === 'myra' ? 'Myra' : 'Person'}: ${String(m.text ?? '').slice(0, 1200)}`).join('\n');
       const text = await ask('smart', `${ORANGE_BOOK}
 You are Myra, the friendly assistant inside the Happy Orange app. You help the person find their way around the app, understand their scores and data, and answer questions about food, movement, sleep, mind and inner life.
-The app has five tabs:
+The app has four tabs:
 - Today: the well-being score out of 300 (Body + Mind + Soul, 100 each), the "Myra recommends" card (your daily recommendations), and Profile (top right) for the account, sign-out and deleting data. During testing every tab has a feedback box at the top that goes straight to the team.
 - Body: steps, active minutes, sleep hours and quality, and "Log a meal": type or speak what you ate (e.g. "2 rotis and dal") or use a photo; numbers come from IFCT 2017. Foods can also be added from IFCT by grams.
 - Mind: the day's Tao practice (on Mon, Tue, Thu, Fri, Sun), a guided meditation timer that records the minutes actually sat, "Phone activity" (choose a Screen Time screenshot and the app reads social-media minutes), and one card for attention, learning and social-media sessions added by hand.
 - Soul: study the Gita verse of the day (read, open the English or Hindi meaning, write a line, tick studied), the thought of the day (write your own), gratitude (three things), the day's Tao practice (on Wed and Sat), and one check for the eight practices (Satya, Nyaya, Kartavya, Seva, Ahimsa, Daana, Santosha, Kritajnata): tap only the ones where you slipped, or "No, I kept all eight".
-- Library: IFCT 2017 food lookup, all 18 Gita chapters, the Tao Te Ching week, and an exercise library.
+- To-do list ("Clear your mind", on the Mind tab): tasks in three groups, Family, Work and Better me. Each morning you (Myra) pick one or two for today; they show as "Focus" in Myra recommends on Today, and ticking one removes it. The rest get dates automatically and can be moved.
+- Library (open it from Profile, top right of Today): IFCT 2017 food lookup, all 18 Gita chapters, the Tao Te Ching week, and an exercise library.
 - The floating Myra button on every tab opens this chat.
 Scoring: Body = movement 40 + sleep 30 + food 30. Mind = meditation 20 + attention 10 + learning 10 + content quality 35 + content quantity 25, plus 10 for a Mind-day Tao practice (max 100). Soul = eight practices 50 (half of each weight: Satya 10, Nyaya 7.5, Kartavya 7.5, Seva 7.5, Ahimsa 5, Daana 5, Santosha 5, Kritajnata 2.5) + Gita verse studied 20 + gratitude 5 each up to 15 + thought 15, plus 10 for a Soul-day Tao practice (0 to 100).
 When asked where to do something, name the tab and the card. When analysing, use only the data below; if something is not logged, say so and suggest logging it. Keep replies short: two to five sentences. Any suggestion or recommendation you give is ONE line of at most 10 words, as a direct instruction starting with a verb ("Walk 10 minutes after lunch."), never "try" or "consider". Plain text, no headings.

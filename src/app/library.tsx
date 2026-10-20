@@ -2,13 +2,13 @@
 
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
-import { Card, Heading, Label, Note, Screen, Segmented, TextField, s } from '../../components/ui';
-import { TaoWeek } from '../../components/TaoCard';
-import { searchExercises } from '../../lib/exercises';
-import { chapters, versesOf } from '../../lib/gita';
-import { TAO_CORE, WEEK_REVIEW } from '../../lib/tao';
-import { IFCT_COLUMNS, foodByCode, formatAmount, nutrient, per100g, searchFoods } from '../../lib/ifct';
-import { colors } from '../../theme';
+import { Card, Heading, Label, Note, Screen, Segmented, TextField, s } from '../components/ui';
+import { TaoWeek } from '../components/TaoCard';
+import { searchExercises } from '../lib/exercises';
+import { chapters, versesOf } from '../lib/gita';
+import { TAO_CORE, WEEK_REVIEW } from '../lib/tao';
+import { IFCT_COLUMNS, foodByCode, formatAmount, nutrient, per100g, searchFoods } from '../lib/ifct';
+import { colors } from '../theme';
 
 type Section = 'food' | 'gita' | 'tao' | 'exercise';
 
