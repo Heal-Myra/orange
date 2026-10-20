@@ -1,7 +1,7 @@
 # Changelog
 
 ## 0.6.0 — 20 October 2026 ("Clear your mind")
-- Soul tab is now: Gita verse, Breathing & meditation, Thought of the day, Gratitude. The eight-practices check and the Tao card were removed from Soul; the eight practices are kept in the Library (Profile → Library → Practices) for the future. The Tao practice is on Mind every day.
+- Soul tab order (founder): Gratitude, Breathing & meditation, **Daily Wisdom** (the Gita verse card, renamed), Thought of the day. The eight-practices check and the Tao card were removed from Soul; the eight practices are kept in the Library (Profile → Library → Practices) for the future. The Tao practice is on Mind every day.
 - Soul rebalanced to 100: meditation 30, verse 25, gratitude 10 each up to 30, thought 15 (plus or minus 10 from older reflections).
 - Body tab is now three cards in the founder's priority: **Food**, **Sleep**, **Movement**. The separate "Add food from IFCT 2017" card is gone: when the AI cannot be used (signed out, not yet approved, offline), Type searches IFCT 2017 in the same box. The IFCT lookup stays in the Library.
 - Better food search: spelling variants (daal, dhal → dal; moong, toor, chana, urad…) and matching at the start of words, so "daal" no longer finds apricot (jardaalu).

@@ -16,7 +16,8 @@ export function VerseStudyCard() {
   const so = day.soul ?? {};
   return (
     <Card style={{ borderLeftWidth: 4, borderLeftColor: colors.soul }}>
-      <Label>Study today's verse · Bhagavad Gita {v.chapter}.{v.verse}</Label>
+      <Heading>Daily Wisdom</Heading>
+      <Label>Bhagavad Gita {v.chapter}.{v.verse} · verse of the day</Label>
       <Text style={{ fontSize: 19, lineHeight: 30, color: colors.ink }}>{v.sanskrit}</Text>
       <Text style={{ fontStyle: 'italic', color: colors.muted }}>{v.transliteration}</Text>
       <Note>1. Read it slowly, aloud if you can. 2. Open its meaning. 3. Write one line on what it says to you today.</Note>

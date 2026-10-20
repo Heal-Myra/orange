@@ -1,4 +1,5 @@
-// Soul / inner life: study the Gita verse of the day, breathing and meditation, the thought of the day and gratitude.
+// Soul / inner life, in the founder's order (20 Oct 2026): Gratitude, Breathing & meditation, Daily Wisdom (the Gita
+// verse of the day), then the thought of the day.
 // The eight-practices check and the Tao card were taken off Soul by the founder (20 Oct 2026); Tao now lives on Mind.
 
 import { GratitudeCard, ThoughtCard, VerseStudyCard } from '../../components/SoulCards';
@@ -15,10 +16,10 @@ export default function Soul() {
       <Card style={{ paddingVertical: 12 }}>
         <Heading right={<Score value={score?.total} max={100} />}>Soul today</Heading>
       </Card>
-      <VerseStudyCard />
-      <MeditationTimer />
-      <ThoughtCard />
       <GratitudeCard />
+      <MeditationTimer />
+      <VerseStudyCard />
+      <ThoughtCard />
     </Screen>
   );
 }
