@@ -1,4 +1,4 @@
-# 0012 — Quick updates (EAS Update) on the free Expo plan
+# 0012 — Quick updates (EAS Update); Expo Starter plan
 
 Date: 20 October 2026 · Decided by: founder
 
@@ -6,6 +6,9 @@ Date: 20 October 2026 · Decided by: founder
 Stay on the Expo **free plan** for now (Starter, US$19/month, considered and set aside until there are many testers and
 several updates a day). To keep the iPhone app current without frequent full builds, the app uses **EAS Update**
 ("quick updates"): JavaScript changes (screens, cards, text, colours, scoring) are sent straight into the installed app.
+
+## Update, same evening (20 Oct 2026, 23:32)
+The founder upgraded the **healmyra** Expo account to **Starter** (US$19/month, $45 build credit, high-priority queue, usage-based CI minutes) so Claude can deploy the AI server, build and send to TestFlight without his PC. Quick updates stay: they keep most changes out of paid builds.
 
 ## How it works
 - `expo-updates` is installed; `app.json` has `updates.url` (u.expo.dev/<projectId>) and `runtimeVersion: {policy: appVersion}`.

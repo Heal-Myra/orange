@@ -1,4 +1,4 @@
-// Happy Orange AI — one server function for every AI feature.
+// Happy Orange AI — one server function for every AI feature. (Deployed by the EAS "Deploy AI server" workflow.)
 // Runs in Supabase (Mumbai). Only signed-in people can call it; each person has a daily cap.
 // The Claude API key lives in the ANTHROPIC_API_KEY secret, never in the app.
 //
