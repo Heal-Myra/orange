@@ -51,7 +51,7 @@ export function ScreenTimeCard() {
 
   return (
     <Card>
-      <Heading right={<Score value={score?.content ?? undefined} max={60} />}>Phone activity</Heading>
+      <Heading right={<Score value={score?.content ?? undefined} max={70} />}>Phone activity</Heading>
       <Note>Take a screenshot of Screen Time (iPhone: Settings → Screen Time → See All App & Website Activity) and choose it here. The app reads your social-media minutes for you.</Note>
       <Check color={colors.mind} checked={day.noMedia} onToggle={() => update(d => { d.noMedia = !d.noMedia; if (d.noMedia) d.media = []; })} title="I used no social media today" />
       {!day.noMedia && (session

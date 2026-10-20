@@ -1,6 +1,6 @@
 // Mind: the Tao practice, guided meditation (minutes recorded by the app), phone activity from a Screen Time
 // screenshot, and one card for everything typed by hand (attention, learning, extra social-media sessions).
-// Scoring: meditation 20 + attention 10 + learning 10 + content diet 60, plus the Tao practice on Mind days.
+// Scoring: attention 15 + learning 15 + content diet 70, plus the Tao practice on Mind days (meditation is on Soul).
 
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
@@ -46,9 +46,9 @@ export default function Mind() {
       <Card>
         <Heading>Other activities</Heading>
         <Check color={colors.mind} checked={!!day.mind.attention} onToggle={() => update(d => { d.mind.attention = !d.mind.attention; })}
-          title="Attention" detail="Did a focused, phone-free block of single-tasking" points={10} />
+          title="Attention" detail="Did a focused, phone-free block of single-tasking" points={15} />
         <Check color={colors.mind} checked={!!day.mind.learning} onToggle={() => update(d => { d.mind.learning = !d.mind.learning; })}
-          title="Learning" detail="Learned something: a book, course, skill or wisdom text" points={10} />
+          title="Learning" detail="Learned something: a book, course, skill or wisdom text" points={15} />
 
         {day.media.map((m, i) => (
           <View key={i} style={[s.headingRow, { borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 8 }]}>
@@ -72,7 +72,7 @@ export default function Mind() {
             </View>
           </View>
         ) : <Button kind="plain" title="+ Add a social-media session by hand" onPress={() => setAdding(true)} />)}
-        <Note>Content quality earns up to 35 points and staying within your {profile.mediaLimit}-minute limit earns up to 25.</Note>
+        <Note>Content quality earns up to 40 points and staying within your {profile.mediaLimit}-minute limit earns up to 30.</Note>
       </Card>
     </Screen>
   );

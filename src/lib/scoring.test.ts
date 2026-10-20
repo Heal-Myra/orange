@@ -49,19 +49,19 @@ describe('body', () => {
 });
 
 describe('mind', () => {
-  it('scores practices alone when social media is not logged', () => {
+  it('scores practices alone when social media is not logged (meditation now counts in Soul)', () => {
     const d = day();
     d.mind = { meditationMin: 20, attention: true, learning: true };
     const m = mindScore(d, P)!;
-    expect(m.practices).toBe(40);
+    expect(m.practices).toBe(30);
     expect(m.content).toBeNull();
-    expect(m.total).toBe(40);
+    expect(m.total).toBe(30);
   });
 
   it('gives the full content score for a day without social media', () => {
     const d = day();
     d.noMedia = true;
-    expect(mindScore(d, P)!.content).toBe(60);
+    expect(mindScore(d, P)!.content).toBe(70);
   });
 
   it('weights content by minutes and category', () => {
@@ -72,38 +72,46 @@ describe('mind', () => {
     ];
     const m = mindScore(d, P)!;
     expect(m.quality).toBeCloseTo(0.6);
-    expect(m.content).toBeCloseTo(35 * 0.6 + 25);
+    expect(m.content).toBeCloseTo(40 * 0.6 + 30);
   });
 
   it('drops quantity points to zero at three times the limit', () => {
     const d = day();
     d.media = [{ platform: 'Instagram', minutes: 180, category: 'learning' }];
-    expect(mindScore(d, P)!.content).toBeCloseTo(35);
+    expect(mindScore(d, P)!.content).toBeCloseTo(40);
   });
 });
 
 describe('soul', () => {
-  it('gives half of each kept practice\'s weight (eight practices worth 50)', () => {
+  it('gives 0.4 of each kept practice\'s weight (eight practices worth 40)', () => {
     const d = day();
     d.dharma = { satya: true, nyaya: true };
-    expect(soulScore(d)!.total).toBe(17.5);
+    expect(soulScore(d)!.total).toBe(14);
   });
 
-  it('adds 20 for the verse, 5 per gratitude (max 15) and 15 for a thought', () => {
+  it('adds up to 20 for breathing and meditation against the daily target', () => {
+    const d = day();
+    d.mind = { meditationMin: P.meditation / 2 };
+    expect(soulScore(d, P)!.meditation).toBe(10);
+    expect(mindScore(d, P)).toBeNull();
+  });
+
+  it('adds 15 for the verse, 5 per gratitude (max 15) and 10 for a thought', () => {
     const d = day();
     d.soul = { verseStudied: true, gratitude: ['family', 'health', 'rain', 'tea'], thought: 'Be gentle today' };
     const s = soulScore(d)!;
-    expect(s.verse).toBe(20);
+    expect(s.verse).toBe(15);
     expect(s.gratitude).toBe(15);
-    expect(s.thought).toBe(15);
-    expect(s.total).toBe(50);
+    expect(s.thought).toBe(10);
+    expect(s.total).toBe(40);
   });
 
-  it('reaches 100 with all practices kept and all three cards done', () => {
+  it('reaches 100 with all practices kept, meditation done and all three cards done', () => {
     const d = day();
     d.dharma = { satya: true, nyaya: true, kartavya: true, seva: true, ahimsa: true, daana: true, santosha: true, kritajnata: true };
     d.soul = { checked: true, verseStudied: true, gratitude: ['a', 'b', 'c'], thought: 'Let go' };
-    expect(soulScore(d)!.total).toBe(100);
+    d.mind = { meditationMin: P.meditation };
+    expect(soulScore(d, P)!.total).toBe(100);
   });
 
   it('counts answering the check even when every practice slipped', () => {
@@ -116,8 +124,9 @@ describe('soul', () => {
     const d = day();
     d.dharma = { satya: true, nyaya: true, kartavya: true, seva: true, ahimsa: true, daana: true, santosha: true, kritajnata: true };
     d.soul = { verseStudied: true, gratitude: ['a', 'b', 'c'], thought: 'Let go' };
+    d.mind = { meditationMin: P.meditation };
     d.actions = Array.from({ length: 5 }, () => ({ text: 'helped', principle: 'Seva', alignment: 2 }));
-    const s = soulScore(d)!;
+    const s = soulScore(d, P)!;
     expect(s.bonus).toBe(10);
     expect(s.total).toBe(100);
   });
@@ -164,7 +173,8 @@ describe('Tao practice', () => {
     s.tao = { done: true };
     s.dharma = { satya: true, nyaya: true, kartavya: true, seva: true, ahimsa: true, daana: true, santosha: true, kritajnata: true };
     s.soul = { verseStudied: true, gratitude: ['a', 'b', 'c'], thought: 'Let go' };
-    expect(soulScore(s)!.total).toBe(100);
+    s.mind = { meditationMin: P.meditation };
+    expect(soulScore(s, P)!.total).toBe(100);
   });
 
   it('does nothing when only a note is written', () => {

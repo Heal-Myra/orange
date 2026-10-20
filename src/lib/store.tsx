@@ -42,7 +42,7 @@ function toRow(userId: string, d: DayLog, p: Profile) {
     log: d,
     body_score: round2(bodyScore(d, p)?.total),
     mind_score: round2(mindScore(d, p)?.total),
-    soul_score: round2(soulScore(d)?.total),
+    soul_score: round2(soulScore(d, p)?.total),
     updated_at: new Date().toISOString(),
   };
 }

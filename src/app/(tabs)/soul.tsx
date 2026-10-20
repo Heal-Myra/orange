@@ -9,8 +9,8 @@ import { soulScore } from '../../lib/scoring';
 import { useHeal } from '../../lib/store';
 
 export default function Soul() {
-  const { day } = useHeal();
-  const score = soulScore(day);
+  const { day, profile } = useHeal();
+  const score = soulScore(day, profile);
   return (
     <Screen feedback="Soul">
       <Card style={{ paddingVertical: 12 }}>

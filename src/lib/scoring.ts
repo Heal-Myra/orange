@@ -4,7 +4,7 @@
 // (The Orange Book, Chapter 2). Weights are documented in docs/scoring.md.
 
 import { TAO_POINTS, taoForDate } from './tao';
-import type { ContentCategoryId, DayLog, Meal, PracticeId, Profile } from './types';
+import { DEFAULT_PROFILE, type ContentCategoryId, type DayLog, type Meal, type PracticeId, type Profile } from './types';
 
 export const CONTENT_CATEGORIES: { id: ContentCategoryId; name: string; weight: number }[] = [
   { id: 'learning', name: 'Learning or skill-building', weight: 1.0 },
@@ -91,19 +91,20 @@ export interface MindScore {
 export function mindScore(d: DayLog, P: Profile): MindScore | null {
   const m = d.mind;
   const tao = taoPoints(d, 'mind');
-  const hasPractice = m.meditationMin != null || !!m.attention || !!m.learning || tao > 0;
-  const practices = 20 * c01((m.meditationMin ?? 0) / P.meditation) + (m.attention ? 10 : 0) + (m.learning ? 10 : 0);
+  // Meditation moved to Soul (founder, 20 Oct 2026). Mind = attention 15 + learning 15 + content diet 70.
+  const hasPractice = !!m.attention || !!m.learning || tao > 0;
+  const practices = (m.attention ? 15 : 0) + (m.learning ? 15 : 0);
 
   let content: number | null = null, minutes = 0, quality: number | null = null;
   if (d.noMedia) {
-    content = 60; quality = 1;
+    content = 70; quality = 1;
   } else {
     minutes = d.media.reduce((s, x) => s + (x.minutes || 0), 0);
     if (minutes > 0) {
       quality = d.media.reduce((s, x) => s + (x.minutes || 0) * weightOf(x.category), 0) / minutes;
       const L = P.mediaLimit;
-      const quantity = minutes <= L ? 25 : 25 * c01(1 - (minutes - L) / (2 * L));
-      content = 35 * quality + quantity;
+      const quantity = minutes <= L ? 30 : 30 * c01(1 - (minutes - L) / (2 * L));
+      content = 40 * quality + quantity;
     }
   }
   if (!hasPractice && content == null) return null;
@@ -118,38 +119,40 @@ const weightOf = (id: ContentCategoryId) => CONTENT_CATEGORIES.find(c => c.id ==
 
 export interface SoulScore {
   total: number;
-  practices: number; // /50 from the eight-practices check
-  verse: number;     // /20 for studying the Gita verse of the day
+  practices: number; // /40 from the eight-practices check
+  verse: number;     // /15 for studying the Gita verse of the day
+  meditation: number; // /20 for breathing and meditation minutes against the daily target
   gratitude: number; // /15, 5 per thing
-  thought: number;   // /15 for writing a thought for the day
+  thought: number;   // /10 for writing a thought for the day
   bonus: number;     // ±10 from reflected actions
   tao: number;       // Soul-day Tao practice
   count: number;     // practices kept
 }
 
 /**
- * Soul / inner life (0–100): eight practices check 50 (each practice's weight halved), Gita verse studied 20,
- * gratitude 15 (5 each, up to three), thought for the day 15, plus or minus up to 10 from reflected actions,
- * plus the Soul-day Tao practice.
+ * Soul / inner life (0–100), rebalanced 20 Oct 2026 when meditation moved here: eight practices check 40
+ * (each practice's weight × 0.4), breathing and meditation 20, Gita verse studied 15, gratitude 15 (5 each,
+ * up to three), thought for the day 10, plus or minus up to 10 from reflected actions, plus the Soul-day Tao practice.
  */
-export function soulScore(d: DayLog): SoulScore | null {
+export function soulScore(d: DayLog, P: Profile = DEFAULT_PROFILE): SoulScore | null {
   const kept = PRACTICES.filter(p => d.dharma[p.id]);
   const tao = taoPoints(d, 'soul');
   const so = d.soul ?? {};
   const grateful = (so.gratitude ?? []).filter(g => g.trim()).length;
-  const verse = so.verseStudied ? 20 : 0;
+  const verse = so.verseStudied ? 15 : 0;
+  const meditation = 20 * c01((d.mind.meditationMin ?? 0) / P.meditation);
   const gratitude = Math.min(3, grateful) * 5;
-  const thought = (so.thought ?? '').trim().length >= 3 ? 15 : 0;
-  if (!kept.length && !d.actions.length && !tao && !so.checked && !verse && !gratitude && !thought) return null;
-  const practices = kept.reduce((s, p) => s + p.points, 0) / 2;
+  const thought = (so.thought ?? '').trim().length >= 3 ? 10 : 0;
+  if (!kept.length && !d.actions.length && !tao && !so.checked && !verse && !gratitude && !thought && d.mind.meditationMin == null) return null;
+  const practices = kept.reduce((s, p) => s + p.points, 0) * 0.4;
   const bonus = clamp(d.actions.reduce((s, a) => s + (a.alignment || 0), 0) * 2.5, -10, 10);
-  return { total: clamp(practices + verse + gratitude + thought + bonus + tao, 0, 100), practices, verse, gratitude, thought, bonus, tao, count: kept.length };
+  return { total: clamp(practices + verse + meditation + gratitude + thought + bonus + tao, 0, 100), practices, verse, meditation, gratitude, thought, bonus, tao, count: kept.length };
 }
 
 export interface WellBeing { body: BodyScore | null; mind: MindScore | null; soul: SoulScore | null; total: number; logged: number }
 
 export function wellBeing(d: DayLog, P: Profile): WellBeing {
-  const body = bodyScore(d, P), mind = mindScore(d, P), soul = soulScore(d);
+  const body = bodyScore(d, P), mind = mindScore(d, P), soul = soulScore(d, P);
   return {
     body, mind, soul,
     total: (body?.total ?? 0) + (mind?.total ?? 0) + (soul?.total ?? 0),

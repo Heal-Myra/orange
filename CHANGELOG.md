@@ -3,7 +3,7 @@
 ## 0.6.0 — 20 October 2026 ("Clear your mind")
 - New to-do list on the Mind tab, in three groups: Family, Work, Better me. Add a task (with Today / Tomorrow / This week / Next week, or let Myra choose), tick to finish, tap the calendar to move it, or remove it.
 - Each day Myra picks one or two tasks as today's **Focus**, shown inside Myra recommends on Today; the rest are spread out automatically, two a day. A task moved three times gets a gentle "make it smaller, or let it go?".
-- The breathing and meditation card moved from Mind to Soul (its minutes still count in the Mind score for now).
+- The breathing and meditation card moved from Mind to Soul, and its 20 points moved with it. Mind is now attention 15 + learning 15 + content 70 (quality 40, quantity 30). Soul is now practices 40 + meditation 20 + verse 15 + gratitude 15 + thought 10. See docs/scoring.md.
 - The Library moved into Profile; the app now has four tabs: Today, Body, Mind, Soul.
 - New table `tasks` (migration 0005); see docs/decisions/0008-clear-your-mind.md.
 
