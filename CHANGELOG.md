@@ -1,6 +1,7 @@
 # Changelog
 
 ## 0.7.0 — 20 October 2026 (Hindi)
+- Today circle: only three coloured arcs (Body, Mind, Soul) on one quiet grey ring; the pale "unfilled" parts that looked like a fourth ring are gone.
 - First screen: choose **English** or **हिंदी**; change any time in Profile → Language. The whole app, the Tao week and the thoughts of the day are in Hindi, and Myra, her recommendations, meal tips and explanations answer in Hindi. See docs/decisions/0010-languages.md.
 
 ## 0.6.0 — 20 October 2026 ("Clear your mind")

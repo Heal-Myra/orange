@@ -5,13 +5,13 @@
 
 import { router } from 'expo-router';
 import { Pressable, Text, View, useWindowDimensions } from 'react-native';
-import Svg, { G, Path } from 'react-native-svg';
+import Svg, { Circle, G, Path } from 'react-native-svg';
 import type { WellBeing } from '../lib/scoring';
 import { colors } from '../theme';
 import { tr } from '../lib/i18n';
 
 const BASE = 210; // designed at 210 px, scaled down on narrow phones
-const SPAN = 110; // degrees per arc, leaving small gaps between them
+const SPAN = 100; // degrees an arc reaches at 100/100, leaving clear gaps between the three
 
 type Part = { key: 'body' | 'mind' | 'soul'; name: string; color: string; start: number; value: number | undefined; route: '/body' | '/mind' | '/soul' };
 
@@ -34,14 +34,15 @@ export function WellBeingRing({ w, label, labelColor }: { w: WellBeing; label: s
         <View style={{ width: SIZE + 24 * k, height: SIZE + 24 * k, borderRadius: 999, backgroundColor: colors.tint, alignItems: 'center', justifyContent: 'center' }}>
           <View style={{ width: SIZE, height: SIZE }}>
             <Svg width={SIZE} height={SIZE}>
+              {/* One quiet grey ring underneath, then only three coloured arcs: Body, Mind, Soul (founder, 20 Oct 2026). */}
+              <Circle cx={C} cy={C} r={R} stroke={colors.sunk} strokeWidth={STROKE} fill="none" />
               {parts.map(p => {
                 const filled = Math.max(0, Math.min(100, p.value ?? 0)) / 100;
-                return (
+                return filled > 0 ? (
                   <G key={p.key} onPress={() => router.navigate(p.route)}>
-                    <Path d={arc(p.start, p.start + SPAN)} stroke={p.color} strokeOpacity={0.2} strokeWidth={STROKE} strokeLinecap="round" fill="none" />
-                    {filled > 0 ? <Path d={arc(p.start, p.start + Math.max(1, SPAN * filled))} stroke={p.color} strokeWidth={STROKE} strokeLinecap="round" fill="none" /> : null}
+                    <Path d={arc(p.start, p.start + Math.max(2, SPAN * filled))} stroke={p.color} strokeWidth={STROKE} strokeLinecap="round" fill="none" />
                   </G>
-                );
+                ) : null;
               })}
             </Svg>
             <View pointerEvents="none" style={{ position: 'absolute', left: 0, top: 0, width: SIZE, height: SIZE, alignItems: 'center', justifyContent: 'center' }}>
@@ -59,9 +60,9 @@ export function WellBeingRing({ w, label, labelColor }: { w: WellBeing; label: s
 
 // Body top right, Mind bottom, Soul left.
 const partsOf = (w: WellBeing): Part[] => [
-  { key: 'body', name: tr('Body'), color: colors.body, start: -55, value: w.body?.total, route: '/body' },
-  { key: 'mind', name: tr('Mind'), color: colors.mind, start: 65, value: w.mind?.total, route: '/mind' },
-  { key: 'soul', name: tr('Soul'), color: colors.soul, start: 185, value: w.soul?.total, route: '/soul' },
+  { key: 'body', name: tr('Body'), color: colors.body, start: -50, value: w.body?.total, route: '/body' },
+  { key: 'mind', name: tr('Mind'), color: colors.mind, start: 70, value: w.mind?.total, route: '/mind' },
+  { key: 'soul', name: tr('Soul'), color: colors.soul, start: 190, value: w.soul?.total, route: '/soul' },
 ];
 
 /** Three coloured tiles under the circle; each opens its tab. */
