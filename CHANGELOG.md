@@ -1,6 +1,8 @@
 # Changelog
 
 ## 0.6.0 — 20 October 2026 ("Clear your mind")
+- Body tab is now three cards in the founder's priority: **Food**, **Sleep**, **Movement**. The separate "Add food from IFCT 2017" card is gone: when the AI cannot be used (signed out, not yet approved, offline), Type searches IFCT 2017 in the same box. The IFCT lookup stays in the Library.
+- Better food search: spelling variants (daal, dhal → dal; moong, toor, chana, urad…) and matching at the start of words, so "daal" no longer finds apricot (jardaalu).
 - New to-do list on the Mind tab, in three groups: Family, Work, Better me. Add a task (with Today / Tomorrow / This week / Next week, or let Myra choose), tick to finish, tap the calendar to move it, or remove it.
 - Each day Myra picks one or two tasks as today's **Focus**, shown inside Myra recommends on Today; the rest are spread out automatically, two a day. A task moved three times gets a gentle "make it smaller, or let it go?".
 - The breathing and meditation card moved from Mind to Soul, and its 20 points moved with it. Mind is now attention 15 + learning 15 + content 70 (quality 40, quantity 30). Soul is now practices 40 + meditation 20 + verse 15 + gratitude 15 + thought 10. See docs/scoring.md.

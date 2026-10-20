@@ -52,15 +52,23 @@ export function per100g(f: Food): Per100g {
 }
 
 /** Search by English name, regional names, scientific name or food group. */
+const SPELLINGS: [RegExp, string][] = [
+  [/^(daal|dhal|dhaal|daal?s)$/, 'dal'], [/^(chawal|chaval)$/, 'rice'], [/^(paneer|panir)$/, 'paneer'],
+  [/^(moong|mung|mug)$/, 'green gram'], [/^(urad|urd)$/, 'black gram'], [/^(chana|channa|chole)$/, 'bengal gram'],
+  [/^(toor|tuvar|arhar)$/, 'red gram'], [/^(masoor)$/, 'lentil'], [/^(dahi|curd)$/, 'curd'], [/^(bhindi)$/, 'ladies finger'],
+];
+const startsWord = (hay: string, w: string) => hay.startsWith(w) || hay.includes(' ' + w) || hay.includes(',' + w) || hay.includes('(' + w) || hay.includes('-' + w);
+
 export function searchFoods(query: string, limit = 20): Food[] {
-  const words = query.toLowerCase().split(/[^a-z0-9ऀ-ॿ]+/).filter(w => w.length > 1);
+  const words = query.toLowerCase().split(/[^a-z0-9ऀ-ॿ]+/).filter(w => w.length > 1)
+    .flatMap(w => (SPELLINGS.find(([re]) => re.test(w))?.[1] ?? w).split(' '));
   if (!words.length) return [];
   const scored: [number, Food][] = [];
   foods.forEach((f, i) => {
     const h = hay[i];
     let score = 0, all = true;
     for (const w of words) {
-      const m = h.n.includes(w) ? 3 : h.l.includes(w) ? 2 : h.o.includes(w) ? 1 : 0;
+      const m = startsWord(h.n, w) ? 3 : startsWord(h.l, w) ? 2 : startsWord(h.o, w) ? 1 : 0;
       if (!m) all = false;
       score += m;
     }

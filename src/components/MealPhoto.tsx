@@ -11,6 +11,7 @@ import { analyseMeal, analyseMealText, oneLine, type MealItem } from '../lib/ai'
 import { useAuth } from '../lib/auth';
 import { useHeal } from '../lib/store';
 import { colors } from '../theme';
+import { IfctPicker } from './IfctPicker';
 import { Button, Card, Heading, Note, TextField, s } from './ui';
 
 export async function shrink(uri: string, fallback: string | null | undefined, mime: string | null | undefined) {
@@ -54,6 +55,7 @@ export function MealPhoto({ right, children }: { right?: ReactNode; children?: R
   const [items, setItems] = useState<MealItem[] | null>(null);
   const [insight, setInsight] = useState('');
   const [note, setNote] = useState('');
+  const [noAi, setNoAi] = useState<string | null>(null); // why the AI could not be used: Type then searches IFCT directly
 
   const pick = async (camera: boolean) => {
     setMessage(null); setItems(null);
@@ -90,7 +92,9 @@ export function MealPhoto({ right, children }: { right?: ReactNode; children?: R
       setNote([r.confidence && `Confidence: ${r.confidence}.`, r.note].filter(Boolean).join(' '));
       setMessage(r.items.length ? 'Check the numbers, change anything that looks off, then add.' : (r.note || 'No food found in that description.'));
     } catch (e) {
-      setMessage(e instanceof Error ? e.message : 'Something went wrong. Try again.');
+      // AI not available (not approved yet, limit reached, offline): search IFCT 2017 instead, in the same box.
+      setMessage(null);
+      setNoAi(e instanceof Error ? `${e.message} Meanwhile, pick from IFCT 2017:` : 'Pick from IFCT 2017:');
     } finally { setBusy(false); }
   };
 
@@ -133,13 +137,14 @@ export function MealPhoto({ right, children }: { right?: ReactNode; children?: R
   return (
     <Card>
       <Heading right={right}>Food</Heading>
-      {!session ? <Note>Sign in to log meals this way.</Note> : (
+      {(
         <>
           <View style={{ flexDirection: 'row', gap: 10 }}>
             {([['photo', 'camera-outline', 'Photo'], ['speak', 'mic-outline', 'Speak'], ['type', 'create-outline', 'Type']] as const).map(([m, icon, label]) => (
               <Pressable key={m} accessibilityRole="button" accessibilityLabel={`${label} your meal`} disabled={busy}
                 onPress={() => {
                   setMode(m); setMessage(null);
+                  if (!session && m !== 'type') { setMessage('Sign in to use Photo and Speak. Type works now.'); return; }
                   if (m === 'photo') pick(Platform.OS !== 'web');
                   if (m === 'speak' && Speech && !listening) speak();
                 }}
@@ -163,7 +168,11 @@ export function MealPhoto({ right, children }: { right?: ReactNode; children?: R
             <Note>Speaking is coming with the Happy Orange iPhone app very soon. For now, tap Photo or Type.</Note>
           ))}
 
-          {mode === 'type' && (
+          {mode === 'type' && (!session || noAi) && (
+            <IfctPicker start={words} why={!session ? 'Search a food and add grams. Sign in to just type your whole meal in your own words.' : noAi ?? undefined} />
+          )}
+
+          {mode === 'type' && session && !noAi && (
             <>
               <TextField label="What did you eat?" value={words} onChangeText={setWords} multiline
                 placeholder="e.g. 2 rotis with ghee, 1 katori moong dal, bhindi sabzi, a cup of chai with sugar" />
