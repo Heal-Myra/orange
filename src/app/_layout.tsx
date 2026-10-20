@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import { AuthProvider, useAuth } from '../lib/auth';
 import { HealProvider } from '../lib/store';
 import { TasksProvider } from '../lib/tasks';
+import { HealthProvider } from '../components/HealthSync';
 import { LangProvider, tr, useLang } from '../lib/i18n';
 import { colors } from '../theme';
 
@@ -53,10 +54,12 @@ export default function RootLayout() {
     <LangProvider>
     <AuthProvider>
       <HealProvider>
+        <HealthProvider>
         <TasksProvider>
           <StatusBar style="dark" />
           <Gate />
         </TasksProvider>
+        </HealthProvider>
       </HealProvider>
     </AuthProvider>
     </LangProvider>

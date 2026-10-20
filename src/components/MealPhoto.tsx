@@ -11,9 +11,10 @@ import { analyseMeal, analyseMealText, oneLine, type MealItem } from '../lib/ai'
 import { useAuth } from '../lib/auth';
 import { useHeal } from '../lib/store';
 import { colors } from '../theme';
+import { NativeSpeech } from '../lib/nativeSpeech';
 import { IfctPicker } from './IfctPicker';
 import { Button, Card, Heading, Note, TextField, s } from './ui';
-import { tr } from '../lib/i18n';
+import { lang, tr } from '../lib/i18n';
 
 export async function shrink(uri: string, fallback: string | null | undefined, mime: string | null | undefined) {
   try {
@@ -28,11 +29,12 @@ export async function shrink(uri: string, fallback: string | null | undefined, m
 }
 
 /**
- * Speech to text in the browser, where it works reliably (Chrome, Android).
- * Not offered on iPhone/iPad: Safari's speech recognition often hangs, especially in home-screen apps,
+ * Speech to text: Apple's recognition in the iPhone app; the browser's in Chrome and Android.
+ * Not offered in Safari on iPhone/iPad: Safari's speech recognition often hangs, especially in home-screen apps,
  * and the keyboard's own microphone (dictation) works better there.
  */
 function speechRecognition(): (new () => any) | null {
+  if (Platform.OS === 'ios') return NativeSpeech; // the iPhone app: Apple's own speech recognition
   if (Platform.OS !== 'web' || typeof window === 'undefined' || typeof navigator === 'undefined') return null;
   const ios = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   if (ios) return null;
@@ -109,7 +111,7 @@ export function MealPhoto({ right, children }: { right?: ReactNode; children?: R
     if (listening) { stopListening(); return; }
     let r: any;
     try { r = new Speech(); } catch { setMessage(tr('Speaking is not available here. Tap the microphone on your keyboard instead.')); return; }
-    r.lang = 'en-IN'; r.interimResults = false; r.maxAlternatives = 1;
+    r.lang = lang() === 'hi' ? 'hi-IN' : 'en-IN'; r.interimResults = false; r.maxAlternatives = 1;
     r.onresult = (e: any) => { const t = e.results?.[0]?.[0]?.transcript ?? ''; if (t) { setWords(t); describe(t); } };
     r.onerror = () => { setMessage(tr('Could not hear that. You can also tap the microphone on your keyboard.')); stopListening(); };
     r.onend = () => setListening(false);

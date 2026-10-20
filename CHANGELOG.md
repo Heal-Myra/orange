@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.0 — 20 October 2026 (iPhone app, getting ready)
+- iPhone app settings: Apple Health permission (read steps, exercise minutes, sleep), microphone and speech permission for Speak, encryption declaration, iPhone only (no iPad layout yet).
+- Apple Health: "Connect Apple Health" card on Body; once connected, Sleep and Movement fill in by themselves (on open, on return to the app, every 15 minutes).
+- Speak works in the iPhone app (English or Hindi, following the app language).
+- Workflow `.eas/workflows/ios-testflight.yml`: build and send to TestFlight on pushes to the `testflight` branch. See docs/decisions/0011-native-app-and-apple-health.md.
+
 ## 0.7.0 — 20 October 2026 (Hindi)
 - Today circle: only three coloured arcs (Body, Mind, Soul) on one quiet grey ring; the pale "unfilled" parts that looked like a fourth ring are gone.
 - First screen: choose **English** or **हिंदी**; change any time in Profile → Language. The whole app, the Tao week and the thoughts of the day are in Hindi, and Myra, her recommendations, meal tips and explanations answer in Hindi. See docs/decisions/0010-languages.md.

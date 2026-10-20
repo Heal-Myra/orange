@@ -2,6 +2,7 @@
 // Milestone 3 replaces typing steps and sleep with automatic HealthKit / Health Connect sync.
 
 import { Pressable, Text, View } from 'react-native';
+import { HealthLine } from '../../components/HealthSync';
 import { MealPhoto } from '../../components/MealPhoto';
 import { Card, Heading, Meter, Note, NumberField, Screen, Score, Segmented, s } from '../../components/ui';
 import { bodyScore, mealTotals } from '../../lib/scoring';
@@ -31,6 +32,8 @@ export default function Body() {
           )) : <Note>{tr('No meals yet today.')}</Note>}
         </View>
       </MealPhoto>
+
+      <HealthLine />
 
       <Card>
         <Heading right={<Score value={score?.sleep} max={30} />}>{tr('Sleep')}</Heading>

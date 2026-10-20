@@ -27,6 +27,7 @@ interface HealState {
   setDate: (iso: string) => void;
   goDay: (delta: number) => void;
   update: (change: (d: DayLog) => void) => void;
+  updateOn: (iso: string, change: (d: DayLog) => void) => void; // change a given day (e.g. today from Apple Health)
   setProfile: (p: Profile) => void;
   clearDevice: () => Promise<void>;
 }
@@ -140,16 +141,20 @@ export function HealProvider({ children }: { children: ReactNode }) {
     }, 800);
   }, [userId, fail]);
 
-  const update = useCallback((change: (d: DayLog) => void) => {
+  const updateOn = useCallback((iso: string, change: (d: DayLog) => void) => {
     setDays(prev => {
-      const copy: DayLog = JSON.parse(JSON.stringify(prev[date] ?? emptyDay(date)));
+      const copy: DayLog = JSON.parse(JSON.stringify(prev[iso] ?? emptyDay(iso)));
+      const before = JSON.stringify(copy);
       change(copy);
-      const next = { ...prev, [date]: copy };
+      if (JSON.stringify(copy) === before) return prev; // nothing changed: no save, no re-draw
+      const next = { ...prev, [iso]: copy };
       persistLocal({ days: next, profile });
       pushDay(copy, profile);
       return next;
     });
-  }, [date, profile, persistLocal, pushDay]);
+  }, [profile, persistLocal, pushDay]);
+
+  const update = useCallback((change: (d: DayLog) => void) => updateOn(date, change), [date, updateOn]);
 
   const setProfile = useCallback((p: Profile) => {
     setProfileState(p);
@@ -167,10 +172,10 @@ export function HealProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo<HealState>(() => ({
-    ready, date, days, profile, sync, syncError, update, setProfile, setDate, clearDevice,
+    ready, date, days, profile, sync, syncError, update, updateOn, setProfile, setDate, clearDevice,
     day: days[date] ?? emptyDay(date),
     goDay: (delta: number) => setDate(d => { const n = shiftISO(d, delta); return n > todayISO() ? d : n; }),
-  }), [ready, date, days, profile, sync, syncError, update, setProfile, clearDevice]);
+  }), [ready, date, days, profile, sync, syncError, update, updateOn, setProfile, clearDevice]);
 
   return <HealContext.Provider value={value}>{children}</HealContext.Provider>;
 }

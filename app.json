@@ -7,8 +7,11 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "in.happyorange.heal"
+      "supportsTablet": false,
+      "bundleIdentifier": "in.happyorange.heal",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -39,8 +42,22 @@
         "expo-image-picker",
         {
           "photosPermission": "Happy Orange uses your photos to estimate the nutrition of your meals.",
-          "cameraPermission": "Happy Orange uses the camera to photograph your meals and estimate their nutrition.",
-          "microphonePermission": false
+          "cameraPermission": "Happy Orange uses the camera to photograph your meals and estimate their nutrition."
+        }
+      ],
+      [
+        "@kingstinct/react-native-healthkit",
+        {
+          "NSHealthShareUsageDescription": "Happy Orange reads your steps, exercise minutes and sleep from Apple Health, so your Body score fills in without typing.",
+          "NSHealthUpdateUsageDescription": false,
+          "background": false
+        }
+      ],
+      [
+        "expo-speech-recognition",
+        {
+          "microphonePermission": "Happy Orange listens only while you tap Speak, so you can say what you ate.",
+          "speechRecognitionPermission": "Happy Orange turns what you say about your meal into text to work out its nutrition."
         }
       ]
     ],

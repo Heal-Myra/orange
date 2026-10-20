@@ -1,0 +1,23 @@
+# Builds the iPhone app in the cloud and sends it to TestFlight.
+# Runs when the 'testflight' branch is pushed (Claude pushes main to it when a new tester version is ready).
+# Needs the signing credentials created once by the founder's first interactive build
+# (docs/decisions/0011-native-app-and-apple-health.md) and the App Store Connect API key on the Expo account.
+name: iPhone to TestFlight
+
+on:
+  push:
+    branches: ['testflight']
+
+jobs:
+  build_ios:
+    type: build
+    params:
+      platform: ios
+      profile: production
+
+  submit_ios:
+    needs: [build_ios]
+    type: submit
+    params:
+      build_id: ${{ needs.build_ios.outputs.build_id }}
+      profile: production

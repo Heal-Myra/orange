@@ -70,6 +70,10 @@ export const HI: Record<string, string> = {
   '10 points each, up to 30.': 'हर एक के 10 अंक, 30 तक।',
 
   // ---------- Body ----------
+  'Fill these in from Apple Health': 'इन्हें Apple Health से भरें',
+  'Steps, exercise minutes and sleep from your iPhone and Apple Watch, read automatically. Nothing is written back.': 'आपके iPhone और Apple Watch से कदम, व्यायाम के मिनट और नींद अपने आप पढ़े जाते हैं। वापस कुछ नहीं लिखा जाता।',
+  'Connect Apple Health': 'Apple Health जोड़ें',
+  'From Apple Health': 'Apple Health से',
   'Food': 'भोजन',
   'Photo': 'फ़ोटो',
   'Speak': 'बोलें',
