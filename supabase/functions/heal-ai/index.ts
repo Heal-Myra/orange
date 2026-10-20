@@ -24,6 +24,7 @@ const MODELS = {
   gemini: { smart: Deno.env.get('GEMINI_MODEL') ?? 'gemini-3.8-flash', quick: Deno.env.get('GEMINI_MODEL') ?? 'gemini-3.8-flash' },
 };
 const DAILY_LIMIT = Number(Deno.env.get('AI_DAILY_LIMIT') ?? 20);
+const ADMIN_DAILY_LIMIT = Number(Deno.env.get('AI_ADMIN_DAILY_LIMIT') ?? 200);
 // Comma-separated emails allowed to use the AI. While AI_PROVIDER is gemini (free tier), set this to the
 // founder's email so no other person's data reaches a service that may train on it.
 const ALLOWED = (Deno.env.get('AI_ALLOWED_EMAILS') ?? '').split(',').map(e => e.trim().toLowerCase()).filter(Boolean);
@@ -354,14 +355,19 @@ export default {
     // Daily cap per person.
     const since = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
     const { count } = await ctx.supabase.from('ai_requests').select('id', { count: 'exact', head: true }).gte('created_at', since);
-    if ((count ?? 0) >= DAILY_LIMIT) {
-      return Response.json({ error: `You've used today's ${DAILY_LIMIT} AI requests. They refresh over the next 24 hours.` }, { status: 429 });
+    // Admins (the founder, testing every feature) get a much higher cap (20 Oct 2026).
+    const { data: admin } = await ctx.supabase.rpc('is_admin');
+    const limit = admin === true ? ADMIN_DAILY_LIMIT : DAILY_LIMIT;
+    if ((count ?? 0) >= limit) {
+      return Response.json({ error: `You've used today's ${limit} AI requests. They refresh over the next 24 hours.` }, { status: 429 });
     }
-    await ctx.supabase.from('ai_requests').insert({ kind: action });
+    const { data: logged } = await ctx.supabase.from('ai_requests').insert({ kind: action }).select('id').maybeSingle();
 
     try {
       return Response.json({ result: await run(action, body.payload ?? {}, body.uiLang === 'hi'), provider: PROVIDER });
     } catch (e) {
+      // A failed answer does not use up one of the person's daily requests.
+      if (logged?.id) await ctx.supabase.from('ai_requests').delete().eq('id', logged.id);
       return Response.json({ error: e instanceof Error ? e.message : 'Something went wrong.' }, { status: 500 });
     }
   }),

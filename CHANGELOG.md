@@ -1,6 +1,7 @@
 # Changelog
 
 ## 0.8.1 — 20 October 2026 (app icon, quick updates)
+- AI daily cap: admins (app_admins, `is_admin()`) get 200 a day (`AI_ADMIN_DAILY_LIMIT`), others stay at 20; a failed answer no longer uses up a request (row deleted; needs migration 0006 for the delete policy).
 - Root cause of the typed-meal failure: Claude Sonnet 5.5 thinks by default and thinking counts toward `max_tokens`; the old 2000-token limit cut the meal JSON off. Now `max_tokens` 16000, `output_config.effort: low` on the smart tier, and a cut-off reply (`stop_reason: max_tokens`) is treated as unreadable and retried.
 - Type a meal: a typed dinner failed with "Expected ',' or ']' … in JSON" because one AI reply could not be read, and the app then fell back to the IFCT search with the whole sentence in the box. Now: the AI server forgives common JSON slips (code fences, comments, trailing commas, curly quotes) and asks once more if needed (`askJson`, max_tokens 4000); the app retries once quietly; the IFCT fallback is used only when the AI is truly unavailable (key, credit, limit, offline) and starts with the first food typed ("aloo paratha"), otherwise it says "Tap Calculate to try again".
 - Speak on iPhone: clearer reasons when it can't listen (microphone permission, Dictation off, nothing heard), words heard before a pause are kept, and Done/15-second limit stop gracefully instead of throwing the words away.
