@@ -53,31 +53,35 @@ export function GuidanceCard() {
 
   const time = g ? new Date(g.at).toTimeString().slice(0, 5) : '';
 
+  const blocks = g ? ([['Body', colors.body, g.body], ['Mind', colors.mind, g.mind], ['Soul', colors.soul, g.soul]] as const) : [];
+
+  // Three separate blocks, one each for Body, Mind and Soul, stacked one under another (founder, 20 Oct 2026).
   return (
-    <Card>
-      <Heading>Myra recommends</Heading>
-      {g ? (
-        <>
-          <Text style={{ fontSize: 17, color: colors.insight, fontWeight: '600' }}>{oneLine(g.headline)}</Text>
-          {([['Body', colors.body, g.body], ['Mind', colors.mind, g.mind], ['Soul', colors.soul, g.soul]] as const).map(([name, color, list]) => list[0] ? (
-            <View key={name} style={{ flexDirection: 'row', gap: 8, alignItems: 'baseline' }}>
-              <Text style={{ color, fontWeight: '700', fontSize: 13, width: 40 }}>{name}</Text>
-              <Text numberOfLines={1} style={{ color: colors.ink, flex: 1 }}>{oneLine(list[0])}</Text>
-            </View>
-          ) : null)}
-        </>
-      ) : session ? <Note>{busy ? 'Myra is looking at your day…' : 'Myra will suggest your next steps here.'}</Note> : null}
-      {!session ? <Note>Sign in to get Myra's recommendations.</Note> : null}
-      {session && !g && !busy && isToday ? <Button kind="insight" title="Get recommendations" onPress={run} /> : null}
-      {session && g ? (
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Note>{busy ? 'Updating…' : `Updated ${time} · changes with your day`}</Note>
-          {!busy && isToday ? <Pressable onPress={run} hitSlop={8}><Text style={{ color: colors.insight, fontWeight: '600', fontSize: 13 }}>Refresh</Text></Pressable> : null}
-        </View>
-      ) : null}
-      {message ? <Text style={{ color: colors.bad }}>{message}</Text> : null}
-      <Note>Not medical advice.</Note>
-    </Card>
+    <View style={{ gap: 10 }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 4 }}>
+        <Heading>Myra recommends</Heading>
+        {session && g && !busy && isToday ? <Pressable onPress={run} hitSlop={8}><Text style={{ color: colors.insight, fontWeight: '600' }}>Refresh</Text></Pressable> : null}
+      </View>
+      {g ? <Text style={{ fontSize: 14, color: colors.insight, paddingHorizontal: 4 }}>{oneLine(g.headline)}</Text> : null}
+
+      {g ? blocks.map(([name, color, list]) => list[0] ? (
+        <Card key={name} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 12, borderLeftWidth: 5, borderLeftColor: color }}>
+          <Text style={{ color, fontWeight: '700', fontSize: 14, width: 44 }}>{name}</Text>
+          <Text style={{ color: colors.ink, flex: 1, fontSize: 14, lineHeight: 20 }}>{oneLine(list[0])}</Text>
+        </Card>
+      ) : null) : (
+        <Card>
+          {!session ? <Note>Sign in to get Myra's recommendations.</Note>
+            : <Note>{busy ? 'Myra is looking at your day…' : 'Myra will suggest your next steps here.'}</Note>}
+          {session && !busy && isToday ? <Button kind="insight" title="Get recommendations" onPress={run} /> : null}
+        </Card>
+      )}
+
+      {message ? <Text style={{ color: colors.bad, paddingHorizontal: 4 }}>{message}</Text> : null}
+      <View style={{ paddingHorizontal: 4 }}>
+        <Note>{g ? `${busy ? 'Updating…' : `Updated ${time}`} · changes with your day · ` : ''}Not medical advice.</Note>
+      </View>
+    </View>
   );
 }
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.2 — 20 October 2026
+- Myra recommends: the header, one small coral headline, then three separate blocks stacked one under another (Body, Mind, Soul), each with its colour on the left. All lines are small text of at most 10 words and no longer cut off with "…".
+- AI server: if any recommendation comes back longer than 10 words, it is shortened once more before it reaches the phone.
+
 ## 0.5.1 — 19 October 2026 (new look: "Calm Teal" with a Happy Orange coral signature)
 - New theme chosen by the founder from three reference apps: white-grey page, white cards with a soft shadow, rounded buttons, calm teal for buttons and ticks; Body leaf green, Mind teal, Soul amber. The marigold background and glass cards are retired.
 - Happy Orange's signature coral (#C0513A) marks everything the app itself produces: the Happy Orange name, scores, Today's guidance, AI reads (meal Calculate, Screen Time), verse explanations, reflections, category picks, and Myra. See docs/decisions/0007-colour-system.md.

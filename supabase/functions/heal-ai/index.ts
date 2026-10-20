@@ -187,7 +187,7 @@ If this is not a Screen Time screenshot: {"sessions":[],"period":"unclear","note
         { media_type: String(p.media_type ?? 'image/jpeg'), data: String(p.image_base64 ?? '') }));
     }
     case 'guidance': {
-      return parseJson(await ask('smart', ORANGE_BOOK,
+      const g = parseJson(await ask('smart', ORANGE_BOOK,
 `Here is today's data and the last 7 days for one person:
 ${String(p.context ?? '').slice(0, 6000)}
 Tell the person what to do next, for the rest of today from the time shown (if it is night, for tonight and tomorrow morning).
@@ -198,6 +198,18 @@ Reply with JSON only:
  "mind":["one meditation, attention or content suggestion; use today's Tao practice when it fits"],
  "soul":["one truthfulness, service, Gita or Tao suggestion"]}
 STRICT: the headline and every suggestion is ONE line of at most 10 words, written as a direct instruction that starts with a verb, with a number where it helps: e.g. "Walk 10 minutes after lunch.", "Sit for 5 minutes of breathing before 6 pm.", "Eat dal with dinner for protein." Never use "try", "consider", "maybe", "you could" or "it may help". Exactly one suggestion per list.`));
+      // Founder's rule: every line at most 10 words. If the model ran long, ask once more to shorten.
+      const words = (x: unknown) => String(x ?? '').trim().split(/\s+/).filter(Boolean).length;
+      const lines = [g?.headline, g?.body?.[0], g?.mind?.[0], g?.soul?.[0]];
+      if (lines.some(l => words(l) > 10)) {
+        try {
+          const short = parseJson(await ask('quick', ORANGE_BOOK,
+`Shorten each line of this JSON to at most 10 words. Keep the meaning, start each with a verb, keep numbers. Reply with the same JSON shape only.
+${JSON.stringify({ headline: g.headline, body: [g.body?.[0]], mind: [g.mind?.[0]], soul: [g.soul?.[0]] })}`));
+          if (short?.headline) return short;
+        } catch { /* keep the first answer */ }
+      }
+      return g;
     }
     case 'explain_verse': {
       const hindi = p.lang === 'hi';
