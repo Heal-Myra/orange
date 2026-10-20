@@ -6,7 +6,7 @@ import { lang } from './i18n';
 import { supabase } from './supabase';
 import type { ContentCategoryId } from './types';
 
-export interface MealItem { name: string; grams: number; kcal: number; protein_g: number; carbs_g: number; fat_g: number; basis: 'IFCT' | 'estimate' }
+export interface MealItem { name: string; grams: number; kcal: number; protein_g: number; carbs_g: number; fat_g: number; fibre_g?: number; basis: 'IFCT' | 'estimate' }
 export interface MealResult { items: MealItem[]; confidence: string; note: string; insight: string }
 export interface Guidance { headline: string; body: string[]; mind: string[]; soul: string[]; focus?: string[] }
 export interface Reflection { principle: string; alignment: number; reflection: string }

@@ -4,7 +4,8 @@
 import { Pressable, Text, View } from 'react-native';
 import { HealthLine, useHealth } from '../../components/HealthSync';
 import { Dots, Rows, StatRow } from '../../components/StatRows';
-import { bmiOf } from '../../lib/targets';
+import { MacroMix } from '../../components/MacroMix';
+import { bmiOf, fibreTarget } from '../../lib/targets';
 import { MealPhoto } from '../../components/MealPhoto';
 import { Card, Heading, Note, Screen, Score, s } from '../../components/ui';
 import { bodyScore, mealTotals } from '../../lib/scoring';
@@ -27,10 +28,12 @@ export default function Body() {
         <View style={{ borderTopWidth: 1, borderTopColor: colors.line }}>
           <StatRow first label={tr('Calories')} value={Math.round(totals.kcal)} target={profile.kcal} />
           <StatRow label={tr('Protein (g)')} value={Math.round(totals.p)} target={profile.protein} />
+          <StatRow label={tr('Fibre (g)')} value={Math.round(totals.fib)} target={fibreTarget(profile.kcal)} />
+          <MacroMix totals={totals} kcal={profile.kcal} protein={profile.protein} />
           {day.meals.length ? day.meals.map((m, i) => (
             <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 52, borderTopWidth: 1, borderTopColor: colors.line }}>
               <Text numberOfLines={1} style={{ flex: 1, fontSize: 16, color: colors.ink }}>{m.name}</Text>
-              <Text style={{ fontSize: 14, color: colors.muted, fontVariant: ['tabular-nums'] }}>{Math.round(m.kcal)} kcal · P {Math.round(m.p)} g</Text>
+              <Text style={{ fontSize: 14, color: colors.muted, fontVariant: ['tabular-nums'] }}>{Math.round(m.kcal)} kcal · P {Math.round(m.p)} g{m.fib ? ` · ${tr('Fibre')} ${Math.round(m.fib)} g` : ''}</Text>
               <Pressable accessibilityLabel={`Remove ${m.name}`} onPress={() => update(d => { d.meals.splice(i, 1); })} hitSlop={10}>
                 <Text style={{ color: colors.muted, fontSize: 16 }}>✕</Text>
               </Pressable>

@@ -1,6 +1,7 @@
 # Changelog
 
 ## 0.9.0 — 21 October 2026 (About you, more Apple Health)
+- Food card: fibre added (meals carry `fib`; IFCT and the AI meal reader give fibre_g; target 14 g per 1,000 kcal, at least 25 g). New "Where your calories come from": two rings, today's carbs/protein/fat share of energy next to the aim (protein from the person's target, fat 25 %, carbs the rest), with a small table of both (`src/components/MacroMix.tsx`). Myra sees fibre too.
 - Soul: Thought of the day card removed (founder). Soul = gratitude 40 (four things, 10 each) + breathing & meditation 30 + Daily Wisdom 30 (founder's split). Myra's description of the app (Body cards, Mind, Soul, About you, scoring) brought up to date. docs/scoring.md updated.
 - Body tab redesigned (founder: "equal space for sub elements, stacked vertically neatly"): Food, Sleep, Movement, Body and Heart & fitness cards all use one row style (`src/components/StatRows.tsx`): label left, value right, equal height, hairlines; thin bars for targets; 1–5 dots for sleep quality. With Apple Health connected the rows are read-only; without it, the value box can be typed in.
 - Sign-up is one "About you" screen after the privacy step (founder): name, age, sex, height, weight, religion (sets the Daily Wisdom) and the goal in the person's own words. Myra reads the goal (AI action `goal_plan`; `parseGoal` when offline), plans safe targets and says when a goal is too steep. The separate Daily Wisdom step is no longer forced. Today greets by name.

@@ -128,3 +128,6 @@ export function parseGoal(text: string, today = new Date()): Pick<AboutMe, 'goal
   }
   return goal === 'keep' ? { goal } : { goal, goalKg: kg, goalWeeks: weeks ?? 13 };
 }
+
+/** Daily fibre target: about 14 g per 1,000 kcal, at least 25 g (ICMR-NIN suggests 25–40 g a day for adults). */
+export const fibreTarget = (kcal: number) => Math.max(25, Math.round((14 * kcal) / 1000));

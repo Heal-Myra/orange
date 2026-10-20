@@ -31,12 +31,12 @@ export const PRACTICES: { id: PracticeId; name: string; meaning: string; points:
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
 const c01 = (v: number) => clamp(v, 0, 1);
 
-export interface MealTotals { kcal: number; p: number; c: number; f: number }
+export interface MealTotals { kcal: number; p: number; c: number; f: number; fib: number }
 
 export function mealTotals(meals: Meal[]): MealTotals {
   return meals.reduce(
-    (t, m) => ({ kcal: t.kcal + (m.kcal || 0), p: t.p + (m.p || 0), c: t.c + (m.c || 0), f: t.f + (m.f || 0) }),
-    { kcal: 0, p: 0, c: 0, f: 0 },
+    (t, m) => ({ kcal: t.kcal + (m.kcal || 0), p: t.p + (m.p || 0), c: t.c + (m.c || 0), f: t.f + (m.f || 0), fib: t.fib + (m.fib || 0) }),
+    { kcal: 0, p: 0, c: 0, f: 0, fib: 0 },
   );
 }
 

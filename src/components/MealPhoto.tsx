@@ -146,7 +146,7 @@ export function MealPhoto({ right, children }: { right?: ReactNode; children?: R
     if (!items?.length) return;
     update(d => {
       for (const it of items) d.meals.push({
-        name: it.name, grams: it.grams, kcal: it.kcal, p: it.protein_g, c: it.carbs_g, f: it.fat_g,
+        name: it.name, grams: it.grams, kcal: it.kcal, p: it.protein_g, c: it.carbs_g, f: it.fat_g, fib: it.fibre_g ?? 0,
         source: source === 'words' ? (it.basis === 'IFCT' ? 'words+ifct' : 'words') : (it.basis === 'IFCT' ? 'photo+ifct' : 'photo'),
       });
     });
@@ -212,10 +212,10 @@ export function MealPhoto({ right, children }: { right?: ReactNode; children?: R
             <Text style={{ color: it.basis === 'IFCT' ? colors.body : colors.muted, fontSize: 12, fontWeight: '700' }}>{it.basis === 'IFCT' ? 'IFCT' : 'ESTIMATE'}</Text>
           </View>
           <View style={s.row}>
-            {([['grams', 'g'], ['kcal', 'kcal'], ['protein_g', tr('Protein g')], ['carbs_g', tr('Carbs g')], ['fat_g', tr('Fat g')]] as const).map(([k, label]) => (
+            {([['grams', 'g'], ['kcal', 'kcal'], ['protein_g', tr('Protein g')], ['carbs_g', tr('Carbs g')], ['fat_g', tr('Fat g')], ['fibre_g', tr('Fibre g')]] as const).map(([k, label]) => (
               <View key={k} style={{ width: 84, gap: 2 }}>
                 <Text style={s.fieldLabel}>{label}</Text>
-                <TextInput style={s.input} keyboardType="decimal-pad" defaultValue={String(it[k])} onEndEditing={e => edit(i, k, e.nativeEvent.text)} />
+                <TextInput style={s.input} keyboardType="decimal-pad" defaultValue={String(it[k] ?? 0)} onEndEditing={e => edit(i, k, e.nativeEvent.text)} />
               </View>
             ))}
           </View>

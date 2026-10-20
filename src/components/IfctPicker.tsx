@@ -20,7 +20,7 @@ export function IfctPicker({ start = '', why }: { start?: string; why?: string }
   const add = () => {
     if (!food) return;
     const g = parseFloat(grams) || 100, k = g / 100, p = per100g(food);
-    update(d => { d.meals.push({ name: `${food.name} (${Math.round(g)} g)`, grams: g, kcal: p.kcal * k, p: p.protein * k, c: p.carbs * k, f: p.fat * k, source: 'ifct' }); });
+    update(d => { d.meals.push({ name: `${food.name} (${Math.round(g)} g)`, grams: g, kcal: p.kcal * k, p: p.protein * k, c: p.carbs * k, f: p.fat * k, fib: p.fibre * k, source: 'ifct' }); });
     setCode(null); setQuery('');
   };
 

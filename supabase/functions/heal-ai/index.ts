@@ -173,7 +173,7 @@ List each item. Use the quantities they give (e.g. "2 rotis", "1 katori dal"); o
 Break each item into its main raw ingredients with grams (include cooking oil or ghee). Also give your own estimate for the whole item.
 Reply with JSON only:
 {"items":[{"name":"short everyday name, at most 4 words, e.g. Roti, Moong dal, Aloo capsicum sabzi","grams":number,"ingredients":[{"ingredient":"plain raw name, e.g. wheat flour atta, bengal gram dal, ghee","grams":number}],
-  "estimate":{"kcal":number,"protein_g":number,"carbs_g":number,"fat_g":number}}],
+  "estimate":{"kcal":number,"protein_g":number,"carbs_g":number,"fat_g":number,"fibre_g":number}}],
  "confidence":"low"|"medium"|"high","note":"one sentence on what was hardest to estimate",
  "insight":"one natural, food-first tweak as ONE direct instruction of at most 10 words, e.g. Add curd to the next meal."}
 If there is no food: {"items":[],"confidence":"low","note":"${image ? 'No food found in the photo.' : 'No food found in the description.'}","insight":""}`, image ?? undefined));
@@ -201,13 +201,13 @@ Reply with JSON only: {"picks":{"0":"CODE or null","1":"CODE or null"}}`));
       const allMatched = mine.length > 0 && matched.length === mine.length;
       if (!allMatched) {
         const e = it.estimate ?? {};
-        return { name: it.name, grams: Math.round(it.grams || 0), kcal: Math.round(e.kcal || 0), protein_g: r1(e.protein_g || 0), carbs_g: r1(e.carbs_g || 0), fat_g: r1(e.fat_g || 0), basis: 'estimate' };
+        return { name: it.name, grams: Math.round(it.grams || 0), kcal: Math.round(e.kcal || 0), protein_g: r1(e.protein_g || 0), carbs_g: r1(e.carbs_g || 0), fat_g: r1(e.fat_g || 0), fibre_g: r1(e.fibre_g || 0), basis: 'estimate' };
       }
       const t = matched.reduce((acc, x) => {
         const c = byCode.get(String(picks[String(x.n)]))!.per100g, k = x.grams / 100;
-        return { kcal: acc.kcal + c.kcal * k, p: acc.p + c.protein_g * k, c: acc.c + c.carbs_g * k, f: acc.f + c.fat_g * k };
-      }, { kcal: 0, p: 0, c: 0, f: 0 });
-      return { name: it.name, grams: Math.round(it.grams || 0), kcal: Math.round(t.kcal), protein_g: r1(t.p), carbs_g: r1(t.c), fat_g: r1(t.f), basis: 'IFCT' };
+        return { kcal: acc.kcal + c.kcal * k, p: acc.p + c.protein_g * k, c: acc.c + c.carbs_g * k, f: acc.f + c.fat_g * k, fib: acc.fib + (c.fibre_g || 0) * k };
+      }, { kcal: 0, p: 0, c: 0, f: 0, fib: 0 });
+      return { name: it.name, grams: Math.round(it.grams || 0), kcal: Math.round(t.kcal), protein_g: r1(t.p), carbs_g: r1(t.c), fat_g: r1(t.f), fibre_g: r1(t.fib), basis: 'IFCT' };
     }),
     confidence: step1.confidence ?? 'low',
     note: step1.note ?? '',

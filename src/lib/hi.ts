@@ -567,4 +567,11 @@ export const HI: Record<string, string> = {
   'Four things you are grateful for today, big or small.': 'आज की चार बातें जिनके लिए आप आभारी हैं, बड़ी या छोटी।',
   'Something I learned': 'कुछ जो मैंने सीखा',
   '10 points each, up to 40.': 'हर एक के 10 अंक, 40 तक।',
+  'Fibre (g)': 'फ़ाइबर (g)',
+  'Fibre g': 'फ़ाइबर g',
+  'Where your calories come from': 'आपकी कैलोरी कहाँ से आती है',
+  'Aim': 'लक्ष्य',
+  'Carbs': 'कार्ब्स',
+  'Fat': 'वसा',
+  'Fibre': 'फ़ाइबर',
 };

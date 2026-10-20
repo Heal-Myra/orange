@@ -11,6 +11,7 @@ export interface Meal {
   p: number; // protein, g
   c: number; // carbohydrate, g
   f: number; // fat, g
+  fib?: number; // fibre, g (from 21 Oct 2026)
   source: MealSource;
 }
 
