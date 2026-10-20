@@ -9,6 +9,7 @@ import { useHeal } from '../lib/store';
 import { TAO_CORE, TAO_POINTS, TAO_WEEK, WEEK_REVIEW, mondayOf, taoForDate } from '../lib/tao';
 import { colors } from '../theme';
 import { Card, Check, Heading, Label, Note, TextField } from './ui';
+import { tr } from '../lib/i18n';
 
 const NAME = { mind: 'Mind', soul: 'Soul' } as const;
 
@@ -22,9 +23,9 @@ export function TaoCard({ on }: { on: 'mind' | 'soul' }) {
     return (
       <Pressable onPress={() => router.navigate(t.pillar === 'mind' ? '/mind' : '/soul')}>
         <Card>
-          <Label>Tao practice · {t.day}</Label>
-          <Text style={{ color: colors.ink }}>{t.title}{day.tao?.done ? ' ✓ done' : ''}</Text>
-          <Note>Today's practice is on the {NAME[t.pillar]} tab ›</Note>
+          <Label>{tr('Tao practice')} · {tr(t.day)}</Label>
+          <Text style={{ color: colors.ink }}>{tr(t.title)}{day.tao?.done ? ` ✓ ${tr('done')}` : ''}</Text>
+          <Note>{tr("Today's practice is on the {tab} tab ›", { tab: tr(NAME[t.pillar]) })}</Note>
         </Card>
       </Pressable>
     );
@@ -35,30 +36,30 @@ export function TaoCard({ on }: { on: 'mind' | 'soul' }) {
 
   return (
     <Card style={{ borderLeftWidth: 4, borderLeftColor: color }}>
-      <Label>Tao practice · {t.day}</Label>
-      <Heading>{t.title}</Heading>
-      {t.practice.map((p, i) => <Text key={i} style={{ color: colors.ink, lineHeight: 22 }}>{p}</Text>)}
+      <Label>{tr('Tao practice')} · {tr(t.day)}</Label>
+      <Heading>{tr(t.title)}</Heading>
+      {t.practice.map((p, i) => <Text key={i} style={{ color: colors.ink, lineHeight: 22 }}>{tr(p)}</Text>)}
 
-      {t.weekday === 3 && mondayNote ? <Note>Your Monday note: {mondayNote}</Note> : null}
+      {t.weekday === 3 && mondayNote ? <Note>{tr('Your Monday note: {note}', { note: mondayNote })}</Note> : null}
 
-      <TextField key={date + 'tao'} label="My note (private)" value={day.tao?.note ?? ''} multiline
-        onChangeText={v => update(d => { d.tao = { ...d.tao, note: v }; })} placeholder={t.notePrompt} />
+      <TextField key={date + 'tao'} label={tr('My note (private)')} value={day.tao?.note ?? ''} multiline
+        onChangeText={v => update(d => { d.tao = { ...d.tao, note: v }; })} placeholder={tr(t.notePrompt)} />
 
       <Check color={color} checked={!!day.tao?.done} onToggle={() => update(d => { d.tao = { ...d.tao, done: !d.tao?.done }; })}
-        title="I did today's practice" points={TAO_POINTS} />
+        title={tr('I did today\'s practice')} points={TAO_POINTS} />
 
       {t.weekday === 0 && (
         <View style={{ gap: 4, borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 10 }}>
-          <Label>End of the week</Label>
-          <Text style={{ color: colors.ink, lineHeight: 21 }}>{WEEK_REVIEW.intro}</Text>
-          {WEEK_REVIEW.cracks.map((c, i) => <Text key={i} style={{ color: colors.ink }}>• {c}</Text>)}
-          <Note>{mondayNote ? `Your Monday list: ${mondayNote}` : 'No Monday note this week. Next Monday, try writing down what you are trying to grab.'}</Note>
+          <Label>{tr('End of the week')}</Label>
+          <Text style={{ color: colors.ink, lineHeight: 21 }}>{tr(WEEK_REVIEW.intro)}</Text>
+          {WEEK_REVIEW.cracks.map((c, i) => <Text key={i} style={{ color: colors.ink }}>• {tr(c)}</Text>)}
+          <Note>{mondayNote ? tr('Your Monday list: {note}', { note: mondayNote }) : tr('No Monday note this week. Next Monday, try writing down what you are trying to grab.')}</Note>
         </View>
       )}
 
-      <Note>{TAO_CORE.summary}</Note>
+      <Note>{tr(TAO_CORE.summary)}</Note>
       <Pressable onPress={() => setWeek(w => !w)}>
-        <Text style={{ color: colors.accent, fontWeight: '600' }}>{week ? 'Hide the week' : 'See the whole week'}</Text>
+        <Text style={{ color: colors.accent, fontWeight: '600' }}>{week ? tr('Hide the week') : tr('See the whole week')}</Text>
       </Pressable>
       {week && <TaoWeek compact />}
     </Card>
@@ -71,8 +72,8 @@ export function TaoWeek({ compact }: { compact?: boolean }) {
     <View style={{ gap: 10 }}>
       {TAO_WEEK.map(t => (
         <View key={t.day} style={{ gap: 3, borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 8 }}>
-          <Text style={{ fontWeight: '600', color: colors.ink }}>{t.day}: {t.title} <Text style={{ color: t.pillar === 'mind' ? colors.mind : colors.soul, fontWeight: '400' }}>({NAME[t.pillar]})</Text></Text>
-          {(compact ? t.practice.slice(0, 1) : t.practice).map((p, i) => <Text key={i} style={{ color: colors.ink, lineHeight: 21 }}>{p}</Text>)}
+          <Text style={{ fontWeight: '600', color: colors.ink }}>{tr(t.day)}: {tr(t.title)} <Text style={{ color: t.pillar === 'mind' ? colors.mind : colors.soul, fontWeight: '400' }}>({tr(NAME[t.pillar])})</Text></Text>
+          {(compact ? t.practice.slice(0, 1) : t.practice).map((p, i) => <Text key={i} style={{ color: colors.ink, lineHeight: 21 }}>{tr(p)}</Text>)}
         </View>
       ))}
     </View>

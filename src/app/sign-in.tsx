@@ -5,6 +5,7 @@ import { Pressable, Text, TextInput, View } from 'react-native';
 import { Button, Card, Note, Screen, s } from '../components/ui';
 import { useAuth } from '../lib/auth';
 import { colors } from '../theme';
+import { tr } from '../lib/i18n';
 
 export default function SignIn() {
   const { sendCode, verifyCode, continueAsGuest } = useAuth();
@@ -34,30 +35,30 @@ export default function SignIn() {
   return (
     <Screen showDay={false}>
       <View style={{ gap: 6, paddingTop: 32 }}>
-        <Text style={{ fontSize: 30, color: colors.brand, fontWeight: '700' }}>Happy Orange</Text>
-        <Text style={{ fontSize: 15, color: colors.muted }}>Body, mind and inner life in harmony</Text>
+        <Text style={{ fontSize: 30, color: colors.brand, fontWeight: '700' }}>{tr('Happy Orange')}</Text>
+        <Text style={{ fontSize: 15, color: colors.muted }}>{tr('Body, mind and inner life in harmony')}</Text>
       </View>
 
       <Card>
         {!sentTo ? (
           <>
-            <Text style={{ fontSize: 18, fontWeight: '600', color: colors.ink }}>Sign in or create your account</Text>
-            <Note>We'll email you a 6-digit sign-in code. No password needed.</Note>
-            <Text style={s.fieldLabel}>Your email</Text>
-            <TextInput style={s.input} value={email} onChangeText={setEmail} placeholder="you@example.com" placeholderTextColor={colors.muted}
+            <Text style={{ fontSize: 18, fontWeight: '600', color: colors.ink }}>{tr('Sign in or create your account')}</Text>
+            <Note>{tr('We\'ll email you a 6-digit sign-in code. No password needed.')}</Note>
+            <Text style={s.fieldLabel}>{tr('Your email')}</Text>
+            <TextInput style={s.input} value={email} onChangeText={setEmail} placeholder={tr('you@example.com')} placeholderTextColor={colors.muted}
               autoCapitalize="none" autoCorrect={false} keyboardType="email-address" textContentType="emailAddress" autoComplete="email" />
-            <Button title={busy ? 'Sending…' : 'Email me a sign-in code'} onPress={send} disabled={!emailOk || busy} />
+            <Button title={busy ? tr('Sending…') : tr('Email me a sign-in code')} onPress={send} disabled={!emailOk || busy} />
           </>
         ) : (
           <>
-            <Text style={{ fontSize: 18, fontWeight: '600', color: colors.ink }}>Check your email</Text>
-            <Note>We sent a 6-digit code to {sentTo}. It can take a minute; look in Spam too. Type the code here:</Note>
-            <Text style={s.fieldLabel}>6-digit code</Text>
+            <Text style={{ fontSize: 18, fontWeight: '600', color: colors.ink }}>{tr('Check your email')}</Text>
+            <Note>{tr('We sent a 6-digit code to {email}. It can take a minute; look in Spam too. Type the code here:', { email: sentTo })}</Note>
+            <Text style={s.fieldLabel}>{tr('6-digit code')}</Text>
             <TextInput style={[s.input, { fontSize: 24, letterSpacing: 6 }]} value={code} onChangeText={t => setCode(t.replace(/\D/g, '').slice(0, 6))}
               placeholder="123456" placeholderTextColor={colors.muted} keyboardType="number-pad" textContentType="oneTimeCode" autoComplete="one-time-code" />
-            <Button title={busy ? 'Checking…' : 'Sign in'} onPress={verify} disabled={code.length !== 6 || busy} />
+            <Button title={busy ? tr('Checking…') : tr('Sign in')} onPress={verify} disabled={code.length !== 6 || busy} />
             <Pressable onPress={() => { setSentTo(null); setMessage(null); }}>
-              <Text style={{ color: colors.accent, fontWeight: '600' }}>Use a different email</Text>
+              <Text style={{ color: colors.accent, fontWeight: '600' }}>{tr('Use a different email')}</Text>
             </Pressable>
           </>
         )}
@@ -65,7 +66,7 @@ export default function SignIn() {
       </Card>
 
       <Pressable onPress={continueAsGuest} style={{ alignItems: 'center', padding: 8 }}>
-        <Text style={{ color: colors.muted }}>Use without an account (saved on this device only)</Text>
+        <Text style={{ color: colors.muted }}>{tr('Use without an account (saved on this device only)')}</Text>
       </Pressable>
     </Screen>
   );

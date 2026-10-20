@@ -9,6 +9,7 @@ import { useAuth } from '../lib/auth';
 import { traditionName } from '../lib/wisdom';
 import { useHeal } from '../lib/store';
 import { colors } from '../theme';
+import { lang, tr } from '../lib/i18n';
 
 // The tester invitation (founder's wording, 19 Oct 2026). Shared through the phone's own share menu,
 // so people are picked from the contacts in WhatsApp, Messages or any other app.
@@ -38,7 +39,7 @@ export default function Account() {
 
   const invite = async () => {
     try { await Share.share({ message: INVITE }); }
-    catch { setMessage('Sharing is not available here. Copy the link app.happyorange.in and send it yourself.'); }
+    catch { setMessage(tr('Sharing is not available here. Copy the link app.happyorange.in and send it yourself.')); }
   };
 
   const remove = async () => {
@@ -50,23 +51,34 @@ export default function Account() {
 
   return (
     <Screen showDay={false}>
-      <Button kind="plain" title="‹ Back to Today" onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))} />
+      <Button kind="plain" title={tr('‹ Back to Today')} onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))} />
       <Card>
-        <Heading>{session ? 'Signed in' : 'Not signed in'}</Heading>
-        <Text style={{ color: colors.ink }}>{session?.user.email ?? 'You are using Happy Orange on this device only.'}</Text>
-        <Note>{SYNC_TEXT[sync]}</Note>
+        <Heading>{session ? tr('Signed in') : tr('Not signed in')}</Heading>
+        <Text style={{ color: colors.ink }}>{session?.user.email ?? tr('You are using Happy Orange on this device only.')}</Text>
+        <Note>{tr(SYNC_TEXT[sync])}</Note>
         {sync === 'error' && syncError ? <Text selectable style={{ color: colors.bad, fontSize: 12 }}>Details for Claude: {syncError}</Text> : null}
         {session
-          ? <Button kind="plain" title="Sign out" onPress={async () => { await signOut(); router.replace('/sign-in'); }} />
-          : online ? <Button title="Sign in to save online" onPress={async () => { await leaveGuest(); router.replace('/sign-in'); }} /> : null}
+          ? <Button kind="plain" title={tr('Sign out')} onPress={async () => { await signOut(); router.replace('/sign-in'); }} />
+          : online ? <Button title={tr('Sign in to save online')} onPress={async () => { await leaveGuest(); router.replace('/sign-in'); }} /> : null}
       </Card>
+
+      <Pressable onPress={() => router.push('/language')}>
+        <Card style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+          <Ionicons name="language-outline" size={24} color={colors.accent} />
+          <View style={{ flex: 1 }}>
+            <Text style={{ fontSize: 17, fontWeight: '600', color: colors.ink }}>{tr('Language')}</Text>
+            <Note>{lang() === 'hi' ? 'हिंदी' : 'English'} · {tr('tap to change')}</Note>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color={colors.muted} />
+        </Card>
+      </Pressable>
 
       <Pressable onPress={() => router.push('/tradition')}>
         <Card style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
           <Ionicons name="sparkles-outline" size={24} color={colors.accent} />
           <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: 17, fontWeight: '600', color: colors.ink }}>Daily Wisdom</Text>
-            <Note>{tradition ? traditionName(tradition) : 'Not chosen yet (Bhagavad Gita)'} · tap to change</Note>
+            <Text style={{ fontSize: 17, fontWeight: '600', color: colors.ink }}>{tr('Daily Wisdom')}</Text>
+            <Note>{tradition ? tr(traditionName(tradition)) : tr('Not chosen yet (Bhagavad Gita)')} · {tr('tap to change')}</Note>
           </View>
           <Ionicons name="chevron-forward" size={20} color={colors.muted} />
         </Card>
@@ -76,8 +88,8 @@ export default function Account() {
         <Card style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
           <Ionicons name="library-outline" size={24} color={colors.accent} />
           <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: 17, fontWeight: '600', color: colors.ink }}>Library</Text>
-            <Note>Indian foods, Gita, Tao Te Ching and exercises</Note>
+            <Text style={{ fontSize: 17, fontWeight: '600', color: colors.ink }}>{tr('Library')}</Text>
+            <Note>{tr('Indian foods, Gita, Tao Te Ching and exercises')}</Note>
           </View>
           <Ionicons name="chevron-forward" size={20} color={colors.muted} />
         </Card>
@@ -85,24 +97,24 @@ export default function Account() {
 
       {admin && (
         <Card>
-          <Heading>Admin</Heading>
-          <Note>Approve AI access for testers and read their feedback.</Note>
-          <Button title="Open admin" onPress={() => router.push('/admin')} />
-          <Button kind="plain" title="Invite a friend to test" onPress={invite} />
+          <Heading>{tr('Admin')}</Heading>
+          <Note>{tr('Approve AI access for testers and read their feedback.')}</Note>
+          <Button title={tr('Open admin')} onPress={() => router.push('/admin')} />
+          <Button kind="plain" title={tr('Invite a friend to test')} onPress={invite} />
         </Card>
       )}
 
       {session && (
         <Card>
-          <Heading>Delete my data</Heading>
-          <Note>This permanently removes every entry and setting saved to your account, then signs you out.</Note>
+          <Heading>{tr('Delete my data')}</Heading>
+          <Note>{tr('This permanently removes every entry and setting saved to your account, then signs you out.')}</Note>
           {confirm ? (
             <View style={{ gap: 8 }}>
-              <Text style={{ color: colors.bad, fontWeight: '600' }}>Are you sure? This cannot be undone.</Text>
-              <Button title="Yes, delete everything" onPress={remove} />
-              <Button kind="plain" title="Keep my data" onPress={() => setConfirm(false)} />
+              <Text style={{ color: colors.bad, fontWeight: '600' }}>{tr('Are you sure? This cannot be undone.')}</Text>
+              <Button title={tr('Yes, delete everything')} onPress={remove} />
+              <Button kind="plain" title={tr('Keep my data')} onPress={() => setConfirm(false)} />
             </View>
-          ) : <Button kind="plain" title="Delete my data…" onPress={() => setConfirm(true)} />}
+          ) : <Button kind="plain" title={tr('Delete my data…')} onPress={() => setConfirm(true)} />}
           {message ? <Text style={{ color: colors.bad }}>{message}</Text> : null}
         </Card>
       )}

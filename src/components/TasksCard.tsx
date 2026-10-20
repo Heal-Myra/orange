@@ -9,6 +9,7 @@ import { shiftISO, todayISO } from '../lib/dates';
 import { AREAS, areaName, useTasks, type Area, type Task } from '../lib/tasks';
 import { colors } from '../theme';
 import { Button, Card, Heading, Note, s } from './ui';
+import { tr } from '../lib/i18n';
 
 const WHEN = [
   { label: 'Today', days: 0 },
@@ -34,8 +35,8 @@ export function TasksCard() {
 
   return (
     <Card>
-      <Heading>Clear your mind</Heading>
-      <Note>Write it down and let Myra pick one or two a day.</Note>
+      <Heading>{tr('Clear your mind')}</Heading>
+      <Note>{tr('Write it down and let Myra pick one or two a day.')}</Note>
 
       {/* Three groups */}
       <View style={{ flexDirection: 'row', gap: 8 }}>
@@ -46,7 +47,7 @@ export function TasksCard() {
             <Pressable key={a.id} onPress={() => setArea(a.id)}
               style={{ flex: 1, alignItems: 'center', paddingVertical: 10, borderRadius: 14, borderWidth: 1,
                 borderColor: on ? colors.accent : colors.line, backgroundColor: on ? colors.accent + '14' : colors.surface }}>
-              <Text style={{ fontWeight: '700', color: on ? colors.accent : colors.ink }}>{a.name}</Text>
+              <Text style={{ fontWeight: '700', color: on ? colors.accent : colors.ink }}>{tr(a.name)}</Text>
               <Text style={{ fontSize: 12, color: colors.muted }}>{n} open</Text>
             </Pressable>
           );
@@ -56,9 +57,9 @@ export function TasksCard() {
       <AddTask area={area} />
 
       {shown.length ? shown.map(t => <TaskRow key={t.id} t={t} inFocus={focusIds.includes(t.id)} />)
-        : <Note>Nothing in {areaName(area)}. A clear mind!</Note>}
+        : <Note>{tr('Nothing in {area}. A clear mind!', { area: tr(areaName(area)) })}</Note>}
 
-      {doneToday ? <Note>Done today: {doneToday} ✓</Note> : null}
+      {doneToday ? <Note>{tr('Done today: {n} ✓', { n: doneToday })}</Note> : null}
     </Card>
   );
 }
@@ -77,7 +78,7 @@ function AddTask({ area }: { area: Area }) {
       <View style={{ flexDirection: 'row', gap: 8 }}>
         <TextInput style={[s.input, { flex: 1, minWidth: 0 }]} value={title} onChangeText={setTitle} onSubmitEditing={save} returnKeyType="done"
           placeholder={area === 'family' ? 'e.g. Call Mum' : area === 'work' ? 'e.g. Send the budget' : 'e.g. Read 10 pages'} placeholderTextColor={colors.muted} />
-        <Button title="Add" onPress={save} disabled={!title.trim()} />
+        <Button title={tr('Add')} onPress={save} disabled={!title.trim()} />
       </View>
       {title.trim() ? (
         <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap' }}>
@@ -85,7 +86,7 @@ function AddTask({ area }: { area: Area }) {
             <Pressable key={w.label} onPress={() => setDays(d => d === w.days ? null : w.days)}
               style={{ paddingVertical: 6, paddingHorizontal: 12, borderRadius: 99, borderWidth: 1,
                 borderColor: days === w.days ? colors.accent : colors.line, backgroundColor: days === w.days ? colors.accent + '14' : colors.surface }}>
-              <Text style={{ color: days === w.days ? colors.accent : colors.ink, fontSize: 13 }}>{w.label}</Text>
+              <Text style={{ color: days === w.days ? colors.accent : colors.ink, fontSize: 13 }}>{tr(w.label)}</Text>
             </Pressable>
           ))}
           <Text style={{ alignSelf: 'center', fontSize: 12, color: colors.muted }}>{days == null ? 'or let Myra choose' : ''}</Text>
@@ -108,7 +109,7 @@ function TaskRow({ t, inFocus }: { t: Task; inFocus: boolean }) {
         <Pressable style={{ flex: 1 }} onPress={() => setOpen(o => !o)}>
           <Text style={{ color: colors.ink, fontSize: 15 }}>{t.title}</Text>
           <Text style={{ fontSize: 12, color: inFocus ? colors.insight : colors.muted }}>
-            {inFocus ? 'In today’s focus' : t.due ? shortDate(t.due) : 'Myra will choose a day'}
+            {inFocus ? tr('In today’s focus') : t.due ? shortDate(t.due) : tr('Myra will choose a day')}
           </Text>
         </Pressable>
         <Pressable onPress={() => setOpen(o => !o)} hitSlop={8}>
@@ -120,14 +121,14 @@ function TaskRow({ t, inFocus }: { t: Task; inFocus: boolean }) {
       ) : null}
       {open ? (
         <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap', paddingLeft: 34 }}>
-          {[['Tomorrow', 1], ['In 3 days', 3], ['Next week', 7]].map(([label, n]) => (
+          {[[tr('Tomorrow'), 1], [tr('In 3 days'), 3], [tr('Next week'), 7]].map(([label, n]) => (
             <Pressable key={label} onPress={() => { moveTo(t.id, shiftISO(today, n as number)); setOpen(false); }}
               style={{ paddingVertical: 6, paddingHorizontal: 12, borderRadius: 99, borderWidth: 1, borderColor: colors.line }}>
               <Text style={{ fontSize: 13, color: colors.ink }}>{label}</Text>
             </Pressable>
           ))}
           <Pressable onPress={() => remove(t.id)} style={{ paddingVertical: 6, paddingHorizontal: 12 }}>
-            <Text style={{ fontSize: 13, color: colors.bad }}>Remove</Text>
+            <Text style={{ fontSize: 13, color: colors.bad }}>{tr('Remove')}</Text>
           </Pressable>
         </View>
       ) : null}
@@ -143,8 +144,8 @@ export function FocusBlock() {
     <Card style={{ gap: 10, paddingVertical: 12, borderLeftWidth: 5, borderLeftColor: colors.insight }}>
       {focus.map(t => (
         <View key={t.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-          <Text style={{ color: colors.insight, fontWeight: '700', fontSize: 14, width: 44 }}>Focus</Text>
-          <Text style={{ flex: 1, color: colors.ink, fontSize: 14, lineHeight: 20 }}>{t.title} <Text style={{ color: colors.muted, fontSize: 12 }}>· {areaName(t.area)}</Text></Text>
+          <Text style={{ color: colors.insight, fontWeight: '700', fontSize: 14, width: 44 }}>{tr('Focus')}</Text>
+          <Text style={{ flex: 1, color: colors.ink, fontSize: 14, lineHeight: 20 }}>{t.title} <Text style={{ color: colors.muted, fontSize: 12 }}>· {tr(areaName(t.area))}</Text></Text>
           <Pressable accessibilityRole="checkbox" accessibilityLabel={`Done: ${t.title}`} onPress={() => complete(t.id)} hitSlop={10}>
             <Ionicons name="ellipse-outline" size={24} color={colors.accent} />
           </Pressable>

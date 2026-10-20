@@ -7,6 +7,7 @@ import { foodByCode, per100g, searchFoods } from '../lib/ifct';
 import { useHeal } from '../lib/store';
 import { colors } from '../theme';
 import { Button, Note, TextField, s } from './ui';
+import { tr } from '../lib/i18n';
 
 export function IfctPicker({ start = '', why }: { start?: string; why?: string }) {
   const { update } = useHeal();
@@ -26,7 +27,7 @@ export function IfctPicker({ start = '', why }: { start?: string; why?: string }
   return (
     <View style={{ gap: 8 }}>
       {why ? <Note>{why}</Note> : null}
-      <TextField label="Search a food (IFCT 2017)" value={query} onChangeText={t => { setQuery(t); setCode(null); }} placeholder="e.g. moong dal, ragi, paneer" />
+      <TextField label={tr('Search a food (IFCT 2017)')} value={query} onChangeText={t => { setQuery(t); setCode(null); }} placeholder={tr('e.g. moong dal, ragi, paneer')} />
       {!food && results.map(f => {
         const p = per100g(f);
         return (
@@ -36,12 +37,12 @@ export function IfctPicker({ start = '', why }: { start?: string; why?: string }
           </Pressable>
         );
       })}
-      {query.trim() && !results.length ? <Note>No match. Try another name, e.g. "toor dal" or "rice".</Note> : null}
+      {query.trim() && !results.length ? <Note>{tr('No match. Try another name, e.g. "toor dal" or "rice".')}</Note> : null}
       {food && (
         <View style={{ gap: 8 }}>
           <Text style={{ fontWeight: '600', color: colors.ink }}>{food.name}</Text>
-          <TextField label="How many grams?" value={grams} onChangeText={setGrams} />
-          <Button title="Add to my day" onPress={add} />
+          <TextField label={tr('How many grams?')} value={grams} onChangeText={setGrams} />
+          <Button title={tr('Add to my day')} onPress={add} />
         </View>
       )}
     </View>

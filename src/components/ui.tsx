@@ -8,6 +8,7 @@ import { formatDay, todayISO } from '../lib/dates';
 import { useHeal } from '../lib/store';
 import { FeedbackBox } from './FeedbackBox';
 import { colors, radius, shadow, space } from '../theme';
+import { tr } from '../lib/i18n';
 
 export function Screen({ children, showDay = true, feedback, top }: { children: ReactNode; showDay?: boolean; feedback?: string; top?: ReactNode }) {
   return (
@@ -27,11 +28,11 @@ export function DayBar() {
   const isToday = date === todayISO();
   return (
     <View style={s.dayBar}>
-      <Pressable accessibilityLabel="Previous day" onPress={() => goDay(-1)} style={s.dayBtn} hitSlop={8}>
+      <Pressable accessibilityLabel={tr('Previous day')} onPress={() => goDay(-1)} style={s.dayBtn} hitSlop={8}>
         <Ionicons name="chevron-back" size={20} color={colors.muted} />
       </Pressable>
       <Text style={s.dayText}>{formatDay(date)}</Text>
-      <Pressable accessibilityLabel="Next day" onPress={() => goDay(1)} style={[s.dayBtn, isToday && { opacity: 0.3 }]} disabled={isToday} hitSlop={8}>
+      <Pressable accessibilityLabel={tr('Next day')} onPress={() => goDay(1)} style={[s.dayBtn, isToday && { opacity: 0.3 }]} disabled={isToday} hitSlop={8}>
         <Ionicons name="chevron-forward" size={20} color={colors.muted} />
       </Pressable>
     </View>

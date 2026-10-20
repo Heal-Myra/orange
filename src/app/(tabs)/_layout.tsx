@@ -6,6 +6,7 @@ import { MyraButton } from '../../components/MyraButton';
 import type { ComponentProps } from 'react';
 import type { ColorValue } from 'react-native';
 import { colors } from '../../theme';
+import { tr } from '../../lib/i18n';
 
 type IconName = ComponentProps<typeof Ionicons>['name'];
 
@@ -29,18 +30,18 @@ export default function TabLayout() {
         tabBarInactiveTintColor: colors.muted,
       }}
     >
-      <Tabs.Screen name="index" options={{ ...tab('Today', 'sunny-outline', colors.accent), headerTitle: 'Happy Orange', headerTitleStyle: { color: colors.brand, fontWeight: '700' },
+      <Tabs.Screen name="index" options={{ ...tab(tr('Today'), 'sunny-outline', colors.accent), headerTitle: 'Happy Orange', headerTitleStyle: { color: colors.brand, fontWeight: '700' },
         headerRight: () => (
           <Link href="/account" asChild>
-            <Pressable accessibilityLabel="Profile" hitSlop={10} style={{ paddingHorizontal: 16, alignItems: 'center' }}>
+            <Pressable accessibilityLabel={tr('Profile')} hitSlop={10} style={{ paddingHorizontal: 16, alignItems: 'center' }}>
               <Ionicons name="person-circle-outline" size={30} color={colors.ink} />
-              <Text style={{ fontSize: 12, fontWeight: '600', color: colors.ink }}>Profile</Text>
+              <Text style={{ fontSize: 12, fontWeight: '600', color: colors.ink }}>{tr('Profile')}</Text>
             </Pressable>
           </Link>
         ) }} />
-      <Tabs.Screen name="body" options={tab('Body', 'leaf-outline', colors.body)} />
-      <Tabs.Screen name="mind" options={tab('Mind', 'bulb-outline', colors.mind)} />
-      <Tabs.Screen name="soul" options={tab('Soul', 'flame-outline', colors.soul)} />
+      <Tabs.Screen name="body" options={tab(tr('Body'), 'leaf-outline', colors.body)} />
+      <Tabs.Screen name="mind" options={tab(tr('Mind'), 'bulb-outline', colors.mind)} />
+      <Tabs.Screen name="soul" options={tab(tr('Soul'), 'flame-outline', colors.soul)} />
     </Tabs>
     <MyraButton />
     </View>

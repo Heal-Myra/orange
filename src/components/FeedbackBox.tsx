@@ -8,6 +8,7 @@ import { useAuth } from '../lib/auth';
 import { supabase } from '../lib/supabase';
 import { colors } from '../theme';
 import { Button, s } from './ui';
+import { tr } from '../lib/i18n';
 
 export const SHOW_FEEDBACK = true; // testing phase
 const FACES = ['😞', '😕', '😐', '🙂', '😍'];
@@ -28,18 +29,18 @@ export function FeedbackBox({ area }: { area: string }) {
       email: session.user.email, area, rating, message: text.trim(), app_version: Constants.expoConfig?.version ?? 'web',
     });
     setBusy(false);
-    if (e) { setError('Could not send just now. Please try again.'); return; }
+    if (e) { setError(tr('Could not send just now. Please try again.')); return; }
     setText(''); setRating(null); setDone(true);
     setTimeout(() => setDone(false), 4000);
   };
 
-  if (done) return <Text style={{ color: colors.good, fontWeight: '600', textAlign: 'center' }}>Thank you! Your feedback reached the Happy Orange team. 🍊</Text>;
+  if (done) return <Text style={{ color: colors.good, fontWeight: '600', textAlign: 'center' }}>{tr('Thank you! Your feedback reached the Happy Orange team. 🍊')}</Text>;
 
   const open = text.trim().length > 0;
   return (
     <View style={{ gap: 8, backgroundColor: colors.surface, borderRadius: 16, borderWidth: 1, borderColor: colors.accent + '55', padding: 10 }}>
       <TextInput style={[s.input, { borderColor: 'transparent' }, open && { minHeight: 60 }]} value={text} onChangeText={setText} multiline={open}
-        placeholder={`💬 Your feedback on ${area}: type here`} placeholderTextColor={colors.muted} />
+        placeholder={tr('💬 Your feedback on {area}: type here', { area: tr(area) })} placeholderTextColor={colors.muted} />
       {open && (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
           {FACES.map((f, i) => (
@@ -49,7 +50,7 @@ export function FeedbackBox({ area }: { area: string }) {
             </Pressable>
           ))}
           <View style={{ flex: 1 }} />
-          <Button title={busy ? 'Sending…' : 'Send'} onPress={send} disabled={busy} />
+          <Button title={busy ? tr('Sending…') : tr('Send')} onPress={send} disabled={busy} />
         </View>
       )}
       {error ? <Text style={{ color: colors.bad }}>{error}</Text> : null}

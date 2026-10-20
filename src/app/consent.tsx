@@ -6,6 +6,7 @@ import { Text, View } from 'react-native';
 import { Button, Card, Note, Screen } from '../components/ui';
 import { CONSENT_VERSION, useAuth } from '../lib/auth';
 import { colors } from '../theme';
+import { tr } from '../lib/i18n';
 
 const POINTS = [
   ['What we keep', 'What you log in Happy Orange: activity, sleep, meals, meditation, social-media time, your to-do list, practices and reflections, plus your daily scores and targets. If you choose a tradition for Daily Wisdom (optional), it is kept privately in your account only to pick your daily passage.'],
@@ -31,21 +32,21 @@ export default function Consent() {
   return (
     <Screen showDay={false}>
       <View style={{ paddingTop: 24, gap: 4 }}>
-        <Text style={{ fontSize: 26, fontWeight: '600', color: colors.ink }}>Your data, your choice</Text>
-        <Note>Please read this before we save anything to your account.</Note>
+        <Text style={{ fontSize: 26, fontWeight: '600', color: colors.ink }}>{tr('Your data, your choice')}</Text>
+        <Note>{tr('Please read this before we save anything to your account.')}</Note>
       </View>
       <Card>
         {POINTS.map(([title, body]) => (
           <View key={title} style={{ gap: 2 }}>
-            <Text style={{ fontWeight: '600', color: colors.ink }}>{title}</Text>
-            <Text style={{ color: colors.ink, lineHeight: 21 }}>{body}</Text>
+            <Text style={{ fontWeight: '600', color: colors.ink }}>{tr(title)}</Text>
+            <Text style={{ color: colors.ink, lineHeight: 21 }}>{tr(body)}</Text>
           </View>
         ))}
-        <Note>Version {CONSENT_VERSION}</Note>
+        <Note>{tr('Version {v}', { v: CONSENT_VERSION })}</Note>
       </Card>
       {error ? <Text style={{ color: colors.bad }}>{error}</Text> : null}
-      <Button title={busy ? 'Saving…' : 'I agree'} onPress={agree} disabled={busy} />
-      <Button kind="plain" title="Not now (sign out)" onPress={signOut} />
+      <Button title={busy ? tr('Saving…') : tr('I agree')} onPress={agree} disabled={busy} />
+      <Button kind="plain" title={tr('Not now (sign out)')} onPress={signOut} />
     </Screen>
   );
 }

@@ -7,6 +7,7 @@ import { Button, Card, Heading, Note, Screen, Segmented } from '../components/ui
 import { useAuth } from '../lib/auth';
 import { supabase } from '../lib/supabase';
 import { colors } from '../theme';
+import { tr } from '../lib/i18n';
 
 type Access = { user_id: string; email: string; status: 'pending' | 'approved' | 'declined'; requested_at: string; decided_at: string | null };
 type Fb = { id: number; email: string | null; area: string | null; rating: number | null; message: string; created_at: string };
@@ -39,7 +40,7 @@ export default function Admin() {
     if (e) setError(e.message); else setAccess(list => list.map(x => x.user_id === row.user_id ? { ...x, status, decided_at: new Date().toISOString() } : x));
   };
 
-  if (!admin) return <Screen showDay={false}><Card><Note>This page is only for the Happy Orange team.</Note></Card></Screen>;
+  if (!admin) return <Screen showDay={false}><Card><Note>{tr('This page is only for the Happy Orange team.')}</Note></Card></Screen>;
 
   const pending = access.filter(a => a.status === 'pending');
   const others = access.filter(a => a.status !== 'pending');
@@ -53,28 +54,28 @@ export default function Admin() {
       {tab === 'access' ? (
         <>
           <Card>
-            <Heading>Waiting for you</Heading>
-            {!pending.length ? <Note>No new requests. People ask automatically when they first sign in.</Note> : pending.map(r => (
+            <Heading>{tr('Waiting for you')}</Heading>
+            {!pending.length ? <Note>{tr('No new requests. People ask automatically when they first sign in.')}</Note> : pending.map(r => (
               <View key={r.user_id} style={{ gap: 6, borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 8 }}>
                 <Text style={{ fontWeight: '600', color: colors.ink }}>{r.email}</Text>
-                <Note>Asked {when(r.requested_at)}</Note>
+                <Note>{tr('Asked {when}', { when: when(r.requested_at) })}</Note>
                 <View style={{ flexDirection: 'row', gap: 8 }}>
-                  <Button title="Approve" onPress={() => decide(r, 'approved')} />
-                  <Button kind="plain" title="Decline" onPress={() => decide(r, 'declined')} />
+                  <Button title={tr('Approve')} onPress={() => decide(r, 'approved')} />
+                  <Button kind="plain" title={tr('Decline')} onPress={() => decide(r, 'declined')} />
                 </View>
               </View>
             ))}
           </Card>
           <Card>
-            <Heading>Decided</Heading>
-            {!others.length ? <Note>Nothing yet.</Note> : others.map(r => (
+            <Heading>{tr('Decided')}</Heading>
+            {!others.length ? <Note>{tr('Nothing yet.')}</Note> : others.map(r => (
               <View key={r.user_id} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 8 }}>
                 <View style={{ flex: 1 }}>
                   <Text style={{ color: colors.ink }}>{r.email}</Text>
                   <Text style={{ fontSize: 12, fontWeight: '700', color: r.status === 'approved' ? colors.good : colors.bad }}>{r.status === 'approved' ? 'APPROVED' : 'DECLINED'}</Text>
                 </View>
                 <Pressable onPress={() => decide(r, r.status === 'approved' ? 'declined' : 'approved')} hitSlop={8}>
-                  <Text style={{ color: colors.accent, fontWeight: '600' }}>{r.status === 'approved' ? 'Turn off' : 'Approve'}</Text>
+                  <Text style={{ color: colors.accent, fontWeight: '600' }}>{r.status === 'approved' ? tr('Turn off') : tr('Approve')}</Text>
                 </Pressable>
               </View>
             ))}
@@ -82,16 +83,16 @@ export default function Admin() {
         </>
       ) : (
         <Card>
-          <Heading>What testers say</Heading>
-          {!feedback.length ? <Note>No feedback yet.</Note> : feedback.map(f => (
+          <Heading>{tr('What testers say')}</Heading>
+          {!feedback.length ? <Note>{tr('No feedback yet.')}</Note> : feedback.map(f => (
             <View key={f.id} style={{ gap: 4, borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 8 }}>
-              <Text style={{ fontSize: 12, color: colors.muted }}>{when(f.created_at)} · {f.email ?? 'unknown'} · {f.area ?? 'Other'} {f.rating ? FACES[f.rating] : ''}</Text>
+              <Text style={{ fontSize: 12, color: colors.muted }}>{when(f.created_at)} · {f.email ?? 'unknown'} · {f.area ?? tr('Other')} {f.rating ? FACES[f.rating] : ''}</Text>
               <Text selectable style={{ color: colors.ink, lineHeight: 21 }}>{f.message}</Text>
             </View>
           ))}
         </Card>
       )}
-      <Button kind="plain" title={busy ? 'Refreshing…' : 'Refresh'} onPress={load} disabled={busy} />
+      <Button kind="plain" title={busy ? tr('Refreshing…') : tr('Refresh')} onPress={load} disabled={busy} />
     </Screen>
   );
 }

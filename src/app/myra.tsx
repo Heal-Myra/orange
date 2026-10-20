@@ -14,6 +14,7 @@ import { useHeal } from '../lib/store';
 import { todayISO } from '../lib/dates';
 import { tasksForAI, useTasks } from '../lib/tasks';
 import { colors } from '../theme';
+import { tr } from '../lib/i18n';
 
 const KEY = 'heal.myra';
 const HELLO: ChatMessage = { role: 'myra', text: "Hello, I'm Myra. I can help you find your way around Happy Orange, explain your scores, or look at how your week is going. What would you like?" };
@@ -52,7 +53,7 @@ export default function Myra() {
       const done: ChatMessage[] = [...next, { role: 'myra', text: r.text }];
       setMessages(done); save(done);
     } catch (e) {
-      setMessages([...next, { role: 'myra', text: e instanceof Error ? e.message : 'Something went wrong. Please try again.' }]);
+      setMessages([...next, { role: 'myra', text: e instanceof Error ? e.message : tr('Something went wrong. Please try again.') }]);
     } finally { setBusy(false); }
   };
 
@@ -70,12 +71,12 @@ export default function Myra() {
               <Text selectable style={{ color: m.role === 'user' ? colors.onAccent : colors.ink, fontSize: 15, lineHeight: 22 }}>{m.text}</Text>
             </View>
           ))}
-          {busy ? <Note>Myra is thinking…</Note> : null}
+          {busy ? <Note>{tr('Myra is thinking…')}</Note> : null}
           {session && messages.length <= 2 && !busy && (
             <View style={{ gap: 8, paddingTop: 4 }}>
               {SUGGESTIONS[page].map(q => (
-                <Pressable key={q} onPress={() => send(q)} style={{ alignSelf: 'flex-start', paddingVertical: 8, paddingHorizontal: 12, borderRadius: 99, borderWidth: 1, borderColor: colors.insight, backgroundColor: colors.surface }}>
-                  <Text style={{ color: colors.insight, fontWeight: '600' }}>{q}</Text>
+                <Pressable key={q} onPress={() => send(tr(q))} style={{ alignSelf: 'flex-start', paddingVertical: 8, paddingHorizontal: 12, borderRadius: 99, borderWidth: 1, borderColor: colors.insight, backgroundColor: colors.surface }}>
+                  <Text style={{ color: colors.insight, fontWeight: '600' }}>{tr(q)}</Text>
                 </Pressable>
               ))}
             </View>
@@ -84,20 +85,20 @@ export default function Myra() {
         <View style={{ padding: 12, gap: 8, borderTopWidth: 1, borderTopColor: colors.line }}>
           {session ? (
             <>
-              <Note>Myra can make mistakes. Not medical advice.</Note>
+              <Note>{tr('Myra can make mistakes. Not medical advice.')}</Note>
               <View style={{ flexDirection: 'row', gap: 8, alignItems: 'flex-end' }}>
-                <TextInput style={[s.input, { flex: 1, maxHeight: 120 }]} value={text} onChangeText={setText} placeholder="Ask Myra anything…"
+                <TextInput style={[s.input, { flex: 1, maxHeight: 120 }]} value={text} onChangeText={setText} placeholder={tr('Ask Myra anything…')}
                   placeholderTextColor={colors.muted} multiline onSubmitEditing={() => send(text)} />
-                <Button kind="insight" title="Send" onPress={() => send(text)} disabled={!text.trim() || busy} />
+                <Button kind="insight" title={tr('Send')} onPress={() => send(text)} disabled={!text.trim() || busy} />
               </View>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                 <Pressable onPress={() => router.push({ pathname: '/feedback', params: { from: page } })}>
-                  <Text style={{ color: colors.accent, fontWeight: '600', fontSize: 13 }}>Send feedback</Text>
+                  <Text style={{ color: colors.accent, fontWeight: '600', fontSize: 13 }}>{tr('Send feedback')}</Text>
                 </Pressable>
-                {messages.length > 1 ? <Pressable onPress={clear}><Text style={{ color: colors.accent, fontWeight: '600', fontSize: 13 }}>Clear chat</Text></Pressable> : null}
+                {messages.length > 1 ? <Pressable onPress={clear}><Text style={{ color: colors.accent, fontWeight: '600', fontSize: 13 }}>{tr('Clear chat')}</Text></Pressable> : null}
               </View>
             </>
-          ) : <Note>Sign in to talk to Myra (Profile, top right of Today → Sign in).</Note>}
+          ) : <Note>{tr('Sign in to talk to Myra (Profile, top right of Today → Sign in).')}</Note>}
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>

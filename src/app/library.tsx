@@ -10,6 +10,7 @@ import { TAO_CORE, WEEK_REVIEW } from '../lib/tao';
 import { IFCT_COLUMNS, foodByCode, formatAmount, nutrient, per100g, searchFoods } from '../lib/ifct';
 import { PRACTICES } from '../lib/scoring';
 import { colors } from '../theme';
+import { tr } from '../lib/i18n';
 
 type Section = 'food' | 'gita' | 'tao' | 'practices' | 'exercise';
 
@@ -18,7 +19,7 @@ export default function Library() {
   return (
     <Screen showDay={false} feedback="Library">
       <Segmented<Section> value={section} onChange={setSection}
-        options={[{ label: 'Food', value: 'food' }, { label: 'Gita', value: 'gita' }, { label: 'Tao', value: 'tao' }, { label: 'Practices', value: 'practices' }, { label: 'Exercises', value: 'exercise' }]} />
+        options={[{ label: tr('Food'), value: 'food' }, { label: tr('Gita'), value: 'gita' }, { label: tr('Tao'), value: 'tao' }, { label: tr('Practices'), value: 'practices' }, { label: tr('Exercises'), value: 'exercise' }]} />
       {section === 'food' ? <FoodLibrary /> : section === 'gita' ? <GitaLibrary /> : section === 'tao' ? <TaoLibrary /> : section === 'practices' ? <PracticesLibrary /> : <ExerciseLibrary />}
     </Screen>
   );
@@ -34,19 +35,19 @@ function FoodLibrary() {
 
   return (
     <Card>
-      <Heading>Indian Food Composition Tables 2017</Heading>
-      <TextField label="Search foods" value={query} onChangeText={t => { setQuery(t); setCode(null); }} placeholder="e.g. bhindi, aavu paalu, ragi" />
+      <Heading>{tr('Indian Food Composition Tables 2017')}</Heading>
+      <TextField label={tr('Search foods')} value={query} onChangeText={t => { setQuery(t); setCode(null); }} placeholder={tr('e.g. bhindi, aavu paalu, ragi')} />
       {food ? (
         <View style={{ gap: 6 }}>
           <Text style={{ fontSize: 18, fontWeight: '600', color: colors.ink }}>{food.name}</Text>
           <Note>{food.group}{food.scientificName ? ` · ${food.scientificName}` : ''}</Note>
           {food.localNames ? <Note>{food.localNames}</Note> : null}
-          <Label>Per 100 g</Label>
+          <Label>{tr('Per 100 g')}</Label>
           <Text style={{ color: colors.ink }}>Energy: {Math.round(per100g(food).kcal)} kcal{per100g(food).energyCalculated ? ' (calculated)' : ''}</Text>
           {MAIN.map(k => nutrient(food, k) != null && (
             <View key={k} style={s.headingRow}><Text style={{ color: colors.ink }}>{label(k)}</Text><Text style={{ color: colors.muted }}>{formatAmount(nutrient(food, k))}</Text></View>
           ))}
-          <Pressable onPress={() => setCode(null)}><Text style={{ color: colors.accent, fontWeight: '600' }}>Back to results</Text></Pressable>
+          <Pressable onPress={() => setCode(null)}><Text style={{ color: colors.accent, fontWeight: '600' }}>{tr('Back to results')}</Text></Pressable>
         </View>
       ) : searchFoods(query, 25).map(f => (
         <Pressable key={f.code} onPress={() => setCode(f.code)} style={{ paddingVertical: 6 }}>
@@ -54,7 +55,7 @@ function FoodLibrary() {
           <Text style={s.note}>{f.group} · {Math.round(per100g(f).kcal)} kcal per 100 g</Text>
         </Pressable>
       ))}
-      <Note>Source: ICMR–National Institute of Nutrition, Hyderabad.</Note>
+      <Note>{tr('Source: ICMR–National Institute of Nutrition, Hyderabad.')}</Note>
     </Card>
   );
 }
@@ -74,7 +75,7 @@ function GitaLibrary() {
           ))}
         </View>
         <Text style={{ fontSize: 22, color: colors.ink }}>{c.name}</Text>
-        <Note>{c.translit} · {c.meaning} · {c.count} verses</Note>
+        <Note>{c.translit} · {c.meaning} · {tr('{n} verses', { n: c.count })}</Note>
         <Text style={{ color: colors.ink, lineHeight: 21 }}>{c.summary}</Text>
       </Card>
       <Card>
@@ -94,27 +95,27 @@ function TaoLibrary() {
   return (
     <>
       <Card>
-        <Heading>Tao Te Ching: a week of practice</Heading>
-        <Text style={{ fontSize: 17, color: colors.ink, fontWeight: '600', lineHeight: 24 }}>{TAO_CORE.summary}</Text>
-        <Text style={{ color: colors.ink, lineHeight: 21 }}>{TAO_CORE.returning}</Text>
-        <Text style={{ color: colors.ink, lineHeight: 21 }}>{TAO_CORE.gentleness}</Text>
-        {TAO_CORE.reflection.map((p, i) => <Text key={i} style={{ color: colors.ink, lineHeight: 21 }}>{p}</Text>)}
+        <Heading>{tr('Tao Te Ching: a week of practice')}</Heading>
+        <Text style={{ fontSize: 17, color: colors.ink, fontWeight: '600', lineHeight: 24 }}>{tr(TAO_CORE.summary)}</Text>
+        <Text style={{ color: colors.ink, lineHeight: 21 }}>{tr(TAO_CORE.returning)}</Text>
+        <Text style={{ color: colors.ink, lineHeight: 21 }}>{tr(TAO_CORE.gentleness)}</Text>
+        {TAO_CORE.reflection.map((p, i) => <Text key={i} style={{ color: colors.ink, lineHeight: 21 }}>{tr(p)}</Text>)}
       </Card>
       <Card>
-        <Heading>The week</Heading>
-        <Note>Each day's practice appears on the Mind or Soul tab. Doing it adds 10 points to that pillar.</Note>
+        <Heading>{tr('The week')}</Heading>
+        <Note>{tr('Each day\'s practice appears on the Mind tab. Doing it adds 10 points to Mind.')}</Note>
         <TaoWeek />
       </Card>
       <Card>
-        <Heading>At the end of the week</Heading>
-        <Text style={{ color: colors.ink, lineHeight: 21 }}>{WEEK_REVIEW.intro}</Text>
-        {WEEK_REVIEW.cracks.map((c, i) => <Text key={i} style={{ color: colors.ink }}>• {c}</Text>)}
+        <Heading>{tr('At the end of the week')}</Heading>
+        <Text style={{ color: colors.ink, lineHeight: 21 }}>{tr(WEEK_REVIEW.intro)}</Text>
+        {WEEK_REVIEW.cracks.map((c, i) => <Text key={i} style={{ color: colors.ink }}>• {tr(c)}</Text>)}
       </Card>
       <Card>
-        <Heading>When a door will not open</Heading>
-        <Text style={{ color: colors.ink, lineHeight: 21 }}>{TAO_CORE.stuckIntro}</Text>
-        {TAO_CORE.stuck.map((c, i) => <Text key={i} style={{ color: colors.ink }}>{i + 1}. {c}</Text>)}
-        <Note>A practice guide inspired by the Tao Te Ching, written for Happy Orange. Not a translation of the text.</Note>
+        <Heading>{tr('When a door will not open')}</Heading>
+        <Text style={{ color: colors.ink, lineHeight: 21 }}>{tr(TAO_CORE.stuckIntro)}</Text>
+        {TAO_CORE.stuck.map((c, i) => <Text key={i} style={{ color: colors.ink }}>{i + 1}. {tr(c)}</Text>)}
+        <Note>{tr('A practice guide inspired by the Tao Te Ching, written for Happy Orange. Not a translation of the text.')}</Note>
       </Card>
     </>
   );
@@ -125,8 +126,8 @@ function ExerciseLibrary() {
   const [open, setOpen] = useState<string | null>(null);
   return (
     <Card>
-      <Heading>Exercise library</Heading>
-      <TextField label="Search" value={query} onChangeText={setQuery} placeholder="e.g. squat, plank, hamstrings" />
+      <Heading>{tr('Exercise library')}</Heading>
+      <TextField label={tr('Search')} value={query} onChangeText={setQuery} placeholder={tr('e.g. squat, plank, hamstrings')} />
       {searchExercises(query).map(e => (
         <Pressable key={e.name} onPress={() => setOpen(open === e.name ? null : e.name)} style={{ paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: colors.line, gap: 4 }}>
           <Text style={{ fontWeight: '600', color: colors.ink }}>{e.name}</Text>
@@ -148,12 +149,12 @@ function ExerciseLibrary() {
 function PracticesLibrary() {
   return (
     <Card>
-      <Heading>The eight practices</Heading>
-      <Note>Eight areas of inner life, led by truthfulness and fairness. Later, Happy Orange will understand them from your day, with no checklist.</Note>
+      <Heading>{tr('The eight practices')}</Heading>
+      <Note>{tr('Eight areas of inner life, led by truthfulness and fairness. Later, Happy Orange will understand them from your day, with no checklist.')}</Note>
       {PRACTICES.map(p => (
         <View key={p.id} style={{ gap: 2, borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 8 }}>
-          <Text style={{ fontWeight: '700', color: colors.ink }}>{p.name}{p.orangeBook ? <Text style={{ color: colors.insight, fontSize: 12 }}>  Orange Book</Text> : null}</Text>
-          <Text style={{ color: colors.muted }}>{p.meaning}</Text>
+          <Text style={{ fontWeight: '700', color: colors.ink }}>{p.name}{p.orangeBook ? <Text style={{ color: colors.insight, fontSize: 12 }}>  {tr('Orange Book')}</Text> : null}</Text>
+          <Text style={{ color: colors.muted }}>{tr(p.meaning)}</Text>
         </View>
       ))}
     </Card>

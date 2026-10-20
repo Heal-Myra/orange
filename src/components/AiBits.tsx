@@ -15,8 +15,9 @@ import { useHeal } from '../lib/store';
 import type { ContentCategoryId } from '../lib/types';
 import { colors } from '../theme';
 import { Button, Card, Heading, Note, TextField } from './ui';
+import { lang, tr } from '../lib/i18n';
 
-const errText = (e: unknown) => (e instanceof Error ? e.message : 'Something went wrong. Try again.');
+const errText = (e: unknown) => (e instanceof Error ? e.message : tr('Something went wrong. Try again.'));
 
 /** Today: "Myra recommends". Refreshes by itself when the part of the day changes (morning, afternoon, evening, night)
  *  or when what is logged today changes (a meal, steps from a fitness app, meditation...), so the person never has to ask. */
@@ -38,7 +39,7 @@ export function GuidanceCard() {
     const context = buildContext(day, days, date, profile, tasksForAI(open, todayISO()), tradition);
     try {
       const r = await dailyGuidance(context);
-      update(d => { d.guidance = { ...r, at: new Date().toISOString(), part: partOfDay(), sig: daySignature(d) }; });
+      update(d => { d.guidance = { ...r, at: new Date().toISOString(), part: partOfDay(), sig: daySignature(d), lang: lang() }; });
       if (Array.isArray(r.focus) && r.focus.length && date === todayISO()) setFocus(r.focus.map(String)); // Myra's pick
     } catch (e) { setMessage(errText(e)); } finally { setBusy(false); }
   }, [day, days, date, profile, update, open, setFocus, tradition]);
@@ -49,7 +50,7 @@ export function GuidanceCard() {
   useEffect(() => {
     if (!session || !isToday || busy) return;
     const ageMin = g ? (Date.now() - new Date(g.at).getTime()) / 60000 : Infinity;
-    const stale = !g || g.part !== part || (g.sig !== sig && ageMin > 20);
+    const stale = !g || g.part !== part || (g.lang ?? 'en') !== lang() || (g.sig !== sig && ageMin > 20);
     const key = `${date}|${part}|${sig}`;
     if (!stale || tried.current === key) return; // one attempt per situation, so errors never loop
     const t = setTimeout(() => { tried.current = key; run(); }, 4000); // wait until the person stops typing
@@ -58,14 +59,14 @@ export function GuidanceCard() {
 
   const time = g ? new Date(g.at).toTimeString().slice(0, 5) : '';
 
-  const blocks = g ? ([['Body', colors.body, g.body], ['Mind', colors.mind, g.mind], ['Soul', colors.soul, g.soul]] as const) : [];
+  const blocks = g ? ([[tr('Body'), colors.body, g.body], [tr('Mind'), colors.mind, g.mind], [tr('Soul'), colors.soul, g.soul]] as const) : [];
 
   // Three separate blocks, one each for Body, Mind and Soul, stacked one under another (founder, 20 Oct 2026).
   return (
     <View style={{ gap: 10 }}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 4 }}>
-        <Heading>Myra recommends</Heading>
-        {session && g && !busy && isToday ? <Pressable onPress={run} hitSlop={8}><Text style={{ color: colors.insight, fontWeight: '600' }}>Refresh</Text></Pressable> : null}
+        <Heading>{tr('Myra recommends')}</Heading>
+        {session && g && !busy && isToday ? <Pressable onPress={run} hitSlop={8}><Text style={{ color: colors.insight, fontWeight: '600' }}>{tr('Refresh')}</Text></Pressable> : null}
       </View>
       {g ? <Text style={{ fontSize: 14, color: colors.insight, paddingHorizontal: 4 }}>{oneLine(g.headline)}</Text> : null}
 
@@ -80,15 +81,15 @@ export function GuidanceCard() {
 
       {g ? null : (
         <Card>
-          {!session ? <Note>Sign in to get Myra's recommendations.</Note>
-            : <Note>{busy ? 'Myra is looking at your day…' : 'Myra will suggest your next steps here.'}</Note>}
-          {session && !busy && isToday ? <Button kind="insight" title="Get recommendations" onPress={run} /> : null}
+          {!session ? <Note>{tr('Sign in to get Myra\'s recommendations.')}</Note>
+            : <Note>{busy ? tr('Myra is looking at your day…') : tr('Myra will suggest your next steps here.')}</Note>}
+          {session && !busy && isToday ? <Button kind="insight" title={tr('Get recommendations')} onPress={run} /> : null}
         </Card>
       )}
 
       {message ? <Text style={{ color: colors.bad, paddingHorizontal: 4 }}>{message}</Text> : null}
       <View style={{ paddingHorizontal: 4 }}>
-        <Note>{g ? `${busy ? 'Updating…' : `Updated ${time}`} · changes with your day · ` : ''}Not medical advice.</Note>
+        <Note>{g ? `${busy ? tr('Updating…') : tr('Updated {time}', { time })} · ${tr('changes with your day')} · ` : ''}{tr('Not medical advice.')}</Note>
       </View>
     </View>
   );
@@ -100,7 +101,7 @@ export function ExplainPassage({ passage, tradition }: { passage: Passage; tradi
   const [text, setText] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
-  if (!session) return <Note>Sign in to get explanations in English or Hindi.</Note>;
+  if (!session) return <Note>{tr('Sign in to get explanations in English or Hindi.')}</Note>;
 
   const run = async (lang: 'en' | 'hi') => {
     setBusy(lang); setMessage(null);
@@ -113,8 +114,10 @@ export function ExplainPassage({ passage, tradition }: { passage: Passage; tradi
   return (
     <View style={{ gap: 8 }}>
       <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
-        <Button kind="insight" title={busy === 'en' ? 'Explaining…' : 'Open its meaning'} onPress={() => run('en')} disabled={!!busy} />
-        <Button kind="insight" title={busy === 'hi' ? 'समझा रहे हैं…' : 'हिंदी में समझाएँ'} onPress={() => run('hi')} disabled={!!busy} />
+        <Button kind="insight" title={busy === lang() ? tr('Explaining…') : tr('Open its meaning')} onPress={() => run(lang())} disabled={!!busy} />
+        {lang() === 'hi'
+          ? <Button kind="plain" title={busy === 'en' ? 'Explaining…' : 'Explain in English'} onPress={() => run('en')} disabled={!!busy} />
+          : <Button kind="plain" title={busy === 'hi' ? 'समझा रहे हैं…' : 'हिंदी में समझाएँ'} onPress={() => run('hi')} disabled={!!busy} />}
       </View>
       {(['en', 'hi'] as const).map(l => text[l] ? (
         <Text key={l} style={{ color: colors.ink, lineHeight: 22, borderLeftWidth: 3, borderLeftColor: colors.insight, paddingLeft: 10 }}>{text[l]}</Text>
@@ -130,7 +133,7 @@ export function ExplainVerse({ verse }: { verse: Verse }) {
   const [text, setText] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
-  if (!session) return <Note>Sign in to get explanations in English or Hindi.</Note>;
+  if (!session) return <Note>{tr('Sign in to get explanations in English or Hindi.')}</Note>;
 
   const run = async (lang: 'en' | 'hi') => {
     setBusy(lang); setMessage(null);
@@ -143,8 +146,10 @@ export function ExplainVerse({ verse }: { verse: Verse }) {
   return (
     <View style={{ gap: 8 }}>
       <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
-        <Button kind="insight" title={busy === 'en' ? 'Explaining…' : 'Explain'} onPress={() => run('en')} disabled={!!busy} />
-        <Button kind="insight" title={busy === 'hi' ? 'समझा रहे हैं…' : 'हिंदी में समझाएँ'} onPress={() => run('hi')} disabled={!!busy} />
+        <Button kind="insight" title={busy === lang() ? tr('Explaining…') : tr('Open its meaning')} onPress={() => run(lang())} disabled={!!busy} />
+        {lang() === 'hi'
+          ? <Button kind="plain" title={busy === 'en' ? 'Explaining…' : 'Explain in English'} onPress={() => run('en')} disabled={!!busy} />
+          : <Button kind="plain" title={busy === 'hi' ? 'समझा रहे हैं…' : 'हिंदी में समझाएँ'} onPress={() => run('hi')} disabled={!!busy} />}
       </View>
       {(['en', 'hi'] as const).map(l => text[l] ? (
         <Text key={l} style={{ color: colors.ink, lineHeight: 22, borderLeftWidth: 3, borderLeftColor: colors.insight, paddingLeft: 10 }}>{text[l]}</Text>
@@ -175,15 +180,15 @@ export function ReflectCard() {
 
   return (
     <Card>
-      <Heading>Reflect on an action</Heading>
-      <Note>Describe something you did, good or not. The AI reflects on it with the Gita's eyes. It never judges you.</Note>
+      <Heading>{tr('Reflect on an action')}</Heading>
+      <Note>{tr('Describe something you did, good or not. The AI reflects on it with the Gita\'s eyes. It never judges you.')}</Note>
       {session ? (
         <>
-          <TextField label="What did you do?" value={text} onChangeText={setText} multiline
-            placeholder="e.g. Lost my temper with my driver, later apologised and paid him for the extra hour" />
-          <Button kind="insight" title={busy ? 'Reflecting…' : 'Reflect'} onPress={run} disabled={busy || !text.trim()} />
+          <TextField label={tr('What did you do?')} value={text} onChangeText={setText} multiline
+            placeholder={tr('e.g. Lost my temper with my driver, later apologised and paid him for the extra hour')} />
+          <Button kind="insight" title={busy ? tr('Reflecting…') : tr('Reflect')} onPress={run} disabled={busy || !text.trim()} />
         </>
-      ) : <Note>Sign in to use reflections.</Note>}
+      ) : <Note>{tr('Sign in to use reflections.')}</Note>}
       {message ? <Text style={{ color: colors.bad }}>{message}</Text> : null}
       {day.actions.map((a, i) => (
         <View key={i} style={{ gap: 4, borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 8 }}>
@@ -192,7 +197,7 @@ export function ReflectCard() {
             {a.principle} · {a.alignment > 0 ? '+' : ''}{a.alignment}
           </Text>
           {a.reflection ? <Text style={{ color: colors.insight }}>{oneLine(a.reflection)}</Text> : null}
-          <Pressable onPress={() => update(d => { d.actions.splice(i, 1); })}><Text style={{ color: colors.bad }}>Remove</Text></Pressable>
+          <Pressable onPress={() => update(d => { d.actions.splice(i, 1); })}><Text style={{ color: colors.bad }}>{tr('Remove')}</Text></Pressable>
         </View>
       ))}
     </Card>
@@ -212,15 +217,15 @@ export function ClassifyHelper({ onPick }: { onPick: (c: ContentCategoryId) => v
     try {
       const r = await classifyMedia(text);
       const cat = CONTENT_CATEGORIES.find(c => c.id === r.category);
-      if (cat) { onPick(cat.id); setMessage(`${cat.name}: ${oneLine(r.reason)}`); } else setMessage('Could not tell. Please pick a category yourself.');
+      if (cat) { onPick(cat.id); setMessage(`${tr(cat.name)}: ${oneLine(r.reason)}`); } else setMessage(tr('Could not tell. Please pick a category yourself.'));
     } catch (e) { setMessage(errText(e)); } finally { setBusy(false); }
   };
 
   return (
     <View style={{ gap: 8 }}>
-      <TextField label="Not sure of the category? Describe what you watched" value={text} onChangeText={setText} multiline
-        placeholder="e.g. Cooking reels, then a 20-minute video on stock market basics" />
-      <Button kind="insight" title={busy ? 'Thinking…' : 'Pick the category for me'} onPress={run} disabled={busy || !text.trim()} />
+      <TextField label={tr('Not sure of the category? Describe what you watched')} value={text} onChangeText={setText} multiline
+        placeholder={tr('e.g. Cooking reels, then a 20-minute video on stock market basics')} />
+      <Button kind="insight" title={busy ? tr('Thinking…') : tr('Pick the category for me')} onPress={run} disabled={busy || !text.trim()} />
       {message ? <Text style={{ color: colors.muted }}>{message}</Text> : null}
     </View>
   );

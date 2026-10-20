@@ -9,19 +9,20 @@ import { Card, Note, Screen } from '../../components/ui';
 import { band, wellBeing } from '../../lib/scoring';
 import { useHeal } from '../../lib/store';
 import { colors } from '../../theme';
+import { tr } from '../../lib/i18n';
 
 export default function Today() {
   const { day, profile } = useHeal();
   const { session } = useAuth();
   const w = wellBeing(day, profile);
-  const label = w.logged ? band(w.total) : 'Nothing logged yet';
+  const label = w.logged ? tr(band(w.total)) : tr('Nothing logged yet');
   const bandColor = w.total >= 180 ? colors.good : w.total >= 120 ? colors.warn : colors.bad;
 
   return (
     <Screen feedback="Today" top={
       <View style={{ paddingHorizontal: 4 }}>
         <Text style={{ fontSize: 15, color: colors.muted }}>{greeting()},</Text>
-        <Text style={{ fontSize: 24, fontWeight: '700', color: colors.ink }}>{firstName(session?.user.email) ?? 'friend'}</Text>
+        <Text style={{ fontSize: 24, fontWeight: '700', color: colors.ink }}>{firstName(session?.user.email) ?? tr('friend')}</Text>
       </View>
     }>
 
@@ -34,7 +35,7 @@ export default function Today() {
       <GuidanceCard />
 
       <View style={{ paddingHorizontal: 4 }}>
-        <Note>Well-being = Body + Mind + Soul, each out of 100. A working model, not a medical measure.</Note>
+        <Note>{tr('Well-being = Body + Mind + Soul, each out of 100. A working model, not a medical measure.')}</Note>
       </View>
     </Screen>
   );
@@ -42,7 +43,7 @@ export default function Today() {
 
 const greeting = () => {
   const h = new Date().getHours();
-  return h >= 5 && h < 12 ? 'Good morning' : h >= 12 && h < 17 ? 'Good afternoon' : 'Good evening';
+  return h >= 5 && h < 12 ? tr('Good morning') : h >= 12 && h < 17 ? tr('Good afternoon') : tr('Good evening');
 };
 
 /** "santosh.jha01@gmail.com" → "Santosh". Letters before the first dot, number or underscore. */

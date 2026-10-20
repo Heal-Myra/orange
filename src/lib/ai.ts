@@ -2,6 +2,7 @@
 // Every AI feature needs the person to be signed in, so the daily cap and privacy rules apply.
 
 import { FunctionsHttpError } from '@supabase/supabase-js';
+import { lang } from './i18n';
 import { supabase } from './supabase';
 import type { ContentCategoryId } from './types';
 
@@ -14,7 +15,7 @@ async function call<T>(action: string, payload: Record<string, unknown>): Promis
   if (!supabase) throw new Error('AI features need the online version of the app.');
   const { data: session } = await supabase.auth.getSession();
   if (!session.session) throw new Error('Please sign in to use AI features.');
-  const { data, error } = await supabase.functions.invoke('heal-ai', { body: { action, payload } });
+  const { data, error } = await supabase.functions.invoke('heal-ai', { body: { action, payload, uiLang: lang() } });
   if (error) {
     // The function sends a friendly message in its JSON body; show that when we can.
     if (error instanceof FunctionsHttpError) {

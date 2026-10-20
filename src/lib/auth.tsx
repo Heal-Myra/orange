@@ -4,6 +4,7 @@ import type { Session } from '@supabase/supabase-js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { tr } from './i18n';
 import { supabase } from './supabase';
 import type { Tradition } from './wisdom';
 
@@ -35,10 +36,10 @@ const AuthContext = createContext<AuthState | null>(null);
 /** Friendly words for the errors people are most likely to meet. */
 function explain(message: string): string {
   const m = message.toLowerCase();
-  if (m.includes('expired') || m.includes('invalid')) return 'That code is wrong or has expired. Check the latest email, or ask for a new code.';
-  if (m.includes('email rate limit')) return 'Too many sign-in emails were sent in the last hour. Please check your inbox for the last one, or try again in about an hour.';
-  if (m.includes('rate') || m.includes('seconds')) return 'Please wait a minute before asking for another code.';
-  if (m.includes('network') || m.includes('fetch')) return 'Could not reach the internet. Check your connection and try again.';
+  if (m.includes('expired') || m.includes('invalid')) return tr('That code is wrong or has expired. Check the latest email, or ask for a new code.');
+  if (m.includes('email rate limit')) return tr('Too many sign-in emails were sent in the last hour. Please check your inbox for the last one, or try again in about an hour.');
+  if (m.includes('rate') || m.includes('seconds')) return tr('Please wait a minute before asking for another code.');
+  if (m.includes('network') || m.includes('fetch')) return tr('Could not reach the internet. Check your connection and try again.');
   return message;
 }
 
@@ -99,14 +100,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
 
     sendCode: async email => {
-      if (!supabase) return 'Online accounts are not set up in this version.';
+      if (!supabase) return tr('Online accounts are not set up in this version.');
       const redirect = Platform.OS === 'web' && typeof window !== 'undefined' ? window.location.origin : undefined;
       const { error } = await supabase.auth.signInWithOtp({ email: email.trim().toLowerCase(), options: { emailRedirectTo: redirect } });
       return error ? explain(error.message) : null;
     },
 
     verifyCode: async (email, code) => {
-      if (!supabase) return 'Online accounts are not set up in this version.';
+      if (!supabase) return tr('Online accounts are not set up in this version.');
       const { error } = await supabase.auth.verifyOtp({ email: email.trim().toLowerCase(), token: code.trim(), type: 'email' });
       if (error) return explain(error.message);
       await AsyncStorage.removeItem(GUEST_KEY).catch(() => {});
@@ -115,7 +116,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
 
     giveConsent: async () => {
-      if (!supabase || !session) return 'Please sign in first.';
+      if (!supabase || !session) return tr('Please sign in first.');
       const { error } = await supabase.from('profiles').upsert({
         user_id: session.user.id, consent_at: new Date().toISOString(), consent_version: CONSENT_VERSION, updated_at: new Date().toISOString(),
       });
@@ -142,7 +143,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Right to erasure (DPDP Act, 2023): removes every row this person owns.
     // Removing the sign-in record itself needs a server function (planned with the AI features).
     deleteMyData: async () => {
-      if (!supabase || !session) return 'Please sign in first.';
+      if (!supabase || !session) return tr('Please sign in first.');
       const uid = session.user.id;
       const a = await supabase.from('day_logs').delete().eq('user_id', uid);
       if (a.error) return explain(a.error.message);

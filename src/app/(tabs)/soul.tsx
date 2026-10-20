@@ -7,6 +7,7 @@ import { MeditationTimer } from '../../components/MeditationTimer';
 import { Card, Heading, Screen, Score } from '../../components/ui';
 import { soulScore } from '../../lib/scoring';
 import { useHeal } from '../../lib/store';
+import { tr } from '../../lib/i18n';
 
 export default function Soul() {
   const { day, profile } = useHeal();
@@ -14,7 +15,7 @@ export default function Soul() {
   return (
     <Screen feedback="Soul">
       <Card style={{ paddingVertical: 12 }}>
-        <Heading right={<Score value={score?.total} max={100} />}>Soul today</Heading>
+        <Heading right={<Score value={score?.total} max={100} />}>{tr('Soul today')}</Heading>
       </Card>
       <GratitudeCard />
       <MeditationTimer />

@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.7.0 — 20 October 2026 (Hindi)
+- First screen: choose **English** or **हिंदी**; change any time in Profile → Language. The whole app, the Tao week and the thoughts of the day are in Hindi, and Myra, her recommendations, meal tips and explanations answer in Hindi. See docs/decisions/0010-languages.md.
+
 ## 0.6.0 — 20 October 2026 ("Clear your mind")
 - **Daily Wisdom from your own tradition**: asked once after sign-up (optional) and changeable in Profile: Hindu (Bhagavad Gita), Sikh (Japji Sahib), Buddhist (Dhammapada), Christian (Bible, KJV), Muslim (Qur'an, Arabic with transliteration), Universal wisdom; Jain coming soon. "Open its meaning" explains any passage in English or Hindi. Sources and licences: docs/decisions/0009-daily-wisdom.md.
 - Soul tab order (founder): Gratitude, Breathing & meditation, **Daily Wisdom** (the Gita verse card, renamed), Thought of the day. The eight-practices check and the Tao card were removed from Soul; the eight practices are kept in the Library (Profile → Library → Practices) for the future. The Tao practice is on Mind every day.

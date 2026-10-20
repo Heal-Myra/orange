@@ -62,7 +62,13 @@ function searchIfct(query: string, limit = 5) {
 // ---------- One way to ask either AI company ----------
 interface Image { media_type: string; data: string }
 
-async function ask(tier: 'smart' | 'quick', system: string, text: string, image?: Image): Promise<string> {
+// When the person uses the app in Hindi, every word meant for them comes back in Hindi (founder, 20 Oct 2026).
+const HINDI = `
+LANGUAGE: The person uses the app in Hindi. Write every word meant for the person in simple, warm Hindi (Devanagari script), unless this request explicitly asks for English. Keep JSON keys, ids, numbers, units and category names exactly as specified, in English.`;
+const askWith = (hindi: boolean) => (tier: 'smart' | 'quick', system: string, text: string, image?: Image) =>
+  askAI(tier, hindi ? system + HINDI : system, text, image);
+
+async function askAI(tier: 'smart' | 'quick', system: string, text: string, image?: Image): Promise<string> {
   if (PROVIDER === 'gemini') {
     const model = MODELS.gemini[tier];
     const parts: Record<string, unknown>[] = [{ text }];
@@ -110,7 +116,8 @@ const r1 = (v: number) => Math.round(v * 10) / 10;
  *    the server does the arithmetic. Ingredients with no good IFCT match keep the AI's estimate.
  */
 /** Meal to nutrition, from a photo or from words the person typed or spoke. Numbers come from IFCT 2017 where ingredients match. */
-async function mealAnalyse(image: Image | null, hint: string) {
+async function mealAnalyse(image: Image | null, hint: string, hindi = false) {
+  const ask = askWith(hindi);
   const what = image
     ? `Identify every food or drink in this photo and estimate the portion on the plate. Assume Indian home cooking where dishes look Indian, with typical household oil or ghee.
 ${hint ? `The person adds: "${hint}"` : ''}`
@@ -166,14 +173,15 @@ Reply with JSON only: {"picks":{"0":"CODE or null","1":"CODE or null"}}`));
 // ---------- The AI features ----------
 const CATEGORIES = 'learning, spiritual, inspiring, connect, news, fun, scrolling, negative';
 
-async function run(action: string, p: Record<string, unknown>) {
+async function run(action: string, p: Record<string, unknown>, hindi = false) {
+  const ask = askWith(hindi);
   switch (action) {
     case 'meal_photo':
-      return mealAnalyse({ media_type: String(p.media_type ?? 'image/jpeg'), data: String(p.image_base64 ?? '') }, String(p.hint ?? '').slice(0, 300));
+      return mealAnalyse({ media_type: String(p.media_type ?? 'image/jpeg'), data: String(p.image_base64 ?? '') }, String(p.hint ?? '').slice(0, 300), hindi);
     case 'meal_text': {
       const text = String(p.text ?? '').trim().slice(0, 600);
       if (!text) throw new Error('Tell me what you ate first.');
-      return mealAnalyse(null, text);
+      return mealAnalyse(null, text, hindi);
     }
     case 'screen_time': {
       return parseJson(await ask('smart', ORANGE_BOOK,
@@ -295,7 +303,7 @@ export default {
           : 'Your request for AI features is waiting for approval by the Happy Orange team. You will be able to use them as soon as it is approved.' }, { status: 403 });
       }
     }
-    let body: { action?: string; payload?: Record<string, unknown> };
+    let body: { action?: string; payload?: Record<string, unknown>; uiLang?: string };
     try { body = await req.json(); } catch { return Response.json({ error: 'Bad request.' }, { status: 400 }); }
     const action = String(body.action ?? '');
 
@@ -308,7 +316,7 @@ export default {
     await ctx.supabase.from('ai_requests').insert({ kind: action });
 
     try {
-      return Response.json({ result: await run(action, body.payload ?? {}), provider: PROVIDER });
+      return Response.json({ result: await run(action, body.payload ?? {}, body.uiLang === 'hi'), provider: PROVIDER });
     } catch (e) {
       return Response.json({ error: e instanceof Error ? e.message : 'Something went wrong.' }, { status: 500 });
     }

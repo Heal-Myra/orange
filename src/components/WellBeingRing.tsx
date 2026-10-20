@@ -8,6 +8,7 @@ import { Pressable, Text, View, useWindowDimensions } from 'react-native';
 import Svg, { G, Path } from 'react-native-svg';
 import type { WellBeing } from '../lib/scoring';
 import { colors } from '../theme';
+import { tr } from '../lib/i18n';
 
 const BASE = 210; // designed at 210 px, scaled down on narrow phones
 const SPAN = 110; // degrees per arc, leaving small gaps between them
@@ -45,7 +46,7 @@ export function WellBeingRing({ w, label, labelColor }: { w: WellBeing; label: s
             </Svg>
             <View pointerEvents="none" style={{ position: 'absolute', left: 0, top: 0, width: SIZE, height: SIZE, alignItems: 'center', justifyContent: 'center' }}>
               <Text style={{ fontSize: 44 * k, color: colors.insight, fontVariant: ['tabular-nums'], lineHeight: 50 * k }}>{Math.round(w.total)}</Text>
-              <Text style={{ color: colors.muted, fontSize: 12 }}>of 300</Text>
+              <Text style={{ color: colors.muted, fontSize: 12 }}>{tr('of 300')}</Text>
             </View>
           </View>
         </View>
@@ -58,9 +59,9 @@ export function WellBeingRing({ w, label, labelColor }: { w: WellBeing; label: s
 
 // Body top right, Mind bottom, Soul left.
 const partsOf = (w: WellBeing): Part[] => [
-  { key: 'body', name: 'Body', color: colors.body, start: -55, value: w.body?.total, route: '/body' },
-  { key: 'mind', name: 'Mind', color: colors.mind, start: 65, value: w.mind?.total, route: '/mind' },
-  { key: 'soul', name: 'Soul', color: colors.soul, start: 185, value: w.soul?.total, route: '/soul' },
+  { key: 'body', name: tr('Body'), color: colors.body, start: -55, value: w.body?.total, route: '/body' },
+  { key: 'mind', name: tr('Mind'), color: colors.mind, start: 65, value: w.mind?.total, route: '/mind' },
+  { key: 'soul', name: tr('Soul'), color: colors.soul, start: 185, value: w.soul?.total, route: '/soul' },
 ];
 
 /** Three coloured tiles under the circle; each opens its tab. */
@@ -70,7 +71,7 @@ export function PillarTiles({ w }: { w: WellBeing }) {
     <View style={{ flexDirection: 'row', gap: 8 }}>
       {parts.map(p => (
         <Pressable key={p.key} accessibilityRole="button"
-          accessibilityLabel={`${p.name}: ${p.value == null ? 'not logged' : Math.round(p.value) + ' of 100'}. Open the ${p.name} tab.`}
+          accessibilityLabel={`${p.name}: ${p.value == null ? tr('not logged') : Math.round(p.value) + '/100'}`}
           onPress={() => router.navigate(p.route)}
           style={({ pressed }) => ({ flex: 1, backgroundColor: p.color, borderRadius: 16, paddingVertical: 12, alignItems: 'center', opacity: pressed ? 0.85 : 1 })}>
           <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 17 }}>{p.name}</Text>
