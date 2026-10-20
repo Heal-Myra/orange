@@ -45,15 +45,15 @@ export function MeditationTimer() {
   const sitting = running || pausedMs > 0;
 
   return (
-    <Card style={{ borderLeftWidth: 4, borderLeftColor: colors.mind }}>
-      <Heading right={<Score value={Math.min(20, (20 * done) / target)} max={20} />}>Breathing & meditation</Heading>
+    <Card style={{ borderLeftWidth: 4, borderLeftColor: colors.soul }}>
+      <Heading right={<Score value={Math.min(30, (30 * done) / target)} max={30} />}>Breathing & meditation</Heading>
       {!sitting ? (
         <>
           <Note>{done >= target ? `You have sat ${done} minutes today. Lovely. Another short sit is always welcome.` : `Suggested now: ${suggested} minutes (today ${done} of ${target}).`}</Note>
           <View style={{ flexDirection: 'row', gap: 8 }}>
             {CHOICES.map(m => (
               <Pressable key={m} onPress={() => setLength(m)}
-                style={{ paddingVertical: 8, paddingHorizontal: 14, borderRadius: 99, borderWidth: 1, borderColor: m === length ? colors.mind : colors.line, backgroundColor: m === length ? colors.mind + '18' : colors.surface }}>
+                style={{ paddingVertical: 8, paddingHorizontal: 14, borderRadius: 99, borderWidth: 1, borderColor: m === length ? colors.soul : colors.line, backgroundColor: m === length ? colors.soul + '18' : colors.surface }}>
                 <Text style={{ color: colors.ink, fontWeight: m === length ? '700' : '400' }}>{m} min</Text>
               </Pressable>
             ))}
@@ -64,7 +64,7 @@ export function MeditationTimer() {
       ) : (
         <View style={{ alignItems: 'center', gap: 8, paddingVertical: 8 }}>
           <Text style={{ fontSize: 44, color: colors.ink, fontVariant: ['tabular-nums'] }}>{mm}:{String(ss).padStart(2, '0')}</Text>
-          <Text style={{ fontSize: 18, color: colors.mind, fontWeight: '600' }}>{running ? breath(Math.floor(elapsedMs / 1000)) : 'Paused'}</Text>
+          <Text style={{ fontSize: 18, color: colors.soul, fontWeight: '600' }}>{running ? breath(Math.floor(elapsedMs / 1000)) : 'Paused'}</Text>
           <View style={{ flexDirection: 'row', gap: 8 }}>
             {running ? <Button kind="plain" title="Pause" onPress={pause} /> : <Button title="Continue" onPress={start} />}
             <Button kind="plain" title="End and save" onPress={() => finish(elapsedMs)} />
@@ -72,7 +72,7 @@ export function MeditationTimer() {
           <Note>Keep this screen open while you sit.</Note>
         </View>
       )}
-      <Meter label="Today" value={done} max={target} color={colors.mind} right={`${done} / ${target} min`} />
+      <Meter label="Today" value={done} max={target} color={colors.soul} right={`${done} / ${target} min`} />
     </Card>
   );
 }

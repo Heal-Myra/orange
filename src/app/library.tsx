@@ -8,17 +8,18 @@ import { searchExercises } from '../lib/exercises';
 import { chapters, versesOf } from '../lib/gita';
 import { TAO_CORE, WEEK_REVIEW } from '../lib/tao';
 import { IFCT_COLUMNS, foodByCode, formatAmount, nutrient, per100g, searchFoods } from '../lib/ifct';
+import { PRACTICES } from '../lib/scoring';
 import { colors } from '../theme';
 
-type Section = 'food' | 'gita' | 'tao' | 'exercise';
+type Section = 'food' | 'gita' | 'tao' | 'practices' | 'exercise';
 
 export default function Library() {
   const [section, setSection] = useState<Section>('food');
   return (
     <Screen showDay={false} feedback="Library">
       <Segmented<Section> value={section} onChange={setSection}
-        options={[{ label: 'Food', value: 'food' }, { label: 'Gita', value: 'gita' }, { label: 'Tao', value: 'tao' }, { label: 'Exercises', value: 'exercise' }]} />
-      {section === 'food' ? <FoodLibrary /> : section === 'gita' ? <GitaLibrary /> : section === 'tao' ? <TaoLibrary /> : <ExerciseLibrary />}
+        options={[{ label: 'Food', value: 'food' }, { label: 'Gita', value: 'gita' }, { label: 'Tao', value: 'tao' }, { label: 'Practices', value: 'practices' }, { label: 'Exercises', value: 'exercise' }]} />
+      {section === 'food' ? <FoodLibrary /> : section === 'gita' ? <GitaLibrary /> : section === 'tao' ? <TaoLibrary /> : section === 'practices' ? <PracticesLibrary /> : <ExerciseLibrary />}
     </Screen>
   );
 }
@@ -137,6 +138,23 @@ function ExerciseLibrary() {
             </View>
           )}
         </Pressable>
+      ))}
+    </Card>
+  );
+}
+
+/** The eight practices of inner life. Taken off the Soul tab on 20 Oct 2026 and kept here for the future, when
+ *  Happy Orange can understand a person's day on these eight areas without a checklist (founder). */
+function PracticesLibrary() {
+  return (
+    <Card>
+      <Heading>The eight practices</Heading>
+      <Note>Eight areas of inner life, led by truthfulness and fairness. Later, Happy Orange will understand them from your day, with no checklist.</Note>
+      {PRACTICES.map(p => (
+        <View key={p.id} style={{ gap: 2, borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 8 }}>
+          <Text style={{ fontWeight: '700', color: colors.ink }}>{p.name}{p.orangeBook ? <Text style={{ color: colors.insight, fontSize: 12 }}>  Orange Book</Text> : null}</Text>
+          <Text style={{ color: colors.muted }}>{p.meaning}</Text>
+        </View>
       ))}
     </Card>
   );

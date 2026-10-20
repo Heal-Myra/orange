@@ -1,6 +1,6 @@
 // A week of practices inspired by the Tao Te Ching, written by the founder (18 Oct 2026).
 // This is Happy Orange's own practice guide, not a translation of the Tao Te Ching.
-// Each day's practice belongs to Mind or Soul by its nature; doing it adds TAO_POINTS to that pillar (see docs/scoring.md).
+// Since 20 Oct 2026 every day's practice sits on the Mind tab (founder); doing it adds TAO_POINTS to Mind (see docs/scoring.md).
 
 export const TAO_POINTS = 10;
 
@@ -32,7 +32,7 @@ export const TAO_WEEK: TaoDay[] = [
     notePrompt: 'When did you remember to empty out? What did you notice?',
   },
   {
-    weekday: 3, day: 'Wednesday', title: 'The antidote', pillar: 'soul',
+    weekday: 3, day: 'Wednesday', title: 'The antidote', pillar: 'mind',
     practice: [
       'Practise the antidote to your obsession (from Monday) in its simplest form.',
       'If it is money: give something without anyone finding out, such as time, attention or a small bit of help.',
@@ -59,7 +59,7 @@ export const TAO_WEEK: TaoDay[] = [
     notePrompt: 'What arose in the emptiness?',
   },
   {
-    weekday: 6, day: 'Saturday', title: 'Let go of a dry leaf', pillar: 'soul',
+    weekday: 6, day: 'Saturday', title: 'Let go of a dry leaf', pillar: 'mind',
     practice: [
       'Choose something specific you have been carrying for far too long: a grudge, a guilt, or an expectation that no longer makes sense.',
       'Write it on a piece of paper, read it aloud, then tear it up and throw it away. The physical gesture helps the mind understand that something has ended.',

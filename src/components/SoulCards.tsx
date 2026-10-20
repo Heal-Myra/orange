@@ -1,5 +1,5 @@
 // Soul tab cards: Gita verse to study, thought of the day, gratitude, and one simple check for the eight practices.
-// Points (docs/scoring.md): practices 40, meditation 20, verse 15, gratitude 5 each up to 15, thought 10.
+// Points (docs/scoring.md): meditation 30, verse 25, gratitude 10 each up to 30, thought 15.
 
 import { Pressable, Text, View } from 'react-native';
 import { verseOfDay } from '../lib/gita';
@@ -24,7 +24,7 @@ export function VerseStudyCard() {
       <TextField key={date + 'verse'} label="What it means to me today" value={so.verseNote ?? ''} multiline
         onChangeText={t => update(d => { d.soul = { ...d.soul, verseNote: t }; })} placeholder="One line is enough" />
       <Check checked={!!so.verseStudied} onToggle={() => update(d => { d.soul = { ...d.soul, verseStudied: !d.soul?.verseStudied }; })}
-        title="I studied today's verse" points={15} />
+        title="I studied today's verse" points={25} />
     </Card>
   );
 }
@@ -38,7 +38,7 @@ export function ThoughtCard() {
       <Text style={{ fontSize: 17, lineHeight: 26, color: colors.ink, fontWeight: '600' }}>{thoughtOfDay(date)}</Text>
       <TextField key={date + 'thought'} label="My thought to carry today" value={thought} multiline
         onChangeText={t => update(d => { d.soul = { ...d.soul, thought: t }; })} placeholder="In your own words, or something it brings to mind" />
-      <Note>{thought.trim().length >= 3 ? '+10 for your thought today.' : 'Writing a thought adds 10 to Soul.'}</Note>
+      <Note>{thought.trim().length >= 3 ? '+15 for your thought today.' : 'Writing a thought adds 15 to Soul.'}</Note>
     </Card>
   );
 }
@@ -60,7 +60,7 @@ export function GratitudeCard() {
         <TextField key={date + 'g' + i} label={`${i + 1}.`} value={list[i] ?? ''} onChangeText={t => set(i, t)}
           placeholder={['Someone who helped me', 'Something my body did for me', 'A small joy today'][i]} />
       ))}
-      <Note>{filled ? `+${Math.min(3, filled) * 5} so far (5 each).` : '5 points each, up to 15.'}</Note>
+      <Note>{filled ? `+${Math.min(3, filled) * 10} so far (10 each).` : '10 points each, up to 30.'}</Note>
     </Card>
   );
 }

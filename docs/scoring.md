@@ -22,18 +22,18 @@ Attention, learning and what the mind is fed. Meditation moved to Soul on 20 Oct
 
 A day with no social media earns the full 70 content points.
 
-**Tao practice:** each weekday has a Tao Te Ching practice (`src/lib/tao.ts`). Mind days (Mon observation, Tue breathing, Thu listening, Fri emptiness, Sun "Who knows?") add 10 points to Mind when done; Mind is capped at 100.
+**Tao practice:** each weekday has a Tao Te Ching practice (`src/lib/tao.ts`), all on the Mind tab since 20 Oct 2026. Doing it adds 10 points to Mind; Mind is capped at 100.
 
 ## Soul / inner life (100)
+Rebalanced 20 Oct 2026: the founder took the eight-practices check and the Tao card off Soul. The eight practices are kept in the Library for the future, when the app can understand them from a person's day without a checklist.
 | Part | Points | How |
 | --- | --- | --- |
-| Eight practices | 40 | One check: "Was there any moment today when you went against one of these?" Each kept practice earns 0.4 of its weight: Satya 8, Nyaya 6 (Orange Book), Kartavya 6, Seva 6, Ahimsa 4, Daana 4, Santosha 4, Kritajnata 2 |
-| Breathing & meditation | 20 | minutes sat in the app's timer ÷ daily target (moved from Mind, 20 Oct 2026) |
-| Gita verse studied | 15 | Read the verse of the day, open its meaning, tick "studied" |
-| Gratitude | 15 | 5 for each thing written, up to three |
-| Thought of the day | 10 | Write your own thought to carry |
+| Breathing & meditation | 30 | minutes sat in the app's timer ÷ daily target |
+| Gita verse studied | 25 | Read the verse of the day, open its meaning, tick "studied" |
+| Gratitude | 30 | 10 for each thing written, up to three |
+| Thought of the day | 15 | Write your own thought to carry |
 
-Reflected actions (older entries) add or subtract up to 10 points. On Soul days of the Tao week (Wed antidote, Sat letting go) the practice adds 10 points. Soul stays between 0 and 100.
+Reflected actions (older entries) add or subtract up to 10 points. Soul stays between 0 and 100.
 
 ## Bands
 240+ Flourishing · 180+ Balanced · 120+ Finding your footing · below 120 Needs care.

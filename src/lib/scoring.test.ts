@@ -83,27 +83,27 @@ describe('mind', () => {
 });
 
 describe('soul', () => {
-  it('gives 0.4 of each kept practice\'s weight (eight practices worth 40)', () => {
+  it('no longer scores the eight practices (taken off Soul, 20 Oct 2026)', () => {
     const d = day();
     d.dharma = { satya: true, nyaya: true };
-    expect(soulScore(d)!.total).toBe(14);
+    expect(soulScore(d)).toBeNull();
   });
 
-  it('adds up to 20 for breathing and meditation against the daily target', () => {
+  it('adds up to 30 for breathing and meditation against the daily target', () => {
     const d = day();
     d.mind = { meditationMin: P.meditation / 2 };
-    expect(soulScore(d, P)!.meditation).toBe(10);
+    expect(soulScore(d, P)!.meditation).toBe(15);
     expect(mindScore(d, P)).toBeNull();
   });
 
-  it('adds 15 for the verse, 5 per gratitude (max 15) and 10 for a thought', () => {
+  it('adds 25 for the verse, 10 per gratitude (max 30) and 15 for a thought', () => {
     const d = day();
     d.soul = { verseStudied: true, gratitude: ['family', 'health', 'rain', 'tea'], thought: 'Be gentle today' };
     const s = soulScore(d)!;
-    expect(s.verse).toBe(15);
-    expect(s.gratitude).toBe(15);
-    expect(s.thought).toBe(10);
-    expect(s.total).toBe(40);
+    expect(s.verse).toBe(25);
+    expect(s.gratitude).toBe(30);
+    expect(s.thought).toBe(15);
+    expect(s.total).toBe(70);
   });
 
   it('reaches 100 with all practices kept, meditation done and all three cards done', () => {
@@ -114,11 +114,6 @@ describe('soul', () => {
     expect(soulScore(d, P)!.total).toBe(100);
   });
 
-  it('counts answering the check even when every practice slipped', () => {
-    const d = day();
-    d.soul = { checked: true };
-    expect(soulScore(d)!.total).toBe(0);
-  });
 
   it('caps the reflection bonus at plus 10 and the total at 100', () => {
     const d = day();
@@ -156,11 +151,11 @@ describe('Tao practice', () => {
     expect(soulScore(d)).toBeNull();
   });
 
-  it('adds 10 to Soul on a Soul day, nothing to Mind', () => {
+  it('adds 10 to Mind every day, Wednesday included (Tao lives on Mind since 20 Oct 2026)', () => {
     const d = emptyDay('2026-10-21');
     d.tao = { done: true };
-    expect(soulScore(d)!.total).toBe(10);
-    expect(mindScore(d, P)).toBeNull();
+    expect(mindScore(d, P)!.total).toBe(10);
+    expect(soulScore(d)).toBeNull();
   });
 
   it('never takes Mind or Soul above 100', () => {

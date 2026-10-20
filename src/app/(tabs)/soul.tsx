@@ -1,9 +1,8 @@
-// Soul / inner life: study the Gita verse of the day, the thought of the day, gratitude,
-// the Tao practice on Soul days, and one simple check for the eight practices (led by truthfulness and fairness).
+// Soul / inner life: study the Gita verse of the day, breathing and meditation, the thought of the day and gratitude.
+// The eight-practices check and the Tao card were taken off Soul by the founder (20 Oct 2026); Tao now lives on Mind.
 
-import { GratitudeCard, PracticesCheck, ThoughtCard, VerseStudyCard } from '../../components/SoulCards';
+import { GratitudeCard, ThoughtCard, VerseStudyCard } from '../../components/SoulCards';
 import { MeditationTimer } from '../../components/MeditationTimer';
-import { TaoCard } from '../../components/TaoCard';
 import { Card, Heading, Screen, Score } from '../../components/ui';
 import { soulScore } from '../../lib/scoring';
 import { useHeal } from '../../lib/store';
@@ -20,8 +19,6 @@ export default function Soul() {
       <MeditationTimer />
       <ThoughtCard />
       <GratitudeCard />
-      <TaoCard on="soul" />
-      <PracticesCheck />
     </Screen>
   );
 }
