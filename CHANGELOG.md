@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.0 — 21 October 2026 (About you, more Apple Health)
+- "About you" after sign-up (skippable) and in Profile: weight, height, sex, age, goal (lose/keep/gain, kg, by when). Sets food, protein, steps and active-minute targets with safe limits; Myra steers toward the goal. See docs/decisions/0013-about-you-and-more-health-data.md. Needs migration 0007 (`profiles.about`).
+- Apple Health: weight, body fat, resting heart rate, HRV, VO2 max, active energy, mindful minutes, workouts and sleep stages. Shown on Body ("Your body", sleep stages, workouts); a new scale weight updates the targets; mindful minutes count as meditation. People already connected see Apple's sheet once more for the new items.
+- Myra's refresh fingerprint ignores small changes, so she no longer refreshes every 20 minutes.
+- Number fields can update live (`NumberField live`), used on About you.
+
 ## 0.8.1 — 20 October 2026 (app icon, quick updates)
 - AI daily cap: admins (app_admins, `is_admin()`) get 200 a day (`AI_ADMIN_DAILY_LIMIT`), others stay at 20; a failed answer no longer uses up a request (row deleted; migration 0006 run by the founder, 20 Oct 23:46: Success).
 - Root cause of the typed-meal failure: Claude Sonnet 5.5 thinks by default and thinking counts toward `max_tokens`; the old 2000-token limit cut the meal JSON off. Now `max_tokens` 16000, `output_config.effort: low` on the smart tier, and a cut-off reply (`stop_reason: max_tokens`) is treated as unreadable and retried.

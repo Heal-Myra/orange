@@ -1,4 +1,5 @@
 // Shared data shapes for Project Heal.
+import type { AboutMe } from './targets';
 // One DayLog holds everything a person logs for one calendar day.
 
 export type MealSource = 'manual' | 'ifct' | 'photo' | 'photo+ifct' | 'words' | 'words+ifct';
@@ -57,7 +58,14 @@ export interface DayLog {
   mind: { meditationMin?: number; attention?: boolean; learning?: boolean };
   dharma: Partial<Record<PracticeId, boolean>>;
   actions: ReflectedAction[];
-  tao?: { done?: boolean; note?: string }; // the day's Tao Te Ching practice (src/lib/tao.ts)
+  tao?: { done?: boolean; note?: string };
+  // Read from Apple Health (20 Oct 2026). Body measures are the latest reading; the rest are for this day.
+  health?: {
+    weightKg?: number; bodyFatPct?: number; restingHr?: number; hrv?: number; vo2max?: number;
+    activeKcal?: number; mindfulMin?: number;
+    workouts?: { type: string; min: number; kcal?: number }[];
+    sleepStages?: { deep?: number; core?: number; rem?: number; awake?: number }; // hours
+  }; // the day's Tao Te Ching practice (src/lib/tao.ts)
   soul?: {
     checked?: boolean;      // answered the eight-practices check today
     verseStudied?: boolean; // studied the Gita verse of the day
@@ -76,6 +84,7 @@ export interface Profile {
   active: number;
   meditation: number;
   mediaLimit: number;
+  me?: AboutMe; // About you: weight, height, sex, age, goal (src/lib/targets.ts)
 }
 
 export const DEFAULT_PROFILE: Profile = {

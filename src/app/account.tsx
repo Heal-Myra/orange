@@ -33,7 +33,7 @@ const SYNC_TEXT = {
 
 export default function Account() {
   const { session, online, signOut, deleteMyData, leaveGuest, admin, tradition } = useAuth();
-  const { sync, syncError, clearDevice } = useHeal();
+  const { sync, syncError, clearDevice, profile } = useHeal();
   const [confirm, setConfirm] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
@@ -68,6 +68,19 @@ export default function Account() {
           <View style={{ flex: 1 }}>
             <Text style={{ fontSize: 17, fontWeight: '600', color: colors.ink }}>{tr('Language')}</Text>
             <Note>{lang() === 'hi' ? 'हिंदी' : 'English'} · {tr('tap to change')}</Note>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color={colors.muted} />
+        </Card>
+      </Pressable>
+
+      <Pressable onPress={() => router.push('/about-you')}>
+        <Card style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+          <Ionicons name="body-outline" size={24} color={colors.accent} />
+          <View style={{ flex: 1 }}>
+            <Text style={{ fontSize: 17, fontWeight: '600', color: colors.ink }}>{tr('About you')}</Text>
+            <Note>{profile.me
+              ? `${profile.me.weightKg} kg · ${profile.me.goal === 'lose' ? tr('Lose {kg} kg', { kg: profile.me.goalKg ?? 0 }) : profile.me.goal === 'gain' ? tr('Gain {kg} kg', { kg: profile.me.goalKg ?? 0 }) : tr('Keep weight')} · ${profile.kcal} kcal`
+              : tr('Not set yet')} · {tr('tap to change')}</Note>
           </View>
           <Ionicons name="chevron-forward" size={20} color={colors.muted} />
         </Card>

@@ -11,6 +11,7 @@ import { supabase } from './supabase';
 import { DEFAULT_PROFILE, emptyDay, type DayLog, type Profile } from './types';
 
 const STORAGE_KEY = 'heal.v1';
+const ABOUT_KEY = 'heal.about.asked';
 
 export type SyncStatus = 'device' | 'syncing' | 'saved' | 'error';
 
@@ -29,6 +30,8 @@ interface HealState {
   update: (change: (d: DayLog) => void) => void;
   updateOn: (iso: string, change: (d: DayLog) => void) => void; // change a given day (e.g. today from Apple Health)
   setProfile: (p: Profile) => void;
+  meAsked: boolean | null;
+  markMeAsked: () => void;
   clearDevice: () => Promise<void>;
 }
 
@@ -62,6 +65,10 @@ export function HealProvider({ children }: { children: ReactNode }) {
   const [days, setDays] = useState<Record<string, DayLog>>({});
   const [profile, setProfileState] = useState<Profile>(DEFAULT_PROFILE);
   const [sync, setSync] = useState<SyncStatus>('device');
+  // Has the person seen "About you" (saved or skipped)? null until known.
+  const [meAsked, setMeAsked] = useState<boolean | null>(null);
+  useEffect(() => { AsyncStorage.getItem(ABOUT_KEY).then(v => setMeAsked(v === '1')).catch(() => setMeAsked(false)); }, []);
+  const markMeAsked = useCallback(() => { setMeAsked(true); AsyncStorage.setItem(ABOUT_KEY, '1').catch(() => {}); }, []);
   const [syncError, setSyncError] = useState<string | null>(null);
   const fail = useCallback((where: string, e: unknown) => {
     const msg = e && typeof e === 'object' && 'message' in e ? String((e as { message: unknown }).message) : String(e);
@@ -109,7 +116,9 @@ export function HealProvider({ children }: { children: ReactNode }) {
       let mergedProfile = profile;
       if (prof.data?.kcal) {
         const d = prof.data;
-        mergedProfile = { kcal: d.kcal, protein: d.protein, steps: d.steps, active: d.active, meditation: d.meditation, mediaLimit: d.media_limit };
+        mergedProfile = { kcal: d.kcal, protein: d.protein, steps: d.steps, active: d.active, meditation: d.meditation, mediaLimit: d.media_limit,
+          ...(d.about ? { me: d.about as Profile['me'] } : profile.me ? { me: profile.me } : {}) };
+        if (d.about) { setMeAsked(true); AsyncStorage.setItem(ABOUT_KEY, '1').catch(() => {}); }
         setProfileState(mergedProfile);
       }
 
@@ -162,20 +171,22 @@ export function HealProvider({ children }: { children: ReactNode }) {
     if (userId && supabase) {
       setSync('syncing');
       supabase.from('profiles').upsert(profileRow(userId, p)).then(({ error }) => { if (error) fail('save targets', error); else setSync('saved'); });
+      if (p.me) supabase.from('profiles').update({ about: p.me }).eq('user_id', userId).then(() => {});
     }
   }, [days, persistLocal, userId, fail]);
 
   const clearDevice = useCallback(async () => {
     setDays({});
     setProfileState(DEFAULT_PROFILE);
-    await AsyncStorage.removeItem(STORAGE_KEY).catch(() => {});
+    setMeAsked(false);
+    await AsyncStorage.multiRemove([STORAGE_KEY, ABOUT_KEY]).catch(() => {});
   }, []);
 
   const value = useMemo<HealState>(() => ({
-    ready, date, days, profile, sync, syncError, update, updateOn, setProfile, setDate, clearDevice,
+    ready, date, days, profile, sync, syncError, update, updateOn, setProfile, setDate, clearDevice, meAsked, markMeAsked,
     day: days[date] ?? emptyDay(date),
     goDay: (delta: number) => setDate(d => { const n = shiftISO(d, delta); return n > todayISO() ? d : n; }),
-  }), [ready, date, days, profile, sync, syncError, update, updateOn, setProfile, clearDevice]);
+  }), [ready, date, days, profile, sync, syncError, update, updateOn, setProfile, clearDevice, meAsked, markMeAsked]);
 
   return <HealContext.Provider value={value}>{children}</HealContext.Provider>;
 }

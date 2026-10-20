@@ -2,7 +2,7 @@
 // Milestone 3 replaces typing steps and sleep with automatic HealthKit / Health Connect sync.
 
 import { Pressable, Text, View } from 'react-native';
-import { HealthLine } from '../../components/HealthSync';
+import { BodyMeasures, HealthLine } from '../../components/HealthSync';
 import { MealPhoto } from '../../components/MealPhoto';
 import { Card, Heading, Meter, Note, NumberField, Screen, Score, Segmented, s } from '../../components/ui';
 import { bodyScore, mealTotals } from '../../lib/scoring';
@@ -34,6 +34,7 @@ export default function Body() {
       </MealPhoto>
 
       <HealthLine />
+      <BodyMeasures />
 
       <Card>
         <Heading right={<Score value={score?.sleep} max={30} />}>{tr('Sleep')}</Heading>
@@ -42,6 +43,14 @@ export default function Body() {
         <Text style={s.fieldLabel}>{tr('How well did you sleep? (1 poor – 5 great)')}</Text>
         <Segmented options={[1, 2, 3, 4, 5].map(n => ({ label: String(n), value: n as 1 | 2 | 3 | 4 | 5 }))}
           value={day.sleep.quality} onChange={q => update(d => { d.sleep.quality = q; })} />
+        {day.health?.sleepStages ? (
+          <Note>{[
+            day.health.sleepStages.deep != null ? tr('Deep {h} h', { h: day.health.sleepStages.deep }) : null,
+            day.health.sleepStages.core != null ? tr('Core {h} h', { h: day.health.sleepStages.core }) : null,
+            day.health.sleepStages.rem != null ? tr('REM {h} h', { h: day.health.sleepStages.rem }) : null,
+            day.health.sleepStages.awake != null ? tr('Awake {h} h', { h: day.health.sleepStages.awake }) : null,
+          ].filter(Boolean).join(' · ')}</Note>
+        ) : null}
       </Card>
 
       <Card>
@@ -54,6 +63,10 @@ export default function Body() {
         </View>
         <Meter label={tr('Steps')} value={day.activity.steps ?? 0} max={profile.steps} color={colors.body} />
         <Meter label={tr('Active minutes')} value={day.activity.activeMin ?? 0} max={profile.active} color={colors.body} />
+        {day.health?.workouts?.length ? day.health.workouts.map((w, i) => (
+          <Text key={i} style={{ color: colors.ink }}>{tr(w.type)} · {w.min} min{w.kcal ? ` · ${w.kcal} kcal` : ''}</Text>
+        )) : null}
+        {day.health?.activeKcal != null ? <Note>{tr('Active energy {n} kcal', { n: day.health.activeKcal })}</Note> : null}
       </Card>
 
 

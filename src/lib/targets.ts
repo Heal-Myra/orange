@@ -1,0 +1,101 @@
+// Personal daily targets from "About you" (founder, 20 Oct 2026): weight, height, sex, age and a weight goal.
+// Myra uses them to tailor food and movement. Kept deliberately gentle and evidence-aware:
+// - Energy need: Mifflin-St Jeor resting energy × 1.4 (lightly active), the most widely used estimate.
+// - Weight loss: about 7,700 kcal per kg of body fat; pace capped at 0.75 kg a week (about 0.5–1% of body weight),
+//   and food never planned below 1,200 kcal (women) / 1,500 kcal (men), or below resting energy.
+// - Weight gain: at most 0.5 kg a week.
+// - Protein: 1.2 g per kg (1.4 when losing, to protect muscle), using a healthy reference weight when BMI is over 30.
+// Not medical advice: the screen says so, and people under 18 get habits only, no weight goal.
+
+export type Sex = 'male' | 'female' | 'other';
+export type Goal = 'lose' | 'keep' | 'gain';
+
+export interface AboutMe {
+  weightKg: number;
+  heightCm: number;
+  sex: Sex;
+  age: number;
+  goal: Goal;
+  goalKg?: number;    // how many kg to lose or gain
+  goalWeeks?: number; // in how many weeks
+  setAt: string;      // ISO date the goal was set
+}
+
+export interface Plan {
+  kcal: number;
+  protein: number;
+  steps: number;
+  active: number;
+  bmi: number;
+  weeklyKg: number;    // planned change per week (negative = loss)
+  weeks: number;       // weeks the plan will take at the planned pace
+  slowedDown: boolean; // the person's pace was faster than safe, so Myra planned a gentler one
+  adult: boolean;
+}
+
+export const MAX_LOSS_PER_WEEK = 0.75;
+export const MAX_GAIN_PER_WEEK = 0.5;
+const KCAL_PER_KG = 7700;
+const round = (n: number, to: number) => Math.round(n / to) * to;
+
+export const bmiOf = (weightKg: number, heightCm: number) => weightKg / Math.pow(heightCm / 100, 2);
+
+/** Resting energy (Mifflin-St Jeor). "other" uses the midpoint of the male and female formulas. */
+export function restingKcal(m: Pick<AboutMe, 'weightKg' | 'heightCm' | 'age' | 'sex'>) {
+  const base = 10 * m.weightKg + 6.25 * m.heightCm - 5 * m.age;
+  return base + (m.sex === 'male' ? 5 : m.sex === 'female' ? -161 : -78);
+}
+
+export function planFor(m: AboutMe): Plan {
+  const adult = m.age >= 18;
+  const bmi = bmiOf(m.weightKg, m.heightCm);
+  const rest = restingKcal(m);
+  const need = rest * 1.4;
+  const floor = Math.max(rest, m.sex === 'male' ? 1500 : 1200);
+
+  const goal: Goal = adult ? m.goal : 'keep';
+  const kg = Math.max(0, m.goalKg ?? 0);
+  const asked = Math.max(1, m.goalWeeks ?? 12);
+  let weeklyKg = 0, weeks = 0, slowedDown = false;
+  if (goal !== 'keep' && kg > 0) {
+    const cap = goal === 'lose' ? MAX_LOSS_PER_WEEK : MAX_GAIN_PER_WEEK;
+    const wanted = kg / asked;
+    const pace = Math.min(wanted, cap);
+    slowedDown = wanted > cap + 1e-9;
+    weeklyKg = goal === 'lose' ? -pace : pace;
+    weeks = Math.ceil(kg / pace);
+  }
+  let kcal = need + (weeklyKg * KCAL_PER_KG) / 7;
+  if (goal === 'lose' && kcal < floor) {
+    // The floor wins over speed: recompute the real pace at the floor.
+    kcal = floor;
+    const pace = ((need - floor) * 7) / KCAL_PER_KG;
+    if (pace > 0) { slowedDown = slowedDown || pace < -weeklyKg; weeklyKg = -pace; weeks = Math.ceil(kg / pace); }
+    else { weeklyKg = 0; weeks = 0; slowedDown = true; }
+  }
+
+  const refWeight = bmi > 30 ? 27 * Math.pow(m.heightCm / 100, 2) : m.weightKg;
+  const protein = refWeight * (goal === 'lose' ? 1.4 : 1.2);
+
+  return {
+    kcal: round(kcal, 50),
+    protein: round(protein, 5),
+    steps: goal === 'lose' ? 10000 : 8000,
+    active: goal === 'lose' ? 40 : 30,
+    bmi: Math.round(bmi * 10) / 10,
+    weeklyKg: Math.round(weeklyKg * 100) / 100,
+    weeks,
+    slowedDown,
+    adult,
+  };
+}
+
+/** One line for Myra's context. */
+export function aboutLine(m: AboutMe | undefined): string {
+  if (!m) return 'About: not given.';
+  const p = planFor(m);
+  const goal = !p.adult ? 'no weight goal (under 18: healthy habits only)'
+    : m.goal === 'keep' || !m.goalKg ? 'keep current weight'
+    : `${m.goal} ${m.goalKg} kg (asked: in ${m.goalWeeks ?? '?'} weeks; planned pace ${Math.abs(p.weeklyKg)} kg/week, about ${p.weeks} weeks${p.slowedDown ? ', slowed down for safety' : ''})`;
+  return `About: ${m.age} y, ${m.sex}, ${m.heightCm} cm, ${m.weightKg} kg (BMI ${p.bmi}). Goal: ${goal}. Daily targets: ${p.kcal} kcal, protein ${p.protein} g, ${p.steps} steps, ${p.active} active min.`;
+}

@@ -245,6 +245,7 @@ If this is not a Screen Time screenshot: {"sessions":[],"period":"unclear","note
 ${String(p.context ?? '').slice(0, 6000)}
 Tell the person what to do next, for the rest of today from the time shown (if it is night, for tonight and tomorrow morning).
 Base it on the time of day, what they have already done or missed today, their pattern over the last 7 days, and any data from fitness apps. Never recommend something already done.
+If the "About" line gives a weight goal, steer the body suggestion toward it gently (portion, protein, vegetables, a walk), staying within the daily targets; never crash dieting or skipping meals. If HRV is lower than usual, sleep was short or resting heart rate is up, favour rest, an easy walk and breathing over hard exercise.
 Reply with JSON only:
 {"headline":"the single most useful shift today",
  "body":["one food, movement or sleep suggestion"],

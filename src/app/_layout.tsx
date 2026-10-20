@@ -3,7 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import { AmiriQuran_400Regular, useFonts } from '@expo-google-fonts/amiri-quran';
 import { useEffect } from 'react';
 import { AuthProvider, useAuth } from '../lib/auth';
-import { HealProvider } from '../lib/store';
+import { HealProvider, useHeal } from '../lib/store';
 import { TasksProvider } from '../lib/tasks';
 import { HealthProvider } from '../components/HealthSync';
 import { LangProvider, tr, useLang } from '../lib/i18n';
@@ -13,6 +13,7 @@ import { colors } from '../theme';
 function Gate() {
   const { ready, online, session, guest, consented, tradition, traditionReady } = useAuth();
   const langState = useLang();
+  const { meAsked, sync } = useHeal();
   const segments = useSegments();
   const router = useRouter();
 
@@ -28,8 +29,10 @@ function Gate() {
     if (needsSignIn && here !== 'sign-in') router.replace('/sign-in');
     else if (!needsSignIn && needsConsent && here !== 'consent') router.replace('/consent');
     else if (needsTradition && here !== 'tradition') router.replace('/tradition');
+    // Then "About you" once (skippable), after the account has loaded so a new phone doesn't ask again.
+    else if (!needsSignIn && !needsConsent && !needsTradition && session && meAsked === false && sync !== 'syncing' && here !== 'about-you' && here !== 'tradition') router.replace('/about-you');
     else if (!needsSignIn && !needsConsent && !needsTradition && (here === 'sign-in' || here === 'consent')) router.replace('/');
-  }, [ready, online, session, guest, consented, tradition, traditionReady, segments, router, langState.ready, langState.chosen]);
+  }, [ready, online, session, guest, consented, tradition, traditionReady, segments, router, langState.ready, langState.chosen, meAsked, sync]);
 
   return (
     <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }}>
@@ -38,6 +41,7 @@ function Gate() {
       <Stack.Screen name="sign-in" />
       <Stack.Screen name="consent" />
       <Stack.Screen name="tradition" options={{ headerShown: true, title: tr('Daily Wisdom'), headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
+      <Stack.Screen name="about-you" options={{ headerShown: true, title: tr('About you'), headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
       <Stack.Screen name="account" options={{ headerShown: true, title: tr('Profile'), presentation: 'modal', headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
       <Stack.Screen name="admin" options={{ headerShown: true, title: tr('Admin'), presentation: 'modal', headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
       <Stack.Screen name="feedback" options={{ headerShown: true, title: tr('Send feedback'), presentation: 'modal', headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />

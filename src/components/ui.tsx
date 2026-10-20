@@ -77,8 +77,9 @@ export function Meter({ label, value, max, color, right }: { label: string; valu
   );
 }
 
-export function NumberField({ label, value, onChange, placeholder, decimal }: {
+export function NumberField({ label, value, onChange, placeholder, decimal, live }: {
   label: string; value: number | undefined; onChange: (v: number | undefined) => void; placeholder?: string; decimal?: boolean;
+  live?: boolean; // report every keystroke (forms that show a result as you type), not only when typing ends
 }) {
   return (
     <View style={s.field}>
@@ -89,6 +90,7 @@ export function NumberField({ label, value, onChange, placeholder, decimal }: {
         defaultValue={value == null ? '' : String(value)}
         placeholder={placeholder}
         placeholderTextColor={colors.muted}
+        onChangeText={live ? t => { const n = parseFloat(t.replace(',', '.')); onChange(Number.isFinite(n) ? n : undefined); } : undefined}
         onEndEditing={e => {
           const n = parseFloat(e.nativeEvent.text);
           onChange(Number.isFinite(n) ? n : undefined);
