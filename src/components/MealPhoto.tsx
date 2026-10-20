@@ -33,7 +33,7 @@ export async function shrink(uri: string, fallback: string | null | undefined, m
  * Not offered in Safari on iPhone/iPad: Safari's speech recognition often hangs, especially in home-screen apps,
  * and the keyboard's own microphone (dictation) works better there.
  */
-function speechRecognition(): (new () => any) | null {
+export function speechRecognition(): (new () => any) | null {
   if (Platform.OS === 'ios') return NativeSpeech; // the iPhone app: Apple's own speech recognition
   if (Platform.OS !== 'web' || typeof window === 'undefined' || typeof navigator === 'undefined') return null;
   const ios = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);

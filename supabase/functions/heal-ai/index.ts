@@ -84,7 +84,10 @@ async function askAI(tier: 'smart' | 'quick', system: string, text: string, imag
     return (data?.candidates?.[0]?.content?.parts ?? []).map((p: { text?: string }) => p.text ?? '').join('\n').trim();
   }
   const content: Record<string, unknown>[] = [];
-  if (image) content.push({ type: 'image', source: { type: 'base64', media_type: image.media_type, data: image.data } });
+  // A photo, or a PDF the person attached in Myra's chat (21 Oct 2026).
+  if (image) content.push(image.media_type === 'application/pdf'
+    ? { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: image.data } }
+    : { type: 'image', source: { type: 'base64', media_type: image.media_type, data: image.data } });
   content.push({ type: 'text', text });
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
@@ -328,7 +331,12 @@ Do not judge the person. Reply with JSON only:
     case 'myra': {
       const page = String(p.page ?? 'today').slice(0, 40);
       const history = (Array.isArray(p.messages) ? p.messages : []).slice(-12)
-        .map((m: { role?: string; text?: string }) => `${m.role === 'myra' ? 'Myra' : 'Person'}: ${String(m.text ?? '').slice(0, 1200)}`).join('\n');
+        .map((m: { role?: string; text?: string; attach?: { name?: string } }) => `${m.role === 'myra' ? 'Myra' : 'Person'}: ${String(m.text ?? '').slice(0, 1200)}${m.attach?.name ? ` [attached: ${String(m.attach.name).slice(0, 80)}]` : ''}`).join('\n');
+      // An attachment on the last message: a photo or PDF goes to the AI as is; a text file as text.
+      const a = (p.attachment ?? null) as { kind?: string; name?: string; media_type?: string; data?: string; text?: string } | null;
+      const file: Image | undefined = a && (a.kind === 'image' || a.kind === 'pdf') && a.data
+        ? { media_type: a.kind === 'pdf' ? 'application/pdf' : String(a.media_type ?? 'image/jpeg'), data: String(a.data) } : undefined;
+      const fileNote = a ? `\nThe person attached ${a.kind === 'image' ? 'a photo' : a.kind === 'pdf' ? 'a PDF document' : 'a text file'}${a.name ? ` ("${String(a.name).slice(0, 80)}")` : ''}. Look at it to answer.${a.kind === 'text' && a.text ? `\nIts text:\n${String(a.text).slice(0, 20000)}` : ''}\nIf it is a medical report or prescription, explain it in plain words and suggest discussing it with their doctor; never diagnose.` : '';
       const text = await ask('smart', `${ORANGE_BOOK}
 You are Myra, the friendly assistant inside the Happy Orange app. You help the person find their way around the app, understand their scores and data, and answer questions about food, movement, sleep, mind and inner life.
 The app has four tabs:
@@ -347,7 +355,7 @@ Their data:
 ${String(p.context ?? '').slice(0, 6000)}`,
 `Conversation so far:
 ${history}
-Reply as Myra to the person's last message.`);
+Reply as Myra to the person's last message.${fileNote}`, file);
       return { text };
     }
     default:
