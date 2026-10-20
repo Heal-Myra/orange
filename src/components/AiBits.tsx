@@ -7,7 +7,7 @@ import { traditionName, type Passage, type Tradition } from '../lib/wisdom';
 import { useAuth } from '../lib/auth';
 import { buildContext, daySignature, partOfDay } from '../lib/context';
 import { tasksForAI, useTasks } from '../lib/tasks';
-import { FocusBlock } from './TasksCard';
+import { Ionicons } from '@expo/vector-icons';
 import { todayISO } from '../lib/dates';
 import type { Verse } from '../lib/gita';
 import { CONTENT_CATEGORIES } from '../lib/scoring';
@@ -24,10 +24,11 @@ const errText = (e: unknown) => (e instanceof Error ? e.message : tr('Something 
 export function GuidanceCard() {
   const { session, tradition } = useAuth();
   const { day, days, date, profile, update } = useHeal();
-  const { open, setFocus } = useTasks();
+  const { open, focus, setFocus, complete } = useTasks();
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [tick, setTick] = useState(0);
+  const [kick, setKick] = useState(0); // a to-do was ticked: ask Myra for the next thing
   const tried = useRef<string>('');
   const g = day.guidance;
   const isToday = date === todayISO();
@@ -43,6 +44,13 @@ export function GuidanceCard() {
       if (Array.isArray(r.focus) && r.focus.length && date === todayISO()) setFocus(r.focus.map(String)); // Myra's pick
     } catch (e) { setMessage(errText(e)); } finally { setBusy(false); }
   }, [day, days, date, profile, update, open, setFocus, tradition]);
+
+  useEffect(() => {
+    if (!kick) return;
+    const t = setTimeout(() => run(), 1500); // after the tick has been saved, so Myra sees the updated list
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [kick]);
 
   // Look again every 10 minutes, so a new part of the day is noticed even if nothing is tapped.
   useEffect(() => { const t = setInterval(() => setTick(x => x + 1), 10 * 60 * 1000); return () => clearInterval(t); }, []);
@@ -68,16 +76,24 @@ export function GuidanceCard() {
         <Heading>{tr('Myra recommends')}</Heading>
         {session && g && !busy && isToday ? <Pressable onPress={run} hitSlop={8}><Text style={{ color: colors.insight, fontWeight: '600' }}>{tr('Refresh')}</Text></Pressable> : null}
       </View>
-      {g ? <Text style={{ fontSize: 14, color: colors.insight, paddingHorizontal: 4 }}>{oneLine(g.headline)}</Text> : null}
 
-      {g ? blocks.map(([name, color, list]) => list[0] ? (
-        <Card key={name} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 12, borderLeftWidth: 5, borderLeftColor: color }}>
-          <Text style={{ color, fontWeight: '700', fontSize: 14, width: 44 }}>{name}</Text>
-          <Text style={{ color: colors.ink, flex: 1, fontSize: 14, lineHeight: 20 }}>{oneLine(list[0])}</Text>
-        </Card>
-      ) : null) : null}
-
-      {isToday ? <FocusBlock /> : null}
+      {/* Three very simple tasks, one each (founder, 21 Oct 2026). When the Mind task is a to-do, it can be ticked here;
+          Myra then rotates to the next thing. */}
+      {g ? blocks.map(([name, color, list], i) => {
+        const task = i === 1 && isToday ? focus.find(t => (g.focus ?? []).includes(t.id)) : undefined;
+        return list[0] ? (
+          <Card key={name} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 12, borderLeftWidth: 5, borderLeftColor: color }}>
+            <Text style={{ color, fontWeight: '700', fontSize: 14, width: 44 }}>{name}</Text>
+            <Text style={{ color: colors.ink, flex: 1, fontSize: 14, lineHeight: 20 }}>{oneLine(list[0])}</Text>
+            {task ? (
+              <Pressable accessibilityRole="checkbox" accessibilityLabel={`Done: ${task.title}`} hitSlop={10}
+                onPress={() => { complete(task.id); setKick(k => k + 1); }}>
+                <Ionicons name="ellipse-outline" size={24} color={colors.accent} />
+              </Pressable>
+            ) : null}
+          </Card>
+        ) : null;
+      }) : null}
 
       {g ? null : (
         <Card>

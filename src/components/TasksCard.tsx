@@ -1,6 +1,6 @@
 // Mind: "Clear your mind". One to-do list in three groups (Family, Work, Better me).
-// Writing a task down with a "when" quiets the mind even before it is done. Myra puts one or two in
-// today's Focus (on Today, in Myra recommends); the rest get dates automatically. Done tasks leave the list.
+// Writing a task down with a "when" quiets the mind even before it is done. Myra puts one at a time in front of the
+// person (the Mind line of Myra recommends on Today, 21 Oct 2026); the rest get dates automatically. Done tasks leave the list.
 
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
@@ -38,7 +38,7 @@ export function TasksCard() {
   return (
     <Card>
       <Heading right={<Score value={Math.min(2, day.mind.focusDone ?? 0) * 15} max={30} />}>{tr('Clear your mind')}</Heading>
-      <Note>{tr('Write it down and let Myra pick one or two a day. Each focus task you finish earns 15 points.')}</Note>
+      <Note>{tr('Write it down. Myra puts one in front of you at a time, on Today. Each one you finish earns 15 points, up to 30.')}</Note>
 
       {/* Three groups */}
       <View style={{ flexDirection: 'row', gap: 8 }}>

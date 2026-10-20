@@ -574,4 +574,5 @@ export const HI: Record<string, string> = {
   'Carbs': 'कार्ब्स',
   'Fat': 'वसा',
   'Fibre': 'फ़ाइबर',
+  'Write it down. Myra puts one in front of you at a time, on Today. Each one you finish earns 15 points, up to 30.': 'लिख लें। Myra Today पर एक बार में एक काम आपके सामने रखेगी। हर पूरा किया काम 15 अंक देता है, 30 तक।',
 };

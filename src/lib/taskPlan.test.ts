@@ -5,9 +5,9 @@ const t = (id: string, due?: string, extra: Partial<Task> = {}): Task => ({ id, 
 const today = '2026-10-20';
 
 describe('to-do planning', () => {
-  it('picks overdue and due-today first, at most two', () => {
+  it('picks the most overdue task first, one at a time', () => {
     const tasks = [t('a', '2026-10-25'), t('b', '2026-10-19'), t('c'), t('d', today)];
-    expect(defaultFocus(tasks, today)).toEqual(['b', 'd']);
+    expect(defaultFocus(tasks, today)).toEqual(['b']);
   });
   it('picks undated tasks when nothing is due', () => {
     expect(defaultFocus([t('a', '2026-10-30'), t('b')], today)).toEqual(['b']);

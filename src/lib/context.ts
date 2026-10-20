@@ -17,7 +17,7 @@ export function buildContext(day: DayLog, days: Record<string, DayLog>, date: st
   }).join('\n') || 'no earlier days logged';
   const now = new Date();
   const clock = date === todayISO()
-    ? `Now: ${now.toTimeString().slice(0, 5)} local time (${partOfDay(now)}). Only what is still possible from now on today counts.`
+    ? `Now: ${['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][now.getDay()]} ${now.toTimeString().slice(0, 5)} local time (${partOfDay(now)}). Only what is still possible from now on today counts.`
     : `This is a past or future day (${date}), not today.`;
   return [
     clock,
@@ -37,10 +37,20 @@ export function buildContext(day: DayLog, days: Record<string, DayLog>, date: st
   ].join('\n');
 }
 
-/** morning (5-12), afternoon (12-17), evening (17-21) or night. Myra recommends refreshes when this changes. */
-export function partOfDay(d = new Date()): 'morning' | 'afternoon' | 'evening' | 'night' {
-  const h = d.getHours();
-  return h >= 5 && h < 12 ? 'morning' : h >= 12 && h < 17 ? 'afternoon' : h >= 17 && h < 21 ? 'evening' : 'night';
+/** The moment of the day Myra plans for (founder, 21 Oct 2026): first thing in the morning (gratitude), office hours
+ *  on weekdays (a work task), lunch (snap the plate), evening and night. Myra recommends refreshes when this changes. */
+export type Slot = 'early morning' | 'office morning' | 'late morning' | 'lunch' | 'office afternoon' | 'afternoon' | 'evening' | 'dinner' | 'night';
+export function partOfDay(d = new Date()): Slot {
+  const m = d.getHours() * 60 + d.getMinutes();
+  const weekday = d.getDay() >= 1 && d.getDay() <= 5;
+  if (m >= 5 * 60 && m < 9 * 60 + 30) return 'early morning';
+  if (m < 5 * 60) return 'night';
+  if (m < 12 * 60 + 30) return weekday ? 'office morning' : 'late morning';
+  if (m < 14 * 60 + 30) return 'lunch';
+  if (m < 18 * 60 + 30) return weekday ? 'office afternoon' : 'afternoon';
+  if (m < 19 * 60 + 30) return 'evening';
+  if (m < 21 * 60 + 30) return 'dinner';
+  return 'night';
 }
 
 /** A short fingerprint of what the person has logged today, so Myra knows when the picture has changed. */

@@ -20,7 +20,7 @@ export interface Task {
   createdAt: string;
 }
 
-export const FOCUS_MAX = 2; // tasks Myra puts in front of the person each day
+export const FOCUS_MAX = 1; // one task in front of the person at a time; Myra rotates (founder, 21 Oct 2026)
 const PER_DAY = 2; // tasks given the same new date when rescheduling
 
 export const sortOpen = (a: Task, b: Task) => (a.due ?? '9999').localeCompare(b.due ?? '9999') || a.createdAt.localeCompare(b.createdAt);
