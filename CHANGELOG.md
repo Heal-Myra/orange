@@ -1,6 +1,7 @@
 # Changelog
 
 ## 0.9.0 — 21 October 2026 (About you, more Apple Health)
+- Body tab redesigned (founder: "equal space for sub elements, stacked vertically neatly"): Food, Sleep, Movement, Body and Heart & fitness cards all use one row style (`src/components/StatRows.tsx`): label left, value right, equal height, hairlines; thin bars for targets; 1–5 dots for sleep quality. With Apple Health connected the rows are read-only; without it, the value box can be typed in.
 - Sign-up is one "About you" screen after the privacy step (founder): name, age, sex, height, weight, religion (sets the Daily Wisdom) and the goal in the person's own words. Myra reads the goal (AI action `goal_plan`; `parseGoal` when offline), plans safe targets and says when a goal is too steep. The separate Daily Wisdom step is no longer forced. Today greets by name.
 - Sign-in code: the app signs in as soon as 6 digits are in the box; the box already offers iPhone's code autofill (from Messages, and from Apple Mail on iOS 17+). Phone-number sign-in set aside for now: Indian SMS needs TRAI DLT registration and a paid SMS provider (founder: email is fine for now).
 - Mind: the "Other activities" card is removed (founder). Attention and Learning ticks are gone; their 30 points now come from the to-do list: 15 for each of Myra's 1–2 focus tasks ticked off (`mind.focusDone`). Hand-added social-media sessions moved into the Phone activity card. docs/scoring.md updated.
