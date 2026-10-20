@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
-import { classifyMedia, dailyGuidance, explainVerse, oneLine, reflectOnAction } from '../lib/ai';
+import { classifyMedia, dailyGuidance, explainPassage, explainVerse, oneLine, reflectOnAction } from '../lib/ai';
+import { traditionName, type Passage, type Tradition } from '../lib/wisdom';
 import { useAuth } from '../lib/auth';
 import { buildContext, daySignature, partOfDay } from '../lib/context';
 import { tasksForAI, useTasks } from '../lib/tasks';
@@ -20,7 +21,7 @@ const errText = (e: unknown) => (e instanceof Error ? e.message : 'Something wen
 /** Today: "Myra recommends". Refreshes by itself when the part of the day changes (morning, afternoon, evening, night)
  *  or when what is logged today changes (a meal, steps from a fitness app, meditation...), so the person never has to ask. */
 export function GuidanceCard() {
-  const { session } = useAuth();
+  const { session, tradition } = useAuth();
   const { day, days, date, profile, update } = useHeal();
   const { open, setFocus } = useTasks();
   const [busy, setBusy] = useState(false);
@@ -34,13 +35,13 @@ export function GuidanceCard() {
 
   const run = useCallback(async () => {
     setBusy(true); setMessage(null);
-    const context = buildContext(day, days, date, profile, tasksForAI(open, todayISO()));
+    const context = buildContext(day, days, date, profile, tasksForAI(open, todayISO()), tradition);
     try {
       const r = await dailyGuidance(context);
       update(d => { d.guidance = { ...r, at: new Date().toISOString(), part: partOfDay(), sig: daySignature(d) }; });
       if (Array.isArray(r.focus) && r.focus.length && date === todayISO()) setFocus(r.focus.map(String)); // Myra's pick
     } catch (e) { setMessage(errText(e)); } finally { setBusy(false); }
-  }, [day, days, date, profile, update, open, setFocus]);
+  }, [day, days, date, profile, update, open, setFocus, tradition]);
 
   // Look again every 10 minutes, so a new part of the day is noticed even if nothing is tapped.
   useEffect(() => { const t = setInterval(() => setTick(x => x + 1), 10 * 60 * 1000); return () => clearInterval(t); }, []);
@@ -89,6 +90,36 @@ export function GuidanceCard() {
       <View style={{ paddingHorizontal: 4 }}>
         <Note>{g ? `${busy ? 'Updating…' : `Updated ${time}`} · changes with your day · ` : ''}Not medical advice.</Note>
       </View>
+    </View>
+  );
+}
+
+/** Soul: explain the Daily Wisdom passage of any tradition, in English or Hindi. */
+export function ExplainPassage({ passage, tradition }: { passage: Passage; tradition: Tradition }) {
+  const { session } = useAuth();
+  const [text, setText] = useState<Record<string, string>>({});
+  const [busy, setBusy] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+  if (!session) return <Note>Sign in to get explanations in English or Hindi.</Note>;
+
+  const run = async (lang: 'en' | 'hi') => {
+    setBusy(lang); setMessage(null);
+    try {
+      const r = await explainPassage(passage, traditionName(tradition), lang);
+      setText(t => ({ ...t, [lang]: r.text }));
+    } catch (e) { setMessage(errText(e)); } finally { setBusy(null); }
+  };
+
+  return (
+    <View style={{ gap: 8 }}>
+      <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
+        <Button kind="insight" title={busy === 'en' ? 'Explaining…' : 'Open its meaning'} onPress={() => run('en')} disabled={!!busy} />
+        <Button kind="insight" title={busy === 'hi' ? 'समझा रहे हैं…' : 'हिंदी में समझाएँ'} onPress={() => run('hi')} disabled={!!busy} />
+      </View>
+      {(['en', 'hi'] as const).map(l => text[l] ? (
+        <Text key={l} style={{ color: colors.ink, lineHeight: 22, borderLeftWidth: 3, borderLeftColor: colors.insight, paddingLeft: 10 }}>{text[l]}</Text>
+      ) : null)}
+      {message ? <Text style={{ color: colors.bad }}>{message}</Text> : null}
     </View>
   );
 }

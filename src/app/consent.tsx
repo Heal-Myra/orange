@@ -8,7 +8,7 @@ import { CONSENT_VERSION, useAuth } from '../lib/auth';
 import { colors } from '../theme';
 
 const POINTS = [
-  ['What we keep', 'What you log in Happy Orange: activity, sleep, meals, meditation, social-media time, practices and reflections, plus your daily scores and targets.'],
+  ['What we keep', 'What you log in Happy Orange: activity, sleep, meals, meditation, social-media time, your to-do list, practices and reflections, plus your daily scores and targets. If you choose a tradition for Daily Wisdom (optional), it is kept privately in your account only to pick your daily passage.'],
   ['Why', 'Only to show your well-being scores and give you guidance. We never sell your data or use it for advertising.'],
   ['Where', 'In a secure database in Mumbai, India. Only you can see your entries.'],
   ['AI features', 'When you use a meal photo, guidance, verse explanation, reflection or chat with Myra, only what that feature needs is sent to Anthropic (the maker of Claude) to produce the answer. Anthropic does not use it to train its AI.'],

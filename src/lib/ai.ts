@@ -37,6 +37,10 @@ export const readScreenTime = (image_base64: string, media_type: string) => call
 
 export const dailyGuidance = (context: string) => call<Guidance>('guidance', { context });
 
+/** Explain a Daily Wisdom passage from any tradition (meaning in the AI's own words, never a copyrighted translation). */
+export const explainPassage = (p: { ref: string; original?: string; translit?: string; english?: string }, tradition: string, lang: 'en' | 'hi') =>
+  call<{ text: string }>('explain_wisdom', { ref: p.ref, original: p.original ?? '', translit: p.translit ?? '', english: p.english ?? '', tradition, lang });
+
 export const explainVerse = (v: { chapter: number; verse: number; sanskrit: string; transliteration: string }, lang: 'en' | 'hi') =>
   call<{ text: string }>('explain_verse', { ...v, lang });
 

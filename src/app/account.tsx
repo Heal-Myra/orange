@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Pressable, Share, Text, View } from 'react-native';
 import { Button, Card, Heading, Note, Screen } from '../components/ui';
 import { useAuth } from '../lib/auth';
+import { traditionName } from '../lib/wisdom';
 import { useHeal } from '../lib/store';
 import { colors } from '../theme';
 
@@ -30,7 +31,7 @@ const SYNC_TEXT = {
 } as const;
 
 export default function Account() {
-  const { session, online, signOut, deleteMyData, leaveGuest, admin } = useAuth();
+  const { session, online, signOut, deleteMyData, leaveGuest, admin, tradition } = useAuth();
   const { sync, syncError, clearDevice } = useHeal();
   const [confirm, setConfirm] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -59,6 +60,17 @@ export default function Account() {
           ? <Button kind="plain" title="Sign out" onPress={async () => { await signOut(); router.replace('/sign-in'); }} />
           : online ? <Button title="Sign in to save online" onPress={async () => { await leaveGuest(); router.replace('/sign-in'); }} /> : null}
       </Card>
+
+      <Pressable onPress={() => router.push('/tradition')}>
+        <Card style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+          <Ionicons name="sparkles-outline" size={24} color={colors.accent} />
+          <View style={{ flex: 1 }}>
+            <Text style={{ fontSize: 17, fontWeight: '600', color: colors.ink }}>Daily Wisdom</Text>
+            <Note>{tradition ? traditionName(tradition) : 'Not chosen yet (Bhagavad Gita)'} · tap to change</Note>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color={colors.muted} />
+        </Card>
+      </Pressable>
 
       <Pressable onPress={() => router.push('/library')}>
         <Card style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>

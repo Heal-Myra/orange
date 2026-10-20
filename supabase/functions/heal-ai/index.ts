@@ -196,7 +196,7 @@ Reply with JSON only:
 {"headline":"the single most useful shift today",
  "body":["one food, movement or sleep suggestion"],
  "mind":["one attention, learning, phone-use or Tao practice suggestion"],
- "soul":["one breathing or meditation (with minutes), Gita verse, gratitude or reflection suggestion"],
+ "soul":["one breathing or meditation (with minutes), Daily Wisdom passage, gratitude or reflection suggestion"],
  "focus":["id of a to-do task", "optional second id"]}
 For "focus": from the person's to-do list (if any), pick ONE or TWO task ids for today: overdue or due today first, then what matters most for their family, work or growth; on a tired or low-sleep day pick fewer and lighter ones. Use only ids from the list; [] if the list is empty.
 STRICT: the headline and every suggestion is ONE line of at most 10 words, written as a direct instruction that starts with a verb, with a number where it helps: e.g. "Walk 10 minutes after lunch.", "Sit for 5 minutes of breathing before 6 pm.", "Eat dal with dinner for protein." Never use "try", "consider", "maybe", "you could" or "it may help". Exactly one suggestion per list.`));
@@ -220,6 +220,17 @@ ${JSON.stringify({ headline: g.headline, body: [g.body?.[0]], mind: [g.mind?.[0]
 Sanskrit: ${String(p.sanskrit ?? '').slice(0, 800)}
 Transliteration: ${String(p.transliteration ?? '').slice(0, 800)}
 First give the verse's meaning faithfully in your own words in 2–3 sentences (do not copy any published translation). Then, on its own last line, one way to live it today in at most 10 words. Plain text, no headings.`);
+      return { text };
+    }
+    case 'explain_wisdom': {
+      const hindi = p.lang === 'hi';
+      const text = await ask('smart', ORANGE_BOOK,
+`Explain this passage from the ${String(p.tradition ?? '').slice(0, 40)} tradition in simple ${hindi ? 'Hindi (Devanagari script)' : 'English'}.
+Reference: ${String(p.ref ?? '').slice(0, 120)}
+Original text: ${String(p.original ?? '').slice(0, 1500)}
+Transliteration: ${String(p.translit ?? '').slice(0, 1500)}
+English text (public domain): ${String(p.english ?? '').slice(0, 1500)}
+First give its meaning faithfully and respectfully, as its own tradition mainstream understands it, in your own words in 2–3 sentences (never copy a published translation). Then, on its own last line, one way to live it today in at most 10 words. Plain text, no headings.`);
       return { text };
     }
     case 'classify_media': {
@@ -247,7 +258,7 @@ The app has four tabs:
 - Today: the well-being score out of 300 (Body + Mind + Soul, 100 each), the "Myra recommends" card (your daily recommendations), and Profile (top right) for the account, sign-out and deleting data. During testing every tab has a feedback box at the top that goes straight to the team.
 - Body: three cards in this order. Food: Photo, Speak or Type what you ate (e.g. "2 rotis and dal"); numbers come from IFCT 2017; without AI, Type searches IFCT 2017 and asks for grams. Sleep: hours and quality. Movement: steps and active minutes.
 - Mind: the "Clear your mind" to-do list, the day's Tao practice (every day), "Phone activity" (choose a Screen Time screenshot and the app reads social-media minutes), and one card for attention, learning and social-media sessions added by hand.
-- Soul: in this order: Gratitude (three things), Breathing & meditation (a timer that records the minutes actually sat), Daily Wisdom (the Gita verse of the day: read it, open the English or Hindi meaning, write a line, tick studied), and the thought of the day.
+- Soul: in this order: Gratitude (three things), Breathing & meditation (a timer that records the minutes actually sat), Daily Wisdom (one passage a day from the person's chosen tradition: Hindu Bhagavad Gita, Sikh Japji Sahib, Buddhist Dhammapada, Christian Bible, Muslim Qur'an, or Universal wisdom; Jain coming soon. Read it, open its meaning in English or Hindi, write a line, tick studied. The tradition is chosen after sign-up and changed in Profile), and the thought of the day.
 - To-do list ("Clear your mind", on the Mind tab): tasks in three groups, Family, Work and Better me. Each morning you (Myra) pick one or two for today; they show as "Focus" in Myra recommends on Today, and ticking one removes it. The rest get dates automatically and can be moved.
 - Library (open it from Profile, top right of Today): IFCT 2017 food lookup, all 18 Gita chapters, the Tao Te Ching week, the eight practices of inner life (kept for reference), and an exercise library.
 - The floating Myra button on every tab opens this chat.

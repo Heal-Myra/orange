@@ -5,9 +5,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { supabase } from './supabase';
+import type { Tradition } from './wisdom';
 
 export const CONSENT_VERSION = '2026-10-17';
 const GUEST_KEY = 'heal.guest';
+const TRADITION_KEY = 'heal.tradition'; // Daily Wisdom tradition; also kept in the account's private metadata
 
 interface AuthState {
   ready: boolean;
@@ -16,6 +18,9 @@ interface AuthState {
   guest: boolean; // chose to use the app on this device only
   consented: boolean;
   admin: boolean; // listed in app_admins (sees Account → Admin)
+  tradition: Tradition | null; // Daily Wisdom tradition; null = not asked yet
+  traditionReady: boolean;
+  setTradition: (t: Tradition) => Promise<void>;
   sendCode: (email: string) => Promise<string | null>;
   verifyCode: (email: string, code: string) => Promise<string | null>;
   giveConsent: () => Promise<string | null>;
@@ -43,6 +48,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [guest, setGuest] = useState(false);
   const [consented, setConsented] = useState(false);
   const [admin, setAdmin] = useState(false);
+  const [tradition, setTraditionState] = useState<Tradition | null>(null);
+  const [traditionReady, setTraditionReady] = useState(false);
 
   const loadConsent = useCallback(async (s: Session | null) => {
     if (!s || !supabase) { setConsented(false); setAdmin(false); return; }
@@ -55,6 +62,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const acc = await supabase.from('ai_access').select('status').maybeSingle();
     if (!acc.error && !acc.data) await supabase.from('ai_access').insert({ email: (s.user.email ?? '').toLowerCase() });
   }, []);
+
+  // Daily Wisdom tradition: the account's copy wins; otherwise what this device remembers.
+  useEffect(() => {
+    const fromAccount = session?.user.user_metadata?.tradition as Tradition | undefined;
+    if (fromAccount) { setTraditionState(fromAccount); setTraditionReady(true); AsyncStorage.setItem(TRADITION_KEY, fromAccount).catch(() => {}); return; }
+    AsyncStorage.getItem(TRADITION_KEY).then(v => {
+      if (v) { setTraditionState(v as Tradition); if (session && supabase) supabase.auth.updateUser({ data: { tradition: v } }).catch(() => {}); }
+    }).catch(() => {}).finally(() => setTraditionReady(true));
+  }, [session]);
 
   useEffect(() => {
     AsyncStorage.getItem(GUEST_KEY).then(v => setGuest(v === '1')).catch(() => {});
@@ -72,7 +88,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [loadConsent]);
 
   const value = useMemo<AuthState>(() => ({
-    ready, session, guest, consented, admin, online: !!supabase,
+    ready, session, guest, consented, admin, online: !!supabase, traditionReady,
+    // The account's copy is read straight from the session, so it is never missed for a moment after sign-in.
+    tradition: tradition ?? (session?.user.user_metadata?.tradition as Tradition | undefined) ?? null,
+
+    setTradition: async t => {
+      setTraditionState(t);
+      await AsyncStorage.setItem(TRADITION_KEY, t).catch(() => {});
+      if (session && supabase) await supabase.auth.updateUser({ data: { tradition: t } }).catch(() => {});
+    },
 
     sendCode: async email => {
       if (!supabase) return 'Online accounts are not set up in this version.';
@@ -126,13 +150,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await supabase.from('ai_access').delete().eq('user_id', uid);
       await supabase.from('tasks').delete().eq('user_id', uid); // to-do list (migration 0005)
       await AsyncStorage.removeItem('heal.tasks.v1').catch(() => {});
+      await supabase.auth.updateUser({ data: { tradition: null } }).catch(() => {});
+      await AsyncStorage.removeItem(TRADITION_KEY).catch(() => {});
       const b = await supabase.from('profiles').delete().eq('user_id', uid);
       if (b.error) return explain(b.error.message);
       await supabase.auth.signOut();
       setConsented(false);
       return null;
     },
-  }), [ready, session, guest, consented, admin]);
+  }), [ready, session, guest, consented, admin, tradition, traditionReady]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

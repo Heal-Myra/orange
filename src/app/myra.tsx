@@ -29,7 +29,7 @@ const SUGGESTIONS: Record<string, string[]> = {
 export default function Myra() {
   const { from } = useLocalSearchParams<{ from?: string }>();
   const page = typeof from === 'string' && SUGGESTIONS[from] ? from : 'today';
-  const { session } = useAuth();
+  const { session, tradition } = useAuth();
   const { day, days, date, profile } = useHeal();
   const { open } = useTasks();
   const [messages, setMessages] = useState<ChatMessage[]>([HELLO]);
@@ -48,7 +48,7 @@ export default function Myra() {
     const next: ChatMessage[] = [...messages, { role: 'user', text: question }];
     setMessages(next); setText(''); setBusy(true);
     try {
-      const r = await askMyra(next.filter(m => m !== HELLO), buildContext(day, days, date, profile, tasksForAI(open, todayISO())), page);
+      const r = await askMyra(next.filter(m => m !== HELLO), buildContext(day, days, date, profile, tasksForAI(open, todayISO()), tradition), page);
       const done: ChatMessage[] = [...next, { role: 'myra', text: r.text }];
       setMessages(done); save(done);
     } catch (e) {
