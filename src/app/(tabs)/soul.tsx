@@ -2,6 +2,7 @@
 // the Tao practice on Soul days, and one simple check for the eight practices (led by truthfulness and fairness).
 
 import { GratitudeCard, PracticesCheck, ThoughtCard, VerseStudyCard } from '../../components/SoulCards';
+import { MeditationTimer } from '../../components/MeditationTimer';
 import { TaoCard } from '../../components/TaoCard';
 import { Card, Heading, Screen, Score } from '../../components/ui';
 import { soulScore } from '../../lib/scoring';
@@ -16,6 +17,7 @@ export default function Soul() {
         <Heading right={<Score value={score?.total} max={100} />}>Soul today</Heading>
       </Card>
       <VerseStudyCard />
+      <MeditationTimer />
       <ThoughtCard />
       <GratitudeCard />
       <TaoCard on="soul" />

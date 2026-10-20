@@ -46,7 +46,7 @@ export function MeditationTimer() {
 
   return (
     <Card style={{ borderLeftWidth: 4, borderLeftColor: colors.mind }}>
-      <Heading right={<Score value={Math.min(20, (20 * done) / target)} max={20} />}>Meditation</Heading>
+      <Heading right={<Score value={Math.min(20, (20 * done) / target)} max={20} />}>Breathing & meditation</Heading>
       {!sitting ? (
         <>
           <Note>{done >= target ? `You have sat ${done} minutes today. Lovely. Another short sit is always welcome.` : `Suggested now: ${suggested} minutes (today ${done} of ${target}).`}</Note>

@@ -5,7 +5,6 @@
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { ClassifyHelper } from '../../components/AiBits';
-import { MeditationTimer } from '../../components/MeditationTimer';
 import { ScreenTimeCard } from '../../components/ScreenTimeCard';
 import { TaoCard } from '../../components/TaoCard';
 import { TasksCard } from '../../components/TasksCard';
@@ -41,8 +40,6 @@ export default function Mind() {
       <TasksCard />
 
       <TaoCard on="mind" />
-
-      <MeditationTimer />
 
       <ScreenTimeCard />
 
