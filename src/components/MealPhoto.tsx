@@ -89,15 +89,20 @@ export function MealPhoto({ right, children }: { right?: ReactNode; children?: R
     if (!text) return;
     setMessage(tr('Calculating your meal…')); setItems(null); setBusy(true); setSource('words'); setUri(null);
     try {
-      const r = await analyseMealText(text);
+      // One quiet second try: the AI occasionally sends a reply that cannot be read (founder, 20 Oct 2026).
+      const r = await analyseMealText(text).catch(e => { if (aiUnavailable(e)) throw e; return analyseMealText(text); });
       setItems(r.items);
       setInsight(r.insight);
       setNote([r.confidence && `Confidence: ${r.confidence}.`, r.note].filter(Boolean).join(' '));
       setMessage(r.items.length ? tr('Check the numbers, change anything that looks off, then add.') : (r.note || tr('No food found in that description.')));
     } catch (e) {
-      // AI not available (not approved yet, limit reached, offline): search IFCT 2017 instead, in the same box.
-      setMessage(null);
-      setNoAi(e instanceof Error ? `${e.message} Meanwhile, pick from IFCT 2017:` : tr('Pick from IFCT 2017:'));
+      if (aiUnavailable(e)) {
+        // AI not available (key, limit, offline): search IFCT 2017 instead, in the same box.
+        setMessage(null);
+        setNoAi(tr('Myra can’t calculate right now. Meanwhile, pick from IFCT 2017:'));
+      } else {
+        setMessage(tr('Myra couldn’t work that out. Tap Calculate to try again.'));
+      }
     } finally { setBusy(false); }
   };
 
@@ -106,6 +111,12 @@ export function MealPhoto({ right, children }: { right?: ReactNode; children?: R
     try { rec.current?.abort?.(); } catch { /* already stopped */ }
     rec.current = null; setListening(false);
   };
+  /** Stop, but still use the words heard so far (the Stop button and the 15-second limit). */
+  const finishListening = () => {
+    const r = rec.current;
+    if (r?.stop) { try { r.stop(); return; } catch { /* fall through */ } }
+    stopListening();
+  };
   const speak = () => {
     if (!Speech) return;
     if (listening) { stopListening(); return; }
@@ -113,12 +124,18 @@ export function MealPhoto({ right, children }: { right?: ReactNode; children?: R
     try { r = new Speech(); } catch { setMessage(tr('Speaking is not available here. Tap the microphone on your keyboard instead.')); return; }
     r.lang = lang() === 'hi' ? 'hi-IN' : 'en-IN'; r.interimResults = false; r.maxAlternatives = 1;
     r.onresult = (e: any) => { const t = e.results?.[0]?.[0]?.transcript ?? ''; if (t) { setWords(t); describe(t); } };
-    r.onerror = () => { setMessage(tr('Could not hear that. You can also tap the microphone on your keyboard.')); stopListening(); };
+    r.onerror = (problem?: string) => {
+      setMessage(problem === 'permission' ? tr('Allow the microphone: Settings → Happy Orange → Microphone and Speech Recognition.')
+        : problem === 'dictation-off' ? tr('Turn on Dictation: Settings → General → Keyboard → Enable Dictation.')
+        : problem === 'no-speech' ? tr('I didn’t hear anything. Tap Speak and talk after the beep.')
+        : tr('Could not hear that. You can also tap the microphone on your keyboard.'));
+      stopListening();
+    };
     r.onend = () => setListening(false);
     rec.current = r; setListening(true);
     try { r.start(); } catch { stopListening(); setMessage(tr('Speaking is not available here. Tap the microphone on your keyboard instead.')); return; }
     // Never stay stuck: stop listening after 15 seconds whatever happens.
-    setTimeout(() => { if (rec.current === r) stopListening(); }, 15_000);
+    setTimeout(() => { if (rec.current === r) finishListening(); }, 15_000);
   };
 
   const edit = (i: number, key: keyof MealItem, value: string) => setItems(list => list && list.map((it, n) => n !== i ? it : {
@@ -165,14 +182,14 @@ export function MealPhoto({ right, children }: { right?: ReactNode; children?: R
           {mode === 'speak' && (Speech ? (
             <View style={{ alignItems: 'center', gap: 8 }}>
               <Text style={{ fontSize: 16, color: colors.ink }}>{listening ? tr('Listening… say what you ate') : words ? `"${words}"` : tr('Tap Speak to try again.')}</Text>
-              {listening ? <Button kind="plain" title={tr('Stop')} onPress={stopListening} /> : null}
+              {listening ? <Button kind="plain" title={tr('Done')} onPress={finishListening} /> : null}
             </View>
           ) : (
             <Note>{tr('Speaking is coming with the Happy Orange iPhone app very soon. For now, tap Photo or Type.')}</Note>
           ))}
 
           {mode === 'type' && (!session || noAi) && (
-            <IfctPicker start={words} why={!session ? tr('Search a food and add grams. Sign in to just type your whole meal in your own words.') : noAi ?? undefined} />
+            <IfctPicker start={firstFood(words)} why={!session ? tr('Search a food and add grams. Sign in to just type your whole meal in your own words.') : noAi ?? undefined} />
           )}
 
           {mode === 'type' && session && !noAi && (
@@ -214,4 +231,16 @@ export function MealPhoto({ right, children }: { right?: ReactNode; children?: R
       {children}
     </Card>
   );
+}
+
+/** True when the AI itself can't be used (no key, out of credit, a limit, offline); other errors are worth a retry. */
+function aiUnavailable(e: unknown) {
+  const m = e instanceof Error ? e.message : '';
+  return /key|credit|billing|limit|quota|sign in|online version|reach the AI/i.test(m);
+}
+
+/** The first food in a typed meal, for the IFCT search box: "1 aloo paratha, 1 roti…" → "aloo paratha". */
+export function firstFood(words: string) {
+  const first = words.split(/,|\band\b|\n|\+|&/i)[0] ?? '';
+  return first.replace(/^\s*(\d+([.\/]\d+)?|a|an|one|two|half)\s*(bowls?|katoris?|cups?|glass(es)?|plates?|pieces?|pcs|g|gm|grams?|tbsp|tsp|spoons?)?\s*(of\s+)?/i, '').trim();
 }

@@ -463,4 +463,10 @@ export const HI: Record<string, string> = {
   'Before asking the world to be kinder, be the kindness in one room.': 'दुनिया से दयालु होने को कहने से पहले, एक कमरे में खुद दया बनें।',
   'A calm mind is not an empty one; it is a mind that is not being pulled.': 'शांत मन खाली मन नहीं है; वह मन है जिसे कोई खींच नहीं रहा।',
   'Come back to the breath, come back to the body, come back to the present. Returning is the practice.': 'साँस पर लौटें, शरीर पर लौटें, वर्तमान पर लौटें। लौटना ही अभ्यास है।',
+  'Myra can’t calculate right now. Meanwhile, pick from IFCT 2017:': 'Myra अभी हिसाब नहीं लगा पा रही। तब तक IFCT 2017 से चुनें:',
+  'Myra couldn’t work that out. Tap Calculate to try again.': 'Myra इसका हिसाब नहीं लगा पाई। फिर से कोशिश करने के लिए हिसाब लगाएँ दबाएँ।',
+  'Allow the microphone: Settings → Happy Orange → Microphone and Speech Recognition.': 'माइक्रोफ़ोन की अनुमति दें: सेटिंग्स → Happy Orange → माइक्रोफ़ोन और स्पीच रिकग्निशन।',
+  'Turn on Dictation: Settings → General → Keyboard → Enable Dictation.': 'डिक्टेशन चालू करें: सेटिंग्स → सामान्य → कीबोर्ड → डिक्टेशन चालू करें।',
+  'I didn’t hear anything. Tap Speak and talk after the beep.': 'मुझे कुछ सुनाई नहीं दिया। बोलें दबाएँ और बीप के बाद बोलें।',
+  'Done': 'हो गया',
 };

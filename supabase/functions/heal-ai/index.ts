@@ -91,7 +91,7 @@ async function askAI(tier: 'smart' | 'quick', system: string, text: string, imag
       'x-api-key': ANTHROPIC_KEY!, 'anthropic-version': '2023-06-01', 'content-type': 'application/json',
       ...(ANTHROPIC_WORKSPACE ? { 'anthropic-workspace-id': ANTHROPIC_WORKSPACE } : {}),
     },
-    body: JSON.stringify({ model: MODELS.anthropic[tier], max_tokens: 2000, system, messages: [{ role: 'user', content }] }),
+    body: JSON.stringify({ model: MODELS.anthropic[tier], max_tokens: 4000, system, messages: [{ role: 'user', content }] }),
   });
   const data = await res.json();
   if (!res.ok) {
@@ -101,10 +101,48 @@ async function askAI(tier: 'smart' | 'quick', system: string, text: string, imag
   return (data.content ?? []).filter((c: { type: string }) => c.type === 'text').map((c: { text: string }) => c.text).join('\n').trim();
 }
 
+const BAD_FORMAT = 'The AI reply was not in the expected format. Please try again.';
+
+/** Removes // and /* */ comments outside strings, and trailing commas before } or ]. */
+function stripSlips(src: string) {
+  let out = '', inStr = false;
+  for (let i = 0; i < src.length; i++) {
+    const ch = src[i];
+    if (inStr) {
+      out += ch;
+      if (ch === '\\') { out += src[++i] ?? ''; continue; }
+      if (ch === '"') inStr = false;
+      continue;
+    }
+    if (ch === '"') { inStr = true; out += ch; continue; }
+    if (ch === '/' && src[i + 1] === '/') { while (i < src.length && src[i] !== '\n') i++; out += '\n'; continue; }
+    if (ch === '/' && src[i + 1] === '*') { i = src.indexOf('*/', i + 2); if (i < 0) break; i++; continue; }
+    out += ch;
+  }
+  return out.replace(/,\s*([}\]])/g, '$1');
+}
+
+/** Reads the JSON in an AI reply. Forgives the usual slips (code fences, comments, trailing commas, curly quotes). */
 function parseJson(text: string) {
-  const start = text.indexOf('{'), end = text.lastIndexOf('}');
-  if (start < 0 || end < start) throw new Error('The AI reply was not in the expected format. Please try again.');
-  return JSON.parse(text.slice(start, end + 1));
+  const t = text.replace(/```(?:json)?/gi, '');
+  const start = t.indexOf('{'), end = t.lastIndexOf('}');
+  if (start < 0 || end < start) throw new Error(BAD_FORMAT);
+  const body = t.slice(start, end + 1);
+  try { return JSON.parse(body); } catch { /* try a cleaned copy */ }
+  const cleaned = stripSlips(body.replace(/[\u201C\u201D]/g, '"'));
+  try { return JSON.parse(cleaned); } catch { throw new Error(BAD_FORMAT); }
+}
+
+type Ask = (tier: 'smart' | 'quick', system: string, text: string, image?: Image) => Promise<string>;
+
+/** Ask for JSON; if the reply cannot be read, ask once more, firmly (founder, 20 Oct 2026: a typed dinner failed on one bad reply). */
+async function askJson(ask: Ask, tier: 'smart' | 'quick', system: string, text: string, image?: Image) {
+  try { return parseJson(await ask(tier, system, text, image)); } catch (e) {
+    if (e instanceof Error && e.message !== BAD_FORMAT) throw e;
+    return parseJson(await ask(tier, system, `${text}
+
+IMPORTANT: Reply with one valid JSON object only. No comments, no trailing commas, no text before or after it.`, image));
+  }
 }
 
 const r1 = (v: number) => Math.round(v * 10) / 10;
@@ -123,7 +161,7 @@ async function mealAnalyse(image: Image | null, hint: string, hindi = false) {
 ${hint ? `The person adds: "${hint}"` : ''}`
     : `The person describes what they ate or drank (typed or spoken, so expect spelling mistakes and Hindi or regional words): "${hint}"
 List each item. Use the quantities they give (e.g. "2 rotis", "1 katori dal"); otherwise assume typical Indian household portions and household oil or ghee.`;
-  const step1 = parseJson(await ask('smart', `${ORANGE_BOOK} You are also a careful nutrition analyst.`,
+  const step1 = (await askJson(ask, 'smart', `${ORANGE_BOOK} You are also a careful nutrition analyst.`,
 `${what}
 Break each item into its main raw ingredients with grams (include cooking oil or ghee). Also give your own estimate for the whole item.
 Reply with JSON only:
@@ -141,7 +179,7 @@ If there is no food: {"items":[],"confidence":"low","note":"${image ? 'No food f
   let picks: Record<string, string | null> = {};
   if (ingredients.some(x => x.candidates.length)) {
     const list = ingredients.map((x, n) => `${n}. ${x.ingredient}: ${x.candidates.map(c => `${c.code} = ${c.name}`).join(' | ') || 'no candidates'}`).join('\n');
-    const step2 = parseJson(await ask('quick', ORANGE_BOOK,
+    const step2 = (await askJson(ask, 'quick', ORANGE_BOOK,
 `For each ingredient, choose the IFCT 2017 food code that matches it best, or null if none is a fair match (for example, raw versus cooked forms are usually fine; a different food is not).
 ${list}
 Reply with JSON only: {"picks":{"0":"CODE or null","1":"CODE or null"}}`));
@@ -184,7 +222,7 @@ async function run(action: string, p: Record<string, unknown>, hindi = false) {
       return mealAnalyse(null, text, hindi);
     }
     case 'screen_time': {
-      return parseJson(await ask('smart', ORANGE_BOOK,
+      return (await askJson(ask, 'smart', ORANGE_BOOK,
 `This is a screenshot of a phone's Screen Time (iPhone) or Digital Wellbeing (Android) screen. Read the time spent per app.
 Include only social media, video, messaging and news apps (e.g. Instagram, YouTube, WhatsApp, Facebook, X/Twitter, LinkedIn, Snapchat, Telegram, Reddit, ShareChat, Moj, news apps). Skip tools such as Settings, Camera, Maps, Phone, banking.
 For each, give the platform (one of Instagram, YouTube, WhatsApp, Facebook, X, LinkedIn, or Other), whole minutes, and the most likely kind of content from: ${CATEGORIES}
@@ -195,7 +233,7 @@ If this is not a Screen Time screenshot: {"sessions":[],"period":"unclear","note
         { media_type: String(p.media_type ?? 'image/jpeg'), data: String(p.image_base64 ?? '') }));
     }
     case 'guidance': {
-      const g = parseJson(await ask('smart', ORANGE_BOOK,
+      const g = (await askJson(ask, 'smart', ORANGE_BOOK,
 `Here is today's data and the last 7 days for one person:
 ${String(p.context ?? '').slice(0, 6000)}
 Tell the person what to do next, for the rest of today from the time shown (if it is night, for tonight and tomorrow morning).
@@ -213,7 +251,7 @@ STRICT: the headline and every suggestion is ONE line of at most 10 words, writt
       const lines = [g?.headline, g?.body?.[0], g?.mind?.[0], g?.soul?.[0]];
       if (lines.some(l => words(l) > 10)) {
         try {
-          const short = parseJson(await ask('quick', ORANGE_BOOK,
+          const short = (await askJson(ask, 'quick', ORANGE_BOOK,
 `Shorten each line of this JSON to at most 10 words. Keep the meaning, start each with a verb, keep numbers. Reply with the same JSON shape only.
 ${JSON.stringify({ headline: g.headline, body: [g.body?.[0]], mind: [g.mind?.[0]], soul: [g.soul?.[0]] })}`));
           if (short?.headline) return { ...short, focus: g.focus ?? [] };
@@ -242,13 +280,13 @@ First give its meaning faithfully and respectfully, as its own tradition mainstr
       return { text };
     }
     case 'classify_media': {
-      return parseJson(await ask('quick', ORANGE_BOOK,
+      return (await askJson(ask, 'quick', ORANGE_BOOK,
 `Classify this social-media session into exactly one category by its effect on the mind: ${CATEGORIES}.
 Session: "${String(p.text ?? '').slice(0, 600)}"
 Reply with JSON only: {"category":"<one of the categories>","reason":"at most 10 words"}`));
     }
     case 'reflect_action': {
-      return parseJson(await ask('smart', ORANGE_BOOK,
+      return (await askJson(ask, 'smart', ORANGE_BOOK,
 `Reflect on how this action aligns with dharma (duty, truth, fairness, non-harm, service, selflessness, self-discipline), drawing on the Gita and the yamas and niyamas.
 Action: "${String(p.text ?? '').slice(0, 600)}"
 Do not judge the person. Reply with JSON only:
