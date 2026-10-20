@@ -49,7 +49,7 @@
         "@kingstinct/react-native-healthkit",
         {
           "NSHealthShareUsageDescription": "Happy Orange reads your steps, exercise minutes and sleep from Apple Health, so your Body score fills in without typing.",
-          "NSHealthUpdateUsageDescription": false,
+          "NSHealthUpdateUsageDescription": "Happy Orange does not write to Apple Health today. If a future version saves anything, such as a meditation session, it will ask you first.",
           "background": false
         }
       ],
