@@ -70,7 +70,7 @@ export interface DayLog {
     checked?: boolean;      // answered the eight-practices check today
     verseStudied?: boolean; // studied the Gita verse of the day
     verseNote?: string;     // what the verse means to me
-    gratitude?: string[];   // up to three things I am grateful for
+    gratitude?: string[];   // up to four things I am grateful for (10 points each)
     thought?: string;       // my thought for the day
   };
   // Myra recommends. part = part of the day it was made for; sig = fingerprint of the day's data it was made from.
