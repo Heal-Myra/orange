@@ -11,6 +11,10 @@ export type Sex = 'male' | 'female' | 'other';
 export type Goal = 'lose' | 'keep' | 'gain';
 
 export interface AboutMe {
+  name?: string;
+  goalText?: string;  // the goal in the person's own words (founder, 21 Oct 2026); Myra reads it into the fields below
+  aims?: string;      // the non-weight part of the goal, e.g. "run 5 km", "sleep better"
+  goalNote?: string;  // Myra's one-line reply about the goal (e.g. that it is too steep and what she planned instead)
   weightKg: number;
   heightCm: number;
   sex: Sex;
@@ -97,5 +101,30 @@ export function aboutLine(m: AboutMe | undefined): string {
   const goal = !p.adult ? 'no weight goal (under 18: healthy habits only)'
     : m.goal === 'keep' || !m.goalKg ? 'keep current weight'
     : `${m.goal} ${m.goalKg} kg (asked: in ${m.goalWeeks ?? '?'} weeks; planned pace ${Math.abs(p.weeklyKg)} kg/week, about ${p.weeks} weeks${p.slowedDown ? ', slowed down for safety' : ''})`;
-  return `About: ${m.age} y, ${m.sex}, ${m.heightCm} cm, ${m.weightKg} kg (BMI ${p.bmi}). Goal: ${goal}. Daily targets: ${p.kcal} kcal, protein ${p.protein} g, ${p.steps} steps, ${p.active} active min.`;
+  const own = m.goalText ? ` In their words: "${m.goalText}".${m.aims ? ` Other aims: ${m.aims}.` : ''}` : '';
+  return `About: ${m.name ? `${m.name}, ` : ''}${m.age} y, ${m.sex}, ${m.heightCm} cm, ${m.weightKg} kg (BMI ${p.bmi}). Goal: ${goal}. Daily targets: ${p.kcal} kcal, protein ${p.protein} g, ${p.steps} steps, ${p.active} active min.${own}`;
+}
+
+/** A quick reading of a goal written in plain words, used when Myra (the AI) can't be reached.
+ *  "lose 5 kg in 3 months", "gain 4kg by March", "reduce 10 kg" → goal, kg and weeks. */
+export function parseGoal(text: string, today = new Date()): Pick<AboutMe, 'goal' | 'goalKg' | 'goalWeeks'> {
+  const t = text.toLowerCase();
+  const kgMatch = t.match(/(\d+(?:[.,]\d+)?)\s*(?:kg|kgs|kilo|kilos|kilograms?)/);
+  const kg = kgMatch ? parseFloat(kgMatch[1].replace(',', '.')) : undefined;
+  const lose = /lose|loss|reduce|cut|drop|less|slim|ghata|kam/.test(t);
+  const gain = /gain|put on|increase|build|bulk|badha/.test(t);
+  const goal: Goal = kg && (lose || gain) ? (gain && !lose ? 'gain' : 'lose') : 'keep';
+  let weeks: number | undefined;
+  const span = t.match(/(\d+)\s*(week|weeks|wk|month|months|year|years)/);
+  if (span) { const n = parseInt(span[1], 10); weeks = /month/.test(span[2]) ? Math.round(n * 4.35) : /year/.test(span[2]) ? n * 52 : n; }
+  const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+  const by = t.match(/by\s+(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*/);
+  if (!weeks && by) {
+    const m = months.indexOf(by[1]);
+    let year = today.getFullYear();
+    if (m <= today.getMonth()) year++;
+    const end = new Date(year, m + 1, 0);
+    weeks = Math.max(1, Math.round((end.getTime() - today.getTime()) / (7 * 24 * 3600 * 1000)));
+  }
+  return goal === 'keep' ? { goal } : { goal, goalKg: kg, goalWeeks: weeks ?? 13 };
 }

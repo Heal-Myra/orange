@@ -22,7 +22,7 @@ export default function Today() {
     <Screen feedback="Today" top={
       <View style={{ paddingHorizontal: 4 }}>
         <Text style={{ fontSize: 15, color: colors.muted }}>{greeting()},</Text>
-        <Text style={{ fontSize: 24, fontWeight: '700', color: colors.ink }}>{firstName(session?.user.email) ?? tr('friend')}</Text>
+        <Text style={{ fontSize: 24, fontWeight: '700', color: colors.ink }}>{profile.me?.name?.split(' ')[0] || firstName(session?.user.email) || tr('friend')}</Text>
       </View>
     }>
 

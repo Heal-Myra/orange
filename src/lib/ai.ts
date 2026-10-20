@@ -36,6 +36,11 @@ export const analyseMealText = (text: string) => call<MealResult>('meal_text', {
 export interface ScreenTimeResult { sessions: { platform: string; app: string; minutes: number; category: ContentCategoryId }[]; period: string; note: string }
 export const readScreenTime = (image_base64: string, media_type: string) => call<ScreenTimeResult>('screen_time', { image_base64, media_type });
 
+export interface GoalReading { goal: 'lose' | 'keep' | 'gain'; kg: number | null; weeks: number | null; aims: string; verdict: string; message: string }
+/** Myra reads a goal written in plain words (About you). */
+export const understandGoal = (goal: string, me: { age: number; sex: string; heightCm: number; weightKg: number }, today: string) =>
+  call<GoalReading>('goal_plan', { goal, ...me, today });
+
 export const dailyGuidance = (context: string) => call<Guidance>('guidance', { context });
 
 /** Explain a Daily Wisdom passage from any tradition (meaning in the AI's own words, never a copyrighted translation). */

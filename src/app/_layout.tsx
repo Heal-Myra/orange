@@ -25,11 +25,12 @@ function Gate() {
     const needsSignIn = online && !session && !guest;
     const needsConsent = !!session && !consented;
     // Asked once after sign-up (optional: "Prefer not to say"); changeable later in Profile.
-    const needsTradition = !needsSignIn && !needsConsent && traditionReady && tradition === null;
+    // Religion (Daily Wisdom) is chosen on About you since 21 Oct 2026; the separate step is no longer forced.
+    const needsTradition = false && traditionReady && tradition === null;
     if (needsSignIn && here !== 'sign-in') router.replace('/sign-in');
     else if (!needsSignIn && needsConsent && here !== 'consent') router.replace('/consent');
     else if (needsTradition && here !== 'tradition') router.replace('/tradition');
-    // Then "About you" once (skippable), after the account has loaded so a new phone doesn't ask again.
+    // Then "About you" once (name, age, sex, height, weight, religion, goal; skippable), after the account has loaded.
     else if (!needsSignIn && !needsConsent && !needsTradition && session && meAsked === false && sync !== 'syncing' && here !== 'about-you' && here !== 'tradition') router.replace('/about-you');
     else if (!needsSignIn && !needsConsent && !needsTradition && (here === 'sign-in' || here === 'consent')) router.replace('/');
   }, [ready, online, session, guest, consented, tradition, traditionReady, segments, router, langState.ready, langState.chosen, meAsked, sync]);

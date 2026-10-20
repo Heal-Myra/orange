@@ -239,6 +239,22 @@ Reply with JSON only: {"sessions":[{"platform":"Instagram","app":"name as shown"
 If this is not a Screen Time screenshot: {"sessions":[],"period":"unclear","note":"This does not look like a Screen Time screenshot."}`,
         { media_type: String(p.media_type ?? 'image/jpeg'), data: String(p.image_base64 ?? '') }));
     }
+    case 'goal_plan': {
+      // "About you": the person writes their goal in their own words (founder, 21 Oct 2026). Myra reads it into a
+      // weight aim the app can plan with, keeps any other aims, and says plainly if it is too steep.
+      const goal = String(p.goal ?? '').trim().slice(0, 400);
+      const r = await askJson(ask, 'quick', ORANGE_BOOK,
+`Today is ${String(p.today ?? '').slice(0, 10)}. A person (${Number(p.age) || '?'} years, ${String(p.sex ?? '?')}, ${Number(p.heightCm) || '?'} cm, ${Number(p.weightKg) || '?'} kg) wrote their health goal in their own words:
+"${goal}"
+Read it. If it includes a body-weight aim, give the kilograms to lose or gain and the weeks they want (convert months or a date to weeks from today; use 13 if no time is given).
+Safe pace: lose at most 0.75 kg a week (about 1% of body weight), gain at most 0.5 kg a week; no weight loss below a healthy BMI of 18.5; under 18 years, no weight goal at all.
+Reply with JSON only:
+{"goal":"lose"|"keep"|"gain","kg":number or null,"weeks":number or null,"aims":"the other aims in a few plain words, or empty",
+ "verdict":"ok"|"too_steep"|"not_advised"|"unclear",
+ "message":"ONE direct line of at most 12 words for the person, e.g. 'Good goal: about 0.5 kg a week works.' or 'Too fast: plan 16 weeks, not 4.'"}`);
+      return { goal: ['lose', 'keep', 'gain'].includes(r.goal) ? r.goal : 'keep', kg: Number(r.kg) || null, weeks: Number(r.weeks) || null,
+        aims: String(r.aims ?? '').slice(0, 160), verdict: String(r.verdict ?? 'ok'), message: String(r.message ?? '').slice(0, 160) };
+    }
     case 'guidance': {
       const g = (await askJson(ask, 'smart', ORANGE_BOOK,
 `Here is today's data and the last 7 days for one person:

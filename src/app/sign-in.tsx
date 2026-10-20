@@ -24,10 +24,10 @@ export default function SignIn() {
     if (err) setMessage(err); else { setSentTo(email.trim().toLowerCase()); setCode(''); }
   };
 
-  const verify = async () => {
-    if (!sentTo) return;
+  const verify = async (c = code) => {
+    if (!sentTo || busy) return;
     setBusy(true); setMessage(null);
-    const err = await verifyCode(sentTo, code);
+    const err = await verifyCode(sentTo, c);
     setBusy(false);
     if (err) setMessage(err);
   };
@@ -54,9 +54,9 @@ export default function SignIn() {
             <Text style={{ fontSize: 18, fontWeight: '600', color: colors.ink }}>{tr('Check your email')}</Text>
             <Note>{tr('We sent a 6-digit code to {email}. It can take a minute; look in Spam too. Type the code here:', { email: sentTo })}</Note>
             <Text style={s.fieldLabel}>{tr('6-digit code')}</Text>
-            <TextInput style={[s.input, { fontSize: 24, letterSpacing: 6 }]} value={code} onChangeText={t => setCode(t.replace(/\D/g, '').slice(0, 6))}
-              placeholder="123456" placeholderTextColor={colors.muted} keyboardType="number-pad" textContentType="oneTimeCode" autoComplete="one-time-code" />
-            <Button title={busy ? tr('Checking…') : tr('Sign in')} onPress={verify} disabled={code.length !== 6 || busy} />
+            <TextInput style={[s.input, { fontSize: 24, letterSpacing: 6 }]} value={code} onChangeText={t => { const c = t.replace(/\D/g, '').slice(0, 6); setCode(c); if (c.length === 6) verify(c); }}
+              autoFocus placeholder="123456" placeholderTextColor={colors.muted} keyboardType="number-pad" textContentType="oneTimeCode" autoComplete="one-time-code" />
+            <Button title={busy ? tr('Checking…') : tr('Sign in')} onPress={() => verify()} disabled={code.length !== 6 || busy} />
             <Pressable onPress={() => { setSentTo(null); setMessage(null); }}>
               <Text style={{ color: colors.accent, fontWeight: '600' }}>{tr('Use a different email')}</Text>
             </Pressable>

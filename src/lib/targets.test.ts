@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { planFor, restingKcal, type AboutMe } from './targets';
+import { parseGoal, planFor, restingKcal, type AboutMe } from './targets';
 
 const base: AboutMe = { weightKg: 84, heightCm: 178, sex: 'male', age: 42, goal: 'keep', setAt: '2026-10-20' };
 
@@ -36,5 +36,14 @@ describe('targets', () => {
   it('protein uses a healthy reference weight when BMI is over 30', () => {
     const heavy = planFor({ ...base, weightKg: 120, goal: 'lose', goalKg: 10, goalWeeks: 20 });
     expect(heavy.protein).toBeLessThan(120 * 1.4);
+  });
+
+  it('reads a goal written in plain words', () => {
+    expect(parseGoal('I want to lose 5 kg in 3 months')).toEqual({ goal: 'lose', goalKg: 5, goalWeeks: 13 });
+    expect(parseGoal('gain 4kg in 8 weeks')).toEqual({ goal: 'gain', goalKg: 4, goalWeeks: 8 });
+    expect(parseGoal('run 5 km and sleep better')).toEqual({ goal: 'keep' });
+    const by = parseGoal('reduce 10 kg by March', new Date(2026, 9, 21));
+    expect(by.goal).toBe('lose');
+    expect(by.goalWeeks).toBeGreaterThan(20);
   });
 });

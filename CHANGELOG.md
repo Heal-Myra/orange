@@ -1,6 +1,8 @@
 # Changelog
 
 ## 0.9.0 — 21 October 2026 (About you, more Apple Health)
+- Sign-up is one "About you" screen after the privacy step (founder): name, age, sex, height, weight, religion (sets the Daily Wisdom) and the goal in the person's own words. Myra reads the goal (AI action `goal_plan`; `parseGoal` when offline), plans safe targets and says when a goal is too steep. The separate Daily Wisdom step is no longer forced. Today greets by name.
+- Sign-in code: the app signs in as soon as 6 digits are in the box; the box already offers iPhone's code autofill (from Messages, and from Apple Mail on iOS 17+). Phone-number sign-in set aside for now: Indian SMS needs TRAI DLT registration and a paid SMS provider (founder: email is fine for now).
 - Mind: the "Other activities" card is removed (founder). Attention and Learning ticks are gone; their 30 points now come from the to-do list: 15 for each of Myra's 1–2 focus tasks ticked off (`mind.focusDone`). Hand-added social-media sessions moved into the Phone activity card. docs/scoring.md updated.
 - "About you" after sign-up (skippable) and in Profile: weight, height, sex, age, goal (lose/keep/gain, kg, by when). Sets food, protein, steps and active-minute targets with safe limits; Myra steers toward the goal. See docs/decisions/0013-about-you-and-more-health-data.md. Needs migration 0007 (`profiles.about`).
 - Apple Health: weight, body fat, resting heart rate, HRV, VO2 max, active energy, mindful minutes, workouts and sleep stages. Shown on Body ("Your body", sleep stages, workouts); a new scale weight updates the targets; mindful minutes count as meditation. People already connected see Apple's sheet once more for the new items.

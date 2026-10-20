@@ -10,6 +10,11 @@ Date: 21 October 2026 · Decided by: founder
    heart rate variability, VO2 max, active energy, mindful minutes, workouts and sleep stages, besides steps, exercise
    minutes and sleep. Read-only. A new weight from the scale updates "About you" and the targets automatically.
 
+## Update 21 Oct 2026 (00:15)
+The founder reshaped sign-up into one screen in this order: name, age, sex, height, weight, religion (which picks the
+Daily Wisdom), and the goal as free text. Myra reads the text (weight aim + other aims), plans with the same safe limits,
+and replies in one line, saying so when the goal is too steep. Phone sign-in is postponed (TRAI DLT + SMS provider).
+
 ## How targets are set (src/lib/targets.ts, tested in targets.test.ts)
 - Energy need: Mifflin-St Jeor resting energy × 1.4 (lightly active). "Prefer not to say" uses the midpoint formula.
 - Loss: 7,700 kcal per kg; pace capped at 0.75 kg a week; food never below 1,200 kcal (women) / 1,500 kcal (men)
