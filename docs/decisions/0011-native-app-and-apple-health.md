@@ -11,3 +11,6 @@ Date: 20 October 2026. Decided by: the founder (Apple Developer account approved
 ## Signing and uploads
 - App Store Connect API key "Expo EAS" (Admin, Team key, Key ID 5L7B7CK24H) uploaded by the founder to the Expo account (expo.dev → healmyra → Android & iOS credentials). The .p8 file stays with the founder; never in chat or the repository.
 - Expo's builder cannot create the first distribution certificate without a person (eas-cli `SetUpDistributionCertificate` throws for non-interactive builds when none exists). So the founder runs the first build once from his computer: `npx eas-cli@latest build --platform ios --profile production --auto-submit`, signing in to Apple himself. After that, `.eas/workflows/ios-testflight.yml` builds and submits on every push to the `testflight` branch.
+
+## First build (20 Oct 2026)
+The founder ran the first build from his Windows PC (with `EAS_NO_VCS=1`, as Git is not installed). Credentials were created and the build was uploaded to App Store Connect, app id **6824918869** (now `submit.production.ios.ascAppId` in eas.json), so later builds go through the `testflight` workflow without him.
