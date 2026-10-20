@@ -564,4 +564,7 @@ export const HI: Record<string, string> = {
   'Cardio fitness (VO₂ max)': 'कार्डियो फ़िटनेस (VO₂ max)',
   '+{n} of 40 so far.': 'अब तक 40 में से +{n}।',
   'All three together earn 40 points.': 'तीनों मिलकर 40 अंक देते हैं।',
+  'Four things you are grateful for today, big or small.': 'आज की चार बातें जिनके लिए आप आभारी हैं, बड़ी या छोटी।',
+  'Something I learned': 'कुछ जो मैंने सीखा',
+  '10 points each, up to 40.': 'हर एक के 10 अंक, 40 तक।',
 };

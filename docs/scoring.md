@@ -30,7 +30,7 @@ Rebalanced 20 Oct 2026: the founder took the eight-practices check and the Tao c
 | --- | --- | --- |
 | Breathing & meditation | 30 | minutes in the app's timer, or mindful minutes from Apple Health (the larger), ÷ daily target |
 | Daily Wisdom studied | 30 | Read the day's passage (from the person's chosen tradition), open its meaning, tick "studied" |
-| Gratitude | 40 | shared equally by up to three things written (about 13 each) |
+| Gratitude | 40 | 10 for each thing written, up to four |
 
 21 Oct 2026: the founder removed the Thought of the day card and set gratitude 40, meditation 30, Daily Wisdom 30.
 

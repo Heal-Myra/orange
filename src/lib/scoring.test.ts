@@ -102,9 +102,9 @@ describe('soul', () => {
     expect(mindScore(d, P)).toBeNull();
   });
 
-  it('adds 30 for Daily Wisdom and 40 for three gratitudes; a thought no longer counts', () => {
+  it('adds 30 for Daily Wisdom and 10 per gratitude up to four; a thought no longer counts', () => {
     const d = day();
-    d.soul = { verseStudied: true, gratitude: ['family', 'health', 'rain', 'tea'], thought: 'Be gentle today' };
+    d.soul = { verseStudied: true, gratitude: ['family', 'health', 'rain', 'tea', 'books'], thought: 'Be gentle today' };
     const s = soulScore(d)!;
     expect(s.verse).toBe(30);
     expect(s.gratitude).toBe(40);
@@ -115,7 +115,7 @@ describe('soul', () => {
   it('reaches 100 with all practices kept, meditation done and all three cards done', () => {
     const d = day();
     d.dharma = { satya: true, nyaya: true, kartavya: true, seva: true, ahimsa: true, daana: true, santosha: true, kritajnata: true };
-    d.soul = { checked: true, verseStudied: true, gratitude: ['a', 'b', 'c'], thought: 'Let go' };
+    d.soul = { checked: true, verseStudied: true, gratitude: ['a', 'b', 'c', 'd'], thought: 'Let go' };
     d.mind = { meditationMin: P.meditation };
     expect(soulScore(d, P)!.total).toBe(100);
   });
@@ -124,7 +124,7 @@ describe('soul', () => {
   it('caps the reflection bonus at plus 10 and the total at 100', () => {
     const d = day();
     d.dharma = { satya: true, nyaya: true, kartavya: true, seva: true, ahimsa: true, daana: true, santosha: true, kritajnata: true };
-    d.soul = { verseStudied: true, gratitude: ['a', 'b', 'c'], thought: 'Let go' };
+    d.soul = { verseStudied: true, gratitude: ['a', 'b', 'c', 'd'], thought: 'Let go' };
     d.mind = { meditationMin: P.meditation };
     d.actions = Array.from({ length: 5 }, () => ({ text: 'helped', principle: 'Seva', alignment: 2 }));
     const s = soulScore(d, P)!;
@@ -173,7 +173,7 @@ describe('Tao practice', () => {
     const s = emptyDay('2026-10-21');
     s.tao = { done: true };
     s.dharma = { satya: true, nyaya: true, kartavya: true, seva: true, ahimsa: true, daana: true, santosha: true, kritajnata: true };
-    s.soul = { verseStudied: true, gratitude: ['a', 'b', 'c'], thought: 'Let go' };
+    s.soul = { verseStudied: true, gratitude: ['a', 'b', 'c', 'd'], thought: 'Let go' };
     s.mind = { meditationMin: P.meditation };
     expect(soulScore(s, P)!.total).toBe(100);
   });

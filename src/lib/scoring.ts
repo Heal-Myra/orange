@@ -123,7 +123,7 @@ export interface SoulScore {
   total: number;
   meditation: number; // /30 for breathing and meditation minutes against the daily target
   verse: number;     // /25 for studying the Gita verse of the day
-  gratitude: number; // /40, shared equally by up to three things
+  gratitude: number; // /40, 10 per thing, up to four
   thought: number;   // /15 for writing a thought for the day
   bonus: number;     // ±10 from reflected actions
 }
@@ -139,7 +139,7 @@ export function soulScore(d: DayLog, P: Profile = DEFAULT_PROFILE): SoulScore | 
   // Founder, 21 Oct 2026: Thought of the day removed; gratitude 40, meditation 30, Daily Wisdom 30.
   const meditation = 30 * c01((d.mind.meditationMin ?? 0) / P.meditation);
   const verse = so.verseStudied ? 30 : 0;
-  const gratitude = (40 * Math.min(3, grateful)) / 3;
+  const gratitude = Math.min(4, grateful) * 10; // four things, 10 each (founder, 21 Oct 2026)
   const thought = 0;
   if (!d.actions.length && !verse && !gratitude && d.mind.meditationMin == null) return null;
   const bonus = clamp(d.actions.reduce((s, a) => s + (a.alignment || 0), 0) * 2.5, -10, 10);

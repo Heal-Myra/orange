@@ -1,5 +1,5 @@
 // Soul tab cards: Gita verse to study, thought of the day, gratitude, and one simple check for the eight practices.
-// Points (docs/scoring.md): gratitude 40, meditation 30, Daily Wisdom 30 (founder, 21 Oct 2026).
+// Points (docs/scoring.md): gratitude 10 each up to four (40), meditation 30, Daily Wisdom 30 (founder, 21 Oct 2026).
 
 import { Pressable, Text, View } from 'react-native';
 import { useAuth } from '../lib/auth';
@@ -79,12 +79,12 @@ export function GratitudeCard() {
   return (
     <Card>
       <Heading>{tr('Gratitude')}</Heading>
-      <Note>{tr('Three things you are grateful for today, big or small.')}</Note>
-      {[0, 1, 2].map(i => (
+      <Note>{tr('Four things you are grateful for today, big or small.')}</Note>
+      {[0, 1, 2, 3].map(i => (
         <TextField key={date + 'g' + i} label={`${i + 1}.`} value={list[i] ?? ''} onChangeText={t => set(i, t)}
-          placeholder={[tr('Someone who helped me'), tr('Something my body did for me'), tr('A small joy today')][i]} />
+          placeholder={[tr('Someone who helped me'), tr('Something my body did for me'), tr('A small joy today'), tr('Something I learned')][i]} />
       ))}
-      <Note>{filled ? tr('+{n} of 40 so far.', { n: Math.round((40 * Math.min(3, filled)) / 3) }) : tr('All three together earn 40 points.')}</Note>
+      <Note>{filled ? tr('+{n} so far (10 each).', { n: Math.min(4, filled) * 10 }) : tr('10 points each, up to 40.')}</Note>
     </Card>
   );
 }
