@@ -91,13 +91,19 @@ async function askAI(tier: 'smart' | 'quick', system: string, text: string, imag
       'x-api-key': ANTHROPIC_KEY!, 'anthropic-version': '2023-06-01', 'content-type': 'application/json',
       ...(ANTHROPIC_WORKSPACE ? { 'anthropic-workspace-id': ANTHROPIC_WORKSPACE } : {}),
     },
-    body: JSON.stringify({ model: MODELS.anthropic[tier], max_tokens: 4000, system, messages: [{ role: 'user', content }] }),
+    // Newer Claude models think before answering, and the thinking counts toward max_tokens. With the old
+    // 2000-token limit a long meal reply was cut off mid-JSON (founder, 20 Oct 2026). Room to spare, short thinking.
+    body: JSON.stringify({
+      model: MODELS.anthropic[tier], max_tokens: 16000, system, messages: [{ role: 'user', content }],
+      ...(tier === 'smart' ? { output_config: { effort: 'low' } } : {}),
+    }),
   });
   const data = await res.json();
   if (!res.ok) {
     if (res.status === 401) throw new Error('The AI key was not accepted by Anthropic (invalid x-api-key). Check ANTHROPIC_API_KEY in Supabase secrets.');
     throw new Error(data?.error?.message ?? `Claude error ${res.status}`);
   }
+  if (data.stop_reason === 'max_tokens') throw new Error(BAD_FORMAT);
   return (data.content ?? []).filter((c: { type: string }) => c.type === 'text').map((c: { text: string }) => c.text).join('\n').trim();
 }
 
