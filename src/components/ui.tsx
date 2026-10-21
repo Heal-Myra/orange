@@ -3,7 +3,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useLocalSearchParams } from 'expo-router';
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View, type ScrollViewInstance, type StyleProp, type ViewStyle } from 'react-native';
+import { Keyboard, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View, type ScrollViewInstance, type StyleProp, type ViewStyle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { formatDay, todayISO } from '../lib/dates';
 import { useHeal } from '../lib/store';
@@ -13,7 +13,7 @@ import { tr } from '../lib/i18n';
 
 // Jump to a card: Today's "Myra recommends" opens a tab with ?card=<id> and the screen scrolls to that card and
 // outlines it for a moment (founder, 21 Oct 2026). Cards opt in by being wrapped in <Anchor id="…">.
-const AnchorCtx = createContext<{ register: (id: string, y: number) => void; lit: string | null }>({ register: () => {}, lit: null });
+const AnchorCtx = createContext<{ register: (id: string, y: number) => void; lit: string | null; keepVisible: () => void }>({ register: () => {}, lit: null, keepVisible: () => {} });
 
 export function Screen({ children, showDay = true, feedback, top }: { children: ReactNode; showDay?: boolean; feedback?: string; top?: ReactNode }) {
   const { card, at } = useLocalSearchParams<{ card?: string; at?: string }>();
@@ -31,11 +31,34 @@ export function Screen({ children, showDay = true, feedback, top }: { children: 
   }, [card, at]);
   useEffect(() => { const t = setTimeout(jump, 250); return () => clearTimeout(t); }, [jump]);
   const register = useCallback((id: string, y: number) => { spots.current[id] = y; if (id === card) jump(); }, [card, jump]);
-  const ctx = useMemo(() => ({ register, lit }), [register, lit]);
+
+  // The box being typed in always stays above the keyboard (founder, 21 Oct 2026: on iPhone the keyboard covered it).
+  // When the keyboard opens, and whenever a growing box gets taller, scroll just enough to show its bottom edge.
+  const offset = useRef(0);
+  const kbTop = useRef<number | null>(null);
+  const keepVisible = useCallback(() => {
+    if (Platform.OS === 'web' || typeof TextInput.State?.currentlyFocusedInput !== 'function') return; // browsers handle this themselves
+    const input = TextInput.State.currentlyFocusedInput() as unknown as { measureInWindow?: (cb: (x: number, y: number, w: number, h: number) => void) => void } | null;
+    const top = kbTop.current;
+    if (!input?.measureInWindow || top == null) return;
+    input.measureInWindow((_x, y, _w, h) => {
+      const overlap = y + h + 16 - top;
+      if (overlap > 0) scroll.current?.scrollTo({ y: offset.current + overlap, animated: true });
+    });
+  }, []);
+  useEffect(() => {
+    if (Platform.OS === 'web') return;
+    const show = Keyboard.addListener('keyboardDidShow', e => { kbTop.current = e.endCoordinates.screenY; setTimeout(keepVisible, 30); });
+    const hide = Keyboard.addListener('keyboardDidHide', () => { kbTop.current = null; });
+    return () => { show.remove(); hide.remove(); };
+  }, [keepVisible]);
+  const ctx = useMemo(() => ({ register, lit, keepVisible }), [register, lit, keepVisible]);
   return (
     <SafeAreaView style={s.safe} edges={['left', 'right']}>
       <AnchorCtx.Provider value={ctx}>
-        <ScrollView ref={scroll} contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled">
+        <ScrollView ref={scroll} contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled"
+          automaticallyAdjustKeyboardInsets keyboardDismissMode="interactive" scrollEventThrottle={32}
+          onScroll={e => { offset.current = e.nativeEvent.contentOffset.y; }}>
           {top}
           {showDay && <DayBar />}
           {feedback ? <FeedbackBox area={feedback} /> : null}
@@ -45,6 +68,9 @@ export function Screen({ children, showDay = true, feedback, top }: { children: 
     </SafeAreaView>
   );
 }
+
+/** For text boxes outside TextField: call on focus / growth so the box stays above the keyboard. */
+export const useKeepVisible = () => useContext(AnchorCtx).keepVisible;
 
 /** A card the Today screen can jump to. Must be a direct child of <Screen>. */
 export function Anchor({ id, children }: { id: string; children: ReactNode }) {
@@ -137,11 +163,13 @@ export function NumberField({ label, value, onChange, placeholder, decimal, live
 export function TextField({ label, value, onChangeText, placeholder, multiline }: {
   label: string; value: string; onChangeText: (t: string) => void; placeholder?: string; multiline?: boolean;
 }) {
+  const { keepVisible } = useContext(AnchorCtx);
   return (
     <View style={s.field}>
       <Text style={s.fieldLabel}>{label}</Text>
       <TextInput style={[s.input, multiline && { minHeight: 70, textAlignVertical: 'top' }]} value={value} onChangeText={onChangeText}
-        placeholder={placeholder} placeholderTextColor={colors.muted} multiline={multiline} />
+        placeholder={placeholder} placeholderTextColor={colors.muted} multiline={multiline}
+        onFocus={() => setTimeout(keepVisible, 300)} onContentSizeChange={multiline ? () => keepVisible() : undefined} />
     </View>
   );
 }

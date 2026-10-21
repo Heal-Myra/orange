@@ -5,6 +5,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { Pressable, Text, TextInput, View } from 'react-native';
 import { colors } from '../theme';
+import { useKeepVisible } from './ui';
 
 export function Rows({ children }: { children: ReactNode }) {
   return <View>{children}</View>;
@@ -21,6 +22,7 @@ export function StatRow({ label, value, unit, target, color = colors.body, first
   decimal?: boolean;
   right?: ReactNode;         // instead of a value (e.g. the 1–5 sleep quality buttons)
 }) {
+  const keep = useKeepVisible();
   const [text, setText] = useState(value == null ? '' : String(value));
   // Show the saved value once it has loaded (and after a sync), not only the value at first draw.
   useEffect(() => { setText(value == null ? '' : String(value)); }, [value]);
@@ -32,7 +34,7 @@ export function StatRow({ label, value, unit, target, color = colors.body, first
         <Text style={{ flex: 1, fontSize: 16, color: colors.ink }}>{label}</Text>
         {right ?? (onEdit ? (
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-            <TextInput value={text} onChangeText={setText} keyboardType={decimal ? 'decimal-pad' : 'number-pad'} placeholder="–"
+            <TextInput value={text} onChangeText={setText} keyboardType={decimal ? 'decimal-pad' : 'number-pad'} placeholder="–" onFocus={() => setTimeout(keep, 300)}
               placeholderTextColor={colors.muted}
               onEndEditing={() => { const n = parseFloat(text.replace(',', '.')); onEdit(Number.isFinite(n) ? n : undefined); }}
               onBlur={() => { const n = parseFloat(text.replace(',', '.')); onEdit(Number.isFinite(n) ? n : undefined); }}

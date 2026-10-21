@@ -7,13 +7,14 @@ import { Pressable, Text, TextInput, View } from 'react-native';
 import { useAuth } from '../lib/auth';
 import { supabase } from '../lib/supabase';
 import { colors } from '../theme';
-import { Button, s } from './ui';
+import { Button, s, useKeepVisible } from './ui';
 import { tr } from '../lib/i18n';
 
 export const SHOW_FEEDBACK = true; // testing phase
 const FACES = ['😞', '😕', '😐', '🙂', '😍'];
 
 export function FeedbackBox({ area }: { area: string }) {
+  const keep = useKeepVisible();
   const { session } = useAuth();
   const [text, setText] = useState('');
   const [rating, setRating] = useState<number | null>(null);
@@ -39,7 +40,7 @@ export function FeedbackBox({ area }: { area: string }) {
   const open = text.trim().length > 0;
   return (
     <View style={{ gap: 8, backgroundColor: colors.surface, borderRadius: 16, borderWidth: 1, borderColor: colors.accent + '55', padding: 10 }}>
-      <TextInput style={[s.input, { borderColor: 'transparent' }, open && { minHeight: 60 }]} value={text} onChangeText={setText} multiline={open}
+      <TextInput style={[s.input, { borderColor: 'transparent' }, open && { minHeight: 60 }]} value={text} onChangeText={setText} multiline={open} onFocus={() => setTimeout(keep, 300)} onContentSizeChange={() => keep()}
         placeholder={tr('💬 Your feedback on {area}: type here', { area: tr(area) })} placeholderTextColor={colors.muted} />
       {open && (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>

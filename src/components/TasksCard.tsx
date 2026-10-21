@@ -8,7 +8,7 @@ import { Pressable, Text, TextInput, View } from 'react-native';
 import { shiftISO, todayISO } from '../lib/dates';
 import { AREAS, areaName, useTasks, type Area, type Task } from '../lib/tasks';
 import { colors } from '../theme';
-import { Button, Card, Heading, Note, Score, s } from './ui';
+import { Button, Card, Heading, Note, Score, s, useKeepVisible } from './ui';
 import { useHeal } from '../lib/store';
 import { tr } from '../lib/i18n';
 
@@ -67,6 +67,7 @@ export function TasksCard() {
 }
 
 function AddTask({ area }: { area: Area }) {
+  const keep = useKeepVisible();
   const { add } = useTasks();
   const [title, setTitle] = useState('');
   const [days, setDays] = useState<number | null>(null);
@@ -78,7 +79,7 @@ function AddTask({ area }: { area: Area }) {
   return (
     <View style={{ gap: 8 }}>
       <View style={{ flexDirection: 'row', gap: 8 }}>
-        <TextInput style={[s.input, { flex: 1, minWidth: 0 }]} value={title} onChangeText={setTitle} onSubmitEditing={save} returnKeyType="done"
+        <TextInput style={[s.input, { flex: 1, minWidth: 0 }]} value={title} onChangeText={setTitle} onSubmitEditing={save} returnKeyType="done" onFocus={() => setTimeout(keep, 300)}
           placeholder={area === 'family' ? 'e.g. Call Mum' : area === 'work' ? 'e.g. Send the budget' : 'e.g. Read 10 pages'} placeholderTextColor={colors.muted} />
         <Button title={tr('Add')} onPress={save} disabled={!title.trim()} />
       </View>
