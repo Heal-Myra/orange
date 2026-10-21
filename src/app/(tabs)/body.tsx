@@ -48,7 +48,7 @@ export default function Body() {
         <Heading right={<Score value={score?.sleep} max={30} />}>{tr('Sleep')}</Heading>
         <Rows>
           <StatRow first label={tr('Hours slept')} value={day.sleep.hours} unit="h" decimal key={date + 'sleep'}
-            onEdit={auto ? undefined : v => update(d => { d.sleep.hours = v; })} />
+            onEdit={v => update(d => { d.sleep.hours = v; d.sleep.source = v == null ? undefined : 'Typed in'; })} />
           {st ? <StatRow label={tr('Deep sleep')} value={st.deep} unit="h" /> : null}
           {st ? <StatRow label={tr('Core sleep')} value={st.core} unit="h" /> : null}
           {st ? <StatRow label={tr('REM sleep')} value={st.rem} unit="h" /> : null}

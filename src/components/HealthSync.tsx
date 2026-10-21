@@ -36,7 +36,8 @@ export function HealthProvider({ children }: { children: ReactNode }) {
     updateOn(iso, d => {
       if (h.steps != null) { d.activity.steps = h.steps; d.activity.source = HEALTH_SOURCE; }
       if (h.activeMin != null) { d.activity.activeMin = h.activeMin; d.activity.source = HEALTH_SOURCE; }
-      if (h.sleepHours != null) d.sleep.hours = h.sleepHours;
+      // Sleep typed by hand (no watch at night) is never overwritten by Apple Health (founder, 21 Oct 2026).
+      if (h.sleepHours != null && d.sleep.source !== 'Typed in') { d.sleep.hours = h.sleepHours; d.sleep.source = HEALTH_SOURCE; }
       const health = { ...(d.health ?? {}) };
       for (const k of ['weightKg', 'bodyFatPct', 'restingHr', 'hrv', 'vo2max', 'activeKcal', 'mindfulMin', 'workouts', 'sleepStages'] as const) {
         if (h[k] != null) (health as Record<string, unknown>)[k] = h[k];

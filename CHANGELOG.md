@@ -1,6 +1,7 @@
 # Changelog
 
 ## 0.9.0 — 21 October 2026 (About you, more Apple Health)
+- Sleep hours can always be typed, also with Apple Health connected (founder doesn't wear the watch at night). A typed number (`sleep.source: 'Typed in'`) is never overwritten by Apple Health; clearing the box lets Apple Health fill it again.
 - Gratitude card (founder chose option B): each question stays on the left, the answer box on the right, one row each, so the question is still visible after answering.
 - Typed notes no longer vanish (founder: the Daily Wisdom note was empty later). Each day now carries `savedAt`; when phone and account meet, the newer copy wins and newer phone copies are uploaded (before, the account's copy always won, even if older). `setProfile` (e.g. a new scale weight) no longer writes an old copy of the days to the phone. Everything waiting is saved at once when the app goes to the background. Verified on the web: a note typed and reloaded 0.15 s later stays.
 - Every text box stays visible while typing (founder: the Daily Wisdom note went behind the keyboard). The shared `Screen` scroll view adjusts for the keyboard (`automaticallyAdjustKeyboardInsets`) and, when the keyboard opens or a box grows, scrolls just enough to show the focused box (`keepVisible`, `useKeepVisible` for boxes outside TextField: feedback, to-do, number rows). Myra's chat has its own fix. Web is unchanged (browsers do this themselves).
