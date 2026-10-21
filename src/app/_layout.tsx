@@ -1,7 +1,8 @@
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { AmiriQuran_400Regular, useFonts } from '@expo-google-fonts/amiri-quran';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { Platform } from 'react-native';
 import { AuthProvider, useAuth } from '../lib/auth';
 import { HealProvider, useHeal } from '../lib/store';
 import { TasksProvider } from '../lib/tasks';
@@ -52,9 +53,66 @@ function Gate() {
   );
 }
 
+/**
+ * Website / home-screen app: the tab and button icons are drawn with the Ionicons font. If that download fails once
+ * (a weak connection when the app wakes up), the browser marks the font as failed and never tries again, so the icons
+ * stay blank (founder, 21 Oct 2026). Watch for that and load the font again under a fresh address; the icons then
+ * repaint by themselves.
+ */
+function useIconFontGuard(): number {
+  const [generation, setGeneration] = useState(0);
+  useEffect(() => {
+    if (Platform.OS !== 'web' || typeof document === 'undefined' || !document.fonts) return;
+    let stopped = false, tries = 0, healed = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    // The font's address, read from the @font-face rule the icon library added to the page.
+    const fontUri = (): string | null => {
+      for (const sheet of Array.from(document.styleSheets)) {
+        let rules: CSSRuleList;
+        try { rules = sheet.cssRules; } catch { continue; }
+        for (const r of Array.from(rules)) {
+          if (r instanceof CSSFontFaceRule && r.style.getPropertyValue('font-family').replace(/["']/g, '') === 'ionicons') {
+            const m = r.style.getPropertyValue('src').match(/url\(["']?([^"')]+)["']?\)/);
+            if (m) return m[1];
+          }
+        }
+      }
+      return null;
+    };
+    const broken = () => {
+      if (healed) return false;
+      const faces = [...(document.fonts as unknown as Iterable<FontFace>)].filter(f => f.family.replace(/["']/g, '') === 'ionicons');
+      // After a failed download the face reads 'error' (Safari) or falls back to 'unloaded' (Chrome).
+      return faces.length > 0 && !faces.some(f => f.status === 'loaded' || f.status === 'loading');
+    };
+    const heal = async () => {
+      const uri = fontUri();
+      if (stopped || !uri || !broken()) return;
+      tries++;
+      try {
+        const face = new FontFace('ionicons', `url("${uri}${uri.includes('?') ? '&' : '?'}retry=${Date.now()}")`);
+        await face.load();
+        document.fonts.add(face);
+        healed = true;
+        setGeneration(g => g + 1); // the icon library gave up on the first try: draw the icons again
+      } catch {
+        if (tries < 30) timer = setTimeout(heal, 4000);
+      }
+    };
+    // Check soon after start, and whenever the app comes back to the front or the connection returns.
+    timer = setTimeout(function check() { if (broken()) heal(); else if (!healed && !stopped) timer = setTimeout(check, 3000); }, 3000);
+    const again = () => { if (document.visibilityState === 'visible') heal(); };
+    document.addEventListener('visibilitychange', again);
+    window.addEventListener('online', again);
+    return () => { stopped = true; if (timer) clearTimeout(timer); document.removeEventListener('visibilitychange', again); window.removeEventListener('online', again); };
+  }, []);
+  return generation;
+}
+
 export default function RootLayout() {
   // Amiri Quran (OFL) draws the Qur'anic marks that phones' built-in Arabic fonts cannot. Loads in the background.
   useFonts({ AmiriQuran_400Regular });
+  const iconGeneration = useIconFontGuard();
   return (
     <LangProvider>
     <AuthProvider>
@@ -62,7 +120,7 @@ export default function RootLayout() {
         <HealthProvider>
         <TasksProvider>
           <StatusBar style="dark" />
-          <Gate />
+          <Gate key={iconGeneration} />
         </TasksProvider>
         </HealthProvider>
       </HealProvider>
