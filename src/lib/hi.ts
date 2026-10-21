@@ -587,4 +587,5 @@ export const HI: Record<string, string> = {
   'Attach a photo or document': 'फ़ोटो या दस्तावेज़ जोड़ें',
   'Feedback': 'फ़ीडबैक',
   'Opens the card where you do this': 'वह कार्ड खोलता है जहाँ यह करना है',
+  'Write here': 'यहाँ लिखें',
 };

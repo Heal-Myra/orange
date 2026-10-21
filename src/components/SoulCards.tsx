@@ -1,7 +1,7 @@
 // Soul tab cards: Gita verse to study, thought of the day, gratitude, and one simple check for the eight practices.
 // Points (docs/scoring.md): gratitude 10 each up to four (40), meditation 30, Daily Wisdom 30 (founder, 21 Oct 2026).
 
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, Text, TextInput, View } from 'react-native';
 import { useAuth } from '../lib/auth';
 import { verseOfDay } from '../lib/gita';
 import { passageOfDay, sourceOf, traditionName } from '../lib/wisdom';
@@ -10,7 +10,7 @@ import { useHeal } from '../lib/store';
 import { thoughtOfDay } from '../lib/thoughts';
 import { colors } from '../theme';
 import { ExplainPassage, ExplainVerse } from './AiBits';
-import { Button, Card, Check, Heading, Label, Note, TextField } from './ui';
+import { Button, Card, Check, Heading, Label, Note, TextField, s, useKeepVisible } from './ui';
 import { tr } from '../lib/i18n';
 
 /** Daily Wisdom: the passage of the day from the person's chosen tradition (Gita when Hindu or not chosen). */
@@ -67,8 +67,11 @@ export function ThoughtCard() {
   );
 }
 
+const QUESTIONS = ['Someone who helped me', 'Something my body did for me', 'A small joy today', 'Something I learned'];
+
 export function GratitudeCard() {
   const { day, date, update } = useHeal();
+  const keep = useKeepVisible();
   const list = (day.soul ?? {}).gratitude ?? [];
   const set = (i: number, t: string) => update(d => {
     const g = [...(d.soul?.gratitude ?? [])];
@@ -80,9 +83,17 @@ export function GratitudeCard() {
     <Card>
       <Heading>{tr('Gratitude')}</Heading>
       <Note>{tr('Four things you are grateful for today, big or small.')}</Note>
-      {[0, 1, 2, 3].map(i => (
-        <TextField key={date + 'g' + i} label={`${i + 1}.`} value={list[i] ?? ''} onChangeText={t => set(i, t)}
-          placeholder={[tr('Someone who helped me'), tr('Something my body did for me'), tr('A small joy today'), tr('Something I learned')][i]} />
+      {/* Founder's choice (21 Oct 2026, option B): the question on the left stays visible next to its answer. */}
+      {QUESTIONS.map((q, i) => (
+        <View key={date + 'g' + i} style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10, borderTopWidth: 1, borderTopColor: colors.line }}>
+          <View style={{ width: 128 }}>
+            <Text style={{ color: colors.soul, fontWeight: '700', fontSize: 12 }}>{i + 1}</Text>
+            <Text style={{ color: colors.muted, fontWeight: '600', fontSize: 14, lineHeight: 18 }}>{tr(q)}</Text>
+          </View>
+          <TextInput style={[s.input, { flex: 1, minWidth: 0, minHeight: 46, paddingVertical: 11 }]} value={list[i] ?? ''} onChangeText={t => set(i, t)} multiline numberOfLines={1}
+            placeholder={tr('Write here')} placeholderTextColor={colors.muted}
+            onFocus={() => setTimeout(keep, 300)} onContentSizeChange={() => keep()} />
+        </View>
       ))}
       <Note>{filled ? tr('+{n} so far (10 each).', { n: Math.min(4, filled) * 10 }) : tr('10 points each, up to 40.')}</Note>
     </Card>
