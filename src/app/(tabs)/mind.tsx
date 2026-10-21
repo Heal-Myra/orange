@@ -8,7 +8,7 @@ import { ClassifyHelper } from '../../components/AiBits';
 import { ScreenTimeCard } from '../../components/ScreenTimeCard';
 import { TaoCard } from '../../components/TaoCard';
 import { TasksCard } from '../../components/TasksCard';
-import { Button, Card, Heading, Note, NumberField, Screen, Score, s } from '../../components/ui';
+import { Anchor, Button, Card, Heading, Note, NumberField, Screen, Score, s } from '../../components/ui';
 import { CONTENT_CATEGORIES, mindScore } from '../../lib/scoring';
 import { useHeal } from '../../lib/store';
 import type { ContentCategoryId } from '../../lib/types';
@@ -38,11 +38,11 @@ export default function Mind() {
         <Heading right={<Score value={score?.total} max={100} />}>{tr('Mind today')}</Heading>
       </Card>
 
-      <TasksCard />
+      <Anchor id="tasks"><TasksCard /></Anchor>
 
-      <TaoCard on="mind" />
+      <Anchor id="tao"><TaoCard on="mind" /></Anchor>
 
-      <ScreenTimeCard>
+      <Anchor id="phone"><ScreenTimeCard>
         {day.media.map((m, i) => (
           <View key={i} style={[s.headingRow, { borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 8 }]}>
             <Text style={{ flex: 1, color: colors.ink }}>{m.platform} · {tr(CONTENT_CATEGORIES.find(c => c.id === m.category)?.name ?? '')} · {m.minutes} {tr('min')}{m.source === 'screen' ? ' · from screenshot' : ''}</Text>
@@ -66,7 +66,7 @@ export default function Mind() {
           </View>
         ) : <Button kind="plain" title={tr('+ Add a social-media session by hand')} onPress={() => setAdding(true)} />)}
         <Note>{tr('Content quality earns up to 40 points and staying within your {limit}-minute limit earns up to 30.', { limit: profile.mediaLimit })}</Note>
-      </ScreenTimeCard>
+      </ScreenTimeCard></Anchor>
     </Screen>
   );
 }

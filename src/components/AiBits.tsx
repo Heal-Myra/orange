@@ -8,6 +8,7 @@ import { useAuth } from '../lib/auth';
 import { buildContext, daySignature, partOfDay } from '../lib/context';
 import { tasksForAI, useTasks } from '../lib/tasks';
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import { todayISO } from '../lib/dates';
 import type { Verse } from '../lib/gita';
 import { CONTENT_CATEGORIES } from '../lib/scoring';
@@ -18,6 +19,17 @@ import { Button, Card, Heading, Note, TextField } from './ui';
 import { lang, tr } from '../lib/i18n';
 
 const errText = (e: unknown) => (e instanceof Error ? e.message : tr('Something went wrong. Try again.'));
+
+/** Which card on the tab a recommendation belongs to: Myra's own answer when she gave one, otherwise read from the words
+ *  (English or Hindi). Used to open the tab right at that card (founder, 21 Oct 2026). */
+export function cardFor(pillar: 'body' | 'mind' | 'soul', text: string, isTask: boolean, given?: string): string {
+  const ok: Record<string, string[]> = { body: ['food', 'sleep', 'movement'], mind: ['tasks', 'tao', 'phone'], soul: ['gratitude', 'meditation', 'wisdom'] };
+  if (given && ok[pillar].includes(given)) return given;
+  const t = text.toLowerCase();
+  if (pillar === 'body') return /sleep|bed|nap|नींद|सो/.test(t) ? 'sleep' : /walk|step|run|yoga|exercise|stretch|move|stairs|workout|चल|कदम|टहल|व्यायाम|योग/.test(t) ? 'movement' : 'food';
+  if (pillar === 'mind') return isTask ? 'tasks' : /tao|antidote|ताओ/.test(t) ? 'tao' : /screen|phone|social|scroll|instagram|youtube|स्क्रीन|फ़ोन|फोन/.test(t) ? 'phone' : 'tasks';
+  return /breath|meditat|sit |still|साँस|सांस|ध्यान/.test(t) ? 'meditation' : /wisdom|verse|gita|read|passage|shloka|ज्ञान|श्लोक|गीता|पढ़/.test(t) ? 'wisdom' : 'gratitude';
+}
 
 /** Today: "Myra recommends". Refreshes by itself when the part of the day changes (morning, afternoon, evening, night)
  *  or when what is logged today changes (a meal, steps from a fitness app, meditation...), so the person never has to ask. */
@@ -81,8 +93,13 @@ export function GuidanceCard() {
           Myra then rotates to the next thing. */}
       {g ? blocks.map(([name, color, list], i) => {
         const task = i === 1 && isToday ? focus.find(t => (g.focus ?? []).includes(t.id)) : undefined;
+        const pillar = (['body', 'mind', 'soul'] as const)[i];
+        const card = cardFor(pillar, list[0] ?? '', !!task, g.cards?.[pillar]);
         return list[0] ? (
-          <Card key={name} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 12, borderLeftWidth: 5, borderLeftColor: color }}>
+          <Pressable key={name} accessibilityRole="button" accessibilityHint={tr('Opens the card where you do this')}
+            onPress={() => router.navigate({ pathname: `/${pillar}`, params: { card, at: String(Date.now()) } })}
+            style={({ pressed }) => ({ opacity: pressed ? 0.8 : 1 })}>
+          <Card style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 12, borderLeftWidth: 5, borderLeftColor: color }}>
             <Text style={{ color, fontWeight: '700', fontSize: 14, width: 44 }}>{name}</Text>
             <Text style={{ color: colors.ink, flex: 1, fontSize: 14, lineHeight: 20 }}>{oneLine(list[0])}</Text>
             {task ? (
@@ -90,8 +107,9 @@ export function GuidanceCard() {
                 onPress={() => { complete(task.id); setKick(k => k + 1); }}>
                 <Ionicons name="ellipse-outline" size={24} color={colors.accent} />
               </Pressable>
-            ) : null}
+            ) : <Ionicons name="chevron-forward" size={18} color={colors.muted} />}
           </Card>
+          </Pressable>
         ) : null;
       }) : null}
 

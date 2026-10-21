@@ -1,8 +1,9 @@
 // Small building blocks shared by every screen.
 
 import { Ionicons } from '@expo/vector-icons';
-import type { ReactNode } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View, type StyleProp, type ViewStyle } from 'react-native';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useLocalSearchParams } from 'expo-router';
+import { Pressable, ScrollView, StyleSheet, Text, TextInput, View, type ScrollViewInstance, type StyleProp, type ViewStyle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { formatDay, todayISO } from '../lib/dates';
 import { useHeal } from '../lib/store';
@@ -10,16 +11,49 @@ import { FeedbackBox } from './FeedbackBox';
 import { colors, radius, shadow, space } from '../theme';
 import { tr } from '../lib/i18n';
 
+// Jump to a card: Today's "Myra recommends" opens a tab with ?card=<id> and the screen scrolls to that card and
+// outlines it for a moment (founder, 21 Oct 2026). Cards opt in by being wrapped in <Anchor id="…">.
+const AnchorCtx = createContext<{ register: (id: string, y: number) => void; lit: string | null }>({ register: () => {}, lit: null });
+
 export function Screen({ children, showDay = true, feedback, top }: { children: ReactNode; showDay?: boolean; feedback?: string; top?: ReactNode }) {
+  const { card, at } = useLocalSearchParams<{ card?: string; at?: string }>();
+  const scroll = useRef<ScrollViewInstance>(null);
+  const spots = useRef<Record<string, number>>({});
+  const [lit, setLit] = useState<string | null>(null);
+  const jumped = useRef('');
+  const jump = useCallback(() => {
+    const key = `${card}|${at}`;
+    if (!card || jumped.current === key || spots.current[card] == null) return;
+    jumped.current = key;
+    scroll.current?.scrollTo({ y: Math.max(0, spots.current[card] - 12), animated: true });
+    setLit(card);
+    setTimeout(() => setLit(l => (l === card ? null : l)), 1800);
+  }, [card, at]);
+  useEffect(() => { const t = setTimeout(jump, 250); return () => clearTimeout(t); }, [jump]);
+  const register = useCallback((id: string, y: number) => { spots.current[id] = y; if (id === card) jump(); }, [card, jump]);
+  const ctx = useMemo(() => ({ register, lit }), [register, lit]);
   return (
     <SafeAreaView style={s.safe} edges={['left', 'right']}>
-      <ScrollView contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled">
-        {top}
-        {showDay && <DayBar />}
-        {feedback ? <FeedbackBox area={feedback} /> : null}
-        {children}
-      </ScrollView>
+      <AnchorCtx.Provider value={ctx}>
+        <ScrollView ref={scroll} contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled">
+          {top}
+          {showDay && <DayBar />}
+          {feedback ? <FeedbackBox area={feedback} /> : null}
+          {children}
+        </ScrollView>
+      </AnchorCtx.Provider>
     </SafeAreaView>
+  );
+}
+
+/** A card the Today screen can jump to. Must be a direct child of <Screen>. */
+export function Anchor({ id, children }: { id: string; children: ReactNode }) {
+  const { register, lit } = useContext(AnchorCtx);
+  return (
+    <View onLayout={e => register(id, e.nativeEvent.layout.y)}
+      style={{ borderRadius: radius.lg + 4, borderWidth: 2, borderColor: lit === id ? colors.insight : 'transparent', margin: -2 }}>
+      {children}
+    </View>
   );
 }
 

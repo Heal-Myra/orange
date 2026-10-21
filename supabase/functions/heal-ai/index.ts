@@ -277,7 +277,9 @@ Reply with JSON only:
  "body":["the one Body task"],
  "mind":["the one Mind task; if it is a to-do task, name it, e.g. 'Finish: Send the Q3 budget.'"],
  "soul":["the one Soul task"],
- "focus":["the id of the to-do task used in mind, or nothing"]}
+ "focus":["the id of the to-do task used in mind, or nothing"],
+ "cards":{"body":"food"|"sleep"|"movement","mind":"tasks"|"tao"|"phone","soul":"gratitude"|"meditation"|"wisdom"}}
+"cards" names the app card where each task is done (Body tab: Food, Sleep, Movement; Mind tab: Clear your mind to-do list, Tao practice, Phone activity; Soul tab: Gratitude, Breathing & meditation, Daily Wisdom).
 For "focus": [] unless the Mind task is a to-do task; then exactly that one id (overdue or due today first; on a tired or low-sleep day pick a light one). Use only ids from the list.
 STRICT: every line is ONE line of at most 10 words, written as a direct instruction that starts with a verb, with a number where it helps: e.g. "Walk 10 minutes after lunch.", "Write four things you are grateful for.", "Snap your lunch in Food before eating." Never use "try", "consider", "maybe", "you could" or "it may help". Exactly one item per list.`));
       // Founder's rule: every line at most 10 words. If the model ran long, ask once more to shorten.
@@ -288,7 +290,7 @@ STRICT: every line is ONE line of at most 10 words, written as a direct instruct
           const short = (await askJson(ask, 'quick', ORANGE_BOOK,
 `Shorten each line of this JSON to at most 10 words. Keep the meaning, start each with a verb, keep numbers. Reply with the same JSON shape only.
 ${JSON.stringify({ headline: g.headline, body: [g.body?.[0]], mind: [g.mind?.[0]], soul: [g.soul?.[0]] })}`));
-          if (short?.headline) return { ...short, focus: g.focus ?? [] };
+          if (short?.headline) return { ...short, focus: g.focus ?? [], cards: g.cards };
         } catch { /* keep the first answer */ }
       }
       return g;

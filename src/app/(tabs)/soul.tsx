@@ -4,7 +4,7 @@
 
 import { GratitudeCard, VerseStudyCard } from '../../components/SoulCards';
 import { MeditationTimer } from '../../components/MeditationTimer';
-import { Card, Heading, Screen, Score } from '../../components/ui';
+import { Anchor, Card, Heading, Screen, Score } from '../../components/ui';
 import { soulScore } from '../../lib/scoring';
 import { useHeal } from '../../lib/store';
 import { tr } from '../../lib/i18n';
@@ -17,9 +17,9 @@ export default function Soul() {
       <Card style={{ paddingVertical: 12 }}>
         <Heading right={<Score value={score?.total} max={100} />}>{tr('Soul today')}</Heading>
       </Card>
-      <GratitudeCard />
-      <MeditationTimer />
-      <VerseStudyCard />
+      <Anchor id="gratitude"><GratitudeCard /></Anchor>
+      <Anchor id="meditation"><MeditationTimer /></Anchor>
+      <Anchor id="wisdom"><VerseStudyCard /></Anchor>
     </Screen>
   );
 }

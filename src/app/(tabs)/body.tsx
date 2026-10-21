@@ -7,7 +7,7 @@ import { Dots, Rows, StatRow } from '../../components/StatRows';
 import { MacroMix } from '../../components/MacroMix';
 import { bmiOf, fibreTarget } from '../../lib/targets';
 import { MealPhoto } from '../../components/MealPhoto';
-import { Card, Heading, Note, Screen, Score, s } from '../../components/ui';
+import { Anchor, Card, Heading, Note, Screen, Score, s } from '../../components/ui';
 import { bodyScore, mealTotals } from '../../lib/scoring';
 import { useHeal } from '../../lib/store';
 import { colors } from '../../theme';
@@ -24,7 +24,7 @@ export default function Body() {
 
   return (
     <Screen feedback="Body">
-      <MealPhoto right={<Score value={score?.nutrition} max={30} />}>
+      <Anchor id="food"><MealPhoto right={<Score value={score?.nutrition} max={30} />}>
         <View style={{ borderTopWidth: 1, borderTopColor: colors.line }}>
           <StatRow first label={tr('Calories')} value={Math.round(totals.kcal)} target={profile.kcal} />
           <StatRow label={tr('Protein (g)')} value={Math.round(totals.p)} target={profile.protein} />
@@ -40,11 +40,11 @@ export default function Body() {
             </View>
           )) : <View style={{ borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 10 }}><Note>{tr('No meals yet today.')}</Note></View>}
         </View>
-      </MealPhoto>
+      </MealPhoto></Anchor>
 
       <HealthLine />
 
-      <Card>
+      <Anchor id="sleep"><Card>
         <Heading right={<Score value={score?.sleep} max={30} />}>{tr('Sleep')}</Heading>
         <Rows>
           <StatRow first label={tr('Hours slept')} value={day.sleep.hours} unit="h" decimal key={date + 'sleep'}
@@ -56,9 +56,9 @@ export default function Body() {
           <StatRow label={tr('Sleep quality')} value={undefined}
             right={<Dots value={day.sleep.quality} onChange={q => update(d => { d.sleep.quality = q; })} />} />
         </Rows>
-      </Card>
+      </Card></Anchor>
 
-      <Card>
+      <Anchor id="movement"><Card>
         <Heading right={<Score value={score?.movement} max={40} />}>{tr('Movement')}</Heading>
         <Rows>
           <StatRow first label={tr('Steps')} value={day.activity.steps} target={profile.steps} key={date + 'steps'}
@@ -70,7 +70,7 @@ export default function Body() {
             <StatRow key={'w' + i} label={tr(w.type)} value={w.kcal ? `${w.min} min · ${w.kcal} kcal` : `${w.min} min`} />
           ))}
         </Rows>
-      </Card>
+      </Card></Anchor>
 
       {h && (h.weightKg != null || h.bodyFatPct != null || profile.me) ? (
         <Card>

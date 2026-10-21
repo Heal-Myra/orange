@@ -8,7 +8,7 @@ import type { ContentCategoryId } from './types';
 
 export interface MealItem { name: string; grams: number; kcal: number; protein_g: number; carbs_g: number; fat_g: number; fibre_g?: number; basis: 'IFCT' | 'estimate' }
 export interface MealResult { items: MealItem[]; confidence: string; note: string; insight: string }
-export interface Guidance { headline: string; body: string[]; mind: string[]; soul: string[]; focus?: string[] }
+export interface Guidance { headline: string; body: string[]; mind: string[]; soul: string[]; focus?: string[]; cards?: { body?: string; mind?: string; soul?: string } }
 export interface Reflection { principle: string; alignment: number; reflection: string }
 
 async function call<T>(action: string, payload: Record<string, unknown>): Promise<T> {
