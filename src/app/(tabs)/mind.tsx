@@ -3,13 +3,13 @@
 // Scoring: Myra's focus tasks done 15 each (up to 30) + content diet 70, plus the Tao practice on Mind days.
 
 import { useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Linking, Pressable, Text, TextInput, View } from 'react-native';
 import { ClassifyHelper } from '../../components/AiBits';
 import { ScreenTimeCard } from '../../components/ScreenTimeCard';
 import { TaoCard } from '../../components/TaoCard';
 import { TasksCard } from '../../components/TasksCard';
-import { Anchor, Button, Card, Heading, Note, NumberField, Screen, Score, s } from '../../components/ui';
-import { CONTENT_CATEGORIES, mindScore } from '../../lib/scoring';
+import { Anchor, Button, Card, Heading, Note, NumberField, Screen, Score, s, useKeepVisible } from '../../components/ui';
+import { CONTENT_CATEGORIES, LEARNING_POINTS, mindScore } from '../../lib/scoring';
 import { useHeal } from '../../lib/store';
 import type { ContentCategoryId } from '../../lib/types';
 import { colors } from '../../theme';
@@ -66,6 +66,7 @@ export default function Mind() {
           </View>
         ) : <Button kind="plain" title={tr('+ Add a social-media session by hand')} onPress={() => setAdding(true)} />)}
         <Note>{tr('Content quality earns up to 40 points and staying within your {limit}-minute limit earns up to 30.', { limit: profile.mediaLimit })}</Note>
+        <LearningBox />
       </ScreenTimeCard></Anchor>
     </Screen>
   );
@@ -80,6 +81,36 @@ function Chips({ options, value, onChange, labels }: { options: string[]; value:
           <Text style={{ color: colors.ink, fontSize: 14 }}>{labels?.[o] ?? tr(o)}</Text>
         </Pressable>
       ))}
+    </View>
+  );
+}
+
+/** Phone activity: what I learned today, in about five words, with an optional link (founder, 21 Oct 2026). Adds 15. */
+function LearningBox() {
+  const { day, date, update } = useHeal();
+  const keep = useKeepVisible();
+  const l = day.mind.learned ?? {};
+  const words = (l.text ?? '').trim().split(/\s+/).filter(Boolean).length;
+  const link = (l.link ?? '').trim();
+  const url = /^https?:\/\//i.test(link) ? link : link && /\.[a-z]{2,}/i.test(link) ? `https://${link}` : '';
+  const set = (k: 'text' | 'link', v: string) => update(d => { d.mind = { ...d.mind, learned: { ...(d.mind.learned ?? {}), [k]: v } }; });
+  return (
+    <View key={date} style={{ gap: 8, borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 12 }}>
+      <View style={s.headingRow}>
+        <Text style={{ fontSize: 17, fontWeight: '700', color: colors.ink }}>{tr('Learning')}</Text>
+        <Text style={{ color: colors.mind, fontWeight: '700' }}>{(l.text ?? '').trim().length >= 3 ? `+${LEARNING_POINTS}` : `${LEARNING_POINTS}`}</Text>
+      </View>
+      <TextInput style={s.input} value={l.text ?? ''} onChangeText={t => set('text', t.split(/\s+/).slice(0, 6).join(' '))}
+        placeholder={tr('What I learned today, in 5 words')} placeholderTextColor={colors.muted} onFocus={() => setTimeout(keep, 300)} />
+      {words > 5 ? <Note>{tr('Keep it to about 5 words.')}</Note> : null}
+      <TextInput style={s.input} value={l.link ?? ''} onChangeText={t => set('link', t.trim())} autoCapitalize="none" autoCorrect={false}
+        keyboardType="url" placeholder={tr('Link (optional): article, video, course')} placeholderTextColor={colors.muted} onFocus={() => setTimeout(keep, 300)} />
+      {url ? (
+        <Pressable onPress={() => Linking.openURL(url).catch(() => {})}>
+          <Text numberOfLines={1} style={{ color: colors.accent, textDecorationLine: 'underline' }}>{url}</Text>
+        </Pressable>
+      ) : null}
+      <Note>{tr('Learning something today adds {n} to Mind.', { n: LEARNING_POINTS })}</Note>
     </View>
   );
 }

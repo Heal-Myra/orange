@@ -58,6 +58,14 @@ describe('mind', () => {
     expect(m.total).toBe(30);
   });
 
+  it('adds 15 for writing what was learned today', () => {
+    const d = day();
+    d.mind = { learned: { text: 'How compound interest works', link: 'https://example.com' } };
+    const m = mindScore(d, P)!;
+    expect(m.learning).toBe(15);
+    expect(m.total).toBe(15);
+  });
+
   it('gives 15 points for one focus task done', () => {
     const d = day();
     d.mind = { focusDone: 1 };

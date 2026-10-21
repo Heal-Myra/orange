@@ -80,14 +80,17 @@ export function bodyScore(d: DayLog, P: Profile): BodyScore | null {
 
 export interface MindScore {
   total: number;
-  practices: number; // /40
-  content: number | null; // /60, null when social media not logged
+  practices: number; // /30, focus tasks done
+  content: number | null; // /70, null when social media not logged
   minutes: number;
   quality: number | null; // 0–1 share of nourishing content
   tao: number; // points from the day's Tao practice
+  learning: number; // 15 when something learned today is written
 }
 
-/** Mind: focus tasks done (30) + social-media content diet (70) + Tao practice bonus, capped at 100. */
+export const LEARNING_POINTS = 15;
+
+/** Mind: focus tasks done (30) + social-media content diet (70) + Tao practice and learning bonuses, capped at 100. */
 export function mindScore(d: DayLog, P: Profile): MindScore | null {
   const m = d.mind;
   const tao = taoPoints(d, 'mind');
@@ -95,7 +98,9 @@ export function mindScore(d: DayLog, P: Profile): MindScore | null {
   // Attention and Learning ticks were removed; older days that have them still count, within the same 30.
   const done = Math.min(2, m.focusDone ?? 0);
   const practices = Math.min(30, done * 15 + (m.attention ? 15 : 0) + (m.learning ? 15 : 0));
-  const hasPractice = practices > 0 || tao > 0;
+  // Learning (founder, 21 Oct 2026): what I learned today in a few words (and a link) adds 15, like the Tao practice.
+  const learning = (m.learned?.text ?? '').trim().length >= 3 ? LEARNING_POINTS : 0;
+  const hasPractice = practices > 0 || tao > 0 || learning > 0;
 
   let content: number | null = null, minutes = 0, quality: number | null = null;
   if (d.noMedia) {
@@ -110,7 +115,7 @@ export function mindScore(d: DayLog, P: Profile): MindScore | null {
     }
   }
   if (!hasPractice && content == null) return null;
-  return { total: Math.min(100, practices + (content ?? 0) + tao), practices, content, minutes, quality, tao };
+  return { total: Math.min(100, practices + (content ?? 0) + tao + learning), practices, content, minutes, quality, tao, learning };
 }
 
 /** Points from the day's Tao practice, for the pillar it belongs to. */

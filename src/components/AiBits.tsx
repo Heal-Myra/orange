@@ -27,7 +27,7 @@ export function cardFor(pillar: 'body' | 'mind' | 'soul', text: string, isTask: 
   if (given && ok[pillar].includes(given)) return given;
   const t = text.toLowerCase();
   if (pillar === 'body') return /sleep|bed|nap|नींद|सो/.test(t) ? 'sleep' : /walk|step|run|yoga|exercise|stretch|move|stairs|workout|चल|कदम|टहल|व्यायाम|योग/.test(t) ? 'movement' : 'food';
-  if (pillar === 'mind') return isTask ? 'tasks' : /tao|antidote|ताओ/.test(t) ? 'tao' : /screen|phone|social|scroll|instagram|youtube|स्क्रीन|फ़ोन|फोन/.test(t) ? 'phone' : 'tasks';
+  if (pillar === 'mind') return isTask ? 'tasks' : /tao|antidote|ताओ/.test(t) ? 'tao' : /screen|phone|social|scroll|instagram|youtube|learn|स्क्रीन|फ़ोन|फोन|सीख/.test(t) ? 'phone' : 'tasks';
   return /breath|meditat|sit |still|साँस|सांस|ध्यान/.test(t) ? 'meditation' : /wisdom|verse|gita|read|passage|shloka|ज्ञान|श्लोक|गीता|पढ़/.test(t) ? 'wisdom' : 'gratitude';
 }
 

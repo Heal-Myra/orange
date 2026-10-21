@@ -588,4 +588,8 @@ export const HI: Record<string, string> = {
   'Feedback': 'फ़ीडबैक',
   'Opens the card where you do this': 'वह कार्ड खोलता है जहाँ यह करना है',
   'Write here': 'यहाँ लिखें',
+  'What I learned today, in 5 words': 'आज मैंने क्या सीखा, 5 शब्दों में',
+  'Keep it to about 5 words.': 'लगभग 5 शब्दों में रखें।',
+  'Link (optional): article, video, course': 'लिंक (ज़रूरी नहीं): लेख, वीडियो, कोर्स',
+  'Learning something today adds {n} to Mind.': 'आज कुछ सीखने से Mind में {n} जुड़ते हैं।',
 };

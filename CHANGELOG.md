@@ -1,6 +1,7 @@
 # Changelog
 
 ## 0.9.0 — 21 October 2026 (About you, more Apple Health)
+- Mind → Phone activity: new Learning part (founder): what I learned today in about five words plus an optional link (tappable). Adds 15 to Mind (`LEARNING_POINTS`, capped at 100 like the Tao bonus). Myra sees it and can put it in front of the person. docs/scoring.md updated.
 - Sleep hours, steps, active minutes and weight can always be typed, also with Apple Health connected (founder doesn't wear the watch at night). A typed number (`sleep.source: 'Typed in'`, `activity.stepsTyped/activeTyped`, `health.weightTyped`) is never overwritten by Apple Health that day; a typed weight also updates About you and the targets; clearing the box lets Apple Health fill it again.
 - Gratitude card (founder chose option B): each question stays on the left, the answer box on the right, one row each, so the question is still visible after answering.
 - Typed notes no longer vanish (founder: the Daily Wisdom note was empty later). Each day now carries `savedAt`; when phone and account meet, the newer copy wins and newer phone copies are uploaded (before, the account's copy always won, even if older). `setProfile` (e.g. a new scale weight) no longer writes an old copy of the days to the phone. Everything waiting is saved at once when the app goes to the background. Verified on the web: a note typed and reloaded 0.15 s later stays.

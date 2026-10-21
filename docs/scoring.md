@@ -22,6 +22,8 @@ Attention and Learning ticks and gave their 30 points to the to-do list ("Clear 
 
 A day with no social media earns the full 70 content points.
 
+**Learning:** writing what you learned today (about five words, with an optional link) in Phone activity adds 15 points to Mind (founder, 21 Oct 2026); Mind is capped at 100.
+
 **Tao practice:** each weekday has a Tao Te Ching practice (`src/lib/tao.ts`), all on the Mind tab since 20 Oct 2026. Doing it adds 10 points to Mind; Mind is capped at 100.
 
 ## Soul / inner life (100)
