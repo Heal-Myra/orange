@@ -10,6 +10,7 @@ export interface TaoDay {
   title: string;
   pillar: 'mind' | 'soul';
   practice: string[];
+  short: string; // the day's practice in one sentence, for the compact card (founder, 21 Oct 2026)
   notePrompt: string; // what to write in today's note
 }
 
@@ -21,6 +22,7 @@ export const TAO_WEEK: TaoDay[] = [
       'Every time you notice tension, anxiety or the feeling of chasing something, ask yourself: what am I trying to grab? Write it down.',
       'At the end of the day, look at the list and search for a pattern. There is usually one main obsession that repeats itself in different disguises. Give it a name.',
     ],
+    short: 'Each time you feel tense or chasing, note what you are trying to grab. Tonight, name the pattern.',
     notePrompt: 'What were you trying to grab? And at night: what is the name of the pattern?',
   },
   {
@@ -29,6 +31,7 @@ export const TAO_WEEK: TaoDay[] = [
       'Exhale completely, as if releasing air you have been holding for months.',
       'Notice how easily the air comes back in once you have emptied out completely.',
     ],
+    short: 'Exhale fully, as if letting go of months of held air, and feel how easily the breath returns.',
     notePrompt: 'When did you remember to empty out? What did you notice?',
   },
   {
@@ -40,6 +43,7 @@ export const TAO_WEEK: TaoDay[] = [
       'If it is recognition: do something well and tell no one.',
       'If it is certainty: leave one question unanswered the whole day.',
     ],
+    short: 'Quietly practise the opposite of Monday\'s pattern: give unseen, enjoy your own company, tell no one, or leave a question open.',
     notePrompt: 'What antidote did you practise, and how did it feel?',
   },
   {
@@ -48,6 +52,7 @@ export const TAO_WEEK: TaoDay[] = [
       'Whenever someone is speaking and you feel the urge to interrupt, correct them or tell your own story to look good: hold back and keep listening.',
       'Note it down. You will notice two things: how hard it is for you to listen, and how much you learn when you stop filling the silence.',
     ],
+    short: 'When you want to interrupt or tell your own story, hold back and keep listening.',
     notePrompt: 'When did you hold back? What did you learn by listening?',
   },
   {
@@ -56,6 +61,7 @@ export const TAO_WEEK: TaoDay[] = [
       'Leave deliberate emptiness in your schedule: an hour or two with no task, no phone and no purpose.',
       'If restlessness appears, do not fight it. Let the mud settle. Watch what arises when you are not running away from your shadow.',
     ],
+    short: 'Keep an hour with no task, no phone and no purpose. Let the restlessness settle.',
     notePrompt: 'What arose in the emptiness?',
   },
   {
@@ -64,6 +70,7 @@ export const TAO_WEEK: TaoDay[] = [
       'Choose something specific you have been carrying for far too long: a grudge, a guilt, or an expectation that no longer makes sense.',
       'Write it on a piece of paper, read it aloud, then tear it up and throw it away. The physical gesture helps the mind understand that something has ended.',
     ],
+    short: 'Write down one old grudge, guilt or expectation, read it aloud, then tear it up.',
     notePrompt: 'What did you let go of? (You can keep this private and just tick the box.)',
   },
   {
@@ -73,6 +80,7 @@ export const TAO_WEEK: TaoDay[] = [
       'Every time something unsettles you, good or bad, ask the question the old farmer with the horse at the border asked: "Who knows?"',
       'Not to play it down, but to leave the story open and not announce the verdict.',
     ],
+    short: 'When anything unsettles you today, ask "Who knows?" and leave the story open.',
     notePrompt: 'When did you ask "Who knows?" today?',
   },
 ];

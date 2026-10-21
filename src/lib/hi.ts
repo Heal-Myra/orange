@@ -592,4 +592,13 @@ export const HI: Record<string, string> = {
   'Keep it to about 5 words.': 'लगभग 5 शब्दों में रखें।',
   'Link (optional): article, video, course': 'लिंक (ज़रूरी नहीं): लेख, वीडियो, कोर्स',
   'Learning something today adds {n} to Mind.': 'आज कुछ सीखने से Mind में {n} जुड़ते हैं।',
+  'Each time you feel tense or chasing, note what you are trying to grab. Tonight, name the pattern.': 'जब भी तनाव हो या कुछ पाने की दौड़ लगे, लिखें कि आप क्या पकड़ना चाहते हैं। रात को उस पैटर्न को नाम दें।',
+  'Exhale fully, as if letting go of months of held air, and feel how easily the breath returns.': 'पूरी साँस बाहर छोड़ें, जैसे महीनों से रुकी हवा छोड़ रहे हों, और देखें साँस कितनी आसानी से लौटती है।',
+  'Quietly practise the opposite of Monday\'s pattern: give unseen, enjoy your own company, tell no one, or leave a question open.': 'चुपचाप सोमवार के पैटर्न का उल्टा करें: बिना बताए दें, अपनी संगत का आनंद लें, किसी को न बताएँ, या एक सवाल खुला छोड़ दें।',
+  'When you want to interrupt or tell your own story, hold back and keep listening.': 'जब बीच में बोलने या अपनी कहानी सुनाने का मन हो, रुकें और सुनते रहें।',
+  'Keep an hour with no task, no phone and no purpose. Let the restlessness settle.': 'एक घंटा बिना काम, बिना फ़ोन और बिना मक़सद रखें। बेचैनी को शांत होने दें।',
+  'Write down one old grudge, guilt or expectation, read it aloud, then tear it up.': 'कोई पुरानी शिकायत, अपराध-बोध या उम्मीद लिखें, ज़ोर से पढ़ें, फिर फाड़ दें।',
+  'When anything unsettles you today, ask "Who knows?" and leave the story open.': 'आज जब भी कुछ विचलित करे, पूछें "कौन जाने?" और कहानी को खुला छोड़ दें।',
+  'Read the full practice': 'पूरा अभ्यास पढ़ें',
+  'Show less': 'कम दिखाएँ',
 };
