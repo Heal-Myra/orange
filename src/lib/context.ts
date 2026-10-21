@@ -57,7 +57,7 @@ export function partOfDay(d = new Date()): Slot {
 export function daySignature(day: DayLog): string {
   // Small, constant changes (a few hundred steps, heart readings every few minutes) must not count as a new picture:
   // they made Myra refresh every 20 minutes and used up the day's AI requests (20 Oct 2026). Use coarse steps instead.
-  const { guidance: _g, health, activity, mind, ...rest } = day;
+  const { guidance: _g, savedAt: _s, health, activity, mind, ...rest } = day;
   const text = JSON.stringify({
     ...rest,
     activity: { steps: Math.floor((activity.steps ?? 0) / 3000), active: Math.floor((activity.activeMin ?? 0) / 20) },

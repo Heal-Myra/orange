@@ -51,6 +51,7 @@ export interface ReflectedAction {
 
 export interface DayLog {
   date: string; // YYYY-MM-DD, local
+  savedAt?: string; // when this day was last changed (ISO); the newer copy wins between phone and account
   activity: { steps?: number; activeMin?: number; source?: string };
   sleep: { hours?: number; quality?: 1 | 2 | 3 | 4 | 5 };
   meals: Meal[];

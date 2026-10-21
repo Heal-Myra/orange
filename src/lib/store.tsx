@@ -3,6 +3,7 @@
 // given consent, each change is also saved to their own rows in Supabase (Mumbai).
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AppState, Platform } from 'react-native';
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useAuth } from './auth';
 import { shiftISO, todayISO } from './dates';
@@ -63,6 +64,8 @@ export function HealProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false);
   const [date, setDate] = useState(todayISO());
   const [days, setDays] = useState<Record<string, DayLog>>({});
+  const daysRef = useRef<Record<string, DayLog>>({});
+  daysRef.current = days;
   const [profile, setProfileState] = useState<Profile>(DEFAULT_PROFILE);
   const [sync, setSync] = useState<SyncStatus>('device');
   // Has the person seen "About you" (saved or skipped)? null until known.
@@ -91,9 +94,11 @@ export function HealProvider({ children }: { children: ReactNode }) {
       .finally(() => setReady(true));
   }, []);
 
+  const pendingLocal = useRef<Saved | null>(null);
   const persistLocal = useCallback((next: Saved) => {
     if (saveTimer.current) clearTimeout(saveTimer.current);
-    saveTimer.current = setTimeout(() => { AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next)).catch(() => {}); }, 400);
+    pendingLocal.current = next;
+    saveTimer.current = setTimeout(() => { pendingLocal.current = null; AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next)).catch(() => {}); }, 400);
   }, []);
 
   // 2. After sign-in: bring down the person's saved days, and send up any days that exist only on this device.
@@ -122,7 +127,9 @@ export function HealProvider({ children }: { children: ReactNode }) {
         setProfileState(mergedProfile);
       }
 
-      const onlyLocal = Object.values(days).filter(d => !remote[d.date]);
+      // A day on both: keep whichever was changed last (a note typed just before closing the app must not be lost).
+      const newerHere = Object.values(days).filter(d => remote[d.date] && (d.savedAt ?? '') > (remote[d.date].savedAt ?? ''));
+      const onlyLocal = [...Object.values(days).filter(d => !remote[d.date]), ...newerHere];
       if (onlyLocal.length) {
         const up = await supabase.from('day_logs').upsert(onlyLocal.map(d => toRow(userId, d, mergedProfile)));
         if (up.error) { fail('upload days', up.error); return; }
@@ -144,11 +151,31 @@ export function HealProvider({ children }: { children: ReactNode }) {
     if (!userId || !supabase) return;
     clearTimeout(pushTimers.current[d.date]);
     setSync('syncing');
-    pushTimers.current[d.date] = setTimeout(async () => {
+    const send = async () => {
+      delete pendingPush.current[d.date];
       const { error } = await supabase!.from('day_logs').upsert(toRow(userId, d, p));
       if (error) fail('save day', error); else { setSync('saved'); setSyncError(null); }
-    }, 800);
+    };
+    pendingPush.current[d.date] = send;
+    pushTimers.current[d.date] = setTimeout(send, 800);
   }, [userId, fail]);
+
+  // Leaving the app (home button, switching apps, closing): save everything waiting, right away.
+  const pendingPush = useRef<Record<string, () => Promise<void>>>({});
+  useEffect(() => {
+    const flush = () => {
+      if (pendingLocal.current) {
+        if (saveTimer.current) clearTimeout(saveTimer.current);
+        const next = pendingLocal.current; pendingLocal.current = null;
+        AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next)).catch(() => {});
+      }
+      for (const [iso, send] of Object.entries(pendingPush.current)) { clearTimeout(pushTimers.current[iso]); send(); }
+    };
+    const sub = AppState.addEventListener('change', st => { if (st !== 'active') flush(); });
+    const onHide = () => { if (typeof document !== 'undefined' && document.visibilityState === 'hidden') flush(); };
+    if (Platform.OS === 'web' && typeof document !== 'undefined') document.addEventListener('visibilitychange', onHide);
+    return () => { sub.remove(); if (Platform.OS === 'web' && typeof document !== 'undefined') document.removeEventListener('visibilitychange', onHide); };
+  }, []);
 
   const updateOn = useCallback((iso: string, change: (d: DayLog) => void) => {
     setDays(prev => {
@@ -156,7 +183,9 @@ export function HealProvider({ children }: { children: ReactNode }) {
       const before = JSON.stringify(copy);
       change(copy);
       if (JSON.stringify(copy) === before) return prev; // nothing changed: no save, no re-draw
+      copy.savedAt = new Date().toISOString(); // the newer copy wins when phone and account meet (21 Oct 2026)
       const next = { ...prev, [iso]: copy };
+      daysRef.current = next;
       persistLocal({ days: next, profile });
       pushDay(copy, profile);
       return next;
@@ -167,13 +196,13 @@ export function HealProvider({ children }: { children: ReactNode }) {
 
   const setProfile = useCallback((p: Profile) => {
     setProfileState(p);
-    persistLocal({ days, profile: p });
+    persistLocal({ days: daysRef.current, profile: p });
     if (userId && supabase) {
       setSync('syncing');
       supabase.from('profiles').upsert(profileRow(userId, p)).then(({ error }) => { if (error) fail('save targets', error); else setSync('saved'); });
       if (p.me) supabase.from('profiles').update({ about: p.me }).eq('user_id', userId).then(() => {});
     }
-  }, [days, persistLocal, userId, fail]);
+  }, [persistLocal, userId, fail]);
 
   const clearDevice = useCallback(async () => {
     setDays({});
