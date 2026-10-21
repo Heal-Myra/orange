@@ -32,8 +32,13 @@ export default function Body() {
           <MacroMix totals={totals} kcal={profile.kcal} protein={profile.protein} />
           {day.meals.length ? day.meals.map((m, i) => (
             <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 52, borderTopWidth: 1, borderTopColor: colors.line }}>
-              <Text numberOfLines={1} style={{ flex: 1, fontSize: 16, color: colors.ink }}>{m.name}</Text>
-              <Text style={{ fontSize: 14, color: colors.muted, fontVariant: ['tabular-nums'] }}>{Math.round(m.kcal)} kcal · P {Math.round(m.p)} g{m.fib ? ` · ${tr('Fibre')} ${Math.round(m.fib)} g` : ''}</Text>
+              {/* Two lines (founder, 21 Oct 2026): the dish, then its calories, protein, fat and fibre, so the source of fat is clear. */}
+              <View style={{ flex: 1, paddingVertical: 8, gap: 2 }}>
+                <Text numberOfLines={1} style={{ fontSize: 16, color: colors.ink }}>{m.name}</Text>
+                <Text style={{ fontSize: 13, color: colors.muted, fontVariant: ['tabular-nums'] }}>
+                  {Math.round(m.kcal)} kcal · {tr('Protein')} {Math.round(m.p)} g · {tr('Fat')} {Math.round(m.f)} g{m.fib ? ` · ${tr('Fibre')} ${Math.round(m.fib)} g` : ''}
+                </Text>
+              </View>
               <Pressable accessibilityLabel={`Remove ${m.name}`} onPress={() => update(d => { d.meals.splice(i, 1); })} hitSlop={10}>
                 <Text style={{ color: colors.muted, fontSize: 16 }}>✕</Text>
               </Pressable>
