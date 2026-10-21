@@ -5,7 +5,7 @@ import { Pressable, Text, View } from 'react-native';
 import { HealthLine, useHealth } from '../../components/HealthSync';
 import { Dots, Rows, StatRow } from '../../components/StatRows';
 import { MacroMix } from '../../components/MacroMix';
-import { bmiOf, fibreTarget } from '../../lib/targets';
+import { bmiOf, fibreTarget, planFor } from '../../lib/targets';
 import { MealPhoto } from '../../components/MealPhoto';
 import { Anchor, Card, Heading, Note, Screen, Score, s } from '../../components/ui';
 import { bodyScore, mealTotals } from '../../lib/scoring';
@@ -14,7 +14,7 @@ import { colors } from '../../theme';
 import { tr } from '../../lib/i18n';
 
 export default function Body() {
-  const { day, date, profile, update } = useHeal();
+  const { day, date, profile, update, setProfile } = useHeal();
   const score = bodyScore(day, profile);
   const totals = mealTotals(day.meals);
   const { connected } = useHealth();
@@ -62,9 +62,9 @@ export default function Body() {
         <Heading right={<Score value={score?.movement} max={40} />}>{tr('Movement')}</Heading>
         <Rows>
           <StatRow first label={tr('Steps')} value={day.activity.steps} target={profile.steps} key={date + 'steps'}
-            onEdit={auto ? undefined : v => update(d => { d.activity.steps = v; d.activity.source = 'Typed in'; })} />
+            onEdit={v => update(d => { d.activity.steps = v; d.activity.stepsTyped = v != null; })} />
           <StatRow label={tr('Active minutes')} value={day.activity.activeMin} target={profile.active} key={date + 'active'}
-            onEdit={auto ? undefined : v => update(d => { d.activity.activeMin = v; d.activity.source = 'Typed in'; })} />
+            onEdit={v => update(d => { d.activity.activeMin = v; d.activity.activeTyped = v != null; })} />
           {h?.activeKcal != null ? <StatRow label={tr('Active energy')} value={h.activeKcal} unit="kcal" /> : null}
           {(h?.workouts ?? []).map((w, i) => (
             <StatRow key={'w' + i} label={tr(w.type)} value={w.kcal ? `${w.min} min · ${w.kcal} kcal` : `${w.min} min`} />
@@ -72,13 +72,17 @@ export default function Body() {
         </Rows>
       </Card></Anchor>
 
-      {h && (h.weightKg != null || h.bodyFatPct != null || profile.me) ? (
+      {h || profile.me ? (
         <Card>
           <Heading>{tr('Body')}</Heading>
           <Rows>
-            <StatRow first label={tr('Weight')} value={h.weightKg ?? profile.me?.weightKg} unit="kg" />
-            {h.bodyFatPct != null ? <StatRow label={tr('Body fat')} value={h.bodyFatPct} unit="%" /> : null}
-            {profile.me ? <StatRow label="BMI" value={Math.round(bmiOf(h.weightKg ?? profile.me.weightKg, profile.me.heightCm) * 10) / 10} /> : null}
+            <StatRow first label={tr('Weight')} value={h?.weightKg ?? profile.me?.weightKg} unit="kg" decimal
+              onEdit={v => {
+                update(d => { d.health = { ...(d.health ?? {}), weightKg: v, weightTyped: v != null }; });
+                if (v != null && profile.me) { const me = { ...profile.me, weightKg: v }; const pl = planFor(me); setProfile({ ...profile, kcal: pl.kcal, protein: pl.protein, steps: pl.steps, active: pl.active, me }); }
+              }} />
+            {h?.bodyFatPct != null ? <StatRow label={tr('Body fat')} value={h.bodyFatPct} unit="%" /> : null}
+            {profile.me ? <StatRow label="BMI" value={Math.round(bmiOf(h?.weightKg ?? profile.me.weightKg, profile.me.heightCm) * 10) / 10} /> : null}
           </Rows>
         </Card>
       ) : null}

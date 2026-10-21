@@ -52,7 +52,7 @@ export interface ReflectedAction {
 export interface DayLog {
   date: string; // YYYY-MM-DD, local
   savedAt?: string; // when this day was last changed (ISO); the newer copy wins between phone and account
-  activity: { steps?: number; activeMin?: number; source?: string };
+  activity: { steps?: number; activeMin?: number; source?: string; stepsTyped?: boolean; activeTyped?: boolean }; // *Typed: the person's own number wins over Apple Health
   sleep: { hours?: number; quality?: 1 | 2 | 3 | 4 | 5; source?: string }; // source 'Typed in' = the person's own number wins over Apple Health
   meals: Meal[];
   media: MediaSession[];
@@ -63,7 +63,7 @@ export interface DayLog {
   tao?: { done?: boolean; note?: string };
   // Read from Apple Health (20 Oct 2026). Body measures are the latest reading; the rest are for this day.
   health?: {
-    weightKg?: number; bodyFatPct?: number; restingHr?: number; hrv?: number; vo2max?: number;
+    weightKg?: number; weightTyped?: boolean; bodyFatPct?: number; restingHr?: number; hrv?: number; vo2max?: number;
     activeKcal?: number; mindfulMin?: number;
     workouts?: { type: string; min: number; kcal?: number }[];
     sleepStages?: { deep?: number; core?: number; rem?: number; awake?: number }; // hours

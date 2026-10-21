@@ -4,7 +4,7 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { AppState, Platform, Text, View } from 'react-native';
 import { todayISO } from '../lib/dates';
 import { connectHealth, healthAvailable, HEALTH_READ_VERSION, readHealthDay } from '../lib/health';
@@ -22,7 +22,9 @@ interface HealthState { available: boolean; connected: boolean; lastSync: Date |
 const Ctx = createContext<HealthState>({ available: false, connected: false, lastSync: null, connect: async () => {}, syncNow: async () => {} });
 
 export function HealthProvider({ children }: { children: ReactNode }) {
-  const { updateOn, ready, profile, setProfile } = useHeal();
+  const { updateOn, ready, profile, setProfile, days } = useHeal();
+  const daysRef = useRef(days);
+  daysRef.current = days;
   const available = Platform.OS === 'ios' && healthAvailable();
   const [connected, setConnected] = useState(false);
   const [lastSync, setLastSync] = useState<Date | null>(null);
@@ -34,13 +36,14 @@ export function HealthProvider({ children }: { children: ReactNode }) {
     const iso = todayISO();
     const h = await readHealthDay(iso).catch(() => ({} as Awaited<ReturnType<typeof readHealthDay>>));
     updateOn(iso, d => {
-      if (h.steps != null) { d.activity.steps = h.steps; d.activity.source = HEALTH_SOURCE; }
-      if (h.activeMin != null) { d.activity.activeMin = h.activeMin; d.activity.source = HEALTH_SOURCE; }
+      // A number the person typed is never overwritten by Apple Health that day (founder, 21 Oct 2026).
+      if (h.steps != null && !d.activity.stepsTyped) { d.activity.steps = h.steps; d.activity.source = HEALTH_SOURCE; }
+      if (h.activeMin != null && !d.activity.activeTyped) { d.activity.activeMin = h.activeMin; d.activity.source = HEALTH_SOURCE; }
       // Sleep typed by hand (no watch at night) is never overwritten by Apple Health (founder, 21 Oct 2026).
       if (h.sleepHours != null && d.sleep.source !== 'Typed in') { d.sleep.hours = h.sleepHours; d.sleep.source = HEALTH_SOURCE; }
       const health = { ...(d.health ?? {}) };
       for (const k of ['weightKg', 'bodyFatPct', 'restingHr', 'hrv', 'vo2max', 'activeKcal', 'mindfulMin', 'workouts', 'sleepStages'] as const) {
-        if (h[k] != null) (health as Record<string, unknown>)[k] = h[k];
+        if (h[k] != null && !(k === 'weightKg' && health.weightTyped)) (health as Record<string, unknown>)[k] = h[k];
       }
       if (Object.keys(health).length) d.health = health;
       // Mindful minutes from Apple Watch or other apps count as meditation (the larger of the two, never both).
@@ -48,7 +51,7 @@ export function HealthProvider({ children }: { children: ReactNode }) {
     });
     // A new weight from the scale (e.g. Withings → Apple Health) keeps "About you" and the targets current.
     const me = profile.me;
-    if (me && h.weightKg != null && Math.abs(h.weightKg - me.weightKg) >= 0.1) {
+    if (me && h.weightKg != null && !daysRef.current[iso]?.health?.weightTyped && Math.abs(h.weightKg - me.weightKg) >= 0.1) {
       const next = { ...me, weightKg: h.weightKg };
       const p = planFor(next);
       setProfile({ ...profile, kcal: p.kcal, protein: p.protein, steps: p.steps, active: p.active, me: next });
