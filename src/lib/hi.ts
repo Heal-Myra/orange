@@ -680,6 +680,5 @@ export const HI: Record<string, string> = {
   'bpm': 'bpm',
   'per day': 'प्रति दिन',
   'days': 'दिन',
-  'of 300': '/ 300',
-  'of 100': '/ 100',
+  'of 100': '100 में से',
 };
