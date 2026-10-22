@@ -2,6 +2,7 @@
 // Energy: carbs and protein 4 kcal per gram, fat 9. Aim: protein from the person's protein target, fat 25 % (ICMR-NIN:
 // about 20–30 %), carbs the rest. Two rings with the share written on each slice, and one legend.
 
+import type { ReactNode } from 'react';
 import { Platform, Text, View } from 'react-native';
 import Svg, { Circle, G, Text as SvgText } from 'react-native-svg';
 import { tr } from '../lib/i18n';
@@ -109,11 +110,14 @@ export function NutritionTable({ totals, kcal, protein, fibre }: { totals: MealT
   );
 }
 
-export function MacroMix({ totals, kcal, protein, fibre }: { totals: MealTotals; kcal: number; protein: number; fibre?: number }) {
+export function MacroMix({ totals, kcal, protein, fibre, right }: { totals: MealTotals; kcal: number; protein: number; fibre?: number; right?: ReactNode }) {
   const now = mixOf(totals), aim = aimMix(kcal, protein, fibre);
   return (
     <View style={{ borderTopWidth: 1, borderTopColor: colors.line, paddingVertical: 14, gap: 12 }}>
-      <Text style={{ fontSize: 16, color: colors.ink }}>{tr('Where your calories come from')}</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+        <Text style={{ fontSize: 16, color: colors.ink, flex: 1 }}>{tr('Where your calories come from')}</Text>
+        {right}
+      </View>
       <View style={{ flexDirection: 'row' }}>
         <Ring mix={now} label={tr('Today')} />
         <Ring mix={aim} label={tr('Aim')} />

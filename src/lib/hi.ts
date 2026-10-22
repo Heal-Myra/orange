@@ -604,4 +604,7 @@ export const HI: Record<string, string> = {
   'Total calories': 'कुल कैलोरी',
   'of calories': 'कैलोरी का',
   'aim': 'लक्ष्य',
+  'See details': 'विवरण देखें',
+  'Hide details': 'विवरण छिपाएँ',
+  'Hide': 'छिपाएँ',
 };

@@ -1,6 +1,7 @@
 // Body: one Food card (photo, speak, type; Type falls back to IFCT 2017 search without AI), then Sleep, then Movement (founder's priority).
 // Milestone 3 replaces typing steps and sleep with automatic HealthKit / Health Connect sync.
 
+import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { HealthLine, useHealth } from '../../components/HealthSync';
 import { Dots, Rows, StatRow } from '../../components/StatRows';
@@ -18,6 +19,7 @@ export default function Body() {
   const score = bodyScore(day, profile);
   const totals = mealTotals(day.meals);
   const { connected } = useHealth();
+  const [details, setDetails] = useState(false);
   const auto = connected; // Apple Health fills sleep and movement; typing is only for phones without it
   const h = day.health;
   const st = h?.sleepStages;
@@ -27,8 +29,14 @@ export default function Body() {
       <Anchor id="food"><MealPhoto right={<Score value={score?.nutrition} max={30} />}>
         <View style={{ borderTopWidth: 1, borderTopColor: colors.line }}>
           <NutritionTable totals={totals} kcal={profile.kcal} protein={profile.protein} fibre={fibreTarget(profile.kcal)} />
-          <MacroMix totals={totals} kcal={profile.kcal} protein={profile.protein} fibre={fibreTarget(profile.kcal)} />
-          {day.meals.length ? day.meals.map((m, i) => (
+          {/* Food items only when asked (founder, 22 Oct 2026): "See details" next to the pies' title opens them below. */}
+          <MacroMix totals={totals} kcal={profile.kcal} protein={profile.protein} fibre={fibreTarget(profile.kcal)}
+            right={day.meals.length ? (
+              <Pressable onPress={() => setDetails(x => !x)} hitSlop={8} accessibilityRole="button">
+                <Text style={{ color: colors.accent, fontWeight: '600' }}>{details ? tr('Hide') : tr('See details')}</Text>
+              </Pressable>
+            ) : undefined} />
+          {day.meals.length ? (details ? day.meals.map((m, i) => (
             <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 52, borderTopWidth: 1, borderTopColor: colors.line }}>
               {/* Two lines (founder, 21 Oct 2026): the dish, then its calories, protein, fat and fibre, so the source of fat is clear. */}
               <View style={{ flex: 1, paddingVertical: 8, gap: 2 }}>
@@ -41,7 +49,7 @@ export default function Body() {
                 <Text style={{ color: colors.muted, fontSize: 16 }}>✕</Text>
               </Pressable>
             </View>
-          )) : <View style={{ borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 10 }}><Note>{tr('No meals yet today.')}</Note></View>}
+          )) : null) : <View style={{ borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 10 }}><Note>{tr('No meals yet today.')}</Note></View>}
         </View>
       </MealPhoto></Anchor>
 
