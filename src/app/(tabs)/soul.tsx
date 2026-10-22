@@ -13,7 +13,7 @@ export default function Soul() {
   const { day, profile } = useHeal();
   const score = soulScore(day, profile);
   return (
-    <Screen feedback="Soul">
+    <Screen feedback="Soul" trends="soul">
       <Card style={{ paddingVertical: 12 }}>
         <Heading right={<Score value={score?.total} max={100} />}>{tr('Soul today')}</Heading>
       </Card>

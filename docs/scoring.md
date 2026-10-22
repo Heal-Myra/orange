@@ -41,6 +41,10 @@ Reflected actions (older entries) add or subtract up to 10 points. Soul stays be
 ## Bands
 240+ Flourishing · 180+ Balanced · 120+ Finding your footing · below 120 Needs care.
 
+## Trends: Week, Month, Quarter, Year (22 Oct 2026)
+
+Every tab has a D · W · M · Q · Y switch (src/lib/trends.ts). Calendar periods (weeks start Monday). Week and Month: one bar per day; Quarter: per week; Year: per month. A bar is the average of the days with data (days without data are left out, never counted as zero); "days" measures (learning, Daily Wisdom) count the days instead. The change is against the previous period of the same kind; under 2% shows as steady. Green or red only where a direction is clearly better (weight follows the person's goal).
+
 ## Learning (22 Oct 2026)
 
 Learning adds 15 to Mind when today's note has at least 3 characters. The note is up to 10 words; Myra can write it from a pasted or shared link.

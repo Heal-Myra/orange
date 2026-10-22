@@ -19,7 +19,7 @@ export default function Today() {
   const bandColor = w.total >= 180 ? colors.good : w.total >= 120 ? colors.warn : colors.bad;
 
   return (
-    <Screen feedback="Today" top={
+    <Screen feedback="Today" trends="today" top={
       <View style={{ paddingHorizontal: 4 }}>
         <Text style={{ fontSize: 15, color: colors.muted }}>{greeting()},</Text>
         <Text style={{ fontSize: 24, fontWeight: '700', color: colors.ink }}>{profile.me?.name?.split(' ')[0] || firstName(session?.user.email) || tr('friend')}</Text>

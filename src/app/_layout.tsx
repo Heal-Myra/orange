@@ -9,6 +9,7 @@ import { TasksProvider } from '../lib/tasks';
 import { HealthProvider } from '../components/HealthSync';
 import { ReminderScheduler } from '../components/Reminders';
 import { ShareReceiver } from '../components/ShareReceiver';
+import { RangeProvider } from '../lib/range';
 import { ShareIntentProvider } from 'expo-share-intent';
 import { LangProvider, tr, useLang } from '../lib/i18n';
 import { colors } from '../theme';
@@ -119,6 +120,7 @@ export default function RootLayout() {
   return (
     <ShareIntentProvider>
     <LangProvider>
+    <RangeProvider>
     <AuthProvider>
       <HealProvider>
         <HealthProvider>
@@ -131,6 +133,7 @@ export default function RootLayout() {
         </HealthProvider>
       </HealProvider>
     </AuthProvider>
+    </RangeProvider>
     </LangProvider>
     </ShareIntentProvider>
   );

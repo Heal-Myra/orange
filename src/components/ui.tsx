@@ -8,6 +8,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { formatDay, todayISO } from '../lib/dates';
 import { useHeal } from '../lib/store';
 import { FeedbackBox } from './FeedbackBox';
+import { RangeBar, Trends } from './Trends';
+import { useRange } from '../lib/range';
+import type { Pillar } from '../lib/trends';
 import { colors, radius, shadow, space } from '../theme';
 import { tr } from '../lib/i18n';
 
@@ -15,7 +18,9 @@ import { tr } from '../lib/i18n';
 // outlines it for a moment (founder, 21 Oct 2026). Cards opt in by being wrapped in <Anchor id="…">.
 const AnchorCtx = createContext<{ register: (id: string, y: number) => void; lit: string | null; keepVisible: () => void }>({ register: () => {}, lit: null, keepVisible: () => {} });
 
-export function Screen({ children, showDay = true, feedback, top }: { children: ReactNode; showDay?: boolean; feedback?: string; top?: ReactNode }) {
+export function Screen({ children, showDay = true, feedback, top, trends }: { children: ReactNode; showDay?: boolean; feedback?: string; top?: ReactNode; trends?: Pillar }) {
+  const { range } = useRange();
+  const trending = !!trends && range !== 'D';
   const { card, at } = useLocalSearchParams<{ card?: string; at?: string }>();
   const scroll = useRef<ScrollViewInstance>(null);
   const spots = useRef<Record<string, number>>({});
@@ -59,10 +64,14 @@ export function Screen({ children, showDay = true, feedback, top }: { children: 
         <ScrollView ref={scroll} contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled"
           automaticallyAdjustKeyboardInsets keyboardDismissMode="interactive" scrollEventThrottle={32}
           onScroll={e => { offset.current = e.nativeEvent.contentOffset.y; }}>
-          {top}
-          {showDay && <DayBar />}
-          {feedback ? <FeedbackBox area={feedback} /> : null}
-          {children}
+          {/* Day · Week · Month · Quarter · Year (founder, 22 Oct 2026): any other choice than Day shows the tab's trends. */}
+          {trends ? <RangeBar /> : null}
+          {trending ? <Trends pillar={trends} /> : <>
+            {top}
+            {showDay && <DayBar />}
+            {feedback ? <FeedbackBox area={feedback} /> : null}
+            {children}
+          </>}
         </ScrollView>
       </AnchorCtx.Provider>
     </SafeAreaView>

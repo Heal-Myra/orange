@@ -26,7 +26,7 @@ export default function Body() {
   const st = h?.sleepStages;
 
   return (
-    <Screen feedback="Body">
+    <Screen feedback="Body" trends="body">
       <Anchor id="food"><MealPhoto right={<Score value={score?.nutrition} max={30} />}>
         {/* "I'm fasting today" (founder, 22 Oct 2026): a declared fast scores Food in full while only water, black tea
             or black coffee go in, and Myra changes her advice. */}

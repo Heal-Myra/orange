@@ -35,7 +35,7 @@ export default function Mind() {
   };
 
   return (
-    <Screen feedback="Mind">
+    <Screen feedback="Mind" trends="mind">
       <Card style={{ paddingVertical: 12 }}>
         <Heading right={<Score value={score?.total} max={100} />}>{tr('Mind today')}</Heading>
       </Card>
