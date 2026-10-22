@@ -601,4 +601,7 @@ export const HI: Record<string, string> = {
   'When anything unsettles you today, ask "Who knows?" and leave the story open.': 'आज जब भी कुछ विचलित करे, पूछें "कौन जाने?" और कहानी को खुला छोड़ दें।',
   'Read the full practice': 'पूरा अभ्यास पढ़ें',
   'Show less': 'कम दिखाएँ',
+  'Total calories': 'कुल कैलोरी',
+  'of calories': 'कैलोरी का',
+  'aim': 'लक्ष्य',
 };

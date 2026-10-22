@@ -4,7 +4,7 @@
 import { Pressable, Text, View } from 'react-native';
 import { HealthLine, useHealth } from '../../components/HealthSync';
 import { Dots, Rows, StatRow } from '../../components/StatRows';
-import { MacroMix } from '../../components/MacroMix';
+import { MacroMix, NutritionTable } from '../../components/MacroMix';
 import { bmiOf, fibreTarget, planFor } from '../../lib/targets';
 import { MealPhoto } from '../../components/MealPhoto';
 import { Anchor, Card, Heading, Note, Screen, Score, s } from '../../components/ui';
@@ -26,9 +26,7 @@ export default function Body() {
     <Screen feedback="Body">
       <Anchor id="food"><MealPhoto right={<Score value={score?.nutrition} max={30} />}>
         <View style={{ borderTopWidth: 1, borderTopColor: colors.line }}>
-          <StatRow first label={tr('Calories')} value={Math.round(totals.kcal)} target={profile.kcal} />
-          <StatRow label={tr('Protein (g)')} value={Math.round(totals.p)} target={profile.protein} />
-          <StatRow label={tr('Fibre (g)')} value={Math.round(totals.fib)} target={fibreTarget(profile.kcal)} />
+          <NutritionTable totals={totals} kcal={profile.kcal} protein={profile.protein} fibre={fibreTarget(profile.kcal)} />
           <MacroMix totals={totals} kcal={profile.kcal} protein={profile.protein} />
           {day.meals.length ? day.meals.map((m, i) => (
             <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 52, borderTopWidth: 1, borderTopColor: colors.line }}>

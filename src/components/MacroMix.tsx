@@ -48,30 +48,66 @@ function Ring({ mix, label }: { mix: Mix | null; label: string }) {
   );
 }
 
+const KCAL_PER_G = { c: 4, p: 4, f: 9, fib: 2 } as const; // fibre: about 2 kcal per gram (FAO; IFCT counts 8 kJ/g)
+
+/** Food card (founder, 22 Oct 2026): total calories, then carbs, protein, fat and fibre: grams against the person's
+ *  target, the calories each brings and its share of today's calories next to the aim. */
+export function NutritionTable({ totals, kcal, protein, fibre }: { totals: MealTotals; kcal: number; protein: number; fibre: number }) {
+  const aim = aimMix(kcal, protein);
+  const target = { c: Math.round((aim.c * kcal) / 4), p: protein, f: Math.round((aim.f * kcal) / 9), fib: fibre };
+  const fromG = { c: totals.c * 4, p: totals.p * 4, f: totals.f * 9, fib: (totals.fib ?? 0) * KCAL_PER_G.fib };
+  const sum = fromG.c + fromG.p + fromG.f + fromG.fib;
+  const rows = [
+    { key: 'c', name: 'Carbs', color: PARTS[0].color, g: totals.c, aimPct: aim.c },
+    { key: 'p', name: 'Protein', color: PARTS[1].color, g: totals.p, aimPct: aim.p },
+    { key: 'f', name: 'Fat', color: PARTS[2].color, g: totals.f, aimPct: aim.f },
+    { key: 'fib', name: 'Fibre', color: '#8A6BB8', g: totals.fib ?? 0, aimPct: null },
+  ] as const;
+  const bar = (v: number, max: number, color: string) => (
+    <View style={{ height: 4, borderRadius: 2, backgroundColor: colors.sunk, overflow: 'hidden' }}>
+      <View style={{ width: `${Math.max(0, Math.min(1, max ? v / max : 0)) * 100}%`, height: 4, backgroundColor: color }} />
+    </View>
+  );
+  return (
+    <View>
+      <View style={{ paddingVertical: 12, gap: 6 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
+          <Text style={{ flex: 1, fontSize: 17, fontWeight: '700', color: colors.ink }}>{tr('Total calories')}</Text>
+          <Text style={{ fontSize: 17, fontWeight: '700', color: colors.ink, fontVariant: ['tabular-nums'] }}>{Math.round(totals.kcal).toLocaleString()}
+            <Text style={{ fontWeight: '400', color: colors.muted }}> / {kcal.toLocaleString()} kcal</Text></Text>
+        </View>
+        {bar(totals.kcal, kcal, colors.body)}
+      </View>
+      {rows.map(r => {
+        const k = fromG[r.key];
+        const share = sum > 0 ? k / sum : null;
+        return (
+          <View key={r.key} style={{ borderTopWidth: 1, borderTopColor: colors.line, paddingVertical: 10, gap: 5 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: r.color }} />
+              <Text style={{ flex: 1, fontSize: 16, color: colors.ink }}>{tr(r.name)}</Text>
+              <Text style={{ fontSize: 16, fontWeight: '600', color: colors.ink, fontVariant: ['tabular-nums'] }}>{Math.round(r.g)}
+                <Text style={{ fontWeight: '400', color: colors.muted }}> / {target[r.key]} g</Text></Text>
+            </View>
+            <Text style={{ fontSize: 13, color: colors.muted, paddingLeft: 18, fontVariant: ['tabular-nums'] }}>
+              {Math.round(k)} kcal{share != null ? ` · ${Math.round(share * 100)}% ${tr('of calories')}` : ''}{r.aimPct != null ? ` · ${tr('aim')} ${Math.round(r.aimPct * 100)}%` : ''}
+            </Text>
+            {bar(r.g, target[r.key], r.color)}
+          </View>
+        );
+      })}
+    </View>
+  );
+}
+
 export function MacroMix({ totals, kcal, protein }: { totals: MealTotals; kcal: number; protein: number }) {
   const now = mixOf(totals), aim = aimMix(kcal, protein);
-  const pct = (n: number) => `${Math.round(n * 100)}%`;
   return (
     <View style={{ borderTopWidth: 1, borderTopColor: colors.line, paddingVertical: 14, gap: 12 }}>
       <Text style={{ fontSize: 16, color: colors.ink }}>{tr('Where your calories come from')}</Text>
       <View style={{ flexDirection: 'row' }}>
         <Ring mix={now} label={tr('Today')} />
         <Ring mix={aim} label={tr('Aim')} />
-      </View>
-      <View style={{ gap: 6 }}>
-        <View style={{ flexDirection: 'row' }}>
-          <Text style={{ flex: 1 }} />
-          <Text style={{ width: 64, textAlign: 'right', fontSize: 13, color: colors.muted }}>{tr('Today')}</Text>
-          <Text style={{ width: 64, textAlign: 'right', fontSize: 13, color: colors.muted }}>{tr('Aim')}</Text>
-        </View>
-        {PARTS.map(part => (
-          <View key={part.key} style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-            <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: part.color }} />
-            <Text style={{ flex: 1, fontSize: 15, color: colors.ink }}>{tr(part.name)}</Text>
-            <Text style={{ width: 64, textAlign: 'right', fontSize: 15, fontWeight: '600', color: colors.ink, fontVariant: ['tabular-nums'] }}>{now ? pct(now[part.key]) : '–'}</Text>
-            <Text style={{ width: 64, textAlign: 'right', fontSize: 15, color: colors.muted, fontVariant: ['tabular-nums'] }}>{pct(aim[part.key])}</Text>
-          </View>
-        ))}
       </View>
     </View>
   );

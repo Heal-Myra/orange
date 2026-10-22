@@ -1,6 +1,7 @@
 # Changelog
 
 ## 0.9.0 — 21 October 2026 (About you, more Apple Health)
+- Food card nutrition table (founder, 22 Oct): Total calories against the target, then Carbs, Protein, Fat and Fibre, each with grams against its target (carbs and fat from the aim mix, protein from About you, fibre 14 g/1,000 kcal), the kcal it brings (4/4/9/2 per gram) and its share of today's calories next to the aim. The two rings stay below; the old legend table is gone (`NutritionTable` in src/components/MacroMix.tsx).
 - Food: each meal row shows the dish on one line and kcal · protein · fat · fibre underneath, so it is clear which dish brings the fat (founder asked why fat was 47%: mostly cooking oil in sabzi, dal and chole).
 - Tao card made compact, about the size of Clear your mind (founder): title, the day's practice in one sentence (`short` in src/lib/tao.ts, Hindi too), the note and the tick; the full text, Sunday review and the week sit behind "Read the full practice".
 - Mind → Phone activity: new Learning part (founder): what I learned today in about five words plus an optional link (tappable). Adds 15 to Mind (`LEARNING_POINTS`, capped at 100 like the Tao bonus). Myra sees it and can put it in front of the person. docs/scoring.md updated.
