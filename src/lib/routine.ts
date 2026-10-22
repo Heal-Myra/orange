@@ -51,7 +51,7 @@ export const KIND_HINT: Record<RoutineKind, string> = {
   break: 'Mind: one quick Work to-do; Body: water',
   meal: 'Body: snap the plate in Food before eating',
   sport: 'Body: enjoy the game; drink water after',
-  learning: 'Mind: write what you learned (Learning, about five words)',
+  learning: 'Mind: write what you learned (Learning, up to 10 words)',
   walk: 'Body: the walk, with minutes',
   reading: 'Soul: Daily Wisdom; read slowly',
   sleep: 'Soul: 5 minutes of slow breathing; Body: screens away',

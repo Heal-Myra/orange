@@ -8,6 +8,8 @@ import { HealProvider, useHeal } from '../lib/store';
 import { TasksProvider } from '../lib/tasks';
 import { HealthProvider } from '../components/HealthSync';
 import { ReminderScheduler } from '../components/Reminders';
+import { ShareReceiver } from '../components/ShareReceiver';
+import { ShareIntentProvider } from 'expo-share-intent';
 import { LangProvider, tr, useLang } from '../lib/i18n';
 import { colors } from '../theme';
 
@@ -115,6 +117,7 @@ export default function RootLayout() {
   useFonts({ AmiriQuran_400Regular });
   const iconGeneration = useIconFontGuard();
   return (
+    <ShareIntentProvider>
     <LangProvider>
     <AuthProvider>
       <HealProvider>
@@ -123,10 +126,12 @@ export default function RootLayout() {
           <StatusBar style="dark" />
           <Gate key={iconGeneration} />
           <ReminderScheduler />
+          <ShareReceiver />
         </TasksProvider>
         </HealthProvider>
       </HealProvider>
     </AuthProvider>
     </LangProvider>
+    </ShareIntentProvider>
   );
 }

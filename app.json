@@ -60,7 +60,22 @@
           "speechRecognitionPermission": "Happy Orange turns what you say about your meal into text to work out its nutrition."
         }
       ],
-      "expo-notifications"
+      "expo-notifications",
+      "./plugins/withShareMenuName",
+      [
+        "expo-share-intent",
+        {
+          "iosActivationRules": {
+            "NSExtensionActivationSupportsWebURLWithMaxCount": 1,
+            "NSExtensionActivationSupportsWebPageWithMaxCount": 1,
+            "NSExtensionActivationSupportsText": true
+          },
+          "androidIntentFilters": [
+            "text/*"
+          ],
+          "iosShareExtensionName": "Happy Orange Share"
+        }
+      ]
     ],
     "scheme": "projectheal",
     "experiments": {

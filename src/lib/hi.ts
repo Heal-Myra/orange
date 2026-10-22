@@ -631,4 +631,13 @@ export const HI: Record<string, string> = {
   'Water, black tea and black coffee are fine. Food scores in full.': 'पानी, काली चाय और ब्लैक कॉफ़ी ठीक हैं। Food के पूरे अंक मिलेंगे।',
   'Food was logged, so today is scored as a normal day.': 'खाना दर्ज हुआ है, इसलिए आज सामान्य दिन की तरह अंक मिलेंगे।',
   'Fasting today: a glass of water instead.': 'आज उपवास है: इसकी जगह एक गिलास पानी।',
+  'Myra could not read this page. Write it in your own words.': 'मायरा यह पेज नहीं पढ़ सकी। अपने शब्दों में लिखें।',
+  'Paste a link: video, article, course': 'लिंक चिपकाएँ: वीडियो, लेख, कोर्स',
+  'Myra is reading the link…': 'मायरा लिंक पढ़ रही है…',
+  'What I learned today, in up to 10 words': 'आज मैंने क्या सीखा, 10 शब्दों तक में',
+  'Keep it to 10 words.': '10 शब्दों तक रखें।',
+  'Myra wrote this from the link. Change it if you like.': 'मायरा ने यह लिंक से लिखा। चाहें तो बदल दें।',
+  'Myra, write it': 'मायरा, लिख दो',
+  'Tip: in YouTube, Instagram or LinkedIn tap Share, then Happy Orange.': 'सुझाव: YouTube, Instagram या LinkedIn में Share दबाएँ, फिर Happy Orange चुनें।',
+  'What did you learn today? Write it in up to 10 words.': 'आज आपने क्या सीखा? 10 शब्दों तक में लिखें।',
 };

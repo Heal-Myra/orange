@@ -58,7 +58,7 @@ export interface DayLog {
   fasting?: boolean; // "I'm fasting today" (founder, 22 Oct 2026): water, black tea and black coffee are fine
   media: MediaSession[];
   noMedia: boolean;
-  mind: { meditationMin?: number; attention?: boolean; learning?: boolean; focusDone?: number; learned?: { text?: string; link?: string } }; // focusDone: Myra's focus tasks ticked off today (attention/learning: older days only)
+  mind: { meditationMin?: number; attention?: boolean; learning?: boolean; focusDone?: number; learned?: { text?: string; link?: string; by?: 'myra' } }; // focusDone: Myra's focus tasks ticked off today (attention/learning: older days only)
   dharma: Partial<Record<PracticeId, boolean>>;
   actions: ReflectedAction[];
   tao?: { done?: boolean; note?: string };

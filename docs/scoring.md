@@ -41,6 +41,10 @@ Reflected actions (older entries) add or subtract up to 10 points. Soul stays be
 ## Bands
 240+ Flourishing · 180+ Balanced · 120+ Finding your footing · below 120 Needs care.
 
+## Learning (22 Oct 2026)
+
+Learning adds 15 to Mind when today's note has at least 3 characters. The note is up to 10 words; Myra can write it from a pasted or shared link.
+
 ## Fasting days (22 Oct 2026)
 
 If the person switches on "I'm fasting today" on the Food card and the day's food stays at or under 60 kcal (water, black tea, black coffee), Nutrition scores the full 30. If more food is logged, the day is scored as a normal day.

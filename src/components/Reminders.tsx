@@ -29,7 +29,7 @@ export function nudgeFor(it: RoutineItem, take: (area: Task['area']) => Task | u
     case 'meal': return fasting ? tr('Fasting today: a glass of water instead.') : tr('Snap your {meal} in Food before eating.', { meal: it.what.toLowerCase() });
     case 'exercise': case 'walk': return tr('Time for {what}.', { what: it.what.toLowerCase() });
     case 'sport': return tr('Enjoy {what}. Drink water after.', { what: it.what.toLowerCase() });
-    case 'learning': return tr('What did you learn today? Write it in five words.');
+    case 'learning': return tr('What did you learn today? Write it in up to 10 words.');
     case 'wake': return tr('Good morning. Write four gratitudes and plan your day.');
     case 'reading': return tr('Read today\'s Daily Wisdom slowly.');
     case 'sleep': return tr('Five minutes of slow breathing, then sleep.');
