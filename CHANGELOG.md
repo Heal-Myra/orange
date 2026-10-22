@@ -1,6 +1,7 @@
 # Changelog
 
 ## 0.9.0 — 21 October 2026 (About you, more Apple Health)
+- Food card, later the same morning (founder): no repetition. The nutrient rows show grams against target only; the share of calories is shown once, on the two pies, now with fibre as a fourth slice (2 kcal/g; aim about 3%) and each slice's percentage written on it (thin slices just outside), plus one legend.
 - Food card nutrition table (founder, 22 Oct): Total calories against the target, then Carbs, Protein, Fat and Fibre, each with grams against its target (carbs and fat from the aim mix, protein from About you, fibre 14 g/1,000 kcal), the kcal it brings (4/4/9/2 per gram) and its share of today's calories next to the aim. The two rings stay below; the old legend table is gone (`NutritionTable` in src/components/MacroMix.tsx).
 - Food: each meal row shows the dish on one line and kcal · protein · fat · fibre underneath, so it is clear which dish brings the fat (founder asked why fat was 47%: mostly cooking oil in sabzi, dal and chole).
 - Tao card made compact, about the size of Clear your mind (founder): title, the day's practice in one sentence (`short` in src/lib/tao.ts, Hindi too), the note and the tick; the full text, Sunday review and the week sit behind "Read the full practice".

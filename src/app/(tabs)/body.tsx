@@ -27,7 +27,7 @@ export default function Body() {
       <Anchor id="food"><MealPhoto right={<Score value={score?.nutrition} max={30} />}>
         <View style={{ borderTopWidth: 1, borderTopColor: colors.line }}>
           <NutritionTable totals={totals} kcal={profile.kcal} protein={profile.protein} fibre={fibreTarget(profile.kcal)} />
-          <MacroMix totals={totals} kcal={profile.kcal} protein={profile.protein} />
+          <MacroMix totals={totals} kcal={profile.kcal} protein={profile.protein} fibre={fibreTarget(profile.kcal)} />
           {day.meals.length ? day.meals.map((m, i) => (
             <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 52, borderTopWidth: 1, borderTopColor: colors.line }}>
               {/* Two lines (founder, 21 Oct 2026): the dish, then its calories, protein, fat and fibre, so the source of fat is clear. */}
