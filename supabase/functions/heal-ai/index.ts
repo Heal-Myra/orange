@@ -347,6 +347,7 @@ Base it on the time of day, what they have already done or missed today, their p
 If "Fasting today: yes", do not suggest food or meal photos: suggest water (and a pinch of salt or electrolytes if light-headed), an easy walk instead of hard exercise, rest, and later how to break the fast gently (a light, protein-rich meal); stop the fast and see a doctor if dizzy or unwell. The Food score does not penalise eating under the calorie target. But if the last several days were all far under it (less than half) and the person has not said they are fasting, gently suggest eating enough (protein, a proper meal); never praise very low eating. If the "About" line gives a weight goal, steer the body suggestion toward it gently (portion, protein, vegetables, a walk), staying within the daily targets; never crash dieting or skipping meals. If HRV is lower than usual, sleep was short or resting heart rate is up, favour rest, an easy walk and breathing over hard exercise.
 Give exactly THREE very simple tasks: one for Body, one for Mind, one for Soul. Each is something the person can do right now or next, in a minute or two of effort to start.
 If there is a "Moment in their usual day" line, follow it first: it says what the person is doing now and what to put in front of them (one Work to-do at office moments and breaks, one Family to-do at family time, Learning on the drive home, a meal photo at meals). Otherwise follow the moment of the day shown on the "Now:" line (founder's rules, in priority order):
+- night, or the "sleep" moment, or later than their usual sleep time: help them wind down and go to sleep. pick = "soul". Soul = slow breathing for 5 minutes, then sleep (cards.soul "meditation"); Body = screens away and lights low, or a glass of water (never food, exercise or a meal photo); Mind = put the phone away, or write one line about tomorrow. Do not start anything new or stimulating.
 - early morning: Soul = write today's four gratitudes (if not yet written).
 - lunch (and dinner): Body = snap a photo of the plate in Food (if that meal is not logged yet), e.g. "Snap your lunch in Food before eating."
 - office morning / office afternoon (weekdays): Mind = one Work task from the to-do list (if there is one).
@@ -367,15 +368,29 @@ STRICT: every line is ONE line of at most 10 words, written as a direct instruct
       // Founder's rule: every line at most 10 words. If the model ran long, ask once more to shorten.
       const words = (x: unknown) => String(x ?? '').trim().split(/\s+/).filter(Boolean).length;
       const lines = [g?.headline, g?.body?.[0], g?.mind?.[0], g?.soul?.[0]];
+      const guard = (x: Record<string, unknown>, ctx: string, hi: boolean) => {
+        // Hard rules the model must never break (founder, 22 Oct 2026: a dinner tip on a declared fast, at 10 pm).
+        const out = { ...x } as { body?: string[]; pick?: string; cards?: Record<string, string> };
+        const foodWords = /\b(eat|eating|dinner|lunch|breakfast|meal|snack|paneer|dal|eggs?|roti|rice|food|protein|fruit|curd|plate)\b|खा|भोजन|नाश्ता|दाल|पनीर|अंडे/i;
+        const fasting = /Fasting today: yes/.test(ctx);
+        const now = ctx.match(/Now:[^\n]*?\b(night|dinner|evening)\b/i)?.[1]?.toLowerCase();
+        const bedtime = now === 'night' || /Moment in their usual day: now "[^"]*" \(sleep/.test(ctx);
+        if ((fasting || bedtime) && out.body?.[0] && foodWords.test(out.body[0])) {
+          out.body = [bedtime ? (hi ? 'स्क्रीन दूर रखें और रोशनी धीमी करें।' : 'Put screens away and dim the lights.') : (hi ? 'धीरे-धीरे एक गिलास पानी पिएँ।' : 'Sip a glass of water slowly.')];
+          out.cards = { ...(out.cards ?? {}), body: 'sleep' };
+        }
+        if (bedtime) out.pick = 'soul';
+        return out;
+      };
       if (lines.some(l => words(l) > 10)) {
         try {
           const short = (await askJson(ask, 'quick', ORANGE_BOOK,
 `Shorten each line of this JSON to at most 10 words. Keep the meaning, start each with a verb, keep numbers. Reply with the same JSON shape only.
 ${JSON.stringify({ headline: g.headline, body: [g.body?.[0]], mind: [g.mind?.[0]], soul: [g.soul?.[0]] })}`));
-          if (short?.headline) return { ...short, focus: g.focus ?? [], cards: g.cards, pick: g.pick };
+          if (short?.headline) return guard({ ...short, focus: g.focus ?? [], cards: g.cards, pick: g.pick }, String(p.context ?? ''), hindi);
         } catch { /* keep the first answer */ }
       }
-      return g;
+      return guard(g, String(p.context ?? ''), hindi);
     }
     case 'explain_verse': {
       const hindi = p.lang === 'hi';

@@ -5,8 +5,8 @@ import { Pressable, Text, View } from 'react-native';
 import { classifyMedia, dailyGuidance, explainPassage, explainVerse, oneLine, reflectOnAction } from '../lib/ai';
 import { traditionName, type Passage, type Tradition } from '../lib/wisdom';
 import { useAuth } from '../lib/auth';
-import { buildContext, daySignature, partOfDay } from '../lib/context';
-import { momentOf } from '../lib/routine';
+import { buildContext, daySignature, partOfDay, type Slot } from '../lib/context';
+import { momentOf, type RoutineKind } from '../lib/routine';
 import { tasksForAI, useTasks } from '../lib/tasks';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -32,6 +32,18 @@ export function cardFor(pillar: 'body' | 'mind' | 'soul', text: string, isTask: 
   return /breath|meditat|sit |still|साँस|सांस|ध्यान/.test(t) ? 'meditation' : /wisdom|verse|gita|read|passage|shloka|ज्ञान|श्लोक|गीता|पढ़/.test(t) ? 'wisdom' : 'gratitude';
 }
 
+/** Which of Body, Mind and Soul fits this moment of the day. */
+export function pickForMoment(kind: RoutineKind | undefined, slot: Slot, myra?: 'body' | 'mind' | 'soul'): 'body' | 'mind' | 'soul' {
+  if (kind) {
+    if (kind === 'sleep' || kind === 'wake' || kind === 'reading') return 'soul';
+    if (kind === 'meal' || kind === 'exercise' || kind === 'walk' || kind === 'sport') return 'body';
+    if (kind === 'work' || kind === 'break' || kind === 'family' || kind === 'learning' || kind === 'commute') return 'mind';
+  }
+  if (slot === 'night' || slot === 'early morning') return 'soul';
+  if (slot === 'lunch' || slot === 'dinner') return 'body';
+  return myra ?? 'mind';
+}
+
 /** Today: "Myra recommends". Refreshes by itself when the part of the day changes (morning, afternoon, evening, night)
  *  or when what is logged today changes (a meal, steps from a fitness app, meditation...), so the person never has to ask. */
 export function GuidanceCard() {
@@ -55,7 +67,7 @@ export function GuidanceCard() {
     const context = buildContext(day, days, date, profile, tasksForAI(open, todayISO()), tradition);
     try {
       const r = await dailyGuidance(context);
-      update(d => { d.guidance = { ...r, at: new Date().toISOString(), part: momentKey(), sig: daySignature(d), lang: lang() }; });
+      update(d => { d.guidance = { ...r, at: new Date().toISOString(), part: momentKey(), sig: daySignature(d), lang: lang(), fasting: !!d.fasting }; });
       if (Array.isArray(r.focus) && r.focus.length && date === todayISO()) setFocus(r.focus.map(String)); // Myra's pick
     } catch (e) { setMessage(errText(e)); } finally { setBusy(false); }
   }, [day, days, date, profile, update, open, setFocus, tradition]);
@@ -73,8 +85,9 @@ export function GuidanceCard() {
   useEffect(() => {
     if (!session || !isToday || busy) return;
     const ageMin = g ? (Date.now() - new Date(g.at).getTime()) / 60000 : Infinity;
-    const stale = !g || g.part !== part || (g.lang ?? 'en') !== lang() || (g.sig !== sig && ageMin > 20);
-    const key = `${date}|${part}|${sig}`;
+    // Switching "I'm fasting today" on or off changes the advice at once (founder, 22 Oct 2026).
+    const stale = !g || g.part !== part || (g.lang ?? 'en') !== lang() || !!g.fasting !== !!day.fasting || (g.sig !== sig && ageMin > 20);
+    const key = `${date}|${part}|${sig}|${day.fasting ? 'fast' : ''}`;
     if (!stale || tried.current === key) return; // one attempt per situation, so errors never loop
     const t = setTimeout(() => { tried.current = key; run(); }, 4000); // wait until the person stops typing
     return () => clearTimeout(t);
@@ -82,10 +95,9 @@ export function GuidanceCard() {
 
   const time = g ? new Date(g.at).toTimeString().slice(0, 5) : '';
 
-  // Which one to show now: Myra's pick, else read from the moment of the person's day.
-  const kind = momentOf(profile.me?.routine)?.now.kind;
-  const pick: 'body' | 'mind' | 'soul' = g?.pick ?? (kind === 'meal' || kind === 'exercise' || kind === 'walk' || kind === 'sport' ? 'body'
-    : kind === 'wake' || kind === 'reading' || kind === 'sleep' ? 'soul' : 'mind');
+  // Which one to show now. The moment decides first, so bedtime is always about winding down (founder, 22 Oct 2026:
+  // at 10 pm Myra showed a dinner tip); Myra's own pick only when the moment does not say.
+  const pick = pickForMoment(momentOf(profile.me?.routine)?.now.kind, partOfDay(), g?.pick);
   const blocks = g ? ([[tr('Body'), colors.body, g.body], [tr('Mind'), colors.mind, g.mind], [tr('Soul'), colors.soul, g.soul]] as const) : [];
 
   // Three separate blocks, one each for Body, Mind and Soul, stacked one under another (founder, 20 Oct 2026).
