@@ -53,6 +53,16 @@ describe('body', () => {
     expect(rich.total).toBeGreaterThan(heavy.total + 10);
   });
 
+  it('scores a declared fast in full while only tea or coffee went in', () => {
+    const d = day();
+    d.fasting = true;
+    expect(bodyScore(d, P)!.nutrition).toBe(30);
+    d.meals = [{ name: 'Black coffee', kcal: 5, p: 0, c: 1, f: 0, source: 'words' }];
+    expect(bodyScore(d, P)!.nutrition).toBe(30);
+    d.meals.push({ name: 'Paratha', kcal: 300, p: 6, c: 40, f: 12, source: 'words' });
+    expect(bodyScore(d, P)!.nutrition).toBeLessThan(30);
+  });
+
   it('does not reward going over the calorie target', () => {
     expect(foodScore({ kcal: 2800, p: 140, c: 300, f: 80, fib: 30 }, 2000).kcal).toBe(0);
     expect(foodScore({ kcal: 900, p: 60, c: 90, f: 25, fib: 15 }, 2000).kcal).toBe(12);

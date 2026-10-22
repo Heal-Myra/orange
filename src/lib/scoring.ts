@@ -67,12 +67,14 @@ export function foodScore(t: MealTotals, targetKcal: number) {
   return { total: kcal + protein + fibre + fat, kcal, protein, fibre, fat };
 }
 
+export const FAST_KCAL = 60; // black tea and coffee through a day stay under this
+
 /** Body: movement 40, sleep 30, food 30. Returns null when nothing is logged. */
 export function bodyScore(d: DayLog, P: Profile): BodyScore | null {
   const a = d.activity, s = d.sleep;
   const hasAct = a.steps != null || a.activeMin != null;
   const hasSleep = s.hours != null;
-  const hasFood = d.meals.length > 0;
+  const hasFood = d.meals.length > 0 || !!d.fasting;
   if (!hasAct && !hasSleep && !hasFood) return null;
 
   const movement = hasAct ? 20 * c01((a.steps ?? 0) / P.steps) + 20 * c01((a.activeMin ?? 0) / P.active) : 0;
@@ -87,7 +89,9 @@ export function bodyScore(d: DayLog, P: Profile): BodyScore | null {
 
   const totals = mealTotals(d.meals);
   let nutrition = 0;
-  if (hasFood) nutrition = foodScore(totals, P.kcal).total;
+  // A declared fast scores full, as long as only water, black tea or black coffee (a few calories) went in.
+  if (d.fasting && totals.kcal <= FAST_KCAL) nutrition = 30;
+  else if (hasFood) nutrition = foodScore(totals, P.kcal).total;
   return { total: movement + sleep + nutrition, movement, sleep, nutrition, totals };
 }
 

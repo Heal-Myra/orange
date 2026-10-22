@@ -10,6 +10,7 @@ import { useHeal } from '../lib/store';
 import { useTasks, type Task } from '../lib/tasks';
 import { itemsFor, LEAD_MINUTES, type RoutineItem } from '../lib/routine';
 import { lang, tr } from '../lib/i18n';
+import { todayISO } from '../lib/dates';
 
 // Arrived with build 7; older installed builds simply schedule nothing.
 let N: typeof import('expo-notifications') | null = null;
@@ -18,14 +19,14 @@ try { N = Platform.OS === 'web' ? null : require('expo-notifications'); } catch 
 const at = (day: Date, hhmm: string) => { const [h, m] = hhmm.split(':').map(Number); const d = new Date(day); d.setHours(h, m - LEAD_MINUTES, 0, 0); return d; };
 
 /** The nudge for one moment, taking the next unused to-do of the right group when it needs one. */
-export function nudgeFor(it: RoutineItem, take: (area: Task['area']) => Task | undefined, morning: boolean): string {
+export function nudgeFor(it: RoutineItem, take: (area: Task['area']) => Task | undefined, morning: boolean, fasting = false): string {
   const task = (area: Task['area'], prefix: string) => { const t = take(area); return t ? `${prefix}: ${t.title}` : null; };
   switch (it.kind) {
     case 'work': return task('work', tr('Work')) ?? tr('Start with the one task that matters most today.');
     case 'break': return task('work', tr('Work')) ?? tr('Drink a glass of water.');
     case 'commute': return morning ? (task('work', tr('Work')) ?? tr('Plan the first task for when you arrive.')) : tr('Listen to something you can learn from.');
     case 'family': return task('family', tr('Family')) ?? tr('Put the phone away and be with your family.');
-    case 'meal': return tr('Snap your {meal} in Food before eating.', { meal: it.what.toLowerCase() });
+    case 'meal': return fasting ? tr('Fasting today: a glass of water instead.') : tr('Snap your {meal} in Food before eating.', { meal: it.what.toLowerCase() });
     case 'exercise': case 'walk': return tr('Time for {what}.', { what: it.what.toLowerCase() });
     case 'sport': return tr('Enjoy {what}. Drink water after.', { what: it.what.toLowerCase() });
     case 'learning': return tr('What did you learn today? Write it in five words.');
@@ -37,7 +38,8 @@ export function nudgeFor(it: RoutineItem, take: (area: Task['area']) => Task | u
 }
 
 export function ReminderScheduler() {
-  const { profile } = useHeal();
+  const { profile, days } = useHeal();
+  const fastingToday = !!days[todayISO()]?.fasting;
   const { open } = useTasks();
   const routine = profile.me?.routine;
 
@@ -61,7 +63,7 @@ export function ReminderScheduler() {
         for (const it of itemsFor(routine, day)) {
           const when = at(day, it.at);
           if (when.getTime() <= now + 30_000 || when.getTime() > horizon) continue;
-          const body = nudgeFor(it, take, when.getHours() < 12);
+          const body = nudgeFor(it, take, when.getHours() < 12, offset === 0 && fastingToday);
           await Notif.scheduleNotificationAsync({
             content: { title: it.what, body, data: { kind: it.kind, lang: lang() } },
             trigger: { type: Notif.SchedulableTriggerInputTypes.DATE, date: when },
@@ -73,7 +75,7 @@ export function ReminderScheduler() {
     plan().catch(() => { /* reminders are a bonus; never break the app */ });
     const sub = AppState.addEventListener('change', s => { if (s === 'active') plan().catch(() => {}); });
     return () => { cancelled = true; sub.remove(); };
-  }, [routine, open]);
+  }, [routine, open, fastingToday]);
 
   return null;
 }

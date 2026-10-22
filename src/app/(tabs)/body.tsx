@@ -2,6 +2,7 @@
 // Milestone 3 replaces typing steps and sleep with automatic HealthKit / Health Connect sync.
 
 import { useState } from 'react';
+import { Ionicons } from '@expo/vector-icons';
 import { Pressable, Text, View } from 'react-native';
 import { HealthLine, useHealth } from '../../components/HealthSync';
 import { Dots, Rows, StatRow } from '../../components/StatRows';
@@ -9,7 +10,7 @@ import { MacroMix, NutritionTable } from '../../components/MacroMix';
 import { bmiOf, fibreTarget, planFor } from '../../lib/targets';
 import { MealPhoto } from '../../components/MealPhoto';
 import { Anchor, Card, Heading, Note, Screen, Score, s } from '../../components/ui';
-import { bodyScore, mealTotals } from '../../lib/scoring';
+import { FAST_KCAL, bodyScore, mealTotals } from '../../lib/scoring';
 import { useHeal } from '../../lib/store';
 import { colors } from '../../theme';
 import { tr } from '../../lib/i18n';
@@ -27,6 +28,18 @@ export default function Body() {
   return (
     <Screen feedback="Body">
       <Anchor id="food"><MealPhoto right={<Score value={score?.nutrition} max={30} />}>
+        {/* "I'm fasting today" (founder, 22 Oct 2026): a declared fast scores Food in full while only water, black tea
+            or black coffee go in, and Myra changes her advice. */}
+        <Pressable accessibilityRole="switch" accessibilityState={{ checked: !!day.fasting }} onPress={() => update(d => { d.fasting = !d.fasting; })}
+          style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10, borderTopWidth: 1, borderTopColor: colors.line }}>
+          <Ionicons name={day.fasting ? 'checkmark-circle' : 'ellipse-outline'} size={24} color={day.fasting ? colors.body : colors.muted} />
+          <View style={{ flex: 1 }}>
+            <Text style={{ fontSize: 16, color: colors.ink, fontWeight: day.fasting ? '600' : '400' }}>{tr('I\'m fasting today')}</Text>
+            {day.fasting ? <Text style={{ fontSize: 13, color: colors.muted }}>
+              {totals.kcal <= FAST_KCAL ? tr('Water, black tea and black coffee are fine. Food scores in full.') : tr('Food was logged, so today is scored as a normal day.')}
+            </Text> : null}
+          </View>
+        </Pressable>
         <View style={{ borderTopWidth: 1, borderTopColor: colors.line }}>
           <NutritionTable totals={totals} kcal={profile.kcal} protein={profile.protein} fibre={fibreTarget(profile.kcal)} />
           {/* Food items only when asked (founder, 22 Oct 2026): "See details" next to the pies' title opens them below. */}

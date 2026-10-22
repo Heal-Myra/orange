@@ -55,6 +55,7 @@ export interface DayLog {
   activity: { steps?: number; activeMin?: number; source?: string; stepsTyped?: boolean; activeTyped?: boolean }; // *Typed: the person's own number wins over Apple Health
   sleep: { hours?: number; quality?: 1 | 2 | 3 | 4 | 5; source?: string }; // source 'Typed in' = the person's own number wins over Apple Health
   meals: Meal[];
+  fasting?: boolean; // "I'm fasting today" (founder, 22 Oct 2026): water, black tea and black coffee are fine
   media: MediaSession[];
   noMedia: boolean;
   mind: { meditationMin?: number; attention?: boolean; learning?: boolean; focusDone?: number; learned?: { text?: string; link?: string } }; // focusDone: Myra's focus tasks ticked off today (attention/learning: older days only)

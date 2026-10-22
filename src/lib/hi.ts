@@ -627,4 +627,8 @@ export const HI: Record<string, string> = {
   'Read today\'s Daily Wisdom slowly.': 'आज का ज्ञान धीरे-धीरे पढ़ें।',
   'Five minutes of slow breathing, then sleep.': 'पाँच मिनट धीमी साँस, फिर सो जाएँ।',
   'One small step for yourself.': 'अपने लिए एक छोटा कदम।',
+  'I\'m fasting today': 'आज मेरा उपवास है',
+  'Water, black tea and black coffee are fine. Food scores in full.': 'पानी, काली चाय और ब्लैक कॉफ़ी ठीक हैं। Food के पूरे अंक मिलेंगे।',
+  'Food was logged, so today is scored as a normal day.': 'खाना दर्ज हुआ है, इसलिए आज सामान्य दिन की तरह अंक मिलेंगे।',
+  'Fasting today: a glass of water instead.': 'आज उपवास है: इसकी जगह एक गिलास पानी।',
 };
