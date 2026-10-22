@@ -681,4 +681,5 @@ export const HI: Record<string, string> = {
   'per day': 'प्रति दिन',
   'days': 'दिन',
   'of 100': '100 में से',
+  'Breathe slowly for 5 minutes, then sleep.': 'धीरे-धीरे 5 मिनट साँस लें, फिर सो जाएँ।',
 };

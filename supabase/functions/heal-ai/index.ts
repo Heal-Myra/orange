@@ -379,7 +379,7 @@ STRICT: every line is ONE line of at most 10 words, written as a direct instruct
           out.body = [bedtime ? (hi ? 'स्क्रीन दूर रखें और रोशनी धीमी करें।' : 'Put screens away and dim the lights.') : (hi ? 'धीरे-धीरे एक गिलास पानी पिएँ।' : 'Sip a glass of water slowly.')];
           out.cards = { ...(out.cards ?? {}), body: 'sleep' };
         }
-        if (bedtime) out.pick = 'soul';
+        if (bedtime) { out.pick = 'soul'; (out as { soul?: string[] }).soul = [hi ? 'धीरे-धीरे 5 मिनट साँस लें, फिर सो जाएँ।' : 'Breathe slowly for 5 minutes, then sleep.']; out.cards = { ...(out.cards ?? {}), soul: 'meditation' }; }
         return out;
       };
       if (lines.some(l => words(l) > 10)) {
