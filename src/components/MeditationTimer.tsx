@@ -1,5 +1,6 @@
 // Guided meditation inside the app: the app suggests a length, guides the breath, and records the minutes actually sat.
 
+import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { useHeal } from '../lib/store';
@@ -61,6 +62,7 @@ export function MeditationTimer() {
           </View>
           <Note>{tr('Sit comfortably, let your eyes close, and follow the breath. The app counts only the minutes you actually sit.')}</Note>
           <Button title={tr('Begin {n}-minute meditation', { n: length })} onPress={start} />
+          <Button kind="plain" title={tr('Guided Yoga Nidra, lying down (15 min)')} onPress={() => router.push('/yoga-nidra')} />
         </>
       ) : (
         <View style={{ alignItems: 'center', gap: 8, paddingVertical: 8 }}>

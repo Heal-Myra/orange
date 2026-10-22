@@ -102,7 +102,7 @@ export function GuidanceCard() {
   // After the usual sleep time (or 9:30 pm), only winding down: never a target to chase (founder, 22 Oct 2026:
   // "Meditate 15 more minutes to reach your target" at 10:20 pm).
   const bedtime = nowKind === 'sleep' || (!nowKind && partOfDay() === 'night');
-  const soulLine = bedtime ? [tr('Breathe slowly for 5 minutes, then sleep.')] : g?.soul ?? [];
+  const soulLine = bedtime ? [tr('Lie down for Yoga Nidra, then drift into sleep.')] : g?.soul ?? [];
   const blocks = g ? ([[tr('Body'), colors.body, g.body], [tr('Mind'), colors.mind, g.mind], [tr('Soul'), colors.soul, soulLine]] as const) : [];
 
   // Three separate blocks, one each for Body, Mind and Soul, stacked one under another (founder, 20 Oct 2026).
@@ -122,7 +122,7 @@ export function GuidanceCard() {
         const card = bedtime && pillar === 'soul' ? 'meditation' : cardFor(pillar, list[0] ?? '', !!task, g.cards?.[pillar]);
         return list[0] ? (
           <Pressable key={name} accessibilityRole="button" accessibilityHint={tr('Opens the card where you do this')}
-            onPress={() => router.navigate({ pathname: `/${pillar}`, params: { card, at: String(Date.now()) } })}
+            onPress={() => bedtime && pillar === 'soul' ? router.push('/yoga-nidra') : router.navigate({ pathname: `/${pillar}`, params: { card, at: String(Date.now()) } })}
             style={({ pressed }) => ({ opacity: pressed ? 0.8 : 1 })}>
           <Card style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 12, borderLeftWidth: 5, borderLeftColor: color }}>
             <Text style={{ color, fontWeight: '700', fontSize: 14, width: 44 }}>{name}</Text>

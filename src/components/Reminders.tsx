@@ -5,6 +5,7 @@
 // Re-planned whenever the app opens, the to-do list changes or the usual day changes. iPhone app only.
 
 import { useEffect } from 'react';
+import { router } from 'expo-router';
 import { AppState, Platform } from 'react-native';
 import { useHeal } from '../lib/store';
 import { useTasks, type Task } from '../lib/tasks';
@@ -32,7 +33,7 @@ export function nudgeFor(it: RoutineItem, take: (area: Task['area']) => Task | u
     case 'learning': return tr('What did you learn today? Write it in up to 10 words.');
     case 'wake': return tr('Good morning. Write four gratitudes and plan your day.');
     case 'reading': return tr('Read today\'s Daily Wisdom slowly.');
-    case 'sleep': return tr('Five minutes of slow breathing, then sleep.');
+    case 'sleep': return tr('Lie down for Yoga Nidra in Happy Orange, then sleep.');
     default: return task('self', tr('Better me')) ?? tr('One small step for yourself.');
   }
 }
@@ -73,8 +74,12 @@ export function ReminderScheduler() {
       }
     };
     plan().catch(() => { /* reminders are a bonus; never break the app */ });
+    // Tapping the bedtime reminder opens the guided Yoga Nidra (founder, 22 Oct 2026).
+    const tap = Notif.addNotificationResponseReceivedListener(r => {
+      if ((r.notification.request.content.data as { kind?: string } | undefined)?.kind === 'sleep') router.push('/yoga-nidra');
+    });
     const sub = AppState.addEventListener('change', s => { if (s === 'active') plan().catch(() => {}); });
-    return () => { cancelled = true; sub.remove(); };
+    return () => { cancelled = true; sub.remove(); tap.remove(); };
   }, [routine, open, fastingToday]);
 
   return null;
