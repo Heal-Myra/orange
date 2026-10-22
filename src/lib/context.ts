@@ -2,6 +2,7 @@
 // (daily guidance and Myra) so its answers are about this person. Built on the device; only what is needed is sent.
 
 import { aboutLine, fibreTarget } from './targets';
+import { momentLine } from './routine';
 import { shiftISO, todayISO } from './dates';
 import { verseOfDay } from './gita';
 import { mealTotals, wellBeing } from './scoring';
@@ -24,6 +25,7 @@ export function buildContext(day: DayLog, days: Record<string, DayLog>, date: st
     `Targets: ${profile.kcal} kcal, ${profile.protein} g protein, ${profile.steps} steps, ${profile.active} active min, ${profile.meditation} min meditation, social media ≤ ${profile.mediaLimit} min.`,
     `Today (${date}): steps ${day.activity.steps ?? 'not logged'}, active ${day.activity.activeMin ?? 'not logged'} min${day.activity.source ? ` (from ${day.activity.source})` : ''}, sleep ${day.sleep.hours ?? 'not logged'} h (quality ${day.sleep.quality ?? '-'}/5).`,
     aboutLine(profile.me),
+    momentLine(profile.me?.routine),
     healthLine(day),
     `Food: ${day.meals.map(m => m.name).join(', ') || 'nothing logged'}; totals ${Math.round(t.kcal)} kcal, protein ${Math.round(t.p)} g, carbs ${Math.round(t.c)} g, fat ${Math.round(t.f)} g, fibre ${Math.round(t.fib)} g (target ${fibreTarget(profile.kcal)} g).`,
     `Mind: focus tasks done today ${day.mind.focusDone ?? 0} of up to 2; learned today: ${day.mind.learned?.text?.trim() ? `"${day.mind.learned.text.trim()}"${day.mind.learned.link ? ` (${day.mind.learned.link})` : ''}` : 'not written yet'}; social media ${day.noMedia ? 'none' : day.media.map(m => `${m.minutes} min ${m.platform} (${m.category})`).join('; ') || 'not logged'}.`,

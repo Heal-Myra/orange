@@ -23,7 +23,7 @@ const MODELS = {
   anthropic: { smart: Deno.env.get('ANTHROPIC_MODEL_SMART') ?? 'claude-sonnet-5-5', quick: Deno.env.get('ANTHROPIC_MODEL_QUICK') ?? 'claude-haiku-5-5' },
   gemini: { smart: Deno.env.get('GEMINI_MODEL') ?? 'gemini-3.8-flash', quick: Deno.env.get('GEMINI_MODEL') ?? 'gemini-3.8-flash' },
 };
-const DAILY_LIMIT = Number(Deno.env.get('AI_DAILY_LIMIT') ?? 20);
+const DAILY_LIMIT = Number(Deno.env.get('AI_DAILY_LIMIT') ?? 40); // 40 since 22 Oct 2026: Myra refreshes at each switch-over of the day
 const ADMIN_DAILY_LIMIT = Number(Deno.env.get('AI_ADMIN_DAILY_LIMIT') ?? 200);
 // Comma-separated emails allowed to use the AI. While AI_PROVIDER is gemini (free tier), set this to the
 // founder's email so no other person's data reaches a service that may train on it.
@@ -242,6 +242,26 @@ Reply with JSON only: {"sessions":[{"platform":"Instagram","app":"name as shown"
 If this is not a Screen Time screenshot: {"sessions":[],"period":"unclear","note":"This does not look like a Screen Time screenshot."}`,
         { media_type: String(p.media_type ?? 'image/jpeg'), data: String(p.image_base64 ?? '') }));
     }
+    case 'routine_plan': {
+      // "About you": the person's usual day in their own words (founder, 22 Oct 2026) → a simple timetable.
+      const text = String(p.text ?? '').trim().slice(0, 1500);
+      if (!text) return { routine: [] };
+      const r = await askJson(ask, 'quick', ORANGE_BOOK,
+`A person described their usual day:
+"${text}"
+Turn it into a timetable of the moments when what they are doing changes. Use 24-hour "HH:MM" local times. If they give a range, use its start. If something happens only on working days (office, commute to work), mark it "weekdays"; if only at the weekend, "weekend"; otherwise "daily". If they mention working days (e.g. Monday to Friday), office-related items are "weekdays".
+Each item's "what" is their own words, at most 5 words (e.g. "Tea break", "Lunch", "Drive home, podcasts"). "kind" is one of: wake, exercise, family, commute, work, break, meal, sport, learning, walk, reading, sleep, other ("work" = arriving at or starting work; "break" = tea or hydration breaks at work; "meal" = breakfast, lunch or dinner; a drive with podcasts is "learning").
+Reply with JSON only: {"routine":[{"at":"HH:MM","what":"…","kind":"…","days":"daily"|"weekdays"|"weekend"}]} in time order, at most 24 items.`);
+      const KINDS = ['wake', 'exercise', 'family', 'commute', 'work', 'break', 'meal', 'sport', 'learning', 'walk', 'reading', 'sleep', 'other'];
+      const list = (Array.isArray(r.routine) ? r.routine : []).slice(0, 24)
+        .filter((x: { at?: string }) => /^\d{1,2}:\d{2}$/.test(String(x.at ?? '')))
+        .map((x: { at: string; what?: string; kind?: string; days?: string }) => ({
+          at: String(x.at).padStart(5, '0'), what: String(x.what ?? '').slice(0, 40),
+          kind: KINDS.includes(String(x.kind)) ? String(x.kind) : 'other',
+          days: ['daily', 'weekdays', 'weekend'].includes(String(x.days)) ? String(x.days) : 'daily',
+        }));
+      return { routine: list };
+    }
     case 'goal_plan': {
       // "About you": the person writes their goal in their own words (founder, 21 Oct 2026). Myra reads it into a
       // weight aim the app can plan with, keeps any other aims, and says plainly if it is too steep.
@@ -266,7 +286,7 @@ Tell the person what to do next, for the rest of today from the time shown (if i
 Base it on the time of day, what they have already done or missed today, their pattern over the last 7 days, and any data from fitness apps. Never recommend something already done.
 If the "About" line gives a weight goal, steer the body suggestion toward it gently (portion, protein, vegetables, a walk), staying within the daily targets; never crash dieting or skipping meals. If HRV is lower than usual, sleep was short or resting heart rate is up, favour rest, an easy walk and breathing over hard exercise.
 Give exactly THREE very simple tasks: one for Body, one for Mind, one for Soul. Each is something the person can do right now or next, in a minute or two of effort to start.
-Follow the moment of the day shown on the "Now:" line (founder's rules, in priority order):
+If there is a "Moment in their usual day" line, follow it first: it says what the person is doing now and what to put in front of them (one Work to-do at office moments and breaks, one Family to-do at family time, Learning on the drive home, a meal photo at meals). Otherwise follow the moment of the day shown on the "Now:" line (founder's rules, in priority order):
 - early morning: Soul = write today's four gratitudes (if not yet written).
 - lunch (and dinner): Body = snap a photo of the plate in Food (if that meal is not logged yet), e.g. "Snap your lunch in Food before eating."
 - office morning / office afternoon (weekdays): Mind = one Work task from the to-do list (if there is one).
@@ -278,7 +298,9 @@ Reply with JSON only:
  "mind":["the one Mind task; if it is a to-do task, name it, e.g. 'Finish: Send the Q3 budget.'"],
  "soul":["the one Soul task"],
  "focus":["the id of the to-do task used in mind, or nothing"],
- "cards":{"body":"food"|"sleep"|"movement","mind":"tasks"|"tao"|"phone","soul":"gratitude"|"meditation"|"wisdom"}}
+ "cards":{"body":"food"|"sleep"|"movement","mind":"tasks"|"tao"|"phone","soul":"gratitude"|"meditation"|"wisdom"},
+ "pick":"body"|"mind"|"soul"}
+"pick" is the ONE of the three that fits this moment best; the Today screen shows only that one (founder, 22 Oct 2026): e.g. a Work to-do at office moments and breaks, the meal photo at meals, gratitude on waking.
 "cards" names the app card where each task is done (Body tab: Food, Sleep, Movement; Mind tab: Clear your mind to-do list, Tao practice, Phone activity (including Learning); Soul tab: Gratitude, Breathing & meditation, Daily Wisdom).
 For "focus": [] unless the Mind task is a to-do task; then exactly that one id (overdue or due today first; on a tired or low-sleep day pick a light one). Use only ids from the list.
 STRICT: every line is ONE line of at most 10 words, written as a direct instruction that starts with a verb, with a number where it helps: e.g. "Walk 10 minutes after lunch.", "Write four things you are grateful for.", "Snap your lunch in Food before eating." Never use "try", "consider", "maybe", "you could" or "it may help". Exactly one item per list.`));
@@ -290,7 +312,7 @@ STRICT: every line is ONE line of at most 10 words, written as a direct instruct
           const short = (await askJson(ask, 'quick', ORANGE_BOOK,
 `Shorten each line of this JSON to at most 10 words. Keep the meaning, start each with a verb, keep numbers. Reply with the same JSON shape only.
 ${JSON.stringify({ headline: g.headline, body: [g.body?.[0]], mind: [g.mind?.[0]], soul: [g.soul?.[0]] })}`));
-          if (short?.headline) return { ...short, focus: g.focus ?? [], cards: g.cards };
+          if (short?.headline) return { ...short, focus: g.focus ?? [], cards: g.cards, pick: g.pick };
         } catch { /* keep the first answer */ }
       }
       return g;

@@ -59,7 +59,8 @@
           "microphonePermission": "Happy Orange listens only while you tap Speak, so you can say what you ate.",
           "speechRecognitionPermission": "Happy Orange turns what you say about your meal into text to work out its nutrition."
         }
-      ]
+      ],
+      "expo-notifications"
     ],
     "scheme": "projectheal",
     "experiments": {

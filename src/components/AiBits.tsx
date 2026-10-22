@@ -6,6 +6,7 @@ import { classifyMedia, dailyGuidance, explainPassage, explainVerse, oneLine, re
 import { traditionName, type Passage, type Tradition } from '../lib/wisdom';
 import { useAuth } from '../lib/auth';
 import { buildContext, daySignature, partOfDay } from '../lib/context';
+import { momentOf } from '../lib/routine';
 import { tasksForAI, useTasks } from '../lib/tasks';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -44,7 +45,9 @@ export function GuidanceCard() {
   const tried = useRef<string>('');
   const g = day.guidance;
   const isToday = date === todayISO();
-  const part = partOfDay();
+  // The moment of the person's usual day if they described it (switches 5 minutes early), else the part of the day.
+  const momentKey = () => momentOf(profile.me?.routine)?.key ?? partOfDay();
+  const part = momentKey();
   const sig = daySignature(day);
 
   const run = useCallback(async () => {
@@ -52,7 +55,7 @@ export function GuidanceCard() {
     const context = buildContext(day, days, date, profile, tasksForAI(open, todayISO()), tradition);
     try {
       const r = await dailyGuidance(context);
-      update(d => { d.guidance = { ...r, at: new Date().toISOString(), part: partOfDay(), sig: daySignature(d), lang: lang() }; });
+      update(d => { d.guidance = { ...r, at: new Date().toISOString(), part: momentKey(), sig: daySignature(d), lang: lang() }; });
       if (Array.isArray(r.focus) && r.focus.length && date === todayISO()) setFocus(r.focus.map(String)); // Myra's pick
     } catch (e) { setMessage(errText(e)); } finally { setBusy(false); }
   }, [day, days, date, profile, update, open, setFocus, tradition]);
@@ -64,8 +67,8 @@ export function GuidanceCard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [kick]);
 
-  // Look again every 10 minutes, so a new part of the day is noticed even if nothing is tapped.
-  useEffect(() => { const t = setInterval(() => setTick(x => x + 1), 10 * 60 * 1000); return () => clearInterval(t); }, []);
+  // Look again every minute, so a switch-over in the day (5 minutes early) is noticed even if nothing is tapped.
+  useEffect(() => { const t = setInterval(() => setTick(x => x + 1), 60 * 1000); return () => clearInterval(t); }, []);
 
   useEffect(() => {
     if (!session || !isToday || busy) return;
@@ -79,19 +82,24 @@ export function GuidanceCard() {
 
   const time = g ? new Date(g.at).toTimeString().slice(0, 5) : '';
 
+  // Which one to show now: Myra's pick, else read from the moment of the person's day.
+  const kind = momentOf(profile.me?.routine)?.now.kind;
+  const pick: 'body' | 'mind' | 'soul' = g?.pick ?? (kind === 'meal' || kind === 'exercise' || kind === 'walk' || kind === 'sport' ? 'body'
+    : kind === 'wake' || kind === 'reading' || kind === 'sleep' ? 'soul' : 'mind');
   const blocks = g ? ([[tr('Body'), colors.body, g.body], [tr('Mind'), colors.mind, g.mind], [tr('Soul'), colors.soul, g.soul]] as const) : [];
 
   // Three separate blocks, one each for Body, Mind and Soul, stacked one under another (founder, 20 Oct 2026).
   return (
     <View style={{ gap: 10 }}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 4 }}>
-        <Heading>{tr('Myra recommends')}</Heading>
+        <Heading>{tr('Clear your mind')}</Heading>
         {session && g && !busy && isToday ? <Pressable onPress={run} hitSlop={8}><Text style={{ color: colors.insight, fontWeight: '600' }}>{tr('Refresh')}</Text></Pressable> : null}
       </View>
 
       {/* Three very simple tasks, one each (founder, 21 Oct 2026). When the Mind task is a to-do, it can be ticked here;
           Myra then rotates to the next thing. */}
       {g ? blocks.map(([name, color, list], i) => {
+        if ((['body', 'mind', 'soul'] as const)[i] !== pick) return null; // one thing at a time (founder, 22 Oct 2026)
         const task = i === 1 && isToday ? focus.find(t => (g.focus ?? []).includes(t.id)) : undefined;
         const pillar = (['body', 'mind', 'soul'] as const)[i];
         const card = cardFor(pillar, list[0] ?? '', !!task, g.cards?.[pillar]);

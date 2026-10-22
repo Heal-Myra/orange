@@ -8,7 +8,7 @@ import type { ContentCategoryId } from './types';
 
 export interface MealItem { name: string; grams: number; kcal: number; protein_g: number; carbs_g: number; fat_g: number; fibre_g?: number; basis: 'IFCT' | 'estimate' }
 export interface MealResult { items: MealItem[]; confidence: string; note: string; insight: string }
-export interface Guidance { headline: string; body: string[]; mind: string[]; soul: string[]; focus?: string[]; cards?: { body?: string; mind?: string; soul?: string } }
+export interface Guidance { headline: string; body: string[]; mind: string[]; soul: string[]; focus?: string[]; cards?: { body?: string; mind?: string; soul?: string }; pick?: 'body' | 'mind' | 'soul' }
 export interface Reflection { principle: string; alignment: number; reflection: string }
 
 async function call<T>(action: string, payload: Record<string, unknown>): Promise<T> {
@@ -40,6 +40,9 @@ export interface GoalReading { goal: 'lose' | 'keep' | 'gain'; kg: number | null
 /** Myra reads a goal written in plain words (About you). */
 export const understandGoal = (goal: string, me: { age: number; sex: string; heightCm: number; weightKg: number }, today: string) =>
   call<GoalReading>('goal_plan', { goal, ...me, today });
+
+/** Myra reads a usual day written in plain words into a timetable (About you). */
+export const readRoutine = (text: string) => call<{ routine: import('./routine').RoutineItem[] }>('routine_plan', { text });
 
 export const dailyGuidance = (context: string) => call<Guidance>('guidance', { context });
 

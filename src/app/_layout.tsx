@@ -7,6 +7,7 @@ import { AuthProvider, useAuth } from '../lib/auth';
 import { HealProvider, useHeal } from '../lib/store';
 import { TasksProvider } from '../lib/tasks';
 import { HealthProvider } from '../components/HealthSync';
+import { ReminderScheduler } from '../components/Reminders';
 import { LangProvider, tr, useLang } from '../lib/i18n';
 import { colors } from '../theme';
 
@@ -121,6 +122,7 @@ export default function RootLayout() {
         <TasksProvider>
           <StatusBar style="dark" />
           <Gate key={iconGeneration} />
+          <ReminderScheduler />
         </TasksProvider>
         </HealthProvider>
       </HealProvider>

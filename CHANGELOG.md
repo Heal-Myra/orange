@@ -1,6 +1,7 @@
 # Changelog
 
 ## 0.9.0 — 21 October 2026 (About you, more Apple Health)
+- Your usual day (22 Oct, founder): About you takes the day in your own words; Myra makes a timetable; five minutes before each switch-over Today shows ONE fitting thing (work to-do at office moments and breaks, family to-do at family time, learning on the drive home, meal photo at meals), titled "Clear your mind". Phone reminders at the same moments from build 7 (`expo-notifications`, local only). Testers' AI cap 20 → 40. See docs/decisions/0014-usual-day-and-one-thing-at-a-time.md.
 - Food: the list of food items is hidden until asked (founder): "See details" next to "Where your calories come from" opens it below the pies; "Hide" closes it.
 - Food card, later the same morning (founder): no repetition. The nutrient rows show grams against target only; the share of calories is shown once, on the two pies, now with fibre as a fourth slice (2 kcal/g; aim about 3%) and each slice's percentage written on it (thin slices just outside), plus one legend.
 - Food card nutrition table (founder, 22 Oct): Total calories against the target, then Carbs, Protein, Fat and Fibre, each with grams against its target (carbs and fat from the aim mix, protein from About you, fibre 14 g/1,000 kcal), the kcal it brings (4/4/9/2 per gram) and its share of today's calories next to the aim. The two rings stay below; the old legend table is gone (`NutritionTable` in src/components/MacroMix.tsx).

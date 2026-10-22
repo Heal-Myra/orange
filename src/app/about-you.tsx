@@ -7,7 +7,7 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { Button, Card, Heading, Note, NumberField, Screen, Segmented, TextField, s } from '../components/ui';
-import { understandGoal } from '../lib/ai';
+import { readRoutine, understandGoal } from '../lib/ai';
 import { useAuth } from '../lib/auth';
 import { todayISO } from '../lib/dates';
 import { tr } from '../lib/i18n';
@@ -27,6 +27,7 @@ export default function AboutYou() {
   const [weight, setWeight] = useState<number | undefined>(me?.weightKg ?? day.health?.weightKg);
   const [faith, setFaith] = useState<Tradition | null>(tradition);
   const [goalText, setGoalText] = useState(me?.goalText ?? '');
+  const [dayText, setDayText] = useState(me?.dayText ?? '');
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<{ me: AboutMe; plan: Plan } | null>(null);
 
@@ -47,6 +48,12 @@ export default function AboutYou() {
         next = { ...next, ...parseGoal(text) };
       }
     }
+    // The usual day → a timetable (Myra reads it; kept as it was if the words did not change).
+    const day = dayText.trim();
+    next.dayText = day || undefined;
+    if (day && day === me?.dayText && me?.routine?.length) next.routine = me.routine;
+    else if (day && session) { try { next.routine = (await readRoutine(day)).routine; } catch { next.routine = me?.routine; } }
+    else if (!day) next.routine = undefined;
     const plan = planFor(next);
     if (!next.goalNote && plan.adult && plan.slowedDown) next.goalNote = tr('Too fast to be safe: Myra planned about {weeks} weeks.', { weeks: plan.weeks });
     setProfile({ ...profile, kcal: plan.kcal, protein: plan.protein, steps: plan.steps, active: plan.active, me: next });
@@ -69,6 +76,16 @@ export default function AboutYou() {
           {!plan.adult ? <Note>{tr('Under 18: Myra helps with healthy habits, not weight goals.')}</Note>
             : plan.weeks ? <Note>{tr('About {kg} kg a week, so about {weeks} weeks.', { kg: Math.abs(plan.weeklyKg), weeks: plan.weeks })}</Note> : null}
           {m.aims ? <Note>{tr('Also working toward: {aims}', { aims: m.aims })}</Note> : null}
+          {m.routine?.length ? (
+            <View style={{ gap: 2, borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 8 }}>
+              <Text style={{ color: colors.ink, fontWeight: '600' }}>{tr('Your day, as Myra understood it')}</Text>
+              {m.routine.map((it, i) => (
+                <Text key={i} style={{ color: colors.muted, fontVariant: ['tabular-nums'] }}>
+                  {it.at}  {it.what}{it.days === 'weekdays' ? ` · ${tr('Mon–Fri')}` : it.days === 'weekend' ? ` · ${tr('weekend')}` : ''}
+                </Text>
+              ))}
+            </View>
+          ) : null}
           <Note>{tr('BMI {bmi}', { bmi: plan.bmi })}</Note>
         </Card>
         <Button kind="insight" title={tr('Done')} onPress={done} />
@@ -116,6 +133,13 @@ export default function AboutYou() {
         <TextField label={tr('In your own words')} value={goalText} onChangeText={setGoalText} multiline
           placeholder={tr('e.g. Lose 6 kg by March, walk 10,000 steps a day, sleep better')} />
         <Note>{tr('Myra will shape your food and exercise around it, and tell you if it is too steep.')}</Note>
+      </Card>
+
+      <Card>
+        <Heading>{tr('Your usual day')}</Heading>
+        <TextField label={tr('In your own words (optional)')} value={dayText} onChangeText={setDayText} multiline
+          placeholder={tr('e.g. Wake 5:30, tea and plan. Walk 6–8. Office Mon–Fri 9 to 6, tea at 11 and 3, lunch 1. Dinner 7. Sleep 9:30.')} />
+        <Note>{tr('Five minutes before each change in your day, Myra puts one fitting thing in front of you: a work task on reaching office, a family task at family time.')}</Note>
       </Card>
 
       <Button kind="insight" title={busy ? tr('Myra is reading your goal…') : tr('Save')} onPress={save} disabled={!complete || busy} />
