@@ -9,7 +9,7 @@ The code is in `src/lib/scoring.ts`; tests are in `src/lib/scoring.test.ts`.
 | --- | --- | --- |
 | Movement | 40 | 20 × steps ÷ target + 20 × active minutes ÷ target (each capped) |
 | Sleep | 30 | 20 for 7–9 hours (less outside that range) + 10 × quality ÷ 5 |
-| Food | 30 | 12 for calories near target, 12 for protein met, 3 for fat at 20–35 % of energy, 3 for carbs at 40–62 % |
+| Food | 30 | Founder's rule, 22 Oct 2026: calories 12 (full at or under the target, 0 at 140 % of it) + protein 9 (share of calories: 0 at 10 %, full at 25 %+) + fibre 6 (full at 14 g per 1,000 kcal) + fat 3 (full at 30 % of calories or less, 0 at 45 %). Eating less than the target, or fasting, is not penalised; a mix leaning to protein and fibre beats one heavy in carbs and fat. |
 
 ## Mind (100)
 A clear mind and what the mind is fed. Meditation moved to Soul on 20 Oct 2026; on 21 Oct 2026 the founder removed the

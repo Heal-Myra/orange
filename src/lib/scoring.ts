@@ -48,6 +48,25 @@ export interface BodyScore {
   totals: MealTotals;
 }
 
+/**
+ * Food (30), founder's rule (22 Oct 2026): eating at or under the calorie target is good (fasting included); going
+ * over costs points. A mix leaning to protein and fibre scores higher than one heavy in carbs and fat.
+ *  - Calories 12: full at or under the target, falling to 0 at 140 % of it.
+ *  - Protein 9: by its share of the day's calories, 0 at 10 % or less, full at 25 % or more.
+ *  - Fibre 6: by grams per 1,000 kcal, full at 14 g or more (ICMR-NIN / dietary guidelines).
+ *  - Fat 3: full when fat is 30 % of calories or less, 0 at 45 % or more.
+ */
+export function foodScore(t: MealTotals, targetKcal: number) {
+  const kcal = 12 * c01(1 - Math.max(0, t.kcal - targetKcal) / (targetKcal * 0.4));
+  const energy = t.p * 4 + t.c * 4 + t.f * 9;
+  const proteinShare = energy ? (t.p * 4) / energy : 0, fatShare = energy ? (t.f * 9) / energy : 0;
+  const protein = 9 * c01((proteinShare - 0.1) / 0.15);
+  const fibrePer1000 = t.kcal > 0 ? ((t.fib ?? 0) * 1000) / t.kcal : 0;
+  const fibre = 6 * c01(fibrePer1000 / 14);
+  const fat = energy ? 3 * c01((0.45 - fatShare) / 0.15) : 3;
+  return { total: kcal + protein + fibre + fat, kcal, protein, fibre, fat };
+}
+
 /** Body: movement 40, sleep 30, food 30. Returns null when nothing is logged. */
 export function bodyScore(d: DayLog, P: Profile): BodyScore | null {
   const a = d.activity, s = d.sleep;
@@ -68,13 +87,7 @@ export function bodyScore(d: DayLog, P: Profile): BodyScore | null {
 
   const totals = mealTotals(d.meals);
   let nutrition = 0;
-  if (hasFood) {
-    const kcalPts = 12 * c01(1 - Math.abs(totals.kcal - P.kcal) / (P.kcal * 0.5));
-    const proteinPts = 12 * c01(totals.p / P.protein);
-    const energy = totals.p * 4 + totals.c * 4 + totals.f * 9 || 1;
-    const fatShare = (totals.f * 9) / energy, carbShare = (totals.c * 4) / energy;
-    nutrition = kcalPts + proteinPts + (fatShare >= 0.2 && fatShare <= 0.35 ? 3 : 0) + (carbShare >= 0.4 && carbShare <= 0.62 ? 3 : 0);
-  }
+  if (hasFood) nutrition = foodScore(totals, P.kcal).total;
   return { total: movement + sleep + nutrition, movement, sleep, nutrition, totals };
 }
 

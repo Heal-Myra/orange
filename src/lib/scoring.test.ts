@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { band, bodyScore, mindScore, soulScore, wellBeing } from './scoring';
+import { band, bodyScore, foodScore, mindScore, soulScore, wellBeing } from './scoring';
 import { DEFAULT_PROFILE as P, emptyDay } from './types';
 
 const day = () => emptyDay('2026-10-17');
@@ -40,11 +40,22 @@ describe('body', () => {
     expect(bodyScore(d, P)!.sleep).toBeCloseTo(10 + 6);
   });
 
-  it('gives full nutrition for on-target, balanced eating', () => {
+  it('gives full food points for a protein- and fibre-rich day at or under the target', () => {
     const d = day();
-    // 2000 kcal: protein 100 g (400), carbs 250 g (1000), fat 66.7 g (600)
-    d.meals = [{ name: 'Day', kcal: 2000, p: 100, c: 250, f: 600 / 9, source: 'manual' }];
+    // 1,600 kcal: protein 110 g (27 %), fat 45 g (25 %), fibre 30 g
+    d.meals = [{ name: 'Day', kcal: 1600, p: 110, c: 170, f: 45, fib: 30, source: 'manual' }];
     expect(bodyScore(d, P)!.nutrition).toBeCloseTo(30);
+  });
+
+  it('scores a carb- and fat-heavy day lower than a protein- and fibre-rich one of the same calories', () => {
+    const rich = foodScore({ kcal: 1500, p: 100, c: 160, f: 40, fib: 28 }, 2000);
+    const heavy = foodScore({ kcal: 1500, p: 35, c: 200, f: 70, fib: 8 }, 2000);
+    expect(rich.total).toBeGreaterThan(heavy.total + 10);
+  });
+
+  it('does not reward going over the calorie target', () => {
+    expect(foodScore({ kcal: 2800, p: 140, c: 300, f: 80, fib: 30 }, 2000).kcal).toBe(0);
+    expect(foodScore({ kcal: 900, p: 60, c: 90, f: 25, fib: 15 }, 2000).kcal).toBe(12);
   });
 });
 

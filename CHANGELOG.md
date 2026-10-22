@@ -1,6 +1,7 @@
 # Changelog
 
 ## 0.9.0 — 21 October 2026 (About you, more Apple Health)
+- Food score rebuilt (founder, 22 Oct, on a fasting day): calories 12 (full at or under target, 0 at 140 %), protein 9 (by share of calories), fibre 6 (g per 1,000 kcal), fat 3 (30 % or less). Eating under target or fasting is no longer penalised; protein- and fibre-rich beats carb- and fat-heavy (`foodScore`, tests). Myra still gently checks in if many days in a row are far under target without a declared fast. docs/scoring.md updated.
 - Your usual day (22 Oct, founder): About you takes the day in your own words; Myra makes a timetable; five minutes before each switch-over Today shows ONE fitting thing (work to-do at office moments and breaks, family to-do at family time, learning on the drive home, meal photo at meals), titled "Clear your mind". Phone reminders at the same moments from build 7 (`expo-notifications`, local only). Testers' AI cap 20 → 40. See docs/decisions/0014-usual-day-and-one-thing-at-a-time.md.
 - Food: the list of food items is hidden until asked (founder): "See details" next to "Where your calories come from" opens it below the pies; "Hide" closes it.
 - Food card, later the same morning (founder): no repetition. The nutrient rows show grams against target only; the share of calories is shown once, on the two pies, now with fibre as a fourth slice (2 kcal/g; aim about 3%) and each slice's percentage written on it (thin slices just outside), plus one legend.
