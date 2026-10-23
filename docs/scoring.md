@@ -43,7 +43,7 @@ Reflected actions (older entries) add or subtract up to 10 points. Soul stays be
 
 ## Trends: Week, Month, Quarter, Year (22 Oct 2026)
 
-Every tab has a D · W · M · Q · Y switch (src/lib/trends.ts). Calendar periods (weeks start Monday). Week and Month: one bar per day; Quarter: per week; Year: per month. A bar is the average of the days with data (days without data are left out, never counted as zero); "days" measures (learning, Daily Wisdom) count the days instead. The change is against the previous period of the same kind; under 2% shows as steady. Green or red only where a direction is clearly better (weight follows the person's goal).
+Every tab has a D · W · M · Q · Y switch (src/lib/trends.ts). Calendar periods (weeks start Monday). Shown as a line graph (23 Oct 2026; was bars). Week and Month: one point per day; Quarter: per week; Year: per month. A point is the average of the days with data (days without data are left out, never counted as zero); "days" measures (learning, Daily Wisdom) count the days instead. The change is against the previous period of the same kind; under 2% shows as steady. Green or red only where a direction is clearly better (weight follows the person's goal).
 
 ## Learning (22 Oct 2026)
 

@@ -702,4 +702,5 @@ export const HI: Record<string, string> = {
   'Feelings': 'अनुभूतियाँ',
   'Images': 'चित्र',
   'Rest': 'विश्राम',
+  'Each point is the average of the days you recorded; days with nothing recorded are left out.': 'हर बिंदु आपके दर्ज किए दिनों का औसत है; जिन दिनों कुछ दर्ज नहीं हुआ, वे नहीं गिने जाते।',
 };
