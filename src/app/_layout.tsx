@@ -2,7 +2,7 @@ import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { AmiriQuran_400Regular, useFonts } from '@expo-google-fonts/amiri-quran';
 import { useEffect, useState } from 'react';
-import { Platform } from 'react-native';
+import { Platform, Pressable, Text, View } from 'react-native';
 import { AuthProvider, useAuth } from '../lib/auth';
 import { HealProvider, useHeal } from '../lib/store';
 import { TasksProvider } from '../lib/tasks';
@@ -112,6 +112,21 @@ function useIconFontGuard(): number {
     return () => { stopped = true; if (timer) clearTimeout(timer); document.removeEventListener('visibilitychange', again); window.removeEventListener('online', again); };
   }, []);
   return generation;
+}
+
+/** If a screen hits an error, show a calm page with "Try again" instead of the app closing (founder, 23 Oct 2026). */
+export function ErrorBoundary({ error, retry }: { error: Error; retry: () => Promise<void> }) {
+  return (
+    <View style={{ flex: 1, backgroundColor: colors.bg, justifyContent: 'center', padding: 28, gap: 14 }}>
+      <Text style={{ fontSize: 22, fontWeight: '600', color: colors.ink }}>{tr('Something went wrong.')}</Text>
+      <Text style={{ fontSize: 15, color: colors.muted, lineHeight: 22 }}>{tr('Your data is safe. Tap Try again; if it happens again, send Myra\'s team a screenshot of this page.')}</Text>
+      <Text style={{ fontSize: 12, color: colors.muted }} selectable>{String(error?.message ?? error).slice(0, 300)}</Text>
+      <Pressable onPress={() => { retry().catch(() => {}); }} accessibilityRole="button"
+        style={{ backgroundColor: colors.accent, borderRadius: 99, paddingVertical: 14, alignItems: 'center', marginTop: 8 }}>
+        <Text style={{ color: colors.onAccent, fontSize: 16, fontWeight: '700' }}>{tr('Try again')}</Text>
+      </Pressable>
+    </View>
+  );
 }
 
 export default function RootLayout() {

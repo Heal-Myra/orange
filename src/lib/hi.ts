@@ -703,4 +703,7 @@ export const HI: Record<string, string> = {
   'Images': 'चित्र',
   'Rest': 'विश्राम',
   'Each point is the average of the days you recorded; days with nothing recorded are left out.': 'हर बिंदु आपके दर्ज किए दिनों का औसत है; जिन दिनों कुछ दर्ज नहीं हुआ, वे नहीं गिने जाते।',
+  'Something went wrong.': 'कुछ गड़बड़ हो गई।',
+  'Try again': 'फिर से कोशिश करें',
+  "Your data is safe. Tap Try again; if it happens again, send Myra's team a screenshot of this page.": 'आपका डेटा सुरक्षित है। फिर से कोशिश करें दबाएँ; फिर भी हो, तो इस पेज का स्क्रीनशॉट भेजें।',
 };
