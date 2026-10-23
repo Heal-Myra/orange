@@ -773,4 +773,9 @@ export const HI: Record<string, string> = {
   'Tap a habit to remove it.': 'हटाने के लिए आदत पर दबाएँ।',
   '{done} of {n} done today': 'आज {n} में से {done} हुईं',
   'Habit': 'आदत',
+  'Choose screenshot': 'स्क्रीनशॉट चुनें',
+  'Paste screenshot': 'स्क्रीनशॉट चिपकाएँ',
+  'Paste works from the next app version. For now, choose the screenshot.': 'चिपकाना ऐप के अगले संस्करण से चलेगा। अभी स्क्रीनशॉट चुनें।',
+  'No picture to paste. Take the screenshot, tap Copy, then Paste here.': 'चिपकाने के लिए कोई तस्वीर नहीं। स्क्रीनशॉट लें, Copy दबाएँ, फिर यहाँ चिपकाएँ।',
+  'Take a screenshot of Screen Time (iPhone: Settings → Screen Time → See All App & Website Activity), then choose it or paste it here. The app reads your social-media minutes for you.': 'Screen Time का स्क्रीनशॉट लें (iPhone: Settings → Screen Time → See All App & Website Activity), फिर उसे यहाँ चुनें या चिपकाएँ। ऐप आपके सोशल मीडिया के मिनट खुद पढ़ लेगा।',
 };
