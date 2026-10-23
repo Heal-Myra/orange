@@ -16,6 +16,7 @@ export interface AboutMe {
   aims?: string;      // the non-weight part of the goal, e.g. "run 5 km", "sleep better"
   goalNote?: string;  // Myra's one-line reply about the goal (e.g. that it is too steep and what she planned instead)
   foodPrefs?: string;
+  habits?: import('./habits').Habit[]; // repeating to-dos (23 Oct 2026), kept with About you so they sync
   planLang?: string;  // language for the WhatsApp food message (23 Oct 2026) // food preferences in their own words, for meal plans (23 Oct 2026)
   dayText?: string;   // the usual day in the person's own words (22 Oct 2026)
   routine?: import('./routine').RoutineItem[]; // Myra's reading of it (src/lib/routine.ts)

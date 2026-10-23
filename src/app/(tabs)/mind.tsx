@@ -7,7 +7,7 @@ import { Linking, Platform, Pressable, Text, TextInput, View } from 'react-nativ
 import { ClassifyHelper } from '../../components/AiBits';
 import { ScreenTimeCard } from '../../components/ScreenTimeCard';
 import { TaoCard } from '../../components/TaoCard';
-import { TasksCard } from '../../components/TasksCard';
+import { HabitsBar, TasksCard } from '../../components/TasksCard';
 import { Anchor, Button, Card, Heading, Note, NumberField, Screen, Score, s, useKeepVisible } from '../../components/ui';
 import { CONTENT_CATEGORIES, LEARNING_POINTS, mindScore } from '../../lib/scoring';
 import { useHeal } from '../../lib/store';
@@ -40,6 +40,7 @@ export default function Mind() {
         <Heading right={<Score value={score?.total} max={100} />}>{tr('Mind today')}</Heading>
       </Card>
 
+      <Anchor id="habits"><HabitsBar /></Anchor>
       <Anchor id="tasks"><TasksCard /></Anchor>
 
       <Anchor id="tao"><TaoCard on="mind" /></Anchor>

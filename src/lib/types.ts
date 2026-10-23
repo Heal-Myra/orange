@@ -56,6 +56,7 @@ export interface DayLog {
   sleep: { hours?: number; quality?: 1 | 2 | 3 | 4 | 5; source?: string }; // source 'Typed in' = the person's own number wins over Apple Health
   meals: Meal[];
   fasting?: boolean;
+  habitsDone?: string[]; // habits ticked off this day (23 Oct 2026)
   plan?: import('./foodPlan').FoodPlan; // the food planned for this day (made the day before; founder, 23 Oct 2026) // "I'm fasting today" (founder, 22 Oct 2026): water, black tea and black coffee are fine
   media: MediaSession[];
   noMedia: boolean;

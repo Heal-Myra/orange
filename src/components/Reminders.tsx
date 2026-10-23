@@ -10,6 +10,7 @@ import { AppState, Platform } from 'react-native';
 import { useHeal } from '../lib/store';
 import { useTasks, type Task } from '../lib/tasks';
 import { itemsFor, LEAD_MINUTES, type RoutineItem } from '../lib/routine';
+import { habitsToday } from '../lib/habits';
 import { lang, tr } from '../lib/i18n';
 import { todayISO } from '../lib/dates';
 import { optional } from '../lib/native';
@@ -42,11 +43,13 @@ export function nudgeFor(it: RoutineItem, take: (area: Task['area']) => Task | u
 export function ReminderScheduler() {
   const { profile, days } = useHeal();
   const fastingToday = !!days[todayISO()]?.fasting;
-  const { open } = useTasks();
+  const { open, habits } = useTasks();
+  const doneToday = days[todayISO()]?.habitsDone ?? [];
+  const doneKey = doneToday.join(',');
   const routine = profile.me?.routine;
 
   useEffect(() => {
-    if (!N || !routine?.length) return;
+    if (!N || (!routine?.length && !habits.length)) return;
     const Notif = N;
     let cancelled = false;
     const plan = async () => {
@@ -62,7 +65,18 @@ export function ReminderScheduler() {
       const now = Date.now(), horizon = now + 26 * 3600 * 1000;
       for (const offset of [0, 1]) {
         const day = new Date(); day.setDate(day.getDate() + offset);
-        for (const it of itemsFor(routine, day)) {
+        // Habits at their time (founder, 23 Oct 2026), five minutes early like the rest.
+        for (const h of habitsToday(habits, day)) {
+          if (!h.at || (offset === 0 && doneToday.includes(h.id))) continue;
+          const when = at(day, h.at);
+          if (when.getTime() <= now + 30_000 || when.getTime() > horizon) continue;
+          await Notif.scheduleNotificationAsync({
+            content: { title: tr('Habit'), body: `${h.at} · ${h.title}`, data: { kind: 'habit', lang: lang() } },
+            trigger: { type: Notif.SchedulableTriggerInputTypes.DATE, date: when },
+          });
+          if (cancelled) return;
+        }
+        for (const it of itemsFor(routine ?? [], day)) {
           const when = at(day, it.at);
           if (when.getTime() <= now + 30_000 || when.getTime() > horizon) continue;
           const body = nudgeFor(it, take, when.getHours() < 12, offset === 0 && fastingToday);
@@ -84,7 +98,7 @@ export function ReminderScheduler() {
     } catch { tap = null; }
     const sub = AppState.addEventListener('change', s => { if (s === 'active') plan().catch(() => {}); });
     return () => { cancelled = true; sub.remove(); tap?.remove(); };
-  }, [routine, open, fastingToday]);
+  }, [routine, open, fastingToday, habits, doneKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return null;
 }

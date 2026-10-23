@@ -21,7 +21,8 @@ export interface Task {
 }
 
 export const FOCUS_MAX = 1; // one task in front of the person at a time; Myra rotates (founder, 21 Oct 2026)
-const PER_DAY = 2; // tasks given the same new date when rescheduling
+/** At most three to-dos a day in each group (founder, 23 Oct 2026). */
+export const PER_AREA_DAY = 3;
 
 export const sortOpen = (a: Task, b: Task) => (a.due ?? '9999').localeCompare(b.due ?? '9999') || a.createdAt.localeCompare(b.createdAt);
 
@@ -33,22 +34,28 @@ export function defaultFocus(tasks: Task[], today: string): string[] {
   return [...due, ...undated].slice(0, FOCUS_MAX).map(t => t.id);
 }
 
-/** Give every task that was due (or had no date) but is not in today's focus a new date, at most PER_DAY a day. */
+/** How many open to-dos a group already has on a day. */
+export const loadOn = (tasks: Task[], area: Area, day: string, except?: string) =>
+  tasks.filter(t => !t.doneAt && t.area === area && t.due === day && t.id !== except).length;
+
+/** The first day from `from` on that still has room in this group (at most three a day). */
+export function firstFreeDay(tasks: Task[], area: Area, from: string): string {
+  for (let i = 0; i < 366; i++) { const d = shiftISO(from, i); if (loadOn(tasks, area, d) < PER_AREA_DAY) return d; }
+  return from;
+}
+
+/** Each morning: overdue tasks (and tasks with no date) that are not today's focus get a new date, keeping at most
+ *  three a day in each group. Tasks dated today stay on today's list (founder, 23 Oct 2026: show today's list). */
 export function reschedule(tasks: Task[], focusIds: string[], today: string): Task[] {
-  const load: Record<string, number> = {};
-  for (const t of tasks) if (!t.doneAt && t.due && t.due > today) load[t.due] = (load[t.due] ?? 0) + 1;
-  const nextFree = () => {
-    for (let i = 1; i < 366; i++) {
-      const d = shiftISO(today, i);
-      if ((load[d] ?? 0) < PER_DAY) { load[d] = (load[d] ?? 0) + 1; return d; }
-    }
-    return shiftISO(today, 1);
-  };
-  return tasks.map(t => {
-    if (t.doneAt || focusIds.includes(t.id)) return t;
-    if (t.due && t.due > today) return t;
-    return { ...t, due: nextFree(), moved: t.due ? t.moved + 1 : t.moved };
-  });
+  const next = tasks.map(t => ({ ...t }));
+  for (const t of next) {
+    if (t.doneAt || focusIds.includes(t.id)) continue;
+    if (t.due && t.due >= today) continue;
+    const day = firstFreeDay(next, t.area, today);
+    t.moved = t.due ? t.moved + 1 : t.moved;
+    t.due = day;
+  }
+  return next.map((t, i) => (t.due === tasks[i].due && t.moved === tasks[i].moved ? tasks[i] : t));
 }
 
 /** Short lines for the AI, so Myra can pick today's focus. */
