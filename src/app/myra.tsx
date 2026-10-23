@@ -20,10 +20,11 @@ import { todayISO } from '../lib/dates';
 import { tasksForAI, useTasks } from '../lib/tasks';
 import { colors } from '../theme';
 import { lang, tr } from '../lib/i18n';
+import { optional } from '../lib/native';
 
 // The document picker arrived with a later app build; older installed builds simply don't offer documents.
 let DocumentPicker: typeof import('expo-document-picker') | null = null;
-try { DocumentPicker = require('expo-document-picker'); } catch { DocumentPicker = null; }
+DocumentPicker = optional(['ExpoDocumentPicker'], () => require('expo-document-picker'));
 
 const KEY = 'heal.myra';
 const MAX_FILE_MB = 4;

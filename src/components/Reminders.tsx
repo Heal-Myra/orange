@@ -12,10 +12,11 @@ import { useTasks, type Task } from '../lib/tasks';
 import { itemsFor, LEAD_MINUTES, type RoutineItem } from '../lib/routine';
 import { lang, tr } from '../lib/i18n';
 import { todayISO } from '../lib/dates';
+import { optional } from '../lib/native';
 
 // Arrived with build 7; older installed builds simply schedule nothing.
 let N: typeof import('expo-notifications') | null = null;
-try { N = Platform.OS === 'web' ? null : require('expo-notifications'); } catch { N = null; }
+N = optional(['ExpoNotificationsEmitter', 'ExpoNotificationScheduler', 'ExpoNotificationPermissionsModule'], () => require('expo-notifications'));
 
 const at = (day: Date, hhmm: string) => { const [h, m] = hhmm.split(':').map(Number); const d = new Date(day); d.setHours(h, m - LEAD_MINUTES, 0, 0); return d; };
 
@@ -75,11 +76,14 @@ export function ReminderScheduler() {
     };
     plan().catch(() => { /* reminders are a bonus; never break the app */ });
     // Tapping the bedtime reminder opens the guided Yoga Nidra (founder, 22 Oct 2026).
-    const tap = Notif.addNotificationResponseReceivedListener(r => {
-      if ((r.notification.request.content.data as { kind?: string } | undefined)?.kind === 'sleep') router.push('/yoga-nidra');
-    });
+    let tap: { remove: () => void } | null = null;
+    try {
+      tap = Notif.addNotificationResponseReceivedListener(r => {
+        if ((r.notification.request.content.data as { kind?: string } | undefined)?.kind === 'sleep') router.push('/yoga-nidra');
+      });
+    } catch { tap = null; }
     const sub = AppState.addEventListener('change', s => { if (s === 'active') plan().catch(() => {}); });
-    return () => { cancelled = true; sub.remove(); tap.remove(); };
+    return () => { cancelled = true; sub.remove(); tap?.remove(); };
   }, [routine, open, fastingToday]);
 
   return null;

@@ -12,13 +12,14 @@ import { lang, tr } from '../lib/i18n';
 import { partOfDay } from '../lib/context';
 import { momentOf } from '../lib/routine';
 import { useHeal } from '../lib/store';
+import { optional } from '../lib/native';
 import { nidraMinutes, nidraScript, type Stage } from '../lib/yogaNidra';
 
 // Native helpers arrived with build 9; older builds simply read along without a voice.
 let Speech: typeof import('expo-speech') | null = null;
-try { Speech = require('expo-speech'); } catch { Speech = null; }
+Speech = optional(['ExpoSpeech'], () => require('expo-speech'));
 let Awake: typeof import('expo-keep-awake') | null = null;
-try { Awake = require('expo-keep-awake'); } catch { Awake = null; }
+Awake = optional(['ExpoKeepAwake'], () => require('expo-keep-awake'));
 
 const NIGHT = { bg: '#0F1E22', card: '#172C31', ink: '#E8EEEE', muted: '#93A6A8', glow: '#E0794F' };
 const STAGE: Record<Stage, string> = { settle: 'Settling', resolve: 'Sankalpa', body: 'Body', breath: 'Breath', feel: 'Feelings', images: 'Images', end: 'Rest' };

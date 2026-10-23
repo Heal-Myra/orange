@@ -1,15 +1,29 @@
 // "Share to Happy Orange" (founder, 22 Oct 2026): in YouTube, Instagram, LinkedIn, Facebook or a browser, tap Share and
 // pick Happy Orange. The link lands in today's Learning (Mind tab, Phone activity) and Myra writes what it teaches
-// in up to 10 words. Works from the build that includes expo-share-intent; older builds and the website skip it.
+// in up to 10 words. Only on builds that include the share extension (expo-share-intent); others skip it entirely.
 
 import { router } from 'expo-router';
-import { useShareIntentContext } from 'expo-share-intent';
-import { useEffect } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { useHeal } from '../lib/store';
 import { firstUrl, rememberSharedTitle } from '../lib/shared';
+import { optional } from '../lib/native';
+
+type Lib = typeof import('expo-share-intent');
+const lib: Lib | null = optional(['ExpoShareIntentModule'], () => require('expo-share-intent'));
+
+/** Wraps the app with the share listener when this build has it. */
+export function ShareProvider({ children }: { children: ReactNode }) {
+  if (!lib) return <>{children}</>;
+  const P = lib.ShareIntentProvider;
+  return <P>{children}</P>;
+}
 
 export function ShareReceiver() {
-  const { hasShareIntent, shareIntent, resetShareIntent } = useShareIntentContext();
+  return lib ? <Receiver lib={lib} /> : null;
+}
+
+function Receiver({ lib }: { lib: Lib }) {
+  const { hasShareIntent, shareIntent, resetShareIntent } = lib.useShareIntentContext();
   const { update } = useHeal();
   useEffect(() => {
     if (!hasShareIntent) return;
