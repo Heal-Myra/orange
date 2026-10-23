@@ -27,6 +27,15 @@ export function StatRow({ label, value, unit, target, color = colors.body, first
   // Show the saved value once it has loaded (and after a sync), not only the value at first draw.
   useEffect(() => { setText(value == null ? '' : String(value)); }, [value]);
   const num = typeof value === 'number' ? value : undefined;
+  // Only a real change counts as typed (23 Oct 2026: tapping the weight box and leaving it marked the weight as typed,
+  // so the scale's new reading from Apple Health was ignored).
+  const commit = () => {
+    if (!onEdit) return;
+    const n = parseFloat(text.replace(',', '.'));
+    const next = Number.isFinite(n) ? n : undefined;
+    if (next === num || (next == null && num == null)) return;
+    onEdit(next);
+  };
   const shown = value == null || value === '' ? '–' : typeof value === 'number' ? value.toLocaleString() : value;
   return (
     <View style={{ borderTopWidth: first ? 0 : 1, borderTopColor: colors.line, paddingVertical: 10, gap: 6 }}>
@@ -36,8 +45,7 @@ export function StatRow({ label, value, unit, target, color = colors.body, first
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
             <TextInput value={text} onChangeText={setText} keyboardType={decimal ? 'decimal-pad' : 'number-pad'} placeholder="–" onFocus={() => setTimeout(keep, 300)}
               placeholderTextColor={colors.muted}
-              onEndEditing={() => { const n = parseFloat(text.replace(',', '.')); onEdit(Number.isFinite(n) ? n : undefined); }}
-              onBlur={() => { const n = parseFloat(text.replace(',', '.')); onEdit(Number.isFinite(n) ? n : undefined); }}
+              onEndEditing={() => commit()} onBlur={() => commit()}
               style={{ width: 84, textAlign: 'right', fontSize: 16, fontWeight: '600', color: colors.ink, paddingVertical: 6, paddingHorizontal: 10,
                 borderRadius: 10, backgroundColor: colors.field, borderWidth: 1, borderColor: colors.line }} />
             {unit || target ? <Text style={{ color: colors.muted, fontSize: 14, minWidth: 28 }}>{target ? `/ ${target.toLocaleString()}` : unit}</Text> : null}

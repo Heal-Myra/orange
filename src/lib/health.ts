@@ -4,7 +4,7 @@
 export interface HealthDay {
   steps?: number; activeMin?: number; sleepHours?: number;
   // Added 20 Oct 2026 (founder): body measures (latest), heart and recovery, energy, mindful minutes, workouts, sleep stages.
-  weightKg?: number; bodyFatPct?: number; restingHr?: number; hrv?: number; vo2max?: number;
+  weightKg?: number; weightAt?: number; bodyFatPct?: number; restingHr?: number; hrv?: number; vo2max?: number;
   activeKcal?: number; mindfulMin?: number;
   workouts?: { type: string; min: number; kcal?: number }[];
   sleepStages?: { deep?: number; core?: number; rem?: number; awake?: number };

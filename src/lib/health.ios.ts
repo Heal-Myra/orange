@@ -55,10 +55,13 @@ async function stat(id: string, kind: 'cumulativeSum' | 'discreteAverage', unit:
 
 /** The latest reading, if it is recent enough to still describe the person. */
 async function latest(id: string, unit: string, maxAgeDays: number, end: Date) {
+  return (await latestAt(id, unit, maxAgeDays, end))?.value;
+}
+async function latestAt(id: string, unit: string, maxAgeDays: number, end: Date) {
   const s = await getMostRecentQuantitySample(id as never, unit as never);
   if (!s) return undefined;
   const at = new Date(s.endDate as unknown as string).getTime();
-  return at <= end.getTime() && end.getTime() - at <= maxAgeDays * DAY ? s.quantity : undefined;
+  return at <= end.getTime() && end.getTime() - at <= maxAgeDays * DAY ? { value: s.quantity, at } : undefined;
 }
 
 /** The night ending on this date (6 pm the evening before until noon). Watch and phone can both record the same
@@ -125,7 +128,7 @@ export async function readHealthDay(iso: string): Promise<HealthDay> {
     safe(stat('HKQuantityTypeIdentifierAppleExerciseTime', 'cumulativeSum', 'min', start, end)),
     safe(stat('HKQuantityTypeIdentifierActiveEnergyBurned', 'cumulativeSum', 'kcal', start, end)),
     safe(sleepOf(iso)),
-    safe(latest('HKQuantityTypeIdentifierBodyMass', 'kg', 30, now)),
+    safe(latestAt('HKQuantityTypeIdentifierBodyMass', 'kg', 30, now)),
     safe(latest('HKQuantityTypeIdentifierBodyFatPercentage', '%', 30, now)),
     safe(latest('HKQuantityTypeIdentifierRestingHeartRate', 'count/min', 2, now)),
     // Heart rate variability: average over the last 24 hours (the watch measures it a few times a day and at night).
@@ -140,7 +143,8 @@ export async function readHealthDay(iso: string): Promise<HealthDay> {
     sleepHours: sleep?.hours,
     sleepStages: sleep?.stages,
     activeKcal: activeKcal != null ? Math.round(activeKcal) : undefined,
-    weightKg: weight != null ? r1(weight) : undefined,
+    weightKg: weight != null ? r1(weight.value) : undefined,
+    weightAt: weight?.at,
     bodyFatPct: fat != null ? r1(fat <= 1 ? fat * 100 : fat) : undefined,
     restingHr: rhr != null ? Math.round(rhr) : undefined,
     hrv: hrv != null ? Math.round(hrv) : undefined,

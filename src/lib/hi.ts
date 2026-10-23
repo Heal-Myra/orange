@@ -784,4 +784,10 @@ export const HI: Record<string, string> = {
   'Optional · adds {n} to Mind': 'वैकल्पिक · मन में {n} जोड़ता है',
   'Optional': 'वैकल्पिक',
   'Sent on WhatsApp ✓': 'WhatsApp पर भेजा ✓',
+  'Myra could not work that out. Add a little more detail.': 'मायरा यह नहीं समझ सकी। थोड़ा और विवरण लिखें।',
+  'Correct this dish': 'यह व्यंजन सुधारें',
+  'Fix': 'सुधारें',
+  'What was it really? Dish and how much': 'असल में क्या था? व्यंजन और कितना',
+  'e.g. 1 katori soya chunk sabzi with 1 tsp oil': 'जैसे 1 कटोरी सोया चंक सब्ज़ी, 1 छोटा चम्मच तेल',
+  'Recalculate': 'फिर से गिनें',
 };

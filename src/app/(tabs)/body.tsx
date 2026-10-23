@@ -10,6 +10,7 @@ import { MacroMix, NutritionTable } from '../../components/MacroMix';
 import { bmiOf, fibreTarget, planFor } from '../../lib/targets';
 import { MealPhoto } from '../../components/MealPhoto';
 import { FoodPlanRow } from '../../components/FoodPlan';
+import { MealRow } from '../../components/MealRow';
 import { todayISO } from '../../lib/dates';
 import { Anchor, Card, Heading, Note, Screen, Score, s } from '../../components/ui';
 import { FAST_KCAL, bodyScore, mealTotals } from '../../lib/scoring';
@@ -54,18 +55,7 @@ export default function Body() {
               </Pressable>
             ) : undefined} />
           {day.meals.length ? (details ? day.meals.map((m, i) => (
-            <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 52, borderTopWidth: 1, borderTopColor: colors.line }}>
-              {/* Two lines (founder, 21 Oct 2026): the dish, then its calories, protein, fat and fibre, so the source of fat is clear. */}
-              <View style={{ flex: 1, paddingVertical: 8, gap: 2 }}>
-                <Text numberOfLines={1} style={{ fontSize: 16, color: colors.ink }}>{m.name}</Text>
-                <Text style={{ fontSize: 13, color: colors.muted, fontVariant: ['tabular-nums'] }}>
-                  {Math.round(m.kcal)} kcal · {tr('Protein')} {Math.round(m.p)} g · {tr('Fat')} {Math.round(m.f)} g{m.fib ? ` · ${tr('Fibre')} ${Math.round(m.fib)} g` : ''}
-                </Text>
-              </View>
-              <Pressable accessibilityLabel={`Remove ${m.name}`} onPress={() => update(d => { d.meals.splice(i, 1); })} hitSlop={10}>
-                <Text style={{ color: colors.muted, fontSize: 16 }}>✕</Text>
-              </Pressable>
-            </View>
+            <MealRow key={`${i}-${m.name}`} m={m} i={i} />
           )) : null) : <View style={{ borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 10 }}><Note>{tr('No meals yet today.')}</Note></View>}
         </View>
       </MealPhoto></Anchor>
@@ -106,7 +96,7 @@ export default function Body() {
           <Rows>
             <StatRow first label={tr('Weight')} value={h?.weightKg ?? profile.me?.weightKg} unit="kg" decimal
               onEdit={v => {
-                update(d => { d.health = { ...(d.health ?? {}), weightKg: v, weightTyped: v != null }; });
+                update(d => { d.health = { ...(d.health ?? {}), weightKg: v, weightTyped: v != null, weightTypedAt: v != null ? Date.now() : undefined }; });
                 if (v != null && profile.me) { const me = { ...profile.me, weightKg: v }; const pl = planFor(me); setProfile({ ...profile, kcal: pl.kcal, protein: pl.protein, steps: pl.steps, active: pl.active, me }); }
               }} />
             {h?.bodyFatPct != null ? <StatRow label={tr('Body fat')} value={h.bodyFatPct} unit="%" /> : null}

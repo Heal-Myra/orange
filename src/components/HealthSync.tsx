@@ -21,6 +21,8 @@ export const HEALTH_SOURCE = 'Apple Health';
 interface HealthState { available: boolean; connected: boolean; lastSync: Date | null; connect: () => Promise<void>; syncNow: () => Promise<void> }
 const Ctx = createContext<HealthState>({ available: false, connected: false, lastSync: null, connect: async () => {}, syncNow: async () => {} });
 
+const dayStartMs = (iso: string) => { const [y, m, d] = iso.split('-').map(Number); return new Date(y, m - 1, d).getTime(); };
+
 export function HealthProvider({ children }: { children: ReactNode }) {
   const { updateOn, ready, profile, setProfile, days } = useHeal();
   const daysRef = useRef(days);
@@ -42,6 +44,9 @@ export function HealthProvider({ children }: { children: ReactNode }) {
       // Sleep typed by hand (no watch at night) is never overwritten by Apple Health (founder, 21 Oct 2026).
       if (h.sleepHours != null && d.sleep.source !== 'Typed in') { d.sleep.hours = h.sleepHours; d.sleep.source = HEALTH_SOURCE; }
       const health = { ...(d.health ?? {}) };
+      // A weighing newer than the typed weight wins (founder, 23 Oct 2026: the Withings reading did not show).
+      // Older typed weights have no time: then any weighing from today wins.
+      if (health.weightTyped && h.weightAt != null && h.weightAt > (health.weightTypedAt ?? dayStartMs(iso))) { health.weightTyped = false; health.weightTypedAt = undefined; }
       for (const k of ['weightKg', 'bodyFatPct', 'restingHr', 'hrv', 'vo2max', 'activeKcal', 'mindfulMin', 'workouts', 'sleepStages'] as const) {
         if (h[k] != null && !(k === 'weightKg' && health.weightTyped)) (health as Record<string, unknown>)[k] = h[k];
       }
@@ -51,7 +56,9 @@ export function HealthProvider({ children }: { children: ReactNode }) {
     });
     // A new weight from the scale (e.g. Withings → Apple Health) keeps "About you" and the targets current.
     const me = profile.me;
-    if (me && h.weightKg != null && !daysRef.current[iso]?.health?.weightTyped && Math.abs(h.weightKg - me.weightKg) >= 0.1) {
+    const typed = daysRef.current[iso]?.health;
+    const typedWins = typed?.weightTyped && !(h.weightAt != null && h.weightAt > (typed.weightTypedAt ?? dayStartMs(iso)));
+    if (me && h.weightKg != null && !typedWins && Math.abs(h.weightKg - me.weightKg) >= 0.1) {
       const next = { ...me, weightKg: h.weightKg };
       const p = planFor(next);
       setProfile({ ...profile, kcal: p.kcal, protein: p.protein, steps: p.steps, active: p.active, me: next });
