@@ -743,4 +743,6 @@ export const HI: Record<string, string> = {
   'Cooking for how many people?': 'कितने लोगों के लिए बनाना है?',
   'Myra could not make a plan just now. Please try again.': 'मायरा अभी योजना नहीं बना सकी। फिर से कोशिश करें।',
   "Tomorrow's food": 'कल का भोजन',
+  'Message language': 'संदेश की भाषा',
+  'Myra is translating…': 'मायरा अनुवाद कर रही है…',
 };

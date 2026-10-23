@@ -21,6 +21,7 @@ export interface FoodPlan {
   meals: PlannedMeal[];
   note?: string;                   // Myra's one line on why this plan
   final?: boolean;                 // the person has finalised it
+  messages?: Record<string, string>; // the WhatsApp message already translated, by language code
   madeAt: string;
 }
 
@@ -77,3 +78,21 @@ export function cleanPlan(raw: unknown, date: string, people: number): FoodPlan 
     .sort((a, b) => SLOTS.indexOf(a.slot) - SLOTS.indexOf(b.slot));
   return { date, people, meals, note: str(r.note, 200) || undefined, madeAt: new Date().toISOString() };
 }
+
+/** Languages for the WhatsApp message (founder, 23 Oct 2026: "add Hindi and regional languages"). Native name first. */
+export const MESSAGE_LANGS: { code: string; name: string; english: string }[] = [
+  { code: 'en', name: 'English', english: 'English' }, { code: 'hi', name: 'हिन्दी', english: 'Hindi' },
+  { code: 'mr', name: 'मराठी', english: 'Marathi' }, { code: 'bn', name: 'বাংলা', english: 'Bengali' },
+  { code: 'gu', name: 'ગુજરાતી', english: 'Gujarati' }, { code: 'pa', name: 'ਪੰਜਾਬੀ', english: 'Punjabi' },
+  { code: 'ta', name: 'தமிழ்', english: 'Tamil' }, { code: 'te', name: 'తెలుగు', english: 'Telugu' },
+  { code: 'kn', name: 'ಕನ್ನಡ', english: 'Kannada' }, { code: 'ml', name: 'മലയാളം', english: 'Malayalam' },
+  { code: 'or', name: 'ଓଡ଼ିଆ', english: 'Odia' }, { code: 'ur', name: 'اردو', english: 'Urdu' },
+  { code: 'as', name: 'অসমীয়া', english: 'Assamese' },
+];
+
+/** English labels: the message is written in English first, then Myra translates it when another language is chosen. */
+export const ENGLISH_LABELS = (day: string, people: number) => ({
+  title: `Food for ${day}`, forPeople: people === 1 ? 'Quantities for 1 person' : `Quantities for ${people} people`,
+  slot: { breakfast: 'Breakfast', lunch: 'Lunch', snack: 'Snack', dinner: 'Dinner' } as Record<Slot, string>,
+  ingredients: 'Ingredients', how: 'How to make', video: 'Video (about 1 minute)',
+});

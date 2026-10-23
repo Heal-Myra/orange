@@ -5,11 +5,11 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { Linking, Pressable, Share, Text, View } from 'react-native';
-import { planFood } from '../lib/ai';
+import { planFood, translateMessage } from '../lib/ai';
 import { buildContext } from '../lib/context';
 import { shiftISO, todayISO } from '../lib/dates';
-import { cleanPlan, planMessage, planTotals, videoLink, whatsappLink, type FoodPlan, type Slot } from '../lib/foodPlan';
-import { locale, tr } from '../lib/i18n';
+import { cleanPlan, ENGLISH_LABELS, MESSAGE_LANGS, planMessage, planTotals, videoLink, whatsappLink, type FoodPlan, type Slot } from '../lib/foodPlan';
+import { lang, locale, tr } from '../lib/i18n';
 import { useHeal } from '../lib/store';
 import { fibreTarget } from '../lib/targets';
 import { emptyDay } from '../lib/types';
@@ -18,6 +18,7 @@ import { Button, Card, Heading, Note, TextField } from './ui';
 
 const SLOT_NAME: Record<Slot, string> = { breakfast: 'Breakfast', lunch: 'Lunch', snack: 'Snack', dinner: 'Dinner' };
 
+const englishDay = (iso: string) => { const [y, m, d] = iso.split('-').map(Number); return new Date(y, m - 1, d).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'short' }); };
 const dayName = (iso: string) => { const [y, m, d] = iso.split('-').map(Number); return new Date(y, m - 1, d).toLocaleDateString(locale(), { weekday: 'long', day: 'numeric', month: 'short' }); };
 
 export function FoodPlanCard() {
@@ -33,6 +34,8 @@ export function FoodPlanCard() {
   const [message, setMessage] = useState<string | null>(null);
   const [open, setOpen] = useState<number | null>(null);
   const [showToday, setShowToday] = useState(false);
+  const [msgLang, setMsgLangState] = useState(profile.me?.planLang ?? (lang() === 'hi' ? 'hi' : 'en'));
+  const setMsgLang = (c: string) => { setMsgLangState(c); if (profile.me) setProfile({ ...profile, me: { ...profile.me, planLang: c } }); };
 
   const save = (p: FoodPlan) => updateOn(tomorrow, d => { d.plan = p; });
 
@@ -59,12 +62,18 @@ export function FoodPlanCard() {
 
   const send = async () => {
     if (!plan) return;
-    const text = planMessage(plan, {
-      title: tr('Food for {day}', { day: dayName(tomorrow) }),
-      forPeople: plan.people === 1 ? tr('Quantities for 1 person') : tr('Quantities for {n} people', { n: plan.people }),
-      slot: { breakfast: tr('Breakfast'), lunch: tr('Lunch'), snack: tr('Snack'), dinner: tr('Dinner') },
-      ingredients: tr('Ingredients'), how: tr('How to make'), video: tr('Video (about 1 minute)'),
-    });
+    // Written in English, then (for any other language) translated by Myra once and kept with the plan.
+    const english = planMessage(plan, ENGLISH_LABELS(englishDay(tomorrow), plan.people));
+    let text = english;
+    if (msgLang !== 'en') {
+      text = plan.messages?.[msgLang] ?? '';
+      if (!text) {
+        setBusy('translate'); setMessage(null);
+        try { text = (await translateMessage(english, msgLang)).text; save({ ...plan, messages: { ...(plan.messages ?? {}), [msgLang]: text } }); }
+        catch (e) { setMessage(e instanceof Error ? e.message : String(e)); setBusy(null); return; }
+        setBusy(null);
+      }
+    }
     // WhatsApp opens with the message ready; pick the contact there. Without WhatsApp, the phone's share sheet.
     const ok = await Linking.openURL(whatsappLink(text)).then(() => true).catch(() => false);
     if (!ok) Share.share({ message: text }).catch(() => {});
@@ -116,7 +125,7 @@ export function FoodPlanCard() {
                   {m.steps.map((st, k) => <Text key={k} style={{ color: colors.ink, lineHeight: 20 }}>{k + 1}. {st}</Text>)}
                   {/* The short video only when asked (founder): tapping opens short recipe videos and adds the link to the message. */}
                   <Pressable accessibilityRole="button" style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 }}
-                    onPress={() => { save({ ...plan, meals: plan.meals.map((x, k) => (k === i ? { ...x, video: true } : x)) }); Linking.openURL(videoLink(m.dish)).catch(() => {}); }}>
+                    onPress={() => { if (!m.video) save({ ...plan, messages: undefined, meals: plan.meals.map((x, k) => (k === i ? { ...x, video: true } : x)) }); Linking.openURL(videoLink(m.dish)).catch(() => {}); }}>
                     <Ionicons name="play-circle-outline" size={20} color={colors.insight} />
                     <Text style={{ color: colors.insight, fontWeight: '600' }}>{m.video ? tr('Watch the 1-minute video again') : tr('Show me a 1-minute video')}</Text>
                   </Pressable>
@@ -141,10 +150,22 @@ export function FoodPlanCard() {
             </>
           ) : (
             <>
-              <Pressable accessibilityRole="button" onPress={send}
+              <Text style={{ fontSize: 14, color: colors.ink }}>{tr('Message language')}</Text>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                {MESSAGE_LANGS.map(l => {
+                  const on = l.code === msgLang;
+                  return (
+                    <Pressable key={l.code} onPress={() => setMsgLang(l.code)} accessibilityRole="button" accessibilityLabel={l.english}
+                      style={{ paddingVertical: 6, paddingHorizontal: 12, borderRadius: 99, borderWidth: 1, borderColor: on ? colors.body : colors.line, backgroundColor: on ? colors.body + '18' : colors.surface }}>
+                      <Text style={{ color: colors.ink, fontWeight: on ? '700' : '400' }}>{l.name}</Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+              <Pressable accessibilityRole="button" onPress={send} disabled={!!busy}
                 style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: '#1F8F4E', borderRadius: 99, paddingVertical: 14, opacity: pressed ? 0.8 : 1 })}>
                 <Ionicons name="logo-whatsapp" size={20} color="#fff" />
-                <Text style={{ color: '#fff', fontSize: 16, fontWeight: '700' }}>{tr('Send on WhatsApp')}</Text>
+                <Text style={{ color: '#fff', fontSize: 16, fontWeight: '700' }}>{busy === 'translate' ? tr('Myra is translating…') : tr('Send on WhatsApp')}</Text>
               </Pressable>
               <Note>{tr('WhatsApp opens with the menu, ingredients and steps ready. Choose who to send it to.')}</Note>
               <Pressable onPress={() => save({ ...plan, final: false })} hitSlop={8}><Text style={{ color: colors.accent, textAlign: 'center' }}>{tr('Make changes')}</Text></Pressable>

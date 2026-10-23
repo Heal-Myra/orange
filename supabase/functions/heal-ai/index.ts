@@ -429,6 +429,23 @@ Transliteration: ${String(p.transliteration ?? '').slice(0, 800)}
 First give the verse's meaning faithfully in your own words in 2–3 sentences (do not copy any published translation). Then, on its own last line, one way to live it today in at most 10 words. Plain text, no headings.`);
       return { text };
     }
+    case 'translate_message': {
+      // Tomorrow's food in the cook's language (founder, 23 Oct 2026): Hindi and the main Indian languages.
+      const LANGS: Record<string, string> = { hi: 'Hindi (Devanagari)', mr: 'Marathi (Devanagari)', bn: 'Bengali (Bangla script)', gu: 'Gujarati (Gujarati script)',
+        pa: 'Punjabi (Gurmukhi)', ta: 'Tamil (Tamil script)', te: 'Telugu (Telugu script)', kn: 'Kannada (Kannada script)', ml: 'Malayalam (Malayalam script)',
+        or: 'Odia (Odia script)', ur: 'Urdu (Urdu script)', as: 'Assamese (Assamese script)' };
+      const target = LANGS[String(p.to ?? '')];
+      const text = String(p.text ?? '').slice(0, 8000);
+      if (!target || !text) throw new Error('Choose a language first.');
+      const out = await askWith(false)('smart', 'You translate household messages for Indian home cooks accurately and simply.',
+`Translate this WhatsApp message about the day's meals into ${target}, for a home cook.
+Keep exactly: the *bold* and _italic_ markers, bullet points, numbering, line breaks, every number and unit, and every web link unchanged.
+Use the everyday names of dishes and ingredients that a cook in that region would use (e.g. "katori", "tawa"); keep it simple and warm.
+Reply with the translated message only, nothing before or after it.
+
+${text}`);
+      return { text: out.trim() };
+    }
     case 'explain_wisdom': {
       const hindi = p.lang === 'hi';
       const text = await ask('smart', ORANGE_BOOK,

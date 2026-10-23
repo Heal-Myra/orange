@@ -16,4 +16,4 @@ Date: 23 Oct 2026 · Decided by: founder ("plan the food for next day, ask the u
 ## Limits and later
 - The video is a search for short videos, so the person picks one; YouTube decides lengths (Shorts are mostly under a minute).
   Picking one exact video under 60 seconds needs a YouTube Data API key (a Supabase secret) — a later step if wanted.
-- The message is in the app's language. A Hindi copy for a cook who reads Hindi is a small follow-up.
+- Message language (added the same day): English plus Hindi and 11 regional languages; written in English, translated by Myra (`translate_message`), kept with the plan.

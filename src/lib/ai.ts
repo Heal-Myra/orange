@@ -80,3 +80,6 @@ export const planFood = (p: {
   date: string; weekday: string; people: number; context: string; prefs?: string; recent?: string; fibre: number;
   current?: unknown; tweak?: string; swap?: string;
 }) => call<unknown>('meal_plan', p);
+
+/** The WhatsApp food message in the cook's language (Hindi and other Indian languages). */
+export const translateMessage = (text: string, to: string) => call<{ text: string }>('translate_message', { text, to });
