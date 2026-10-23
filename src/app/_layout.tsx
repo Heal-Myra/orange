@@ -24,6 +24,8 @@ function Gate() {
   useEffect(() => {
     if (!ready || !langState.ready) return;
     const here = segments[0] as string | undefined;
+    // The cooking guide opens from WhatsApp for anyone, without language choice or sign-in (23 Oct 2026).
+    if (here === 'cook') return;
     // First of all: the language (founder, 20 Oct 2026).
     if (!langState.chosen) { if (here !== 'language') router.replace('/language'); return; }
     const needsSignIn = online && !session && !guest;
@@ -52,6 +54,7 @@ function Gate() {
       <Stack.Screen name="feedback" options={{ headerShown: true, title: tr('Send feedback'), presentation: 'modal', headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
       <Stack.Screen name="library" options={{ headerShown: true, title: tr('Library'), headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
       <Stack.Screen name="yoga-nidra" options={{ presentation: 'fullScreenModal', contentStyle: { backgroundColor: '#0F1E22' } }} />
+      <Stack.Screen name="cook" options={{ presentation: 'fullScreenModal' }} />
       <Stack.Screen name="myra" options={{ headerShown: true, title: tr('Myra'), presentation: 'modal', headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
     </Stack>
   );

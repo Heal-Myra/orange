@@ -429,6 +429,19 @@ Transliteration: ${String(p.transliteration ?? '').slice(0, 800)}
 First give the verse's meaning faithfully in your own words in 2–3 sentences (do not copy any published translation). Then, on its own last line, one way to live it today in at most 10 words. Plain text, no headings.`);
       return { text };
     }
+    case 'translate_recipe': {
+      // Myra's 1-minute cooking guide in the cook's language: the dishes chosen for a guide, plus the guide's labels.
+      const LANG_NAMES: Record<string, string> = { hi: 'Hindi', mr: 'Marathi', bn: 'Bengali', gu: 'Gujarati', pa: 'Punjabi', ta: 'Tamil', te: 'Telugu',
+        kn: 'Kannada', ml: 'Malayalam', or: 'Odia', ur: 'Urdu', as: 'Assamese' };
+      const to = LANG_NAMES[String(p.to ?? '')];
+      if (!to) throw new Error('Choose a language first.');
+      return await askJson(askWith(false), 'smart', 'You translate recipes for Indian home cooks accurately and simply.',
+`Translate these recipes into ${to}, in its own script, for a home cook. Use the everyday names of dishes, ingredients and kitchen
+words a cook in that region uses; keep every number and unit. Keep the same JSON shape and the same order.
+Also translate the labels: "Ingredients", "Step", "of" (as in "Step 2 of 5") and "Ready. Enjoy your meal!".
+${JSON.stringify(p.meals ?? []).slice(0, 7000)}
+Reply with JSON only: {"meals":[{"dish":"…","portion":"…","ingredients":[{"item":"…","qty":"…"}],"steps":["…"]}],"labels":["…","…","…","…"]}`);
+    }
     case 'translate_message': {
       // Tomorrow's food in the cook's language (founder, 23 Oct 2026): Hindi and the main Indian languages.
       const LANGS: Record<string, string> = { hi: 'Hindi (Devanagari)', mr: 'Marathi (Devanagari)', bn: 'Bengali (Bangla script)', gu: 'Gujarati (Gujarati script)',

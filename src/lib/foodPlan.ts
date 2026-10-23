@@ -34,7 +34,7 @@ export const videoLink = (dish: string) =>
   `https://www.youtube.com/results?search_query=${encodeURIComponent(`${dish} recipe #shorts`)}`;
 
 /** The WhatsApp message: the day's menu, then each dish with ingredients, steps and (if asked) the video. */
-export function planMessage(p: FoodPlan, labels: { title: string; slot: Record<Slot, string>; ingredients: string; how: string; video: string; forPeople: string }): string {
+export function planMessage(p: FoodPlan, labels: { title: string; slot: Record<Slot, string>; ingredients: string; how: string; video: string; forPeople: string }, videoFor: (m: PlannedMeal) => string = m => videoLink(m.dish)): string {
   const lines = [`*${labels.title}*`, labels.forPeople, ''];
   for (const m of p.meals) {
     lines.push(`*${labels.slot[m.slot]}: ${m.dish}*`);
@@ -47,7 +47,7 @@ export function planMessage(p: FoodPlan, labels: { title: string; slot: Record<S
       lines.push(`_${labels.how}_`);
       m.steps.forEach((st, i) => lines.push(`${i + 1}. ${st}`));
     }
-    if (m.video) lines.push(`${labels.video}: ${videoLink(m.dish)}`);
+    if (m.video) lines.push(`${labels.video}: ${videoFor(m)}`);
     lines.push('');
   }
   return lines.join('\n').trim();
@@ -96,3 +96,14 @@ export const ENGLISH_LABELS = (day: string, people: number) => ({
   slot: { breakfast: 'Breakfast', lunch: 'Lunch', snack: 'Snack', dinner: 'Dinner' } as Record<Slot, string>,
   ingredients: 'Ingredients', how: 'How to make', video: 'Video (about 1 minute)',
 });
+
+/** Labels of the cooking guide in the two app languages; other languages come translated by Myra. */
+export const GUIDE_LABELS: Record<string, [string, string, string, string]> = {
+  en: ['Ingredients', 'Step', 'of', 'Ready. Enjoy your meal!'],
+  hi: ['सामग्री', 'चरण', 'में से', 'तैयार! आनंद लें।'],
+};
+
+/** Myra's 1-minute cooking guide for one planned dish. */
+export function guideFor(m: Pick<PlannedMeal, 'dish' | 'portion' | 'ingredients' | 'steps'>, people: number, lang: string, labels?: [string, string, string, string]): import('./cookGuide').Guide {
+  return { d: m.dish, p: m.portion, n: people, i: m.ingredients.map(x => [x.item, x.qty] as [string, string]), s: m.steps, l: lang, t: labels ?? GUIDE_LABELS[lang] ?? GUIDE_LABELS.en };
+}

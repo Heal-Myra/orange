@@ -745,4 +745,12 @@ export const HI: Record<string, string> = {
   "Tomorrow's food": 'कल का भोजन',
   'Message language': 'संदेश की भाषा',
   'Myra is translating…': 'मायरा अनुवाद कर रही है…',
+  'This cooking guide link is incomplete. Please ask for it to be sent again.': 'यह खाना बनाने की गाइड का लिंक अधूरा है। कृपया इसे फिर से भेजने को कहें।',
+  'Tap to play · words on screen': 'चलाने के लिए दबाएँ · शब्द स्क्रीन पर',
+  'Tap to play · sound on': 'चलाने के लिए दबाएँ · आवाज़ चालू',
+  'Made with Happy Orange · happyorange.in': 'Happy Orange से बना · happyorange.in',
+  'Replay': 'फिर से चलाएँ',
+  'Play': 'चलाएँ',
+  "Play Myra's 1-minute guide again": 'मायरा की 1 मिनट की गाइड फिर चलाएँ',
+  'Its link goes into the WhatsApp message too, so the cook can play it.': 'इसका लिंक WhatsApp संदेश में भी जाएगा, ताकि रसोइया इसे चला सके।',
 };

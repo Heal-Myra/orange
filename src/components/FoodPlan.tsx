@@ -5,10 +5,12 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { Linking, Pressable, Share, Text, View } from 'react-native';
-import { planFood, translateMessage } from '../lib/ai';
+import { planFood, translateMessage, translateRecipes } from '../lib/ai';
+import { encodeGuide, guideLink } from '../lib/cookGuide';
+import { router } from 'expo-router';
 import { buildContext } from '../lib/context';
 import { shiftISO, todayISO } from '../lib/dates';
-import { cleanPlan, ENGLISH_LABELS, MESSAGE_LANGS, planMessage, planTotals, videoLink, whatsappLink, type FoodPlan, type Slot } from '../lib/foodPlan';
+import { cleanPlan, ENGLISH_LABELS, guideFor, MESSAGE_LANGS, planMessage, planTotals, whatsappLink, type FoodPlan, type Slot } from '../lib/foodPlan';
 import { lang, locale, tr } from '../lib/i18n';
 import { useHeal } from '../lib/store';
 import { fibreTarget } from '../lib/targets';
@@ -63,16 +65,31 @@ export function FoodPlanCard() {
   const send = async () => {
     if (!plan) return;
     // Written in English, then (for any other language) translated by Myra once and kept with the plan.
-    const english = planMessage(plan, ENGLISH_LABELS(englishDay(tomorrow), plan.people));
-    let text = english;
-    if (msgLang !== 'en') {
-      text = plan.messages?.[msgLang] ?? '';
-      if (!text) {
-        setBusy('translate'); setMessage(null);
-        try { text = (await translateMessage(english, msgLang)).text; save({ ...plan, messages: { ...(plan.messages ?? {}), [msgLang]: text } }); }
-        catch (e) { setMessage(e instanceof Error ? e.message : String(e)); setBusy(null); return; }
-        setBusy(null);
-      }
+    // Each dish asked for gets Myra's 1-minute guide link, in the message language (recipes translated once).
+    let text = plan.messages?.[msgLang] ?? '';
+    if (!text) {
+      setBusy('translate'); setMessage(null);
+      try {
+        const content = lang(); // the plan was written in the app's language
+        const asked = plan.meals.filter(m => m.video);
+        const links = new Map<string, string>();
+        if (asked.length && msgLang !== content && msgLang !== 'en') {
+          const tr2 = await translateRecipes(asked.map(({ dish, portion, ingredients, steps }) => ({ dish, portion, ingredients, steps })), msgLang);
+          asked.forEach((m, k) => {
+            const x = tr2.meals?.[k];
+            const labels = (tr2.labels?.length === 4 ? tr2.labels : undefined) as [string, string, string, string] | undefined;
+            links.set(m.slot, guideLink(guideFor(x ? { dish: x.dish, portion: x.portion, ingredients: x.ingredients ?? [], steps: x.steps ?? [] } : m, plan.people, msgLang, labels)));
+          });
+        } else {
+          asked.forEach(m => links.set(m.slot, guideLink(guideFor(m, plan.people, msgLang === 'en' && content !== 'en' ? content : msgLang))));
+        }
+        // Long links never go through translation: placeholders stand in for them and are put back after.
+        const english = planMessage(plan, ENGLISH_LABELS(englishDay(tomorrow), plan.people), m => `[[${m.slot.toUpperCase()}]]`);
+        text = msgLang === 'en' ? english : (await translateMessage(english, msgLang)).text;
+        for (const [slot, url] of links) text = text.split(`[[${slot.toUpperCase()}]]`).join(url);
+        save({ ...plan, messages: { ...(plan.messages ?? {}), [msgLang]: text } });
+      } catch (e) { setMessage(e instanceof Error ? e.message : String(e)); setBusy(null); return; }
+      setBusy(null);
     }
     // WhatsApp opens with the message ready; pick the contact there. Without WhatsApp, the phone's share sheet.
     const ok = await Linking.openURL(whatsappLink(text)).then(() => true).catch(() => false);
@@ -125,11 +142,11 @@ export function FoodPlanCard() {
                   {m.steps.map((st, k) => <Text key={k} style={{ color: colors.ink, lineHeight: 20 }}>{k + 1}. {st}</Text>)}
                   {/* The short video only when asked (founder): tapping opens short recipe videos and adds the link to the message. */}
                   <Pressable accessibilityRole="button" style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 }}
-                    onPress={() => { if (!m.video) save({ ...plan, messages: undefined, meals: plan.meals.map((x, k) => (k === i ? { ...x, video: true } : x)) }); Linking.openURL(videoLink(m.dish)).catch(() => {}); }}>
+                    onPress={() => { if (!m.video) save({ ...plan, messages: undefined, meals: plan.meals.map((x, k) => (k === i ? { ...x, video: true } : x)) }); router.push({ pathname: '/cook', params: { r: encodeGuide(guideFor(m, plan.people, lang())) } }); }}>
                     <Ionicons name="play-circle-outline" size={20} color={colors.insight} />
-                    <Text style={{ color: colors.insight, fontWeight: '600' }}>{m.video ? tr('Watch the 1-minute video again') : tr('Show me a 1-minute video')}</Text>
+                    <Text style={{ color: colors.insight, fontWeight: '600' }}>{m.video ? tr('Play Myra\'s 1-minute guide again') : tr('Show me a 1-minute video')}</Text>
                   </Pressable>
-                  {m.video ? <Note>{tr('The video link goes into the WhatsApp message too.')}</Note> : null}
+                  {m.video ? <Note>{tr('Its link goes into the WhatsApp message too, so the cook can play it.')}</Note> : null}
                   {!plan.final ? <Button kind="plain" title={busy === m.slot ? tr('Finding another dish…') : tr('Change this dish')} onPress={() => ask({ swap: m.slot })} disabled={!!busy} /> : null}
                 </View>
               ) : null}

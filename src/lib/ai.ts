@@ -83,3 +83,7 @@ export const planFood = (p: {
 
 /** The WhatsApp food message in the cook's language (Hindi and other Indian languages). */
 export const translateMessage = (text: string, to: string) => call<{ text: string }>('translate_message', { text, to });
+
+/** Recipes (and the guide's labels) in another language, for Myra's 1-minute cooking guides. */
+export const translateRecipes = (meals: { dish: string; portion: string; ingredients: { item: string; qty: string }[]; steps: string[] }[], to: string) =>
+  call<{ meals: { dish: string; portion: string; ingredients: { item: string; qty: string }[]; steps: string[] }[]; labels: string[] }>('translate_recipe', { meals, to });
