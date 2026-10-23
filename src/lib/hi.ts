@@ -783,4 +783,5 @@ export const HI: Record<string, string> = {
   'Draft · {n} meals': 'मसौदा · {n} भोजन',
   'Optional · adds {n} to Mind': 'वैकल्पिक · मन में {n} जोड़ता है',
   'Optional': 'वैकल्पिक',
+  'Sent on WhatsApp ✓': 'WhatsApp पर भेजा ✓',
 };

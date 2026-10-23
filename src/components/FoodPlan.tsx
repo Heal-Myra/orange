@@ -28,15 +28,18 @@ const dayName = (iso: string) => { const [y, m, d] = iso.split('-').map(Number);
 export function FoodPlanRow() {
   const { days } = useHeal();
   const plan = days[shiftISO(todayISO(), 1)]?.plan;
-  const status = !plan ? tr('Not planned yet') : plan.final ? tr('Planned · ready to send') : tr('Draft · {n} meals', { n: plan.meals.length });
+  const [open, setOpen] = useState(false);
+  const status = !plan ? tr('Not planned yet') : plan.sentAt ? tr('Sent on WhatsApp ✓') : plan.final ? tr('Planned · ready to send') : tr('Draft · {n} meals', { n: plan.meals.length });
   return (
-    <Expandable icon="time-outline" color={colors.body} title={tr('Tomorrow\'s food')} status={status} statusColor={plan?.final ? colors.good : undefined}>
-      <FoodPlanPanel />
+    <Expandable icon="time-outline" color={colors.body} title={tr('Tomorrow\'s food')} status={status} statusColor={plan?.final ? colors.good : undefined}
+      open={open} onToggle={setOpen}>
+      {/* Folds away by itself once the plan has gone on WhatsApp (founder, 23 Oct 2026). */}
+      <FoodPlanPanel onSent={() => setOpen(false)} />
     </Expandable>
   );
 }
 
-function FoodPlanPanel() {
+function FoodPlanPanel({ onSent }: { onSent: () => void }) {
   const { days, profile, setProfile, updateOn } = useHeal();
   const today = todayISO();
   const tomorrow = shiftISO(today, 1);
@@ -106,7 +109,9 @@ function FoodPlanPanel() {
     }
     // WhatsApp opens with the message ready; pick the contact there. Without WhatsApp, the phone's share sheet.
     const ok = await Linking.openURL(whatsappLink(text)).then(() => true).catch(() => false);
-    if (!ok) Share.share({ message: text }).catch(() => {});
+    if (!ok) await Share.share({ message: text }).catch(() => {});
+    updateOn(tomorrow, d => { if (d.plan) d.plan = { ...d.plan, sentAt: new Date().toISOString() }; });
+    onSent();
   };
 
   const t = plan ? planTotals(plan) : null;

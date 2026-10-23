@@ -21,6 +21,7 @@ export interface FoodPlan {
   meals: PlannedMeal[];
   note?: string;                   // Myra's one line on why this plan
   final?: boolean;                 // the person has finalised it
+  sentAt?: string;                 // when it was last sent on WhatsApp
   messages?: Record<string, string>; // the WhatsApp message already translated, by language code
   madeAt: string;
 }
