@@ -74,3 +74,9 @@ export const oneLine = (text: string, max = 10): string => {
   const words = String(text ?? '').replace(/\s+/g, ' ').trim().split(' ').filter(Boolean);
   return words.length <= max ? words.join(' ') : words.slice(0, max).join(' ').replace(/[,;:]$/, '') + '…';
 };
+
+/** Tomorrow's food plan (founder, 23 Oct 2026). Pass `current` with `tweak` or `swap` to change an existing plan. */
+export const planFood = (p: {
+  date: string; weekday: string; people: number; context: string; prefs?: string; recent?: string; fibre: number;
+  current?: unknown; tweak?: string; swap?: string;
+}) => call<unknown>('meal_plan', p);

@@ -265,6 +265,34 @@ async function run(action: string, p: Record<string, unknown>, hindi = false) {
   switch (action) {
     case 'meal_photo':
       return mealAnalyse({ media_type: String(p.media_type ?? 'image/jpeg'), data: String(p.image_base64 ?? '') }, String(p.hint ?? '').slice(0, 300), hindi);
+    case 'meal_plan': {
+      // Tomorrow's food (founder, 23 Oct 2026): a day's meals around the person's targets and goal; the person can
+      // ask for changes (tweak) or a new dish for one meal (swap). Ingredients for the number of people; nutrition per person.
+      const people = Math.min(10, Math.max(1, Number(p.people) || 1));
+      const current = p.current ? JSON.stringify(p.current).slice(0, 6000) : '';
+      const tweak = String(p.tweak ?? '').trim().slice(0, 400);
+      const swap = String(p.swap ?? '');
+      const r = await askJson(ask, 'smart', `${ORANGE_BOOK} You are also a practical Indian home-cooking nutritionist.`,
+`Plan the food for ${String(p.date ?? 'tomorrow')} (${String(p.weekday ?? '')}) for this person.
+${String(p.context ?? '').slice(0, 3000)}
+Food preferences in their words: ${String(p.prefs ?? '').slice(0, 300) || 'none given; infer from what they usually eat'}.
+What they ate in recent days: ${String(p.recent ?? '').slice(0, 1200) || 'not known'}.
+${current ? `Current plan: ${current}` : ''}
+${tweak ? `They ask for this change: "${tweak}". Change only what this needs; keep the rest of the plan.` : ''}
+${swap ? `Replace only the ${swap} with a different dish that fits as well; keep every other meal exactly as it is.` : ''}
+Rules:
+- Four meals: breakfast, lunch, snack, dinner. Simple Indian home cooking with seasonal, easily available ingredients; vary from recent days.
+- Per person, the day's total stays within 10% of the calorie target (never above it when the goal is to lose weight), reaches the protein target, and has at least ${String(p.fibre ?? 25)} g fibre. Dinner light and early. No crash dieting.
+- Respect the preferences strictly (vegetarian, no onion or garlic, allergies, fasting days, etc.).
+- "portion" is per person in household measures (katori, roti, glass, piece).
+- "ingredients" are for ${people} ${people === 1 ? 'person' : 'people'}, with quantities a cook can follow (g, cups, katori, spoons, pieces).
+- "steps": 3 to 7 short, clear steps to cook it, as for a home cook.
+- kcal, protein_g and fibre_g are per person, honest estimates.
+Reply with JSON only:
+{"note":"one line: why this plan suits them, at most 15 words",
+ "meals":[{"slot":"breakfast"|"lunch"|"snack"|"dinner","dish":"…","portion":"…","kcal":number,"protein_g":number,"fibre_g":number,"ingredients":[{"item":"…","qty":"…"}],"steps":["…"]}]}`);
+      return r;
+    }
     case 'meal_text': {
       const text = String(p.text ?? '').trim().slice(0, 600);
       if (!text) throw new Error('Tell me what you ate first.');

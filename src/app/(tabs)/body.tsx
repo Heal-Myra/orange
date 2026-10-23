@@ -9,6 +9,8 @@ import { Dots, Rows, StatRow } from '../../components/StatRows';
 import { MacroMix, NutritionTable } from '../../components/MacroMix';
 import { bmiOf, fibreTarget, planFor } from '../../lib/targets';
 import { MealPhoto } from '../../components/MealPhoto';
+import { FoodPlanCard } from '../../components/FoodPlan';
+import { todayISO } from '../../lib/dates';
 import { Anchor, Card, Heading, Note, Screen, Score, s } from '../../components/ui';
 import { FAST_KCAL, bodyScore, mealTotals } from '../../lib/scoring';
 import { useHeal } from '../../lib/store';
@@ -65,6 +67,9 @@ export default function Body() {
           )) : null) : <View style={{ borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 10 }}><Note>{tr('No meals yet today.')}</Note></View>}
         </View>
       </MealPhoto></Anchor>
+
+      {/* Tomorrow's food (founder, 23 Oct 2026): plan, tweak, finalise, send on WhatsApp. Only on today's page. */}
+      {date === todayISO() ? <Anchor id="plan"><FoodPlanCard /></Anchor> : null}
 
       <HealthLine />
 
