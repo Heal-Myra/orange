@@ -8,7 +8,7 @@ import { Pressable, Text, View } from 'react-native';
 import { useHeal } from '../lib/store';
 import { TAO_CORE, TAO_POINTS, TAO_WEEK, WEEK_REVIEW, mondayOf, taoForDate } from '../lib/tao';
 import { colors } from '../theme';
-import { Card, Check, Heading, Label, Note, TextField } from './ui';
+import { Card, Check, Expandable, Heading, Label, Note, TextField } from './ui';
 import { tr } from '../lib/i18n';
 
 const NAME = { mind: 'Mind', soul: 'Soul' } as const;
@@ -44,8 +44,10 @@ export function TaoCard({ on }: { on: 'mind' | 'soul' }) {
       <Text style={{ color: colors.ink, lineHeight: 22 }}>{tr(t.short)}</Text>
       {t.weekday === 3 && mondayNote ? <Note>{tr('Your Monday note: {note}', { note: mondayNote })}</Note> : null}
 
-      <TextField key={date + 'tao'} label={tr('My note (private)')} value={day.tao?.note ?? ''} multiline
-        onChangeText={v => update(d => { d.tao = { ...d.tao, note: v }; })} placeholder={tr(t.notePrompt)} />
+      <Expandable icon="create-outline" title={tr('My note (private)')} status={day.tao?.note?.trim() ? day.tao.note.trim() : tr('Optional')}>
+        <TextField key={date + 'tao'} label={tr('My note (private)')} value={day.tao?.note ?? ''} multiline
+          onChangeText={v => update(d => { d.tao = { ...d.tao, note: v }; })} placeholder={tr(t.notePrompt)} />
+      </Expandable>
 
       <Check color={color} checked={!!day.tao?.done} onToggle={() => update(d => { d.tao = { ...d.tao, done: !d.tao?.done }; })}
         title={tr('I did today\'s practice')} points={TAO_POINTS} />

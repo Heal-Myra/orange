@@ -9,7 +9,7 @@ import { Dots, Rows, StatRow } from '../../components/StatRows';
 import { MacroMix, NutritionTable } from '../../components/MacroMix';
 import { bmiOf, fibreTarget, planFor } from '../../lib/targets';
 import { MealPhoto } from '../../components/MealPhoto';
-import { FoodPlanCard } from '../../components/FoodPlan';
+import { FoodPlanRow } from '../../components/FoodPlan';
 import { todayISO } from '../../lib/dates';
 import { Anchor, Card, Heading, Note, Screen, Score, s } from '../../components/ui';
 import { FAST_KCAL, bodyScore, mealTotals } from '../../lib/scoring';
@@ -42,6 +42,8 @@ export default function Body() {
             </Text> : null}
           </View>
         </Pressable>
+        {/* Tomorrow's food (founder, 23 Oct 2026): one clock row that opens the planner when asked. Only on today's page. */}
+        {date === todayISO() ? <FoodPlanRow /> : null}
         <View style={{ borderTopWidth: 1, borderTopColor: colors.line }}>
           <NutritionTable totals={totals} kcal={profile.kcal} protein={profile.protein} fibre={fibreTarget(profile.kcal)} />
           {/* Food items only when asked (founder, 22 Oct 2026): "See details" next to the pies' title opens them below. */}
@@ -67,9 +69,6 @@ export default function Body() {
           )) : null) : <View style={{ borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 10 }}><Note>{tr('No meals yet today.')}</Note></View>}
         </View>
       </MealPhoto></Anchor>
-
-      {/* Tomorrow's food (founder, 23 Oct 2026): plan, tweak, finalise, send on WhatsApp. Only on today's page. */}
-      {date === todayISO() ? <Anchor id="plan"><FoodPlanCard /></Anchor> : null}
 
       <HealthLine />
 

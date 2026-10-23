@@ -108,6 +108,33 @@ export function DayBar() {
   );
 }
 
+/**
+ * Design rule (founder, 23 Oct 2026): anything optional folds away inside the card of the section it belongs to.
+ * One small row (icon, name, one-line status); tap to open the details, tap again to fold them away.
+ */
+export function Expandable({ icon, title, status, statusColor, color = colors.accent, open: controlled, defaultOpen = false, onToggle, children }: {
+  icon: keyof typeof Ionicons.glyphMap; title: string; status?: string; statusColor?: string; color?: string;
+  open?: boolean; defaultOpen?: boolean; onToggle?: (open: boolean) => void; children: ReactNode;
+}) {
+  const [own, setOwn] = useState(defaultOpen);
+  const open = controlled ?? own;
+  const toggle = () => { setOwn(!open); onToggle?.(!open); };
+  return (
+    <View style={{ borderTopWidth: 1, borderTopColor: colors.line }}>
+      <Pressable onPress={toggle} accessibilityRole="button" accessibilityState={{ expanded: open }}
+        style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 12 }}>
+        <Ionicons name={icon} size={22} color={color} />
+        <View style={{ flex: 1 }}>
+          <Text style={{ fontSize: 16, color: colors.ink }}>{title}</Text>
+          {status ? <Text style={{ fontSize: 13, color: statusColor ?? colors.muted }} numberOfLines={1}>{status}</Text> : null}
+        </View>
+        <Ionicons name={open ? 'chevron-up' : 'chevron-down'} size={18} color={colors.muted} />
+      </Pressable>
+      {open ? <View style={{ gap: 10, paddingBottom: 12 }}>{children}</View> : null}
+    </View>
+  );
+}
+
 export function Card({ children, style }: { children: ReactNode; style?: StyleProp<ViewStyle> }) {
   return <View style={[s.card, style]}>{children}</View>;
 }

@@ -8,7 +8,7 @@ import { ClassifyHelper } from '../../components/AiBits';
 import { ScreenTimeCard } from '../../components/ScreenTimeCard';
 import { TaoCard } from '../../components/TaoCard';
 import { HabitsBar, TasksCard } from '../../components/TasksCard';
-import { Anchor, Button, Card, Heading, Note, NumberField, Screen, Score, s, useKeepVisible } from '../../components/ui';
+import { Anchor, Button, Card, Expandable, Heading, Note, NumberField, Screen, Score, s, useKeepVisible } from '../../components/ui';
 import { CONTENT_CATEGORIES, LEARNING_POINTS, mindScore } from '../../lib/scoring';
 import { useHeal } from '../../lib/store';
 import type { ContentCategoryId } from '../../lib/types';
@@ -100,6 +100,7 @@ function LearningBox() {
   const [busy, setBusy] = useState(false);
   const [miss, setMiss] = useState('');
   const tried = useRef('');
+  const [openLearn, setOpenLearn] = useState(false);
   const set = (k: 'text' | 'link', v: string) => update(d => {
     const cur = d.mind.learned ?? {};
     d.mind = { ...d.mind, learned: { ...cur, [k]: v, by: k === 'text' ? undefined : cur.by } };
@@ -119,12 +120,10 @@ function LearningBox() {
     const t = setTimeout(() => ask(url), 700);
     return () => clearTimeout(t);
   }, [url, l.text, ask]);
+  const earned = (l.text ?? '').trim().length >= 3;
   return (
-    <View key={date} style={{ gap: 8, borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 12 }}>
-      <View style={s.headingRow}>
-        <Text style={{ fontSize: 17, fontWeight: '700', color: colors.ink }}>{tr('Learning')}</Text>
-        <Text style={{ color: colors.mind, fontWeight: '700' }}>{(l.text ?? '').trim().length >= 3 ? `+${LEARNING_POINTS}` : `${LEARNING_POINTS}`}</Text>
-      </View>
+    <Expandable key={date} icon="bulb-outline" color={colors.mind} title={tr('Learning')} open={openLearn || (!!url && !l.text?.trim())} onToggle={setOpenLearn}
+      status={earned ? `+${LEARNING_POINTS} · ${l.text!.trim()}` : tr('Optional · adds {n} to Mind', { n: LEARNING_POINTS })} statusColor={earned ? colors.mind : undefined}>
       <TextInput style={s.input} value={l.link ?? ''} onChangeText={t => { setMiss(''); set('link', t.trim()); }} autoCapitalize="none" autoCorrect={false}
         keyboardType="url" placeholder={tr('Paste a link: video, article, course')} placeholderTextColor={colors.muted} onFocus={() => setTimeout(keep, 300)} />
       <TextInput style={s.input} value={busy ? '' : l.text ?? ''} editable={!busy} multiline onChangeText={t => set('text', t.replace(/\n/g, ' ').split(/ +/).slice(0, 11).join(' '))}
@@ -144,6 +143,6 @@ function LearningBox() {
       ) : null}
       {Platform.OS !== 'web' ? <Note>{tr('Tip: in YouTube, Instagram or LinkedIn tap Share, then Happy Orange.')}</Note> : null}
       <Note>{tr('Learning something today adds {n} to Mind.', { n: LEARNING_POINTS })}</Note>
-    </View>
+    </Expandable>
   );
 }

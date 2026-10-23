@@ -778,4 +778,9 @@ export const HI: Record<string, string> = {
   'Paste works from the next app version. For now, choose the screenshot.': 'चिपकाना ऐप के अगले संस्करण से चलेगा। अभी स्क्रीनशॉट चुनें।',
   'No picture to paste. Take the screenshot, tap Copy, then Paste here.': 'चिपकाने के लिए कोई तस्वीर नहीं। स्क्रीनशॉट लें, Copy दबाएँ, फिर यहाँ चिपकाएँ।',
   'Take a screenshot of Screen Time (iPhone: Settings → Screen Time → See All App & Website Activity), then choose it or paste it here. The app reads your social-media minutes for you.': 'Screen Time का स्क्रीनशॉट लें (iPhone: Settings → Screen Time → See All App & Website Activity), फिर उसे यहाँ चुनें या चिपकाएँ। ऐप आपके सोशल मीडिया के मिनट खुद पढ़ लेगा।',
+  'Not planned yet': 'अभी तय नहीं',
+  'Planned · ready to send': 'तय · भेजने को तैयार',
+  'Draft · {n} meals': 'मसौदा · {n} भोजन',
+  'Optional · adds {n} to Mind': 'वैकल्पिक · मन में {n} जोड़ता है',
+  'Optional': 'वैकल्पिक',
 };

@@ -16,14 +16,27 @@ import { useHeal } from '../lib/store';
 import { fibreTarget } from '../lib/targets';
 import { emptyDay } from '../lib/types';
 import { colors } from '../theme';
-import { Button, Card, Heading, Note, TextField } from './ui';
+import { Button, Expandable, Note, TextField } from './ui';
 
 const SLOT_NAME: Record<Slot, string> = { breakfast: 'Breakfast', lunch: 'Lunch', snack: 'Snack', dinner: 'Dinner' };
 
 const englishDay = (iso: string) => { const [y, m, d] = iso.split('-').map(Number); return new Date(y, m - 1, d).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'short' }); };
 const dayName = (iso: string) => { const [y, m, d] = iso.split('-').map(Number); return new Date(y, m - 1, d).toLocaleDateString(locale(), { weekday: 'long', day: 'numeric', month: 'short' }); };
 
-export function FoodPlanCard() {
+/** One small clock row inside the Food card (founder, 23 Oct 2026: minimalism — details only when asked).
+ *  Tapping it opens the planner below the row; tapping again folds it away. */
+export function FoodPlanRow() {
+  const { days } = useHeal();
+  const plan = days[shiftISO(todayISO(), 1)]?.plan;
+  const status = !plan ? tr('Not planned yet') : plan.final ? tr('Planned · ready to send') : tr('Draft · {n} meals', { n: plan.meals.length });
+  return (
+    <Expandable icon="time-outline" color={colors.body} title={tr('Tomorrow\'s food')} status={status} statusColor={plan?.final ? colors.good : undefined}>
+      <FoodPlanPanel />
+    </Expandable>
+  );
+}
+
+function FoodPlanPanel() {
   const { days, profile, setProfile, updateOn } = useHeal();
   const today = todayISO();
   const tomorrow = shiftISO(today, 1);
@@ -99,8 +112,7 @@ export function FoodPlanCard() {
   const t = plan ? planTotals(plan) : null;
 
   return (
-    <Card style={{ gap: 12 }}>
-      <Heading>{tr('Tomorrow\'s food')}</Heading>
+    <View style={{ gap: 12 }}>
       <Note>{dayName(tomorrow)}</Note>
 
       {todays?.meals.length ? (
@@ -191,7 +203,7 @@ export function FoodPlanCard() {
         </>
       )}
       {message ? <Note>{message}</Note> : null}
-    </Card>
+    </View>
   );
 }
 
