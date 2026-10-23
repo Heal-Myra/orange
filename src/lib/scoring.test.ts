@@ -214,3 +214,10 @@ describe('Tao practice', () => {
     expect(soulScore(d)).toBeNull();
   });
 });
+
+describe('gratitude with empty boxes in between', () => {
+  it('skips empty boxes instead of crashing', () => {
+    const d = { ...emptyDay('2026-10-23'), soul: { gratitude: [null, null, 'My family'] as unknown as string[] } };
+    expect(soulScore(d)!.gratitude).toBe(10);
+  });
+});

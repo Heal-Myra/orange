@@ -4,7 +4,7 @@
 // of the days that have data; days without data are left out (never counted as zero).
 
 import { isoDate } from './dates';
-import { bodyScore, mealTotals, mindScore, soulScore, wellBeing } from './scoring';
+import { bodyScore, countGratitude, mealTotals, mindScore, soulScore, wellBeing } from './scoring';
 import type { DayLog, Profile } from './types';
 
 export type Range = 'D' | 'W' | 'M' | 'Q' | 'Y';
@@ -100,7 +100,7 @@ export const METRICS: Metric[] = [
 
   { id: 'soul', name: 'Soul score', unit: 'of 100', pillar: 'soul', better: 'up', value: (d, P) => num(soulScore(d, P)?.total) },
   { id: 'meditation', name: 'Meditation', unit: 'min', pillar: 'soul', better: 'up', target: P => P.meditation, value: d => num(d.mind.meditationMin) },
-  { id: 'gratitude', name: 'Gratitudes', unit: 'per day', pillar: 'soul', better: 'up', target: () => 4, value: d => { const n = (d.soul?.gratitude ?? []).filter(g => g.trim()).length; return n || null; } },
+  { id: 'gratitude', name: 'Gratitudes', unit: 'per day', pillar: 'soul', better: 'up', target: () => 4, value: d => { const n = countGratitude(d.soul?.gratitude); return n || null; } },
   { id: 'wisdom', name: 'Days with Daily Wisdom', unit: 'days', pillar: 'soul', better: 'up', days: true, value: d => (d.soul?.verseStudied ? 1 : null) },
 ];
 

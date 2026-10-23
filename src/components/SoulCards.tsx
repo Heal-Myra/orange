@@ -74,7 +74,8 @@ export function GratitudeCard() {
   const keep = useKeepVisible();
   const list = (day.soul ?? {}).gratitude ?? [];
   const set = (i: number, t: string) => update(d => {
-    const g = [...(d.soul?.gratitude ?? [])];
+    // Never leave holes: writing box 3 first used to save boxes 1–2 as null and crashed the score (23 Oct 2026).
+    const g = Array.from({ length: Math.max(4, d.soul?.gratitude?.length ?? 0) }, (_, k) => d.soul?.gratitude?.[k] ?? '');
     g[i] = t;
     d.soul = { ...d.soul, gratitude: g };
   });

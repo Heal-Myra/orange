@@ -141,6 +141,10 @@ const taoPoints = (d: DayLog, pillar: 'mind' | 'soul') =>
 
 const weightOf = (id: ContentCategoryId) => CONTENT_CATEGORIES.find(c => c.id === id)?.weight ?? 0.5;
 
+/** Gratitudes written today; empty boxes in between are saved as null and are skipped. */
+export const countGratitude = (list?: (string | null | undefined)[]) =>
+  (Array.isArray(list) ? list : []).filter(g => typeof g === 'string' && g.trim()).length;
+
 export interface SoulScore {
   total: number;
   meditation: number; // /30 for breathing and meditation minutes against the daily target
@@ -156,7 +160,8 @@ export interface SoulScore {
  */
 export function soulScore(d: DayLog, P: Profile = DEFAULT_PROFILE): SoulScore | null {
   const so = d.soul ?? {};
-  const grateful = (so.gratitude ?? []).filter(g => g.trim()).length;
+  // Boxes can be left empty in between (saved as null), so check each one is text (crash, 23 Oct 2026).
+  const grateful = countGratitude(so.gratitude);
   // Founder, 21 Oct 2026: Thought of the day removed; gratitude 40, meditation 30, Daily Wisdom 30.
   const meditation = 30 * c01((d.mind.meditationMin ?? 0) / P.meditation);
   const verse = so.verseStudied ? 30 : 0;
