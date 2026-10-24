@@ -42,6 +42,7 @@ export function buildContext(day: DayLog, days: Record<string, DayLog>, date: st
     `Today's Tao practice (${tao.pillar}): ${tao.title}: ${tao.practice[0]} Done: ${day.tao?.done ? 'yes' : 'not yet'}.`,
     TAO_FOR_AI,
     profile.me?.meditationGoal ? `Meditation goal: ${profile.me.meditationGoal.minutes} min a day by ${profile.me.meditationGoal.by}; today's planned guided session ${todaysLength(profile.me.meditationGoal, days, date).minutes} min (suggest this length, not more).` : 'Meditation goal: none.',
+    profile.me?.saved?.length ? `Saved to their journey (what inspires them): ${profile.me.saved.slice(0, 5).map(x => `"${x.title}"`).join('; ')}.` : 'Saved to their journey: nothing yet.',
     `Habits today (repeating; shown to them at their time by the app, do not repeat them as tasks): ${hab || 'none'}.`,
     tasks ?? '',
     `Last 7 days:\n${week}`,

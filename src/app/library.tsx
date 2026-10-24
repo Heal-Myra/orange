@@ -10,17 +10,20 @@ import { TAO_CORE, WEEK_REVIEW } from '../lib/tao';
 import { IFCT_COLUMNS, foodByCode, formatAmount, nutrient, per100g, searchFoods } from '../lib/ifct';
 import { PRACTICES } from '../lib/scoring';
 import { colors } from '../theme';
+import { useHeal } from '../lib/store';
+import { Linking } from 'react-native';
 import { tr } from '../lib/i18n';
 
-type Section = 'food' | 'gita' | 'tao' | 'practices' | 'exercise';
+type Section = 'saved' | 'food' | 'gita' | 'tao' | 'practices' | 'exercise';
 
 export default function Library() {
-  const [section, setSection] = useState<Section>('food');
+  const { profile } = useHeal();
+  const [section, setSection] = useState<Section>(profile.me?.saved?.length ? 'saved' : 'food');
   return (
     <Screen showDay={false} feedback="Library">
       <Segmented<Section> value={section} onChange={setSection}
-        options={[{ label: tr('Food'), value: 'food' }, { label: tr('Gita'), value: 'gita' }, { label: tr('Tao'), value: 'tao' }, { label: tr('Practices'), value: 'practices' }, { label: tr('Exercises'), value: 'exercise' }]} />
-      {section === 'food' ? <FoodLibrary /> : section === 'gita' ? <GitaLibrary /> : section === 'tao' ? <TaoLibrary /> : section === 'practices' ? <PracticesLibrary /> : <ExerciseLibrary />}
+        options={[{ label: tr('Saved'), value: 'saved' }, { label: tr('Food'), value: 'food' }, { label: tr('Gita'), value: 'gita' }, { label: tr('Tao'), value: 'tao' }, { label: tr('Practices'), value: 'practices' }, { label: tr('Exercises'), value: 'exercise' }]} />
+      {section === 'saved' ? <SavedLibrary /> : section === 'food' ? <FoodLibrary /> : section === 'gita' ? <GitaLibrary /> : section === 'tao' ? <TaoLibrary /> : section === 'practices' ? <PracticesLibrary /> : <ExerciseLibrary />}
     </Screen>
   );
 }
@@ -155,6 +158,28 @@ function PracticesLibrary() {
         <View key={p.id} style={{ gap: 2, borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 8 }}>
           <Text style={{ fontWeight: '700', color: colors.ink }}>{p.name}{p.orangeBook ? <Text style={{ color: colors.insight, fontSize: 12 }}>  {tr('Orange Book')}</Text> : null}</Text>
           <Text style={{ color: colors.muted }}>{tr(p.meaning)}</Text>
+        </View>
+      ))}
+    </Card>
+  );
+}
+
+/** Saved to my journey (founder, 24 Oct 2026): videos and articles shared to Happy Orange. */
+function SavedLibrary() {
+  const { profile, setProfile } = useHeal();
+  const list = profile.me?.saved ?? [];
+  const remove = (url: string) => profile.me && setProfile({ ...profile, me: { ...profile.me, saved: list.filter(x => x.url !== url) } });
+  return (
+    <Card style={{ gap: 10 }}>
+      <Heading>{tr('Saved for my journey')}</Heading>
+      {!list.length ? <Note>{tr('In YouTube, Instagram or a browser tap Share, then Happy Orange, and choose Save to my journey.')}</Note> : list.map(x => (
+        <View key={x.url} style={{ flexDirection: 'row', gap: 10, alignItems: 'center', borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 8 }}>
+          <Pressable style={{ flex: 1 }} onPress={() => Linking.openURL(x.url).catch(() => {})}>
+            <Text style={{ color: colors.ink, fontSize: 15 }}>{x.title}</Text>
+            {x.note ? <Text style={{ color: colors.muted, fontSize: 13 }}>{x.note}</Text> : null}
+            <Text numberOfLines={1} style={{ color: colors.accent, fontSize: 12 }}>{x.url}</Text>
+          </Pressable>
+          <Pressable onPress={() => remove(x.url)} hitSlop={8}><Text style={{ color: colors.muted }}>✕</Text></Pressable>
         </View>
       ))}
     </Card>

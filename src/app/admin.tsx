@@ -2,7 +2,7 @@
 // Uses tables ai_access, app_admins and feedback (migrations 0003, 0004); row-level security lets only admins see others' rows.
 
 import { useCallback, useEffect, useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, Text, View, Linking } from 'react-native';
 import { Button, Card, Heading, Note, Screen, Segmented } from '../components/ui';
 import { useAuth } from '../lib/auth';
 import { supabase } from '../lib/supabase';
@@ -88,6 +88,7 @@ export default function Admin() {
             <View key={f.id} style={{ gap: 4, borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 8 }}>
               <Text style={{ fontSize: 12, color: colors.muted }}>{when(f.created_at)} · {f.email ?? 'unknown'} · {f.area ?? tr('Other')} {f.rating ? FACES[f.rating] : ''}</Text>
               <Text selectable style={{ color: colors.ink, lineHeight: 21 }}>{f.message}</Text>
+              {/^https?:\/\//.test(f.message) ? <Pressable onPress={() => Linking.openURL(f.message.split('\n')[0]).catch(() => {})}><Text style={{ color: colors.accent, fontWeight: '600' }}>{tr('Open link')} ›</Text></Pressable> : null}
             </View>
           ))}
         </Card>

@@ -16,6 +16,7 @@ export interface AboutMe {
   aims?: string;      // the non-weight part of the goal, e.g. "run 5 km", "sleep better"
   goalNote?: string;  // Myra's one-line reply about the goal (e.g. that it is too steep and what she planned instead)
   foodPrefs?: string;
+  saved?: { url: string; title: string; note?: string; at: string }[]; // shared to Happy Orange: "Save to my journey" (24 Oct 2026)
   party?: { what?: string; when?: string; who?: string; plan?: string }; // a party being planned (24 Oct 2026)
   meditationGoal?: import('./meditationPlan').MeditationGoal; // grow guided sessions gradually (24 Oct 2026)
   habits?: import('./habits').Habit[]; // repeating to-dos (23 Oct 2026), kept with About you so they sync

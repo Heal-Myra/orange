@@ -1,6 +1,7 @@
 # Changelog
 
 ## 0.10.0 — 22–24 October 2026 (Trends, food plans, habits, guided breathing, how I feel)
+- Share to Happy Orange (24 Oct, decision 0026): save a video or article to my journey (Library › Saved; Myra knows it) or send it to the team as inspiration (Admin › Feedback).
 - Build 10 (24 Oct) made from the founder's PC with his Apple sign-in: Apple added App Groups and Push Notifications, refreshed the provisioning profile and created one for the share extension; submitted to TestFlight. Builds 7–9 had stopped at these missing permissions. For PC builds run `set EAS_NO_VCS=1` first (no Git on that PC).
 - Scores (24 Oct, decision 0025): no bonuses. Body food 40 · sleep 30 · movement 30; Mind focus to-dos 40 · breathing & meditation 30 · phone activity 30; Soul gratitude 40 · Daily Wisdom 30 · Tao 30 · love 30 (130, held at 100 until trimmed). Meditation card moved to Mind, Tao to Soul; Learning removed (share menu switched off for now).
 - How do you feel today (24 Oct, decision 0023): one text box on Today; symptoms and mood read from the words (English and Hindi); Myra, food plans and guided breathing follow it; "Still the same as yesterday" when there were symptoms.

@@ -3,7 +3,7 @@
 // ShareReceiver (src/components/ShareReceiver.tsx) puts the shared link into Learning.
 export function redirectSystemPath({ path }: { path: string; initial: boolean }) {
   try {
-    if (path.includes('dataUrl=')) return '/mind?card=phone';
+    if (path.includes('dataUrl=')) return '/';
     return path;
   } catch {
     return '/';
