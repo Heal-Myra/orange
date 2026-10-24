@@ -152,7 +152,7 @@ export interface SoulScore {
   gratitude: number; // /40, 10 per thing, up to four
   thought: number;   // /15 for writing a thought for the day
   bonus: number;     // ±10 from reflected actions
-  love: number;      // bonus up to +15 (founder, 24 Oct 2026): whom I love today 5, what makes me happy 5, friend this week 5
+  love: number;      // bonus up to +15 (founder, 24 Oct 2026): whom I love today 5, how I love myself 5, done 5
 }
 
 /**
@@ -169,7 +169,7 @@ export function soulScore(d: DayLog, P: Profile = DEFAULT_PROFILE): SoulScore | 
   const gratitude = Math.min(4, grateful) * 10; // four things, 10 each (founder, 21 Oct 2026)
   const thought = 0;
   const filled = (t?: string) => (t ?? '').trim().length >= 2;
-  const love = (filled(d.love?.whom) ? 5 : 0) + (filled(d.love?.happy) ? 5 : 0) + (filled(d.love?.friend) ? 5 : 0);
+  const love = (filled(d.love?.whom) ? 5 : 0) + (filled(d.love?.self ?? d.love?.happy) ? 5 : 0) + (d.love?.done && (filled(d.love?.whom) || filled(d.love?.self ?? d.love?.happy)) ? 5 : 0);
   if (!d.actions.length && !verse && !gratitude && !love && d.mind.meditationMin == null) return null;
   const bonus = clamp(d.actions.reduce((s, a) => s + (a.alignment || 0), 0) * 2.5, -10, 10);
   return { total: clamp(meditation + verse + gratitude + thought + bonus + love, 0, 100), meditation, verse, gratitude, thought, bonus, love };

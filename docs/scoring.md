@@ -55,6 +55,6 @@ If the person switches on "I'm fasting today" on the Food card and the day's foo
 
 ## Love (24 Oct 2026)
 
-Soul gets a Love bonus of up to +15 (still capped at 100): whom I love today and how (+5), what I will do to make myself happy
-today (+5), the friend I am meeting this week (+5, carried to every day of that week). Planning a party is optional and earns
-no points.
+Soul gets a Love bonus of up to +15 (still capped at 100): whom I will love today, chosen (+5); how I will love myself today,
+chosen (+5); one of them done (+5). Ready answers to tap (talk to a friend, call a family member, be kind to a stranger…; a
+thank-you note to myself, a coffee or treat at the weekend…) or the person's own words.

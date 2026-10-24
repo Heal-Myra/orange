@@ -57,7 +57,7 @@ export interface DayLog {
   meals: Meal[];
   fasting?: boolean;
   // Love (founder, 24 Oct 2026): whom I love today and how, what makes me happy today, the friend I meet this week.
-  love?: { whom?: string; act?: string; happy?: string; friend?: string };
+  love?: { whom?: string; self?: string; done?: boolean; act?: string; happy?: string; friend?: string }; // self: how I love myself (happy: older days)
   feeling?: import('./feeling').Feeling; // "How do you feel today?" (24 Oct 2026)
   habitsDone?: string[]; // habits ticked off this day (23 Oct 2026)
   plan?: import('./foodPlan').FoodPlan; // the food planned for this day (made the day before; founder, 23 Oct 2026) // "I'm fasting today" (founder, 22 Oct 2026): water, black tea and black coffee are fine
