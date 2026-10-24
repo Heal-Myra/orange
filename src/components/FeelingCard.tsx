@@ -1,5 +1,5 @@
-// "How do you feel today?" on Today (founder, 24 Oct 2026). One tap for the mood; if not great, a few taps for what
-// is wrong (cold, fever, tired…). Then it folds into one line, and Myra fits every suggestion to it.
+// "How do you feel today?" on Today (founder, 24 Oct 2026): one text box, in the person's own words. Symptoms and mood are
+// read from the words (src/lib/feeling.ts); then it folds into one line, and Myra fits every suggestion to it.
 
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
@@ -15,60 +15,26 @@ export function FeelingCard() {
   const { day, days, date, update } = useHeal();
   const f = day.feeling;
   const before = days[shiftISO(date, -1)]?.feeling;
-  const [mood, setMood] = useState<Mood | null>(f?.mood ?? null);
-  const [sym, setSym] = useState<Symptom[]>(f?.symptoms ?? []);
   const [note, setNote] = useState(f?.note ?? '');
   const [editing, setEditing] = useState(false);
 
   const save = (m: Mood | null, s: Symptom[], n: string) => {
     // Words count too (founder, 24 Oct 2026): "I have a cold" ticks Cold by itself.
     const all = Array.from(new Set([...s, ...symptomsIn(n)]));
-    const mood: Mood = m ?? (all.some(x => !['stressed', 'sleepless', 'tired'].includes(x)) ? 'unwell' : all.length ? 'low' : 'okay');
+    const happy = /\b(great|good|fine|happy|fresh|energetic|well)\b|अच्छा|बढ़िया|ठीक/i.test(n) && !/\bnot\b|नहीं/i.test(n);
+    const mood: Mood = m ?? (all.some(x => !['stressed', 'sleepless', 'tired'].includes(x)) ? 'unwell' : all.length ? 'low' : happy ? 'good' : 'okay');
     update(d => { d.feeling = { mood, symptoms: all, note: n.trim() || undefined, at: new Date().toISOString() } as Feeling; });
     setEditing(false);
-  };
-  const choose = (m: Mood) => {
-    setMood(m);
-    if ((m === 'great' || m === 'good') && !note.trim()) { setSym([]); save(m, [], ''); }
   };
 
   const summary = f ? (f.note?.trim() || [tr(MOODS.find(x => x.id === f.mood)!.label), ...f.symptoms.map(s => tr(SYMPTOMS.find(x => x.id === s)!.label))].join(' · ')) : '';
   const unwell = f && (f.mood === 'unwell' || f.mood === 'low' || f.symptoms.length > 0);
 
+  // Just the words (founder, 24 Oct 2026: no buttons). Symptoms and mood are read from what is written.
   const picker = (
     <View style={{ gap: 10 }}>
-      {/* In your own words first (founder, 24 Oct 2026); the taps below are optional shortcuts. */}
       <TextField label={tr('In your own words')} value={note} onChangeText={setNote} multiline placeholder={tr('e.g. I have a cold since last night, a little tired')} />
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-        {MOODS.map(m => {
-          const on = mood === m.id;
-          return (
-            <Pressable key={m.id} onPress={() => choose(m.id)} accessibilityRole="button" accessibilityState={{ selected: on }}
-              style={{ alignItems: 'center', gap: 4, paddingVertical: 8, width: 62, borderRadius: 14, borderWidth: 1,
-                borderColor: on ? colors.insight : colors.line, backgroundColor: on ? colors.insight + '12' : colors.surface }}>
-              <Ionicons name={m.icon as keyof typeof Ionicons.glyphMap} size={22} color={on ? colors.insight : colors.muted} />
-              <Text style={{ fontSize: 12, color: colors.ink }}>{tr(m.label)}</Text>
-            </Pressable>
-          );
-        })}
-      </View>
-      {mood && mood !== 'great' && mood !== 'good' ? (
-        <>
-          <Text style={{ color: colors.ink }}>{tr('Anything bothering you?')}</Text>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
-            {SYMPTOMS.map(s => {
-              const on = sym.includes(s.id);
-              return (
-                <Pressable key={s.id} onPress={() => setSym(l => (on ? l.filter(x => x !== s.id) : [...l, s.id]))}
-                  style={{ paddingVertical: 6, paddingHorizontal: 12, borderRadius: 99, borderWidth: 1, borderColor: on ? colors.insight : colors.line, backgroundColor: on ? colors.insight + '12' : colors.surface }}>
-                  <Text style={{ color: colors.ink, fontSize: 13 }}>{tr(s.label)}</Text>
-                </Pressable>
-              );
-            })}
-          </View>
-        </>
-      ) : null}
-      {note.trim() || (mood && mood !== 'great' && mood !== 'good') ? <Button kind="insight" title={tr('Done')} onPress={() => save(mood, sym, note)} /> : null}
+      {note.trim() ? <Button kind="insight" title={tr('Done')} onPress={() => save(null, [], note)} /> : null}
     </View>
   );
 

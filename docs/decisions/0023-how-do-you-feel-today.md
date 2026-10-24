@@ -14,3 +14,5 @@ Date: 24 Oct 2026 · Decided by: founder ("I have a cold today; once I have inpu
 ## In your own words (same day, founder)
 A text box comes first ("I have a cold since last night"); the mood and symptom taps are optional shortcuts. Symptoms are also
 read from the words (English and Hindi, src/lib/feeling.ts), and Myra reads the words themselves.
+
+Later the same day the founder removed the buttons: only the text box (and, when yesterday had symptoms, one tap for "Still the same as yesterday").
