@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.10.0 — 22–24 October 2026 (Trends, food plans, habits, guided breathing, how I feel)
+- Build 10 (24 Oct) made from the founder's PC with his Apple sign-in: Apple added App Groups and Push Notifications, refreshed the provisioning profile and created one for the share extension; submitted to TestFlight. Builds 7–9 had stopped at these missing permissions. For PC builds run `set EAS_NO_VCS=1` first (no Git on that PC).
+- Scores (24 Oct, decision 0025): no bonuses. Body food 40 · sleep 30 · movement 30; Mind focus to-dos 40 · breathing & meditation 30 · phone activity 30; Soul gratitude 40 · Daily Wisdom 30 · Tao 30 · love 30 (130, held at 100 until trimmed). Meditation card moved to Mind, Tao to Soul; Learning removed (share menu switched off for now).
+- How do you feel today (24 Oct, decision 0023): one text box on Today; symptoms and mood read from the words (English and Hindi); Myra, food plans and guided breathing follow it; "Still the same as yesterday" when there were symptoms.
+- Love on Soul (24 Oct, decision 0024): whom will I love today, how will I love myself today (one-tap answers or my own), Done today.
+- Breathing & meditation (24 Oct, decision 0022): 5/10/15 min, Guided or On my own; Myra's mix and nine pranayama practices (Anulom Vilom, Bhastrika, Kapalbhati, Bhramari, Ujjayi, Sheetali, Sama Vritti, Udgeeth, Yoga Nidra) in Happy Orange's own animated, voiced player; safety notes; meditation goal grows sessions gradually.
+- Design rule (23 Oct, decision 0021): optional things fold away in their section's card (Expandable). Tomorrow's food is a clock row in the Food card and folds away after sending.
+- Mind to-dos (23 Oct, decision 0020): today's list with See all; at most 3 a day per group; repeating tasks become Habits shown on Today at their time.
+- Tomorrow's food (23 Oct, decisions 0018–0019): Myra plans four meals to targets and preferences; change a dish or tell her what to change; finalise; send on WhatsApp in English, Hindi or 11 regional languages; Myra's own 1-minute cooking guide (app.happyorange.in/cook) for dishes asked for.
+- Phone activity (23 Oct): "I used no social media" removed; Paste screenshot (iPhone from build 10).
+- Food (23 Oct): Fix a misread dish in words and recalculate. Weight: an untouched box no longer counts as typed; a newer scale reading wins.
+- Crash fix (23 Oct): a gratitude written in a later box with an earlier one empty crashed the Soul score; error page with Try again added; newer phone features load only when the build has them.
+- Trends (22–23 Oct, decision 0016): D · W · M · Q · Y on every tab, line graphs with averages and change vs the previous period.
+- Bedtime (22 Oct, decision 0017): after the usual sleep time only winding down; guided Yoga Nidra.
+- Fasting switch (22 Oct): a declared fast scores Food in full; Myra's advice and reminders change.
+- How-I-learn share and link reading (22 Oct, decision 0015), later removed with Learning on 24 Oct.
+
 ## 0.9.0 — 21 October 2026 (About you, more Apple Health)
 - Food score rebuilt (founder, 22 Oct, on a fasting day): calories 12 (full at or under target, 0 at 140 %), protein 9 (by share of calories), fibre 6 (g per 1,000 kcal), fat 3 (30 % or less). Eating under target or fasting is no longer penalised; protein- and fibre-rich beats carb- and fat-heavy (`foodScore`, tests). Myra still gently checks in if many days in a row are far under target without a declared fast. docs/scoring.md updated.
 - Your usual day (22 Oct, founder): About you takes the day in your own words; Myra makes a timetable; five minutes before each switch-over Today shows ONE fitting thing (work to-do at office moments and breaks, family to-do at family time, learning on the drive home, meal photo at meals), titled "Clear your mind". Phone reminders at the same moments from build 7 (`expo-notifications`, local only). Testers' AI cap 20 → 40. See docs/decisions/0014-usual-day-and-one-thing-at-a-time.md.
