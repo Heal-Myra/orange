@@ -7,6 +7,7 @@ import { shiftISO, todayISO } from './dates';
 import { verseOfDay } from './gita';
 import { countGratitude, mealTotals, wellBeing } from './scoring';
 import { habitsToday } from './habits';
+import { todaysLength } from './meditationPlan';
 import { TAO_FOR_AI, taoForDate } from './tao';
 import { passageOfDay, traditionName, type Tradition } from './wisdom';
 import type { DayLog, Profile } from './types';
@@ -37,6 +38,7 @@ export function buildContext(day: DayLog, days: Record<string, DayLog>, date: st
     dailyWisdomLine(tradition, date, `Bhagavad Gita ${v.chapter}.${v.verse} (${v.transliteration.replace(/\n/g, ' ')})`),
     `Today's Tao practice (${tao.pillar}): ${tao.title}: ${tao.practice[0]} Done: ${day.tao?.done ? 'yes' : 'not yet'}.`,
     TAO_FOR_AI,
+    profile.me?.meditationGoal ? `Meditation goal: ${profile.me.meditationGoal.minutes} min a day by ${profile.me.meditationGoal.by}; today's planned guided session ${todaysLength(profile.me.meditationGoal, days, date).minutes} min (suggest this length, not more).` : 'Meditation goal: none.',
     `Habits today (repeating; shown to them at their time by the app, do not repeat them as tasks): ${hab || 'none'}.`,
     tasks ?? '',
     `Last 7 days:\n${week}`,

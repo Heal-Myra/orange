@@ -5,7 +5,9 @@ import { useEffect, useRef, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { useHeal } from '../lib/store';
 import { colors } from '../theme';
-import { Button, Card, Heading, Meter, Note, Score, Segmented } from './ui';
+import { Button, Card, Expandable, Heading, Meter, Note, Score, Segmented } from './ui';
+import { newGoal, todaysLength } from '../lib/meditationPlan';
+import { locale } from '../lib/i18n';
 import { Ionicons } from '@expo/vector-icons';
 import { PRACTICES, type PracticeId } from '../lib/pranayama';
 import { tr } from '../lib/i18n';
@@ -15,11 +17,15 @@ const CHOICES = [5, 10, 15]; // founder, 24 Oct 2026
 const breath = (sec: number) => (sec % 10 < 4 ? tr('Breathe in…') : tr('Breathe out, slowly…'));
 
 export function MeditationTimer() {
-  const { day, profile, update } = useHeal();
+  const { day, days, date, profile, setProfile, update } = useHeal();
   const target = profile.meditation;
   const done = day.mind.meditationMin ?? 0;
-  const suggested = Math.max(5, Math.min(15, Math.round((target - done || 5) / 5) * 5));
-  const [length, setLength] = useState(CHOICES.includes(suggested) ? suggested : 10);
+  // A goal grows the guided length gradually (founder, 24 Oct 2026); without one, the old suggestion.
+  const goal = profile.me?.meditationGoal;
+  const plan = goal ? todaysLength(goal, days, date) : null;
+  const suggested = plan ? plan.minutes : Math.max(5, Math.min(15, Math.round((target - done || 5) / 5) * 5));
+  const choices = plan && !CHOICES.includes(plan.minutes) ? [plan.minutes, ...CHOICES].sort((a, b) => a - b) : CHOICES;
+  const [length, setLength] = useState(choices.includes(suggested) ? suggested : 10);
   const [mode, setMode] = useState<'guided' | 'self'>('guided');
   const [pick, setPick] = useState<PracticeId>('mix');
   const [choosing, setChoosing] = useState(false);
@@ -56,12 +62,13 @@ export function MeditationTimer() {
       <Heading right={<Score value={Math.min(30, (30 * done) / target)} max={30} />}>{tr('Breathing & meditation')}</Heading>
       {!sitting ? (
         <>
-          <Note>{done >= target ? tr('You have sat {done} minutes today. Lovely. Another short sit is always welcome.', { done }) : tr('Suggested now: {suggested} minutes (today {done} of {target}).', { suggested, done, target })}</Note>
-          <View style={{ flexDirection: 'row', gap: 8 }}>
-            {CHOICES.map(m => (
+          <Note>{plan ? tr('Today\'s plan: {m} minutes, on the way to {goal} minutes a day.', { m: plan.minutes, goal: goal!.minutes })
+            : done >= target ? tr('You have sat {done} minutes today. Lovely. Another short sit is always welcome.', { done }) : tr('Suggested now: {suggested} minutes (today {done} of {target}).', { suggested, done, target })}</Note>
+          <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
+            {choices.map(m => (
               <Pressable key={m} onPress={() => setLength(m)}
                 style={{ paddingVertical: 8, paddingHorizontal: 14, borderRadius: 99, borderWidth: 1, borderColor: m === length ? colors.soul : colors.line, backgroundColor: m === length ? colors.soul + '18' : colors.surface }}>
-                <Text style={{ color: colors.ink, fontWeight: m === length ? '700' : '400' }}>{m} {tr('min')}</Text>
+                <Text style={{ color: colors.ink, fontWeight: m === length ? '700' : '400' }}>{m} {tr('min')}{plan && m === plan.minutes ? ` · ${tr('plan')}` : ''}</Text>
               </Pressable>
             ))}
           </View>
@@ -114,6 +121,42 @@ export function MeditationTimer() {
         </View>
       )}
       <Meter label={tr('Today')} value={done} max={target} color={colors.soul} right={`${done} / ${target} ${tr('min')}`} />
+      {profile.me ? <GoalRow /> : null}
     </Card>
+  );
+}
+
+const GOAL_MIN = [10, 15, 20, 30, 45, 60];
+const GOAL_WEEKS: { weeks: number; label: string }[] = [{ weeks: 4, label: '1 month' }, { weeks: 8, label: '2 months' }, { weeks: 13, label: '3 months' }, { weeks: 26, label: '6 months' }];
+
+/** Meditation goal (optional, folds away): minutes a day, and by when. Happy Orange grows the guided length gradually. */
+function GoalRow() {
+  const { days, date, profile, setProfile } = useHeal();
+  const goal = profile.me?.meditationGoal;
+  const plan = goal ? todaysLength(goal, days, date) : null;
+  const [mins, setMins] = useState(goal?.minutes ?? 20);
+  const [weeks, setWeeks] = useState(8);
+  const by = (iso: string) => { const [y, m, d] = iso.split('-').map(Number); return new Date(y, m - 1, d).toLocaleDateString(locale(), { day: 'numeric', month: 'short' }); };
+  const status = !goal ? tr('Optional · grow your sessions step by step')
+    : plan!.pace === 'reached' ? tr('{m} minutes a day reached', { m: goal.minutes })
+    : `${tr('{m} min a day by {date}', { m: goal.minutes, date: by(goal.by) })} · ${plan!.pace === 'gentler' ? tr('at your pace') : tr('on track')}`;
+  const chip = (on: boolean) => ({ paddingVertical: 6, paddingHorizontal: 12, borderRadius: 99, borderWidth: 1, borderColor: on ? colors.soul : colors.line, backgroundColor: on ? colors.soul + '18' : colors.surface });
+  return (
+    <Expandable icon="trending-up-outline" color={colors.soul} title={tr('Meditation goal')} status={status}>
+      <Text style={{ color: colors.ink }}>{tr('Minutes a day I want to reach')}</Text>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+        {GOAL_MIN.map(m => <Pressable key={m} onPress={() => setMins(m)} style={chip(m === mins)}><Text style={{ color: colors.ink }}>{m} {tr('min')}</Text></Pressable>)}
+      </View>
+      <Text style={{ color: colors.ink }}>{tr('By when')}</Text>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+        {GOAL_WEEKS.map(w => <Pressable key={w.weeks} onPress={() => setWeeks(w.weeks)} style={chip(w.weeks === weeks)}><Text style={{ color: colors.ink }}>{tr(w.label)}</Text></Pressable>)}
+      </View>
+      <Button title={goal ? tr('Update my goal') : tr('Set my goal')} onPress={() => {
+        if (!profile.me) return;
+        setProfile({ ...profile, me: { ...profile.me, meditationGoal: newGoal(mins, weeks, days, date) } });
+      }} />
+      <Note>{tr('Guided sessions start from what you do now and grow a little each week. If sessions get hard, Myra slows down to your pace.')}</Note>
+      {goal ? <Pressable onPress={() => profile.me && setProfile({ ...profile, me: { ...profile.me, meditationGoal: undefined } })}><Text style={{ color: colors.bad }}>{tr('Remove goal')}</Text></Pressable> : null}
+    </Expandable>
   );
 }

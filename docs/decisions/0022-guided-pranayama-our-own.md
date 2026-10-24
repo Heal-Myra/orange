@@ -14,3 +14,9 @@ Date: 24 Oct 2026 · Decided by: founder
 - Safety: Bhastrika and Kapalbhati show who should skip them (pregnancy, high blood pressure, heart disease, hernia, recent
   surgery; empty stomach; stop if dizzy); Sheetali (cold, cough, asthma). Not medical advice.
 - Voice needs the phone build with expo-speech (build 9 onward); before that the session plays with words on screen.
+
+## Meditation goal (added the same day)
+"Meditation goal" (folds away in the card): minutes a day to reach (10–60) and by when (1–6 months). The guided length grows
+steadily from the person's recent level (average of their last five practice days) to the goal; if recent sessions fall
+short of the plan (under 80%), it slows to their pace; never more than 3 minutes above recent practice
+(src/lib/meditationPlan.ts, tested). Myra is told today's planned length.
