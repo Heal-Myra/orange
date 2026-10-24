@@ -86,7 +86,7 @@ export function ScreenTimeCard({ children }: { children?: ReactNode }) {
 
   return (
     <Card>
-      <Heading right={<Score value={score?.content ?? undefined} max={70} />}>{tr('Phone activity')}</Heading>
+      <Heading right={<Score value={score?.content ?? undefined} max={30} />}>{tr('Phone activity')}</Heading>
       <Note>{tr('Take a screenshot of Screen Time (iPhone: Settings → Screen Time → See All App & Website Activity), then choose it or paste it here. The app reads your social-media minutes for you.')}</Note>
       {/* "I used no social media today" removed (founder, 23 Oct 2026). Older days that have it still count. */}
       {session ? (

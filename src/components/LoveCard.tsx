@@ -1,11 +1,12 @@
 // Love (founder, 24 Oct 2026, simplified the same day): two questions, answered with one tap.
 // Whom will I love today? · How will I love myself today? Pick a ready answer or write your own; tick when done.
-// A Soul bonus: +5 for each chosen, +5 when one is done (up to +15, Soul still capped at 100).
+// 30 of Soul (founder, 24 Oct 2026): whom 12, myself 12, one of them done 6.
 
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { tr } from '../lib/i18n';
+import { lovePoints } from '../lib/scoring';
 import { useHeal } from '../lib/store';
 import { colors } from '../theme';
 import { Card, Heading, Note, Score, TextField } from './ui';
@@ -21,11 +22,11 @@ export function LoveCard() {
   const weekend = [0, 6].includes(new Date(y, m - 1, d).getDay());
   const self = love.self ?? love.happy; // older days wrote "happy"
   const set = (k: 'whom' | 'self', v: string | undefined) => update(x => { x.love = { ...(x.love ?? {}), [k]: v }; });
-  const pts = (love.whom?.trim() ? 5 : 0) + (self?.trim() ? 5 : 0) + (love.done ? 5 : 0);
+  const pts = lovePoints(day);
 
   return (
     <Card style={{ borderLeftWidth: 4, borderLeftColor: colors.soul }}>
-      <Heading right={<Score value={pts} max={15} />}>{tr('Love')}</Heading>
+      <Heading right={<Score value={pts} max={30} />}>{tr('Love')}</Heading>
       <Question key={date + 'whom'} title={tr('Whom will I love today?')} options={OTHERS} value={love.whom} onChange={v => set('whom', v)} placeholder={tr('Or write your own, e.g. call Babuji')} />
       <Question key={date + 'self'} title={tr('How will I love myself today?')} options={weekend ? SELF_WEEKEND : SELF_WEEKDAY} value={self} onChange={v => set('self', v)} placeholder={tr('Or write your own')} />
       {love.whom?.trim() || self?.trim() ? (
@@ -34,7 +35,7 @@ export function LoveCard() {
           <Ionicons name={love.done ? 'heart' : 'heart-outline'} size={22} color={colors.soul} />
           <Text style={{ color: colors.ink, fontSize: 16, fontWeight: love.done ? '600' : '400' }}>{tr('Done today')}</Text>
         </Pressable>
-      ) : <Note>{tr('+5 for each, and +5 when you have done one.')}</Note>}
+      ) : <Note>{tr('12 for each, and 6 more when you have done one.')}</Note>}
     </Card>
   );
 }

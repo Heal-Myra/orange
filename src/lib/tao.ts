@@ -1,8 +1,8 @@
 // A week of practices inspired by the Tao Te Ching, written by the founder (18 Oct 2026).
 // This is Happy Orange's own practice guide, not a translation of the Tao Te Ching.
-// Since 20 Oct 2026 every day's practice sits on the Mind tab (founder); doing it adds TAO_POINTS to Mind (see docs/scoring.md).
+// Since 24 Oct 2026 every day's practice sits on the Soul tab (founder); doing it scores TAO_POINTS of Soul (see docs/scoring.md).
 
-export const TAO_POINTS = 10;
+export const TAO_POINTS = 30; // Soul, 30 (founder, 24 Oct 2026)
 
 export interface TaoDay {
   weekday: number; // 0 = Sunday … 6 = Saturday (JavaScript getDay)
@@ -17,7 +17,7 @@ export interface TaoDay {
 // Listed Monday first, the way the week is practised.
 export const TAO_WEEK: TaoDay[] = [
   {
-    weekday: 1, day: 'Monday', title: 'Observation day', pillar: 'mind',
+    weekday: 1, day: 'Monday', title: 'Observation day', pillar: 'soul',
     practice: [
       'Every time you notice tension, anxiety or the feeling of chasing something, ask yourself: what am I trying to grab? Write it down.',
       'At the end of the day, look at the list and search for a pattern. There is usually one main obsession that repeats itself in different disguises. Give it a name.',
@@ -26,7 +26,7 @@ export const TAO_WEEK: TaoDay[] = [
     notePrompt: 'What were you trying to grab? And at night: what is the name of the pattern?',
   },
   {
-    weekday: 2, day: 'Tuesday', title: 'Breathing', pillar: 'mind',
+    weekday: 2, day: 'Tuesday', title: 'Breathing', pillar: 'soul',
     practice: [
       'Exhale completely, as if releasing air you have been holding for months.',
       'Notice how easily the air comes back in once you have emptied out completely.',
@@ -35,7 +35,7 @@ export const TAO_WEEK: TaoDay[] = [
     notePrompt: 'When did you remember to empty out? What did you notice?',
   },
   {
-    weekday: 3, day: 'Wednesday', title: 'The antidote', pillar: 'mind',
+    weekday: 3, day: 'Wednesday', title: 'The antidote', pillar: 'soul',
     practice: [
       'Practise the antidote to your obsession (from Monday) in its simplest form.',
       'If it is money: give something without anyone finding out, such as time, attention or a small bit of help.',
@@ -47,7 +47,7 @@ export const TAO_WEEK: TaoDay[] = [
     notePrompt: 'What antidote did you practise, and how did it feel?',
   },
   {
-    weekday: 4, day: 'Thursday', title: 'Listen', pillar: 'mind',
+    weekday: 4, day: 'Thursday', title: 'Listen', pillar: 'soul',
     practice: [
       'Whenever someone is speaking and you feel the urge to interrupt, correct them or tell your own story to look good: hold back and keep listening.',
       'Note it down. You will notice two things: how hard it is for you to listen, and how much you learn when you stop filling the silence.',
@@ -56,7 +56,7 @@ export const TAO_WEEK: TaoDay[] = [
     notePrompt: 'When did you hold back? What did you learn by listening?',
   },
   {
-    weekday: 5, day: 'Friday', title: 'Create emptiness', pillar: 'mind',
+    weekday: 5, day: 'Friday', title: 'Create emptiness', pillar: 'soul',
     practice: [
       'Leave deliberate emptiness in your schedule: an hour or two with no task, no phone and no purpose.',
       'If restlessness appears, do not fight it. Let the mud settle. Watch what arises when you are not running away from your shadow.',
@@ -65,7 +65,7 @@ export const TAO_WEEK: TaoDay[] = [
     notePrompt: 'What arose in the emptiness?',
   },
   {
-    weekday: 6, day: 'Saturday', title: 'Let go of a dry leaf', pillar: 'mind',
+    weekday: 6, day: 'Saturday', title: 'Let go of a dry leaf', pillar: 'soul',
     practice: [
       'Choose something specific you have been carrying for far too long: a grudge, a guilt, or an expectation that no longer makes sense.',
       'Write it on a piece of paper, read it aloud, then tear it up and throw it away. The physical gesture helps the mind understand that something has ended.',
@@ -74,7 +74,7 @@ export const TAO_WEEK: TaoDay[] = [
     notePrompt: 'What did you let go of? (You can keep this private and just tick the box.)',
   },
   {
-    weekday: 0, day: 'Sunday', title: 'Live normally: "Who knows?"', pillar: 'mind',
+    weekday: 0, day: 'Sunday', title: 'Live normally: "Who knows?"', pillar: 'soul',
     practice: [
       'Live normally, with a single question in your pocket.',
       'Every time something unsettles you, good or bad, ask the question the old farmer with the horse at the border asked: "Who knows?"',

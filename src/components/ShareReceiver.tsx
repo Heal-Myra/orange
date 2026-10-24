@@ -18,8 +18,11 @@ export function ShareProvider({ children }: { children: ReactNode }) {
   return <P>{children}</P>;
 }
 
+// Learning was removed from Mind (founder, 24 Oct 2026), so shared links are not used for now; the share menu stays
+// in the app for a future use. Kept switched off rather than deleted.
+const SHARE_TO_LEARNING = false;
 export function ShareReceiver() {
-  return lib ? <Receiver lib={lib} /> : null;
+  return lib && SHARE_TO_LEARNING ? <Receiver lib={lib} /> : null;
 }
 
 function Receiver({ lib }: { lib: Lib }) {

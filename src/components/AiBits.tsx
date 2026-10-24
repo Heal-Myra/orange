@@ -25,13 +25,13 @@ const errText = (e: unknown) => (e instanceof Error ? e.message : tr('Something 
 /** Which card on the tab a recommendation belongs to: Myra's own answer when she gave one, otherwise read from the words
  *  (English or Hindi). Used to open the tab right at that card (founder, 21 Oct 2026). */
 export function cardFor(pillar: 'body' | 'mind' | 'soul', text: string, isTask: boolean, given?: string): string {
-  const ok: Record<string, string[]> = { body: ['food', 'sleep', 'movement'], mind: ['tasks', 'tao', 'phone'], soul: ['gratitude', 'meditation', 'wisdom', 'love'] };
+  const ok: Record<string, string[]> = { body: ['food', 'sleep', 'movement'], mind: ['tasks', 'meditation', 'phone'], soul: ['gratitude', 'tao', 'wisdom', 'love'] };
   if (given && ok[pillar].includes(given)) return given;
   const t = text.toLowerCase();
   if (pillar === 'body') return /sleep|bed|nap|नींद|सो/.test(t) ? 'sleep' : /walk|step|run|yoga|exercise|stretch|move|stairs|workout|चल|कदम|टहल|व्यायाम|योग/.test(t) ? 'movement' : 'food';
-  if (pillar === 'mind') return isTask ? 'tasks' : /tao|antidote|ताओ/.test(t) ? 'tao' : /screen|phone|social|scroll|instagram|youtube|learn|स्क्रीन|फ़ोन|फोन|सीख/.test(t) ? 'phone' : 'tasks';
+  if (pillar === 'mind') return isTask ? 'tasks' : /breath|meditat|pranayam|nidra|anulom|bhramari|sit |still|साँस|सांस|ध्यान|प्राणायाम/.test(t) ? 'meditation' : /screen|phone|social|scroll|instagram|youtube|learn|स्क्रीन|फ़ोन|फोन|सीख/.test(t) ? 'phone' : 'tasks';
   return /call|meet|friend|love|hug|party|family|mum|dad|wife|husband|joy|happy|मिल|दोस्त|प्यार|परिवार|माँ|पापा|खुश|पार्टी/.test(t) ? 'love'
-    : /breath|meditat|sit |still|साँस|सांस|ध्यान/.test(t) ? 'meditation' : /wisdom|verse|gita|read|passage|shloka|ज्ञान|श्लोक|गीता|पढ़/.test(t) ? 'wisdom' : 'gratitude';
+    : /tao|antidote|ताओ/.test(t) ? 'tao' : /wisdom|verse|gita|read|passage|shloka|ज्ञान|श्लोक|गीता|पढ़/.test(t) ? 'wisdom' : 'gratitude';
 }
 
 const feelKey = (f?: { mood: string; symptoms: string[] }) => (f ? `${f.mood}:${f.symptoms.join(',')}` : '');
@@ -39,11 +39,13 @@ const feelKey = (f?: { mood: string; symptoms: string[] }) => (f ? `${f.mood}:${
 /** Which of Body, Mind and Soul fits this moment of the day. */
 export function pickForMoment(kind: RoutineKind | undefined, slot: Slot, myra?: 'body' | 'mind' | 'soul'): 'body' | 'mind' | 'soul' {
   if (kind) {
-    if (kind === 'sleep' || kind === 'wake' || kind === 'reading') return 'soul';
+    if (kind === 'sleep') return 'mind'; // Yoga Nidra lives with Breathing & meditation on Mind (24 Oct 2026)
+    if (kind === 'wake' || kind === 'reading') return 'soul';
     if (kind === 'meal' || kind === 'exercise' || kind === 'walk' || kind === 'sport') return 'body';
     if (kind === 'work' || kind === 'break' || kind === 'family' || kind === 'learning' || kind === 'commute') return 'mind';
   }
-  if (slot === 'night' || slot === 'early morning') return 'soul';
+  if (slot === 'night') return 'mind';
+  if (slot === 'early morning') return 'soul';
   if (slot === 'lunch' || slot === 'dinner') return 'body';
   return myra ?? 'mind';
 }
@@ -107,8 +109,8 @@ export function GuidanceCard() {
   // After the usual sleep time (or 9:30 pm), only winding down: never a target to chase (founder, 22 Oct 2026:
   // "Meditate 15 more minutes to reach your target" at 10:20 pm).
   const bedtime = nowKind === 'sleep' || (!nowKind && partOfDay() === 'night');
-  const soulLine = bedtime ? [tr('Lie down for Yoga Nidra, then drift into sleep.')] : g?.soul ?? [];
-  const blocks = g ? ([[tr('Body'), colors.body, g.body], [tr('Mind'), colors.mind, g.mind], [tr('Soul'), colors.soul, soulLine]] as const) : [];
+  const mindLine = bedtime ? [tr('Lie down for Yoga Nidra, then drift into sleep.')] : g?.mind ?? [];
+  const blocks = g ? ([[tr('Body'), colors.body, g.body], [tr('Mind'), colors.mind, mindLine], [tr('Soul'), colors.soul, g.soul]] as const) : [];
 
   // Three separate blocks, one each for Body, Mind and Soul, stacked one under another (founder, 20 Oct 2026).
   return (
@@ -132,12 +134,12 @@ export function GuidanceCard() {
       ) : null}
       {g && !hNow ? blocks.map(([name, color, list], i) => {
         if ((['body', 'mind', 'soul'] as const)[i] !== pick) return null; // one thing at a time (founder, 22 Oct 2026)
-        const task = i === 1 && isToday ? focus.find(t => (g.focus ?? []).includes(t.id)) : undefined;
+        const task = i === 1 && isToday && !bedtime ? focus.find(t => (g.focus ?? []).includes(t.id)) : undefined;
         const pillar = (['body', 'mind', 'soul'] as const)[i];
-        const card = bedtime && pillar === 'soul' ? 'meditation' : cardFor(pillar, list[0] ?? '', !!task, g.cards?.[pillar]);
+        const card = bedtime && pillar === 'mind' ? 'meditation' : cardFor(pillar, list[0] ?? '', !!task, g.cards?.[pillar]);
         return list[0] ? (
           <Pressable key={name} accessibilityRole="button" accessibilityHint={tr('Opens the card where you do this')}
-            onPress={() => bedtime && pillar === 'soul' ? router.push('/yoga-nidra') : router.navigate({ pathname: `/${pillar}`, params: { card, at: String(Date.now()) } })}
+            onPress={() => bedtime && pillar === 'mind' ? router.push('/yoga-nidra') : router.navigate({ pathname: `/${pillar}`, params: { card, at: String(Date.now()) } })}
             style={({ pressed }) => ({ opacity: pressed ? 0.8 : 1 })}>
           <Card style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 12, borderLeftWidth: 5, borderLeftColor: color }}>
             <Text style={{ color, fontWeight: '700', fontSize: 14, width: 44 }}>{name}</Text>

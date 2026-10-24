@@ -96,11 +96,13 @@ export const METRICS: Metric[] = [
   { id: 'mind', name: 'Mind score', unit: 'of 100', pillar: 'mind', better: 'up', value: (d, P) => num(mindScore(d, P)?.total) },
   { id: 'focus', name: 'Focus to-dos done', unit: 'per day', decimals: 1, pillar: 'mind', better: 'up', value: d => num(d.mind.focusDone) },
   { id: 'social', name: 'Social media', unit: 'min', pillar: 'mind', better: 'down', target: P => P.mediaLimit, value: d => (d.noMedia ? 0 : d.media.length ? d.media.reduce((s, x) => s + (x.minutes || 0), 0) : null) },
-  { id: 'learning', name: 'Days with learning', unit: 'days', pillar: 'mind', better: 'up', days: true, value: d => ((d.mind.learned?.text ?? '').trim().length >= 3 ? 1 : null) },
+
 
   { id: 'soul', name: 'Soul score', unit: 'of 100', pillar: 'soul', better: 'up', value: (d, P) => num(soulScore(d, P)?.total) },
-  { id: 'meditation', name: 'Meditation', unit: 'min', pillar: 'soul', better: 'up', target: P => P.meditation, value: d => num(d.mind.meditationMin) },
+  { id: 'meditation', name: 'Meditation', unit: 'min', pillar: 'mind', better: 'up', target: P => P.meditation, value: d => num(d.mind.meditationMin) },
   { id: 'gratitude', name: 'Gratitudes', unit: 'per day', pillar: 'soul', better: 'up', target: () => 4, value: d => { const n = countGratitude(d.soul?.gratitude); return n || null; } },
+  { id: 'tao', name: 'Days with Tao practice', unit: 'days', pillar: 'soul', better: 'up', days: true, value: d => (d.tao?.done ? 1 : null) },
+  { id: 'love', name: 'Days with love', unit: 'days', pillar: 'soul', better: 'up', days: true, value: d => (d.love?.done ? 1 : null) },
   { id: 'wisdom', name: 'Days with Daily Wisdom', unit: 'days', pillar: 'soul', better: 'up', days: true, value: d => (d.soul?.verseStudied ? 1 : null) },
 ];
 

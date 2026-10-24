@@ -96,7 +96,7 @@ export function GratitudeCard() {
             onFocus={() => setTimeout(keep, 300)} onContentSizeChange={() => keep()} />
         </View>
       ))}
-      <Note>{filled ? tr('+{n} so far (10 each).', { n: Math.min(4, filled) * 10 }) : tr('10 points each, up to 40.')}</Note>
+      <Note>{filled ? tr('{n} of 4 written.', { n: Math.min(4, filled) }) : tr('10 points each, up to 40.')}</Note>
     </Card>
   );
 }

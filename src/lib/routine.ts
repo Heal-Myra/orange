@@ -46,15 +46,15 @@ export const KIND_HINT: Record<RoutineKind, string> = {
   wake: 'Soul: write the four gratitudes; Mind: pick the first to-do of the day',
   exercise: 'Body: the walk or exercise, with minutes',
   family: 'Mind: one Family to-do',
-  commute: 'Mind: if going to work, the first Work to-do to start with; if coming home, listen and learn (Learning)',
+  commute: 'Mind: if going to work, the first Work to-do to start with; if coming home, a few minutes of calm breathing (not while driving) or music',
   work: 'Mind: one Work to-do',
   break: 'Mind: one quick Work to-do; Body: water',
   meal: 'Body: snap the plate in Food before eating',
   sport: 'Body: enjoy the game; drink water after',
-  learning: 'Mind: write what you learned (Learning, up to 10 words)',
+  learning: 'Mind: read or listen to something that teaches you; Soul: Daily Wisdom',
   walk: 'Body: the walk, with minutes',
   reading: 'Soul: Daily Wisdom; read slowly',
-  sleep: 'Soul: 5 minutes of slow breathing; Body: screens away',
+  sleep: 'Mind: Yoga Nidra or 5 minutes of slow breathing; Body: screens away',
   other: 'the one most useful small thing',
 };
 

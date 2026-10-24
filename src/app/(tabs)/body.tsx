@@ -30,7 +30,7 @@ export default function Body() {
 
   return (
     <Screen feedback="Body" trends="body">
-      <Anchor id="food"><MealPhoto right={<Score value={score?.nutrition} max={30} />}>
+      <Anchor id="food"><MealPhoto right={<Score value={score?.nutrition} max={40} />}>
         {/* "I'm fasting today" (founder, 22 Oct 2026): a declared fast scores Food in full while only water, black tea
             or black coffee go in, and Myra changes her advice. */}
         <Pressable accessibilityRole="switch" accessibilityState={{ checked: !!day.fasting }} onPress={() => update(d => { d.fasting = !d.fasting; })}
@@ -77,7 +77,7 @@ export default function Body() {
       </Card></Anchor>
 
       <Anchor id="movement"><Card>
-        <Heading right={<Score value={score?.movement} max={40} />}>{tr('Movement')}</Heading>
+        <Heading right={<Score value={score?.movement} max={30} />}>{tr('Movement')}</Heading>
         <Rows>
           <StatRow first label={tr('Steps')} value={day.activity.steps} target={profile.steps} key={date + 'steps'}
             onEdit={v => update(d => { d.activity.steps = v; d.activity.stepsTyped = v != null; })} />

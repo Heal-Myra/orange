@@ -34,8 +34,8 @@ describe('trends', () => {
     expect(t.bars[6]).toBeNull(); // Sunday is still to come
   });
   it('counts days for yes/no habits', () => {
-    const learning = METRICS.find(m => m.id === 'learning')!;
-    const d = { '2026-10-19': { ...emptyDay('2026-10-19'), mind: { learned: { text: 'How tides work' } } } };
-    expect(trendOf(learning, d, DEFAULT_PROFILE, 'W', '2026-10-22', 0, '2026-10-22').value).toBe(1);
+    const tao = METRICS.find(m => m.id === 'tao')!;
+    const d = { '2026-10-19': { ...emptyDay('2026-10-19'), tao: { done: true } } };
+    expect(trendOf(tao, d, DEFAULT_PROFILE, 'W', '2026-10-22', 0, '2026-10-22').value).toBe(1);
   });
 });

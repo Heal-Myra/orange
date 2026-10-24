@@ -934,4 +934,9 @@ export const HI: Record<string, string> = {
   'A coffee or a treat': 'एक कॉफ़ी या कुछ खास',
   'A long walk outside': 'बाहर लंबी सैर',
   'A nap': 'एक झपकी',
+  '12 for each, and 6 more when you have done one.': 'हर एक के 12, और एक कर लेने पर 6 और।',
+  '{n} of 4 written.': '4 में से {n} लिखे।',
+  'Write it down. Myra puts one in front of you at a time, on Today. Finishing two of them earns the full 40.': 'लिख लें। मायरा आज वाले पेज पर एक बार में एक काम सामने रखती है। दो पूरे करने पर पूरे 40 अंक।',
+  'Days with Tao practice': 'ताओ अभ्यास वाले दिन',
+  'Days with love': 'प्रेम वाले दिन',
 };

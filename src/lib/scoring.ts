@@ -3,7 +3,6 @@
 // A working model to help people understand themselves, not a medical measure
 // (The Orange Book, Chapter 2). Weights are documented in docs/scoring.md.
 
-import { TAO_POINTS, taoForDate } from './tao';
 import { DEFAULT_PROFILE, type ContentCategoryId, type DayLog, type Meal, type PracticeId, type Profile } from './types';
 
 export const CONTENT_CATEGORIES: { id: ContentCategoryId; name: string; weight: number }[] = [
@@ -57,19 +56,19 @@ export interface BodyScore {
  *  - Fat 3: full when fat is 30 % of calories or less, 0 at 45 % or more.
  */
 export function foodScore(t: MealTotals, targetKcal: number) {
-  const kcal = 12 * c01(1 - Math.max(0, t.kcal - targetKcal) / (targetKcal * 0.4));
+  const kcal = 16 * c01(1 - Math.max(0, t.kcal - targetKcal) / (targetKcal * 0.4));
   const energy = t.p * 4 + t.c * 4 + t.f * 9;
   const proteinShare = energy ? (t.p * 4) / energy : 0, fatShare = energy ? (t.f * 9) / energy : 0;
-  const protein = 9 * c01((proteinShare - 0.1) / 0.15);
+  const protein = 12 * c01((proteinShare - 0.1) / 0.15);
   const fibrePer1000 = t.kcal > 0 ? ((t.fib ?? 0) * 1000) / t.kcal : 0;
-  const fibre = 6 * c01(fibrePer1000 / 14);
-  const fat = energy ? 3 * c01((0.45 - fatShare) / 0.15) : 3;
+  const fibre = 8 * c01(fibrePer1000 / 14);
+  const fat = energy ? 4 * c01((0.45 - fatShare) / 0.15) : 4; // food = 40 (founder, 24 Oct 2026)
   return { total: kcal + protein + fibre + fat, kcal, protein, fibre, fat };
 }
 
 export const FAST_KCAL = 60; // black tea and coffee through a day stay under this
 
-/** Body: movement 40, sleep 30, food 30. Returns null when nothing is logged. */
+/** Body: food 40, sleep 30, movement 30 (founder, 24 Oct 2026). Returns null when nothing is logged. */
 export function bodyScore(d: DayLog, P: Profile): BodyScore | null {
   const a = d.activity, s = d.sleep;
   const hasAct = a.steps != null || a.activeMin != null;
@@ -77,7 +76,8 @@ export function bodyScore(d: DayLog, P: Profile): BodyScore | null {
   const hasFood = d.meals.length > 0 || !!d.fasting;
   if (!hasAct && !hasSleep && !hasFood) return null;
 
-  const movement = hasAct ? 20 * c01((a.steps ?? 0) / P.steps) + 20 * c01((a.activeMin ?? 0) / P.active) : 0;
+  // Body = Food 40 + Sleep 30 + Movement 30 (founder, 24 Oct 2026).
+  const movement = hasAct ? 15 * c01((a.steps ?? 0) / P.steps) + 15 * c01((a.activeMin ?? 0) / P.active) : 0;
 
   let sleep = 0;
   if (hasSleep) {
@@ -90,54 +90,53 @@ export function bodyScore(d: DayLog, P: Profile): BodyScore | null {
   const totals = mealTotals(d.meals);
   let nutrition = 0;
   // A declared fast scores full, as long as only water, black tea or black coffee (a few calories) went in.
-  if (d.fasting && totals.kcal <= FAST_KCAL) nutrition = 30;
+  if (d.fasting && totals.kcal <= FAST_KCAL) nutrition = 40;
   else if (hasFood) nutrition = foodScore(totals, P.kcal).total;
   return { total: movement + sleep + nutrition, movement, sleep, nutrition, totals };
 }
 
+/**
+ * Points per part (founder, 24 Oct 2026): no bonuses.
+ * Body = Food 40 + Sleep 30 + Movement 30.
+ * Mind = Focus to-dos 40 + Breathing & meditation 30 + Phone activity 30 (Learning removed).
+ * Soul = Gratitude 40 + Daily Wisdom 30 + Tao practice 30 + Love 30 — adds up to 130, so Soul is held at 100 until the
+ * founder decides what to trim.
+ */
+export const POINTS = { food: 40, sleep: 30, movement: 30, focus: 40, meditation: 30, phone: 30, gratitude: 40, wisdom: 30, tao: 30, love: 30 } as const;
+export const FOCUS_EACH = POINTS.focus / 2;          // each of up to two focus to-dos
+export const GRATITUDE_EACH = POINTS.gratitude / 4;  // each of up to four gratitudes
+
 export interface MindScore {
   total: number;
-  practices: number; // /30, focus tasks done
-  content: number | null; // /70, null when social media not logged
+  practices: number;      // /40 focus to-dos done
+  meditation: number;     // /30 breathing and meditation minutes ÷ daily target
+  content: number | null; // /30 phone activity (quality 18 + within the limit 12); null when not logged
   minutes: number;
   quality: number | null; // 0–1 share of nourishing content
-  tao: number; // points from the day's Tao practice
-  learning: number; // 15 when something learned today is written
 }
 
-export const LEARNING_POINTS = 15;
-
-/** Mind: focus tasks done (30) + social-media content diet (70) + Tao practice and learning bonuses, capped at 100. */
 export function mindScore(d: DayLog, P: Profile): MindScore | null {
   const m = d.mind;
-  const tao = taoPoints(d, 'mind');
-  // Mind = Myra's focus tasks done (15 each, up to 30) + content diet 70 (founder, 21 Oct 2026).
-  // Attention and Learning ticks were removed; older days that have them still count, within the same 30.
-  const done = Math.min(2, m.focusDone ?? 0);
-  const practices = Math.min(30, done * 15 + (m.attention ? 15 : 0) + (m.learning ? 15 : 0));
-  // Learning (founder, 21 Oct 2026): what I learned today in a few words (and a link) adds 15, like the Tao practice.
-  const learning = (m.learned?.text ?? '').trim().length >= 3 ? LEARNING_POINTS : 0;
-  const hasPractice = practices > 0 || tao > 0 || learning > 0;
+  // Older days with the Attention/Learning ticks count them as done focus tasks.
+  const done = Math.min(2, (m.focusDone ?? 0) + (m.attention ? 1 : 0) + (m.learning ? 1 : 0));
+  const practices = done * FOCUS_EACH;
+  const meditation = POINTS.meditation * c01((m.meditationMin ?? 0) / P.meditation);
 
   let content: number | null = null, minutes = 0, quality: number | null = null;
   if (d.noMedia) {
-    content = 70; quality = 1;
+    content = POINTS.phone; quality = 1;
   } else {
     minutes = d.media.reduce((s, x) => s + (x.minutes || 0), 0);
     if (minutes > 0) {
       quality = d.media.reduce((s, x) => s + (x.minutes || 0) * weightOf(x.category), 0) / minutes;
       const L = P.mediaLimit;
-      const quantity = minutes <= L ? 30 : 30 * c01(1 - (minutes - L) / (2 * L));
-      content = 40 * quality + quantity;
+      const quantity = minutes <= L ? 1 : c01(1 - (minutes - L) / (2 * L));
+      content = 18 * quality + 12 * quantity;
     }
   }
-  if (!hasPractice && content == null) return null;
-  return { total: Math.min(100, practices + (content ?? 0) + tao + learning), practices, content, minutes, quality, tao, learning };
+  if (!practices && m.meditationMin == null && content == null) return null;
+  return { total: Math.min(100, practices + meditation + (content ?? 0)), practices, meditation, content, minutes, quality };
 }
-
-/** Points from the day's Tao practice, for the pillar it belongs to. */
-const taoPoints = (d: DayLog, pillar: 'mind' | 'soul') =>
-  d.tao?.done && taoForDate(d.date).pillar === pillar ? TAO_POINTS : 0;
 
 const weightOf = (id: ContentCategoryId) => CONTENT_CATEGORIES.find(c => c.id === id)?.weight ?? 0.5;
 
@@ -147,32 +146,28 @@ export const countGratitude = (list?: (string | null | undefined)[]) =>
 
 export interface SoulScore {
   total: number;
-  meditation: number; // /30 for breathing and meditation minutes against the daily target
-  verse: number;     // /25 for studying the Gita verse of the day
-  gratitude: number; // /40, 10 per thing, up to four
-  thought: number;   // /15 for writing a thought for the day
-  bonus: number;     // ±10 from reflected actions
-  love: number;      // bonus up to +15 (founder, 24 Oct 2026): whom I love today 5, how I love myself 5, done 5
+  gratitude: number; // /40, 10 each up to four things
+  verse: number;     // /30 Daily Wisdom studied
+  tao: number;       // /30 the day's Tao practice done
+  love: number;      // /30: whom I love today 12, how I love myself 12, one of them done 6
 }
 
-/**
- * Soul / inner life (0–100). Founder, 21 Oct 2026: gratitude 10 each up to four (40) + breathing and meditation 30 + Daily Wisdom
- * studied 30. Older reflected actions add or subtract up to 10.
- */
-export function soulScore(d: DayLog, P: Profile = DEFAULT_PROFILE): SoulScore | null {
+/** Love points (founder, 24 Oct 2026). */
+export function lovePoints(d: DayLog): number {
+  const filled = (t?: string) => (t ?? '').trim().length >= 2;
+  const whom = filled(d.love?.whom), self = filled(d.love?.self ?? d.love?.happy);
+  return (whom ? 12 : 0) + (self ? 12 : 0) + (d.love?.done && (whom || self) ? 6 : 0);
+}
+
+export function soulScore(d: DayLog, _P: Profile = DEFAULT_PROFILE): SoulScore | null {
   const so = d.soul ?? {};
   // Boxes can be left empty in between (saved as null), so check each one is text (crash, 23 Oct 2026).
-  const grateful = countGratitude(so.gratitude);
-  // Founder, 21 Oct 2026: Thought of the day removed; gratitude 40, meditation 30, Daily Wisdom 30.
-  const meditation = 30 * c01((d.mind.meditationMin ?? 0) / P.meditation);
-  const verse = so.verseStudied ? 30 : 0;
-  const gratitude = Math.min(4, grateful) * 10; // four things, 10 each (founder, 21 Oct 2026)
-  const thought = 0;
-  const filled = (t?: string) => (t ?? '').trim().length >= 2;
-  const love = (filled(d.love?.whom) ? 5 : 0) + (filled(d.love?.self ?? d.love?.happy) ? 5 : 0) + (d.love?.done && (filled(d.love?.whom) || filled(d.love?.self ?? d.love?.happy)) ? 5 : 0);
-  if (!d.actions.length && !verse && !gratitude && !love && d.mind.meditationMin == null) return null;
-  const bonus = clamp(d.actions.reduce((s, a) => s + (a.alignment || 0), 0) * 2.5, -10, 10);
-  return { total: clamp(meditation + verse + gratitude + thought + bonus + love, 0, 100), meditation, verse, gratitude, thought, bonus, love };
+  const gratitude = Math.min(4, countGratitude(so.gratitude)) * GRATITUDE_EACH;
+  const verse = so.verseStudied ? POINTS.wisdom : 0;
+  const tao = d.tao?.done ? POINTS.tao : 0;
+  const love = lovePoints(d);
+  if (!gratitude && !verse && !tao && !love) return null;
+  return { total: Math.min(100, gratitude + verse + tao + love), gratitude, verse, tao, love };
 }
 
 export interface WellBeing { body: BodyScore | null; mind: MindScore | null; soul: SoulScore | null; total: number; logged: number }

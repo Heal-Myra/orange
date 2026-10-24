@@ -11,6 +11,7 @@ import { habitsToday, readHabit, repeatName, type Repeat } from '../lib/habits';
 import { colors } from '../theme';
 import { Button, Card, Heading, Note, Score, s, useKeepVisible } from './ui';
 import { useHeal } from '../lib/store';
+import { FOCUS_EACH } from '../lib/scoring';
 import { tr } from '../lib/i18n';
 
 const WHEN = [
@@ -44,8 +45,8 @@ export function TasksCard() {
 
   return (
     <Card>
-      <Heading right={<Score value={Math.min(2, day.mind.focusDone ?? 0) * 15} max={30} />}>{tr('Clear your mind')}</Heading>
-      <Note>{tr('Write it down. Myra puts one in front of you at a time, on Today. Each one you finish earns 15 points, up to 30.')}</Note>
+      <Heading right={<Score value={Math.min(2, day.mind.focusDone ?? 0) * FOCUS_EACH} max={40} />}>{tr('Clear your mind')}</Heading>
+      <Note>{tr('Write it down. Myra puts one in front of you at a time, on Today. Finishing two of them earns the full 40.')}</Note>
 
       {/* Three groups */}
       <View style={{ flexDirection: 'row', gap: 8 }}>
