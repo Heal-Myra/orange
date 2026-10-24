@@ -1,6 +1,7 @@
 # Changelog
 
 ## 0.10.0 — 22–24 October 2026 (Trends, food plans, habits, guided breathing, how I feel)
+- To-dos (24 Oct): Pick a date from a month calendar when adding or moving a task; full days (3 in the group) are greyed.
 - Guided sessions (24 Oct, founder's test on build 10): a woman's voice, slower with pauses, softer wording, fewer repeated cues; voice language English, Hindi or regional (translated once, kept on the phone).
 - Share to Happy Orange (24 Oct, decision 0026): save a video or article to my journey (Library › Saved; Myra knows it) or send it to the team as inspiration (Admin › Feedback).
 - Build 10 (24 Oct) made from the founder's PC with his Apple sign-in: Apple added App Groups and Push Notifications, refreshed the provisioning profile and created one for the share extension; submitted to TestFlight. Builds 7–9 had stopped at these missing permissions. For PC builds run `set EAS_NO_VCS=1` first (no Git on that PC).

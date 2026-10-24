@@ -969,4 +969,5 @@ export const HI: Record<string, string> = {
   'Breathe in gently': 'धीरे से साँस लें',
   'Breathe in deeply': 'गहरी साँस लें',
   'words only': 'केवल शब्द',
+  'Pick a date':'तारीख चुनें',
 };

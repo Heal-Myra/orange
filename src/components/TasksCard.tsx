@@ -8,6 +8,8 @@ import { Pressable, Text, TextInput, View } from 'react-native';
 import { shiftISO, todayISO } from '../lib/dates';
 import { AREAS, areaName, useTasks, type Area, type Task } from '../lib/tasks';
 import { habitsToday, readHabit, repeatName, type Repeat } from '../lib/habits';
+import { DatePicker } from './DatePicker';
+import { loadOn, PER_AREA_DAY } from '../lib/taskPlan';
 import { colors } from '../theme';
 import { Button, Card, Heading, Note, Score, s, useKeepVisible } from './ui';
 import { useHeal } from '../lib/store';
@@ -90,6 +92,9 @@ function AddTask({ area }: { area: Area }) {
   const { add, addHabit } = useTasks();
   const [title, setTitle] = useState('');
   const [days, setDays] = useState<number | null>(null);
+  const [picked, setPicked] = useState<string | null>(null); // a date from the calendar
+  const [cal, setCal] = useState(false);
+  const { tasks } = useTasks();
   const [repeat, setRepeat] = useState<Repeat | 'once' | null>(null); // null: read from the words
   const [note, setNote] = useState<string | null>(null);
   const read = readHabit(title);
@@ -101,11 +106,11 @@ function AddTask({ area }: { area: Area }) {
       addHabit({ title, area, repeat: rep, at: read.at, weekday: rep === 'weekly' ? read.weekday ?? new Date().getDay() : undefined });
       setNote(tr('Added to Habits{at}.', { at: read.at ? ` · ${read.at}` : '' }));
     } else {
-      const asked = days == null ? undefined : shiftISO(todayISO(), days);
+      const asked = picked ?? (days == null ? undefined : shiftISO(todayISO(), days));
       const placed = add(title, area, asked);
       setNote(asked && placed && placed !== asked ? tr('That day already has 3 {area} to-dos, so this is on {day}.', { area: tr(areaName(area)), day: shortDate(placed) }) : null);
     }
-    setTitle(''); setDays(null); setRepeat(null);
+    setTitle(''); setDays(null); setPicked(null); setCal(false); setRepeat(null);
   };
   return (
     <View style={{ gap: 8 }}>
@@ -130,15 +135,22 @@ function AddTask({ area }: { area: Area }) {
       {title.trim() && rep === 'once' ? (
         <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap' }}>
           {WHEN.map(w => (
-            <Pressable key={w.label} onPress={() => setDays(d => d === w.days ? null : w.days)}
+            <Pressable key={w.label} onPress={() => { setPicked(null); setCal(false); setDays(d => d === w.days ? null : w.days); }}
               style={{ paddingVertical: 6, paddingHorizontal: 12, borderRadius: 99, borderWidth: 1,
                 borderColor: days === w.days ? colors.accent : colors.line, backgroundColor: days === w.days ? colors.accent + '14' : colors.surface }}>
               <Text style={{ color: days === w.days ? colors.accent : colors.ink, fontSize: 13 }}>{tr(w.label)}</Text>
             </Pressable>
           ))}
-          <Text style={{ alignSelf: 'center', fontSize: 12, color: colors.muted }}>{days == null ? tr('or let Myra choose') : ''}</Text>
+          <Pressable onPress={() => setCal(c => !c)}
+            style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingVertical: 6, paddingHorizontal: 12, borderRadius: 99, borderWidth: 1,
+              borderColor: picked ? colors.accent : colors.line, backgroundColor: picked ? colors.accent + '14' : colors.surface }}>
+            <Ionicons name="calendar-outline" size={14} color={picked ? colors.accent : colors.ink} />
+            <Text style={{ color: picked ? colors.accent : colors.ink, fontSize: 13 }}>{picked ? shortDate(picked) : tr('Pick a date')}</Text>
+          </Pressable>
+          <Text style={{ alignSelf: 'center', fontSize: 12, color: colors.muted }}>{days == null && !picked ? tr('or let Myra choose') : ''}</Text>
         </View>
       ) : null}
+      {title.trim() && rep === 'once' && cal ? <DatePicker value={picked ?? undefined} full={d => loadOn(tasks, area, d) >= PER_AREA_DAY} onPick={d => { setPicked(d); setDays(null); setCal(false); }} /> : null}
       {note && !title.trim() ? <Note>{note}</Note> : null}
     </View>
   );
@@ -147,6 +159,8 @@ function AddTask({ area }: { area: Area }) {
 function TaskRow({ t, inFocus }: { t: Task; inFocus: boolean }) {
   const { complete, moveTo, remove, addHabit } = useTasks();
   const [open, setOpen] = useState(false);
+  const [cal, setCal] = useState(false);
+  const { tasks } = useTasks();
   const today = todayISO();
   return (
     <View style={{ gap: 6, borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 8 }}>
@@ -180,11 +194,16 @@ function TaskRow({ t, inFocus }: { t: Task; inFocus: boolean }) {
               <Text style={{ fontSize: 13, color: colors.ink }}>{label}</Text>
             </Pressable>
           ))}
+          <Pressable onPress={() => setCal(c => !c)} style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingVertical: 6, paddingHorizontal: 12, borderRadius: 99, borderWidth: 1, borderColor: colors.line }}>
+            <Ionicons name="calendar-outline" size={14} color={colors.ink} />
+            <Text style={{ fontSize: 13, color: colors.ink }}>{tr('Pick a date')}</Text>
+          </Pressable>
           <Pressable onPress={() => remove(t.id)} style={{ paddingVertical: 6, paddingHorizontal: 12 }}>
             <Text style={{ fontSize: 13, color: colors.bad }}>{tr('Remove')}</Text>
           </Pressable>
         </View>
       ) : null}
+      {open && cal ? <View style={{ paddingLeft: 34 }}><DatePicker value={t.due} full={d => d !== t.due && loadOn(tasks, t.area, d) >= PER_AREA_DAY} onPick={d => { moveTo(t.id, d); setCal(false); setOpen(false); }} /></View> : null}
     </View>
   );
 }
