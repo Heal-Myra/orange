@@ -939,4 +939,5 @@ export const HI: Record<string, string> = {
   'Write it down. Myra puts one in front of you at a time, on Today. Finishing two of them earns the full 40.': 'लिख लें। मायरा आज वाले पेज पर एक बार में एक काम सामने रखती है। दो पूरे करने पर पूरे 40 अंक।',
   'Days with Tao practice': 'ताओ अभ्यास वाले दिन',
   'Days with love': 'प्रेम वाले दिन',
+  'e.g. I have a cold since last night, a little tired': 'जैसे कल रात से ज़ुकाम है, थोड़ी थकान',
 };

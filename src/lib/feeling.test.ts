@@ -17,3 +17,12 @@ describe('how I feel today', () => {
     expect(ids).not.toContain('kapalbhati');
   });
 });
+
+describe('reading how I feel from my own words', () => {
+  it('finds symptoms in a sentence, in English or Hindi', async () => {
+    const { symptomsIn } = await import('./feeling');
+    expect(symptomsIn('I have a cold and a mild headache')).toEqual(['cold', 'headache']);
+    expect(symptomsIn('आज ज़ुकाम है')).toEqual(['cold']);
+    expect(symptomsIn('Feeling great today')).toEqual([]);
+  });
+});

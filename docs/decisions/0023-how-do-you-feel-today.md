@@ -10,3 +10,7 @@ Date: 24 Oct 2026 · Decided by: founder ("I have a cold today; once I have inpu
   suggestion to it (Clear your mind, food plan, breathing, sleep); her suggestion refreshes as soon as the answer changes.
 - Guided breathing on such days uses calming practices only (no Bhastrika or Kapalbhati).
 - Not a diagnosis. Fever shows when to see a doctor; Myra says so when relevant.
+
+## In your own words (same day, founder)
+A text box comes first ("I have a cold since last night"); the mood and symptom taps are optional shortcuts. Symptoms are also
+read from the words (English and Hindi, src/lib/feeling.ts), and Myra reads the words themselves.

@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { shiftISO } from '../lib/dates';
-import { MOODS, SYMPTOMS, type Feeling, type Mood, type Symptom } from '../lib/feeling';
+import { MOODS, SYMPTOMS, symptomsIn, type Feeling, type Mood, type Symptom } from '../lib/feeling';
 import { tr } from '../lib/i18n';
 import { useHeal } from '../lib/store';
 import { colors } from '../theme';
@@ -20,20 +20,25 @@ export function FeelingCard() {
   const [note, setNote] = useState(f?.note ?? '');
   const [editing, setEditing] = useState(false);
 
-  const save = (m: Mood, s: Symptom[], n: string) => {
-    update(d => { d.feeling = { mood: m, symptoms: s, note: n.trim() || undefined, at: new Date().toISOString() } as Feeling; });
+  const save = (m: Mood | null, s: Symptom[], n: string) => {
+    // Words count too (founder, 24 Oct 2026): "I have a cold" ticks Cold by itself.
+    const all = Array.from(new Set([...s, ...symptomsIn(n)]));
+    const mood: Mood = m ?? (all.some(x => !['stressed', 'sleepless', 'tired'].includes(x)) ? 'unwell' : all.length ? 'low' : 'okay');
+    update(d => { d.feeling = { mood, symptoms: all, note: n.trim() || undefined, at: new Date().toISOString() } as Feeling; });
     setEditing(false);
   };
   const choose = (m: Mood) => {
     setMood(m);
-    if (m === 'great' || m === 'good') { setSym([]); save(m, [], ''); }
+    if ((m === 'great' || m === 'good') && !note.trim()) { setSym([]); save(m, [], ''); }
   };
 
-  const summary = f ? [tr(MOODS.find(x => x.id === f.mood)!.label), ...f.symptoms.map(s => tr(SYMPTOMS.find(x => x.id === s)!.label))].join(' · ') : '';
+  const summary = f ? (f.note?.trim() || [tr(MOODS.find(x => x.id === f.mood)!.label), ...f.symptoms.map(s => tr(SYMPTOMS.find(x => x.id === s)!.label))].join(' · ')) : '';
   const unwell = f && (f.mood === 'unwell' || f.mood === 'low' || f.symptoms.length > 0);
 
   const picker = (
     <View style={{ gap: 10 }}>
+      {/* In your own words first (founder, 24 Oct 2026); the taps below are optional shortcuts. */}
+      <TextField label={tr('In your own words')} value={note} onChangeText={setNote} multiline placeholder={tr('e.g. I have a cold since last night, a little tired')} />
       <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
         {MOODS.map(m => {
           const on = mood === m.id;
@@ -61,10 +66,9 @@ export function FeelingCard() {
               );
             })}
           </View>
-          <TextField label={tr('Anything else (optional)')} value={note} onChangeText={setNote} placeholder={tr('e.g. blocked nose since last night')} />
-          <Button kind="insight" title={tr('Done')} onPress={() => save(mood, sym, note)} />
         </>
       ) : null}
+      {note.trim() || (mood && mood !== 'great' && mood !== 'good') ? <Button kind="insight" title={tr('Done')} onPress={() => save(mood, sym, note)} /> : null}
     </View>
   );
 

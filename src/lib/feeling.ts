@@ -44,3 +44,18 @@ export const feelingLine = (f?: Feeling): string => {
 
 /** Strong breathing practices are left out of guided sessions today. */
 export const gentleToday = (f?: Feeling) => !!f && (f.mood === 'unwell' || f.symptoms.some(s => ['fever', 'cough', 'cold', 'bodyache', 'stomach', 'period', 'tired'].includes(s)));
+
+/** Symptoms read from the person's own words ("I have a cold and a headache", "zukam hai"), so one sentence is enough. */
+const WORDS: [Symptom, RegExp][] = [
+  ['cold', /\b(cold|runny|blocked nose|stuffy|sneez|zukam|jukam|sardi)|ज़ुकाम|जुकाम|सर्दी|नाक बंद/i],
+  ['cough', /\b(cough|khansi|khaansi)|खाँसी|खांसी/i],
+  ['fever', /\b(fever|temperature|bukhar|bukhaar)|बुखार/i],
+  ['headache', /\b(headache|head ache|migraine|sir dard|sirdard)|सिरदर्द|सिर दर्द/i],
+  ['bodyache', /\b(body ?ache|aching|sore muscles|badan dard)|बदन दर्द/i],
+  ['tired', /\b(tired|exhausted|fatigue|low energy|thaka|thakan)|थकान|थका/i],
+  ['stomach', /\b(stomach|acidity|gas|loose motion|diarrh|vomit|nausea|indigestion|pet kharab)|पेट/i],
+  ['period', /\b(period|cramps|menstrual)|मासिक/i],
+  ['stressed', /\b(stress|anxious|anxiety|worried|tense|overwhelm)|तनाव|चिंता/i],
+  ['sleepless', /\b(slept badly|could not sleep|couldn't sleep|insomnia|no sleep|poor sleep)|नींद नहीं/i],
+];
+export const symptomsIn = (text: string): Symptom[] => WORDS.filter(([, re]) => re.test(text)).map(([s]) => s);
