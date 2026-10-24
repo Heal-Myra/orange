@@ -25,12 +25,13 @@ const errText = (e: unknown) => (e instanceof Error ? e.message : tr('Something 
 /** Which card on the tab a recommendation belongs to: Myra's own answer when she gave one, otherwise read from the words
  *  (English or Hindi). Used to open the tab right at that card (founder, 21 Oct 2026). */
 export function cardFor(pillar: 'body' | 'mind' | 'soul', text: string, isTask: boolean, given?: string): string {
-  const ok: Record<string, string[]> = { body: ['food', 'sleep', 'movement'], mind: ['tasks', 'tao', 'phone'], soul: ['gratitude', 'meditation', 'wisdom'] };
+  const ok: Record<string, string[]> = { body: ['food', 'sleep', 'movement'], mind: ['tasks', 'tao', 'phone'], soul: ['gratitude', 'meditation', 'wisdom', 'love'] };
   if (given && ok[pillar].includes(given)) return given;
   const t = text.toLowerCase();
   if (pillar === 'body') return /sleep|bed|nap|नींद|सो/.test(t) ? 'sleep' : /walk|step|run|yoga|exercise|stretch|move|stairs|workout|चल|कदम|टहल|व्यायाम|योग/.test(t) ? 'movement' : 'food';
   if (pillar === 'mind') return isTask ? 'tasks' : /tao|antidote|ताओ/.test(t) ? 'tao' : /screen|phone|social|scroll|instagram|youtube|learn|स्क्रीन|फ़ोन|फोन|सीख/.test(t) ? 'phone' : 'tasks';
-  return /breath|meditat|sit |still|साँस|सांस|ध्यान/.test(t) ? 'meditation' : /wisdom|verse|gita|read|passage|shloka|ज्ञान|श्लोक|गीता|पढ़/.test(t) ? 'wisdom' : 'gratitude';
+  return /call|meet|friend|love|hug|party|family|mum|dad|wife|husband|joy|happy|मिल|दोस्त|प्यार|परिवार|माँ|पापा|खुश|पार्टी/.test(t) ? 'love'
+    : /breath|meditat|sit |still|साँस|सांस|ध्यान/.test(t) ? 'meditation' : /wisdom|verse|gita|read|passage|shloka|ज्ञान|श्लोक|गीता|पढ़/.test(t) ? 'wisdom' : 'gratitude';
 }
 
 const feelKey = (f?: { mood: string; symptoms: string[] }) => (f ? `${f.mood}:${f.symptoms.join(',')}` : '');

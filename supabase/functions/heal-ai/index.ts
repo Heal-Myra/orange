@@ -381,17 +381,17 @@ If there is a "Moment in their usual day" line, follow it first: it says what th
 - lunch (and dinner): Body = snap a photo of the plate in Food (if that meal is not logged yet), e.g. "Snap your lunch in Food before eating."
 - office morning / office afternoon (weekdays): Mind = one Work task from the to-do list (if there is one).
 - otherwise Mind rotates between: one to-do task (Family or Better me outside office hours), today's Tao practice, writing what you learned today (Phone activity, Learning), and the Screen Time screenshot in Phone activity (evening). Never two Mind tasks at once.
-- Body otherwise: food (protein, fibre, portion toward their goal), a short walk, water or sleep; Soul otherwise: breathing and meditation (with minutes), Daily Wisdom, or gratitude if not done.
+- Body otherwise: food (protein, fibre, portion toward their goal), a short walk, water or sleep; Soul otherwise: breathing and meditation (with minutes), Daily Wisdom, gratitude if not done, or Love (the Soul tab's Love card): the person they mean to love today (e.g. "Call Mum and listen for 10 minutes."), their own small joy, the friend they are meeting this week, or a step for the party they are planning. Evenings and weekends favour Love.
 Reply with JSON only:
 {"headline":"a short summary of the moment, at most 10 words",
  "body":["the one Body task"],
  "mind":["the one Mind task; if it is a to-do task, name it, e.g. 'Finish: Send the Q3 budget.'"],
  "soul":["the one Soul task"],
  "focus":["the id of the to-do task used in mind, or nothing"],
- "cards":{"body":"food"|"sleep"|"movement","mind":"tasks"|"tao"|"phone","soul":"gratitude"|"meditation"|"wisdom"},
+ "cards":{"body":"food"|"sleep"|"movement","mind":"tasks"|"tao"|"phone","soul":"gratitude"|"meditation"|"wisdom"|"love"},
  "pick":"body"|"mind"|"soul"}
 "pick" is the ONE of the three that fits this moment best; the Today screen shows only that one (founder, 22 Oct 2026): e.g. a Work to-do at office moments and breaks, the meal photo at meals, gratitude on waking.
-"cards" names the app card where each task is done (Body tab: Food, Sleep, Movement; Mind tab: Clear your mind to-do list, Tao practice, Phone activity (including Learning); Soul tab: Gratitude, Breathing & meditation, Daily Wisdom).
+"cards" names the app card where each task is done (Body tab: Food, Sleep, Movement; Mind tab: Clear your mind to-do list, Tao practice, Phone activity (including Learning); Soul tab: Gratitude, Breathing & meditation, Love, Daily Wisdom).
 For "focus": [] unless the Mind task is a to-do task; then exactly that one id (overdue or due today first; on a tired or low-sleep day pick a light one). Use only ids from the list.
 STRICT: every line is ONE line of at most 10 words, written as a direct instruction that starts with a verb, with a number where it helps: e.g. "Walk 10 minutes after lunch.", "Write four things you are grateful for.", "Snap your lunch in Food before eating." Never use "try", "consider", "maybe", "you could" or "it may help". Exactly one item per list.`));
       // Founder's rule: every line at most 10 words. If the model ran long, ask once more to shorten.

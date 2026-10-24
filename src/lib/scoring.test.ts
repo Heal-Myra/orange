@@ -221,3 +221,13 @@ describe('gratitude with empty boxes in between', () => {
     expect(soulScore(d)!.gratitude).toBe(10);
   });
 });
+
+describe('love', () => {
+  it('adds up to 15 as a bonus, never above 100', () => {
+    const d = { ...emptyDay('2026-10-24'), love: { whom: 'Mum: call her', happy: 'Evening walk', friend: 'Ravi on Sunday' } };
+    expect(soulScore(d)!.love).toBe(15);
+    expect(soulScore(d)!.total).toBe(15);
+    const full = { ...d, soul: { gratitude: ['a', 'b', 'c', 'd'], verseStudied: true }, mind: { meditationMin: 30 } };
+    expect(soulScore(full)!.total).toBe(100);
+  });
+});

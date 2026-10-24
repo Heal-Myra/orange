@@ -4,6 +4,7 @@
 
 import { GratitudeCard, VerseStudyCard } from '../../components/SoulCards';
 import { MeditationTimer } from '../../components/MeditationTimer';
+import { LoveCard } from '../../components/LoveCard';
 import { Anchor, Card, Heading, Screen, Score } from '../../components/ui';
 import { soulScore } from '../../lib/scoring';
 import { useHeal } from '../../lib/store';
@@ -19,6 +20,7 @@ export default function Soul() {
       </Card>
       <Anchor id="gratitude"><GratitudeCard /></Anchor>
       <Anchor id="meditation"><MeditationTimer /></Anchor>
+      <Anchor id="love"><LoveCard /></Anchor>
       <Anchor id="wisdom"><VerseStudyCard /></Anchor>
     </Screen>
   );
