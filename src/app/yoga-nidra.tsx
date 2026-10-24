@@ -12,6 +12,8 @@ import { lang, tr } from '../lib/i18n';
 import { partOfDay } from '../lib/context';
 import { momentOf } from '../lib/routine';
 import { useHeal } from '../lib/store';
+import { useGuideText } from '../lib/guideText';
+import { speak, voiceLang } from '../lib/voice';
 import { optional } from '../lib/native';
 import { nidraMinutes, nidraScript, type Stage } from '../lib/yogaNidra';
 
@@ -26,11 +28,15 @@ const STAGE: Record<Stage, string> = { settle: 'Settling', resolve: 'Sankalpa', 
 
 export default function YogaNidra() {
   const { profile, update } = useHeal();
-  const params = useLocalSearchParams<{ bed?: string }>();
+  const params = useLocalSearchParams<{ bed?: string; lang?: string }>();
   const bedtime = params.bed ? params.bed === '1' : momentOf(profile.me?.routine)?.now.kind === 'sleep' || partOfDay() === 'night';
   const steps = useMemo(() => nidraScript(bedtime), [bedtime]);
   const total = nidraMinutes(steps);
-  const hi = lang() === 'hi';
+  // The session's own language (founder, 24 Oct 2026): English and Hindi are written; others translated once by Myra.
+  const gLang = params.lang || profile.me?.guideLang || lang();
+  const { say: sayIn, loading: translating } = useGuideText(gLang === 'hi' ? 'en' : gLang, useMemo(() => steps.map(s => s.en), [steps]));
+  const lineOf = (st: { en: string; hi: string }) => (gLang === 'hi' ? st.hi : sayIn(st.en));
+  const voice = voiceLang(gLang);
 
   const [i, setI] = useState(-1);         // -1 = not started; steps.length = finished
   const [playing, setPlaying] = useState(false);
@@ -53,15 +59,13 @@ export default function YogaNidra() {
     if (!playing || i < 0) return;
     if (i >= steps.length) { setPlaying(false); return; }
     const step = steps[i];
-    const text = hi ? step.hi : step.en;
+    const text = lineOf(step);
     const next = () => { timer.current = setTimeout(() => setI(n => n + 1), step.pause * 1000); };
-    if (Speech) {
-      Speech.speak(text, { language: hi ? 'hi-IN' : 'en-IN', rate: 0.85, pitch: 0.95, useApplicationAudioSession: false, onDone: next, onError: () => next() });
-    } else {
-      timer.current = setTimeout(next, (text.split(/\s+/).length / 2.3) * 1000);
-    }
-    return () => { clear(); Speech?.stop(); };
-  }, [i, playing, steps, hi]);
+    // A slow woman's voice with pauses between sentences (src/lib/voice.ts); words on screen when there is no voice.
+    const stop = Speech ? speak(text, voice, next) : (() => { timer.current = setTimeout(next, (text.split(/\s+/).length / 1.7) * 1000); return () => {}; })();
+    return () => { clear(); stop(); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [i, playing, steps, gLang, translating]);
 
   // Count the time, keep the screen awake while playing, and save the minutes at the end.
   useEffect(() => {
@@ -69,10 +73,10 @@ export default function YogaNidra() {
     else if (since.current) { sat.current += Date.now() - since.current; since.current = null; Awake?.deactivateKeepAwake('nidra').catch?.(() => {}); }
   }, [playing]);
   useEffect(() => { if (i >= steps.length) save(); }, [i, steps.length, save]);
-  useEffect(() => () => { clear(); Speech?.stop(); try { Awake?.deactivateKeepAwake('nidra'); } catch { /* fine */ } }, []);
+  useEffect(() => () => { clear(); try { Awake?.deactivateKeepAwake('nidra'); } catch { /* fine */ } }, []);
 
-  const begin = () => { saved.current = false; sat.current = 0; setI(0); setPlaying(true); };
-  const close = () => { setPlaying(false); Speech?.stop(); if (i >= 0) { if (since.current) { sat.current += Date.now() - since.current; since.current = null; } save(); } router.canGoBack() ? router.back() : router.replace('/'); };
+  const begin = () => { if (translating) return; saved.current = false; sat.current = 0; setI(0); setPlaying(true); };
+  const close = () => { setPlaying(false); if (i >= 0) { if (since.current) { sat.current += Date.now() - since.current; since.current = null; } save(); } router.canGoBack() ? router.back() : router.replace('/'); };
 
   const step = i >= 0 && i < steps.length ? steps[i] : null;
   const done = i >= steps.length;
@@ -107,7 +111,7 @@ export default function YogaNidra() {
         ) : (
           <>
             <Text style={{ color: NIGHT.glow, fontSize: 14, fontWeight: '700', letterSpacing: 1 }}>{tr(STAGE[step!.stage]).toUpperCase()}</Text>
-            <Text style={{ color: NIGHT.ink, fontSize: 22, lineHeight: 32, opacity: 0.9 }}>{hi ? step!.hi : step!.en}</Text>
+            <Text style={{ color: NIGHT.ink, fontSize: 22, lineHeight: 32, opacity: 0.9 }}>{lineOf(step!)}</Text>
           </>
         )}
       </View>

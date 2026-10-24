@@ -430,6 +430,22 @@ Transliteration: ${String(p.transliteration ?? '').slice(0, 800)}
 First give the verse's meaning faithfully in your own words in 2–3 sentences (do not copy any published translation). Then, on its own last line, one way to live it today in at most 10 words. Plain text, no headings.`);
       return { text };
     }
+    case 'translate_lines': {
+      // Guided sessions in regional languages (founder, 24 Oct 2026): fixed lines of our own scripts, translated once
+      // and kept on the phone. Same number of lines, same order.
+      const NAMES: Record<string, string> = { mr: 'Marathi', bn: 'Bengali', gu: 'Gujarati', pa: 'Punjabi (Gurmukhi)', ta: 'Tamil', te: 'Telugu',
+        kn: 'Kannada', ml: 'Malayalam', or: 'Odia', ur: 'Urdu', as: 'Assamese', hi: 'Hindi' };
+      const to = NAMES[String(p.to ?? '')];
+      const lines = (Array.isArray(p.lines) ? p.lines : []).slice(0, 160).map(x => String(x).slice(0, 400));
+      if (!to || !lines.length) throw new Error('Choose a language first.');
+      const r = await askJson(askWith(false), 'smart', 'You translate calm, spoken meditation and breathing guidance for Indian listeners.',
+`Translate each line into ${to}, in its own script, as gentle spoken guidance (warm, simple, natural to hear aloud; keep the names
+of practices such as Anulom Vilom, Bhramari, Om, sankalpa as people in that region say them). Keep numbers. Same order, same count.
+${JSON.stringify(lines)}
+Reply with JSON only: {"lines":["…"]}`);
+      const out = Array.isArray(r.lines) ? r.lines.map((x: unknown) => String(x ?? '')) : [];
+      return { lines: lines.map((l, i) => out[i]?.trim() || l) };
+    }
     case 'translate_recipe': {
       // Myra's 1-minute cooking guide in the cook's language: the dishes chosen for a guide, plus the guide's labels.
       const LANG_NAMES: Record<string, string> = { hi: 'Hindi', mr: 'Marathi', bn: 'Bengali', gu: 'Gujarati', pa: 'Punjabi', ta: 'Tamil', te: 'Telugu',

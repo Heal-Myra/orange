@@ -18,6 +18,9 @@ export function tr(en: string, vars?: Record<string, string | number>): string {
   return s;
 }
 
+/** Translate into a given language, whatever the app language (guided sessions have their own voice language). */
+export const trIn = (to: Lang, en: string): string => (to === 'hi' ? HI[en] ?? en : en);
+
 export const lang = () => current;
 /** Locale for dates and numbers. */
 export const locale = () => (current === 'hi' ? 'hi-IN' : 'en-IN');

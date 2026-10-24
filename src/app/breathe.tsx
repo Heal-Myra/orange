@@ -8,21 +8,23 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, Easing, Platform, Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { lang, tr } from '../lib/i18n';
+import { useGuideText } from '../lib/guideText';
 import { optional } from '../lib/native';
 import { phasesFor, practice, segmentName, sessionPlan, type Phase, type PracticeId, type Segment } from '../lib/pranayama';
 import { useHeal } from '../lib/store';
 import { gentleToday } from '../lib/feeling';
 import { todayISO } from '../lib/dates';
-import { speak } from '../lib/voice';
+import { hasVoice, speak, voiceLang } from '../lib/voice';
 
 const Awake = optional(['ExpoKeepAwake'], () => require('expo-keep-awake') as typeof import('expo-keep-awake'));
 const C = { bg: '#10221F', ring: '#1C3934', ink: '#EAF2EF', muted: '#93AAA4', glow: '#E0794F', calm: '#6FB7A8' };
 const QUICK = (ph: Phase) => ph.seconds < 2;
 
-interface Step { seg: number; phase: Phase; intro?: string }
+interface Step { seg: number; phase: Phase; intro?: string; rep?: number } // rep: how many times this cue came before in the part
 
 export default function Breathe() {
-  const { practice: pid, minutes } = useLocalSearchParams<{ practice?: string; minutes?: string }>();
+  const { practice: pid, minutes, lang: gl } = useLocalSearchParams<{ practice?: string; minutes?: string; lang?: string }>();
+  const gLang: string = gl || lang();
   const { update } = useHeal();
   const choice = (pid ?? 'mix') as PracticeId;
   const mins = Math.max(1, Math.min(60, Number(minutes) || 10));
@@ -32,19 +34,26 @@ export default function Breathe() {
   // Each part opens with a short spoken "how to", then its breaths.
   const steps = useMemo<Step[]>(() => plan.flatMap((seg, k): Step[] => {
     const how = seg.id === 'still' ? '' : practice(seg.id).how;
-    const introSec = how ? Math.min(14, Math.max(6, Math.round(how.split(/\s+/).length / 2.2))) : 0;
+    // Slow voice with pauses: about 1.7 words a second, plus a pause per sentence (founder: "speed is too fast").
+    const introSec = how ? Math.min(24, Math.max(8, Math.round(how.split(/\s+/).length / 1.7 + (how.match(/[.!?]/g)?.length ?? 1) * 0.7))) : 0;
     const head: Step[] = how ? [{ seg: k, intro: how, phase: { kind: 'rest', seconds: introSec, cue: how } }] : [];
-    return [...head, ...phasesFor({ ...seg, seconds: Math.max(10, seg.seconds - introSec) }).map(ph => ({ seg: k, phase: ph }))];
+    const seen: Record<string, number> = {};
+    return [...head, ...phasesFor({ ...seg, seconds: Math.max(10, seg.seconds - introSec) }).map(ph => ({ seg: k, phase: ph, rep: (seen[ph.cue] = (seen[ph.cue] ?? -1) + 1) }))];
   }), [plan]);
   const totalSec = useMemo(() => steps.reduce((t, s) => t + s.phase.seconds, 0), [steps]);
+  // Every line spoken or shown, in the session's own language (built in for English and Hindi; translated once otherwise).
+  const allLines = useMemo(() => Array.from(new Set([...steps.map(s => s.phase.cue), 'Begin'])), [steps]);
+  const { say, loading: translating, error: trError } = useGuideText(gLang, allLines);
 
   const [i, setI] = useState(-1); // -1 = not started
   const [playing, setPlaying] = useState(false);
   const [voiceOn, setVoiceOn] = useState(true);
+  const [noVoice, setNoVoice] = useState(false);
   const size = useRef(new Animated.Value(0.6)).current;
   const sat = useRef(0), since = useRef<number | null>(null), saved = useRef(false);
-  const voice = lang() === 'hi' ? 'hi-IN' : 'en-IN';
+  const voice = voiceLang(gLang);
   const done = i >= steps.length;
+  useEffect(() => { hasVoice(voice).then(v => setNoVoice(!v)).catch(() => {}); }, [voice]);
 
   const save = () => {
     if (saved.current) return;
@@ -69,9 +78,11 @@ export default function Breathe() {
       Animated.timing(size, { toValue: target, duration: phase.seconds * 1000, easing: Easing.inOut(Easing.sin), useNativeDriver: Platform.OS !== 'web' }).start();
     }
     const firstOfRun = !prev || prev.kind !== phase.kind || prev.cue !== phase.cue;
-    const say = intro ? tr(intro) : QUICK(phase) ? (firstOfRun && prev && QUICK(prev) ? null : firstOfRun ? tr('Begin') : null) : tr(phase.cue);
+    // Every cue for the first three rounds; after that only every third round, so the rhythm can carry (founder: narration quality).
+    const quiet = !intro && !QUICK(phase) && phase.kind !== 'rest' && (steps[i].rep ?? 0) >= 3 && (steps[i].rep ?? 0) % 3 !== 0;
+    const line = quiet ? null : intro ? say(intro) : QUICK(phase) ? (firstOfRun && prev && QUICK(prev) ? null : firstOfRun ? say('Begin') : null) : say(phase.cue);
     let stop = () => {};
-    if (voiceOn && say) stop = speak(say, voice, () => {});
+    if (voiceOn && line) stop = speak(line, voice, () => {});
     const t = setTimeout(() => setI(n => n + 1), phase.seconds * 1000);
     return () => { clearTimeout(t); if (!QUICK(phase)) stop(); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -105,7 +116,10 @@ export default function Breathe() {
           {pr?.caution ? <Text style={{ color: C.glow, fontSize: 14, lineHeight: 20 }}>{tr(pr.caution)}</Text> : null}
           {!pr && plan.some(s => s.id !== 'still' && practice(s.id).energising) ? <Text style={{ color: C.glow, fontSize: 14, lineHeight: 20 }}>{tr('Bhastrika and Kapalbhati are strong breaths: skip them if pregnant, or with high blood pressure, heart disease, hernia or recent surgery. Empty stomach. Stop if dizzy.')}</Text> : null}
           <Text style={{ color: C.muted, fontSize: 14 }}>{tr('Sit tall and comfortable. Turn the sound up to hear Myra\'s voice.')}</Text>
-          <Pressable onPress={() => { setI(0); setPlaying(true); }} accessibilityRole="button"
+          {translating ? <Text style={{ color: C.muted, fontSize: 14 }}>{tr('Myra is preparing the session in your language…')}</Text> : null}
+          {trError ? <Text style={{ color: C.glow, fontSize: 14 }}>{trError}</Text> : null}
+          {noVoice ? <Text style={{ color: C.muted, fontSize: 14 }}>{tr('This phone has no voice for this language yet, so the words will show on screen. In iPhone Settings › Accessibility › Spoken Content › Voices you can add one.')}</Text> : null}
+          <Pressable disabled={translating} onPress={() => { setI(0); setPlaying(true); }} accessibilityRole="button"
             style={({ pressed }) => ({ backgroundColor: C.glow, borderRadius: 99, paddingVertical: 16, alignItems: 'center', opacity: pressed ? 0.8 : 1, marginTop: 8 })}>
             <Text style={{ color: '#fff', fontSize: 18, fontWeight: '700' }}>{tr('Start session')}</Text>
           </Pressable>
@@ -135,7 +149,7 @@ export default function Breathe() {
               <Animated.View style={{ width: D, height: D, borderRadius: D / 2, backgroundColor: step?.phase.kind === 'hum' || step?.phase.kind === 'chant' ? C.glow + '55' : C.calm + '55', transform: [{ scale: size }] }} />
             </View>
             <Text style={{ color: C.ink, fontSize: step?.intro ? 18 : 26, fontWeight: '600', textAlign: 'center', marginTop: 28, paddingHorizontal: 28, lineHeight: step?.intro ? 26 : 34 }}>
-              {step ? tr(step.phase.cue) : ''}
+              {step ? say(step.phase.cue) : ''}
             </Text>
           </View>
           <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 36, paddingBottom: 28 }}>

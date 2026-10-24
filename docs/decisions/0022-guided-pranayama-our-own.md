@@ -20,3 +20,13 @@ Date: 24 Oct 2026 · Decided by: founder
 steadily from the person's recent level (average of their last five practice days) to the goal; if recent sessions fall
 short of the plan (under 80%), it slows to their pace; never more than 3 minutes above recent practice
 (src/lib/meditationPlan.ts, tested). Myra is told today's planned length.
+
+## Voice and language (founder's test on build 10, same day)
+"Male voice; needs a female voice; speed too fast; language preference; quality of voice and narration."
+- src/lib/voice.ts picks a woman's voice for the language (Indian voices first, Enhanced/Premium preferred, known male voices
+  avoided), speaks about 20% slower than normal and pauses between sentences. Used by guided breathing and Yoga Nidra.
+- "Voice language" (folds away in the card): English, Hindi or 11 regional languages. Regional lines are translated by Myra once
+  (`translate_lines`) and kept on the phone (src/lib/guideText.ts). If the phone has no voice for the language, words show.
+- Softer cue wording; every cue for the first three rounds, then every third round.
+- Next step for real quality: natural "neural" voices made on the server (e.g. Indian English and Hindi women's voices) and
+  saved as audio, or a recorded human voice. Needs the founder's choice of service and an account key (a Supabase secret).

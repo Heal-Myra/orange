@@ -87,3 +87,6 @@ export const translateMessage = (text: string, to: string) => call<{ text: strin
 /** Recipes (and the guide's labels) in another language, for Myra's 1-minute cooking guides. */
 export const translateRecipes = (meals: { dish: string; portion: string; ingredients: { item: string; qty: string }[]; steps: string[] }[], to: string) =>
   call<{ meals: { dish: string; portion: string; ingredients: { item: string; qty: string }[]; steps: string[] }[]; labels: string[] }>('translate_recipe', { meals, to });
+
+/** Fixed lines of a guided session in a regional language (translated once, kept on the phone). */
+export const translateLines = (lines: string[], to: string) => call<{ lines: string[] }>('translate_lines', { lines, to });

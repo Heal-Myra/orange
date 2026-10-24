@@ -7,7 +7,8 @@ import { useHeal } from '../lib/store';
 import { colors } from '../theme';
 import { Button, Card, Expandable, Heading, Meter, Note, Score, Segmented } from './ui';
 import { newGoal, todaysLength } from '../lib/meditationPlan';
-import { locale } from '../lib/i18n';
+import { lang, locale } from '../lib/i18n';
+import { MESSAGE_LANGS } from '../lib/foodPlan';
 import { Ionicons } from '@expo/vector-icons';
 import { PRACTICES, type PracticeId } from '../lib/pranayama';
 import { tr } from '../lib/i18n';
@@ -29,6 +30,9 @@ export function MeditationTimer() {
   const [mode, setMode] = useState<'guided' | 'self'>('guided');
   const [pick, setPick] = useState<PracticeId>('mix');
   const [choosing, setChoosing] = useState(false);
+  const [gLangLocal, setGLangLocal] = useState<string | null>(null);
+  const gLang = gLangLocal ?? profile.me?.guideLang ?? lang();
+  const setGLang = (c: string) => { setGLangLocal(c); if (profile.me) setProfile({ ...profile, me: { ...profile.me, guideLang: c } }); };
   const [startedAt, setStartedAt] = useState<number | null>(null);
   const [pausedMs, setPausedMs] = useState(0); // time already sat before a pause
   const [now, setNow] = useState(Date.now());
@@ -99,8 +103,19 @@ export function MeditationTimer() {
                   );
                 })}
               </View>
+              {/* The voice's language (founder, 24 Oct 2026): English, Hindi or a regional language; folds away. */}
+              <Expandable icon="language-outline" color={colors.soul} title={tr('Voice language')} status={MESSAGE_LANGS.find(l => l.code === gLang)?.name ?? 'English'}>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                  {MESSAGE_LANGS.map(l => (
+                    <Pressable key={l.code} onPress={() => setGLang(l.code)} accessibilityLabel={l.english}
+                      style={{ paddingVertical: 6, paddingHorizontal: 12, borderRadius: 99, borderWidth: 1, borderColor: l.code === gLang ? colors.soul : colors.line, backgroundColor: l.code === gLang ? colors.soul + '18' : colors.surface }}>
+                      <Text style={{ color: colors.ink, fontWeight: l.code === gLang ? '700' : '400' }}>{l.name}</Text>
+                    </Pressable>
+                  ))}
+                </View>
+              </Expandable>
               <Button title={pick === 'nidra' ? tr('Start Yoga Nidra (15 min)') : tr('Start {n}-minute session', { n: length })}
-                onPress={() => (pick === 'nidra' ? router.push('/yoga-nidra') : router.push({ pathname: '/breathe', params: { practice: pick, minutes: String(length) } }))} />
+                onPress={() => (pick === 'nidra' ? router.push({ pathname: '/yoga-nidra', params: { lang: gLang } }) : router.push({ pathname: '/breathe', params: { practice: pick, minutes: String(length), lang: gLang } }))} />
             </>
           ) : (
             <>
