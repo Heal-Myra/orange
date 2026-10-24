@@ -1,0 +1,16 @@
+# 0022 · Breathing & meditation: guided pranayama, our own player
+
+Date: 24 Oct 2026 · Decided by: founder
+
+## Decision
+- The card offers 5, 10 or 15 minutes and a switch: Guided / On my own (the old timer).
+- Guided: Myra's mix (recommended) or one practice: Anulom Vilom, Bhastrika, Kapalbhati, Bhramari, Ujjayi, Sheetali,
+  Sama Vritti (box), Udgeeth (Om), Yoga Nidra (lying down). Only the chosen one shows; "Choose another practice" opens the list.
+- Myra's mix follows the classic order: energising (Bhastrika, Kapalbhati) → balancing (Anulom Vilom) → calming (Bhramari,
+  Udgeeth) → stillness. After 8 pm only calming practices. Plans fill the chosen time exactly (src/lib/pranayama.ts, tested).
+- The session (src/app/breathe.tsx) is Happy Orange's own guided "video": a breathing circle that grows and settles with
+  each breath, the nostril to use lit for Anulom Vilom, pulses for quick breaths, a short spoken "how to" for each practice
+  and Myra's voice on every cue (English or Hindi), voice on/off, pause, end and save. Minutes count to the Soul score.
+- Safety: Bhastrika and Kapalbhati show who should skip them (pregnancy, high blood pressure, heart disease, hernia, recent
+  surgery; empty stomach; stop if dizzy); Sheetali (cold, cough, asthma). Not medical advice.
+- Voice needs the phone build with expo-speech (build 9 onward); before that the session plays with words on screen.

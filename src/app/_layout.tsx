@@ -55,6 +55,7 @@ function Gate() {
       <Stack.Screen name="library" options={{ headerShown: true, title: tr('Library'), headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
       <Stack.Screen name="yoga-nidra" options={{ presentation: 'fullScreenModal', contentStyle: { backgroundColor: '#0F1E22' } }} />
       <Stack.Screen name="cook" options={{ presentation: 'fullScreenModal' }} />
+      <Stack.Screen name="breathe" options={{ presentation: 'fullScreenModal', contentStyle: { backgroundColor: '#10221F' } }} />
       <Stack.Screen name="myra" options={{ headerShown: true, title: tr('Myra'), presentation: 'modal', headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
     </Stack>
   );
