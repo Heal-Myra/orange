@@ -11,6 +11,8 @@ import { lang, tr } from '../lib/i18n';
 import { optional } from '../lib/native';
 import { phasesFor, practice, segmentName, sessionPlan, type Phase, type PracticeId, type Segment } from '../lib/pranayama';
 import { useHeal } from '../lib/store';
+import { gentleToday } from '../lib/feeling';
+import { todayISO } from '../lib/dates';
 import { speak } from '../lib/voice';
 
 const Awake = optional(['ExpoKeepAwake'], () => require('expo-keep-awake') as typeof import('expo-keep-awake'));
@@ -24,7 +26,9 @@ export default function Breathe() {
   const { update } = useHeal();
   const choice = (pid ?? 'mix') as PracticeId;
   const mins = Math.max(1, Math.min(60, Number(minutes) || 10));
-  const plan = useMemo<Segment[]>(() => sessionPlan(choice, mins), [choice, mins]);
+  const { days } = useHeal();
+  const gentle = gentleToday(days[todayISO()]?.feeling);
+  const plan = useMemo<Segment[]>(() => sessionPlan(choice, mins, undefined, gentle), [choice, mins, gentle]);
   // Each part opens with a short spoken "how to", then its breaths.
   const steps = useMemo<Step[]>(() => plan.flatMap((seg, k): Step[] => {
     const how = seg.id === 'still' ? '' : practice(seg.id).how;

@@ -33,6 +33,8 @@ export function cardFor(pillar: 'body' | 'mind' | 'soul', text: string, isTask: 
   return /breath|meditat|sit |still|साँस|सांस|ध्यान/.test(t) ? 'meditation' : /wisdom|verse|gita|read|passage|shloka|ज्ञान|श्लोक|गीता|पढ़/.test(t) ? 'wisdom' : 'gratitude';
 }
 
+const feelKey = (f?: { mood: string; symptoms: string[] }) => (f ? `${f.mood}:${f.symptoms.join(',')}` : '');
+
 /** Which of Body, Mind and Soul fits this moment of the day. */
 export function pickForMoment(kind: RoutineKind | undefined, slot: Slot, myra?: 'body' | 'mind' | 'soul'): 'body' | 'mind' | 'soul' {
   if (kind) {
@@ -68,7 +70,7 @@ export function GuidanceCard() {
     const context = buildContext(day, days, date, profile, tasksForAI(open, todayISO()), tradition);
     try {
       const r = await dailyGuidance(context);
-      update(d => { d.guidance = { ...r, at: new Date().toISOString(), part: momentKey(), sig: daySignature(d), lang: lang(), fasting: !!d.fasting }; });
+      update(d => { d.guidance = { ...r, at: new Date().toISOString(), part: momentKey(), sig: daySignature(d), lang: lang(), fasting: !!d.fasting, feel: feelKey(d.feeling) }; });
       if (Array.isArray(r.focus) && r.focus.length && date === todayISO()) setFocus(r.focus.map(String)); // Myra's pick
     } catch (e) { setMessage(errText(e)); } finally { setBusy(false); }
   }, [day, days, date, profile, update, open, setFocus, tradition]);
@@ -87,8 +89,8 @@ export function GuidanceCard() {
     if (!session || !isToday || busy) return;
     const ageMin = g ? (Date.now() - new Date(g.at).getTime()) / 60000 : Infinity;
     // Switching "I'm fasting today" on or off changes the advice at once (founder, 22 Oct 2026).
-    const stale = !g || g.part !== part || (g.lang ?? 'en') !== lang() || !!g.fasting !== !!day.fasting || (g.sig !== sig && ageMin > 20);
-    const key = `${date}|${part}|${sig}|${day.fasting ? 'fast' : ''}`;
+    const stale = !g || g.part !== part || (g.lang ?? 'en') !== lang() || !!g.fasting !== !!day.fasting || (g.feel ?? '') !== feelKey(day.feeling) || (g.sig !== sig && ageMin > 20);
+    const key = `${date}|${part}|${sig}|${day.fasting ? 'fast' : ''}|${feelKey(day.feeling)}`;
     if (!stale || tried.current === key) return; // one attempt per situation, so errors never loop
     const t = setTimeout(() => { tried.current = key; run(); }, 4000); // wait until the person stops typing
     return () => clearTimeout(t);

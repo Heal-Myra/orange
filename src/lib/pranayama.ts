@@ -61,11 +61,11 @@ export interface Segment { id: Exclude<PracticeId, 'mix' | 'nidra'> | 'still'; s
 
 /** The session plan: one practice for the whole time, or Myra's mix in the classic order. At night (after 8 pm or
  *  before 5 am) the mix leaves out the energising breaths. Always ends with a short stillness. */
-export function sessionPlan(choice: PracticeId, minutes: number, hour = new Date().getHours()): Segment[] {
+export function sessionPlan(choice: PracticeId, minutes: number, hour = new Date().getHours(), gentle = false): Segment[] {
   const total = minutes * 60;
   const still = Math.min(120, Math.max(45, Math.round(total * 0.12)));
   if (choice !== 'mix') return [{ id: choice as Segment['id'], seconds: total - still }, { id: 'still', seconds: still }];
-  const night = hour >= 20 || hour < 5;
+  const night = hour >= 20 || hour < 5 || gentle; // unwell or tired: calming breaths only (24 Oct 2026)
   const parts: [Segment['id'], number][] = night
     ? (minutes <= 5 ? [['anulom', 0.55], ['bhramari', 0.45]] : minutes <= 10 ? [['ujjayi', 0.2], ['anulom', 0.45], ['bhramari', 0.35]]
       : [['ujjayi', 0.15], ['anulom', 0.4], ['bhramari', 0.3], ['udgeeth', 0.15]])

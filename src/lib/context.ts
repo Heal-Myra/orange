@@ -7,6 +7,7 @@ import { shiftISO, todayISO } from './dates';
 import { verseOfDay } from './gita';
 import { countGratitude, mealTotals, wellBeing } from './scoring';
 import { habitsToday } from './habits';
+import { feelingLine } from './feeling';
 import { todaysLength } from './meditationPlan';
 import { TAO_FOR_AI, taoForDate } from './tao';
 import { passageOfDay, traditionName, type Tradition } from './wisdom';
@@ -30,6 +31,7 @@ export function buildContext(day: DayLog, days: Record<string, DayLog>, date: st
     aboutLine(profile.me),
     momentLine(profile.me?.routine),
     healthLine(day),
+    feelingLine(day.feeling),
     `Fasting today: ${day.fasting ? 'yes (declared fast: water, black tea, black coffee)' : 'no'}.`,
     `Food: ${day.meals.map(m => m.name).join(', ') || 'nothing logged'}; totals ${Math.round(t.kcal)} kcal, protein ${Math.round(t.p)} g, carbs ${Math.round(t.c)} g, fat ${Math.round(t.f)} g, fibre ${Math.round(t.fib)} g (target ${fibreTarget(profile.kcal)} g).`,
     `Mind: focus tasks done today ${day.mind.focusDone ?? 0} of up to 2; learned today: ${day.mind.learned?.text?.trim() ? `"${day.mind.learned.text.trim()}"${day.mind.learned.link ? ` (${day.mind.learned.link})` : ''}` : 'not written yet'}; social media ${day.noMedia ? 'none' : day.media.map(m => `${m.minutes} min ${m.platform} (${m.category})`).join('; ') || 'not logged'}.`,

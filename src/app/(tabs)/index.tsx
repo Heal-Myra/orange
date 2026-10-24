@@ -3,6 +3,8 @@
 
 import { Text, View } from 'react-native';
 import { GuidanceCard } from '../../components/AiBits';
+import { FeelingCard } from '../../components/FeelingCard';
+import { todayISO } from '../../lib/dates';
 import { PillarTiles, WellBeingRing } from '../../components/WellBeingRing';
 import { useAuth } from '../../lib/auth';
 import { Card, Note, Screen } from '../../components/ui';
@@ -12,7 +14,7 @@ import { colors } from '../../theme';
 import { tr } from '../../lib/i18n';
 
 export default function Today() {
-  const { day, profile } = useHeal();
+  const { day, date, profile } = useHeal();
   const { session } = useAuth();
   const w = wellBeing(day, profile);
   const label = w.logged ? tr(band(w.total)) : tr('Nothing logged yet');
@@ -25,6 +27,8 @@ export default function Today() {
         <Text style={{ fontSize: 24, fontWeight: '700', color: colors.ink }}>{profile.me?.name?.split(' ')[0] || firstName(session?.user.email) || tr('friend')}</Text>
       </View>
     }>
+
+      {date === todayISO() ? <FeelingCard /> : null}
 
       <Card style={{ alignItems: 'center' }}>
         <WellBeingRing w={w} label={label} labelColor={w.logged ? bandColor : colors.muted} />
