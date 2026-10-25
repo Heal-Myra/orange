@@ -16,6 +16,7 @@ import { gentleToday } from '../lib/feeling';
 import { carePlan } from '../lib/care';
 import { todayISO } from '../lib/dates';
 import { hasVoice, speak, voiceLang } from '../lib/voice';
+import { useServerVoice } from '../lib/serverVoice';
 
 const Awake = optional(['ExpoKeepAwake'], () => require('expo-keep-awake') as typeof import('expo-keep-awake'));
 const C = { bg: '#10221F', ring: '#1C3934', ink: '#EAF2EF', muted: '#93AAA4', glow: '#E0794F', calm: '#6FB7A8' };
@@ -47,6 +48,9 @@ export default function Breathe() {
   // Every line spoken or shown, in the session's own language (built in for English and Hindi; translated once otherwise).
   const allLines = useMemo(() => Array.from(new Set([...steps.map(s => s.phase.cue), 'Begin'])), [steps]);
   const { say, loading: translating, error: trError } = useGuideText(gLang, allLines);
+  // Myra's natural voice (25 Oct 2026): each line made once on our server, then played from the saved file.
+  const spokenLines = useMemo(() => (translating ? [] : allLines.map(say)), [allLines, translating, gLang]); // eslint-disable-line react-hooks/exhaustive-deps
+  const { preparing } = useServerVoice(gLang, spokenLines, !translating);
 
   const [i, setI] = useState(-1); // -1 = not started
   const [playing, setPlaying] = useState(false);
@@ -119,10 +123,11 @@ export default function Breathe() {
           {pr?.caution ? <Text style={{ color: C.glow, fontSize: 14, lineHeight: 20 }}>{tr(pr.caution)}</Text> : null}
           {!pr && plan.some(s => s.id !== 'still' && practice(s.id).energising) ? <Text style={{ color: C.glow, fontSize: 14, lineHeight: 20 }}>{tr('Bhastrika and Kapalbhati are strong breaths: skip them if pregnant, or with high blood pressure, heart disease, hernia or recent surgery. Empty stomach. Stop if dizzy.')}</Text> : null}
           <Text style={{ color: C.muted, fontSize: 14 }}>{tr('Sit tall and comfortable. Turn the sound up to hear Myra\'s voice.')}</Text>
-          {translating ? <Text style={{ color: C.muted, fontSize: 14 }}>{tr('Myra is preparing the session in your language…')}</Text> : null}
+          {translating ? <Text style={{ color: C.muted, fontSize: 14 }}>{tr('Myra is preparing the session in your language…')}</Text>
+            : preparing ? <Text style={{ color: C.muted, fontSize: 14 }}>{tr('Preparing Myra\'s voice…')}</Text> : null}
           {trError ? <Text style={{ color: C.glow, fontSize: 14 }}>{trError}</Text> : null}
           {noVoice ? <Text style={{ color: C.muted, fontSize: 14 }}>{tr('This phone has no voice for this language yet, so the words will show on screen. In iPhone Settings › Accessibility › Spoken Content › Voices you can add one.')}</Text> : null}
-          <Pressable disabled={translating} onPress={() => { setI(0); setPlaying(true); }} accessibilityRole="button"
+          <Pressable disabled={translating || preparing} onPress={() => { setI(0); setPlaying(true); }} accessibilityRole="button"
             style={({ pressed }) => ({ backgroundColor: C.glow, borderRadius: 99, paddingVertical: 16, alignItems: 'center', opacity: pressed ? 0.8 : 1, marginTop: 8 })}>
             <Text style={{ color: '#fff', fontSize: 18, fontWeight: '700' }}>{tr('Start session')}</Text>
           </Pressable>

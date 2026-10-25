@@ -1069,4 +1069,5 @@ export const HI: Record<string, string> = {
   'Added to your cards today:': 'आज आपके कार्ड में जोड़ा गया:',
   'Food and drink': 'खाना और पीना',
   'Rest and sleep': 'आराम और नींद',
+  'Preparing Myra\'s voice…': 'मायरा की आवाज़ तैयार हो रही है…',
 };

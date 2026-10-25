@@ -14,6 +14,7 @@ import { momentOf } from '../lib/routine';
 import { useHeal } from '../lib/store';
 import { useGuideText } from '../lib/guideText';
 import { speak, voiceLang } from '../lib/voice';
+import { serverVoiceFor, useServerVoice } from '../lib/serverVoice';
 import { optional } from '../lib/native';
 import { nidraMinutes, nidraScript, type Stage } from '../lib/yogaNidra';
 
@@ -37,6 +38,11 @@ export default function YogaNidra() {
   const { say: sayIn, loading: translating } = useGuideText(gLang === 'hi' ? 'en' : gLang, useMemo(() => steps.map(s => s.en), [steps]));
   const lineOf = (st: { en: string; hi: string }) => (gLang === 'hi' ? st.hi : sayIn(st.en));
   const voice = voiceLang(gLang);
+  // Myra's natural voice (25 Oct 2026): every sentence made once on our server, then played from the saved file.
+  const natural = serverVoiceFor(gLang);
+  const spokenLines = useMemo(() => (translating ? [] : steps.map(lineOf)), [steps, translating, gLang]); // eslint-disable-line react-hooks/exhaustive-deps
+  const { preparing } = useServerVoice(gLang, spokenLines, !translating);
+  const canSpeak = !!Speech || natural;
 
   const [i, setI] = useState(-1);         // -1 = not started; steps.length = finished
   const [playing, setPlaying] = useState(false);
@@ -62,7 +68,7 @@ export default function YogaNidra() {
     const text = lineOf(step);
     const next = () => { timer.current = setTimeout(() => setI(n => n + 1), step.pause * 1000); };
     // A slow woman's voice with pauses between sentences (src/lib/voice.ts); words on screen when there is no voice.
-    const stop = Speech ? speak(text, voice, next) : (() => { timer.current = setTimeout(next, (text.split(/\s+/).length / 1.7) * 1000); return () => {}; })();
+    const stop = canSpeak ? speak(text, voice, next) : (() => { timer.current = setTimeout(next, (text.split(/\s+/).length / 1.7) * 1000); return () => {}; })();
     return () => { clear(); stop(); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [i, playing, steps, gLang, translating]);
@@ -75,7 +81,7 @@ export default function YogaNidra() {
   useEffect(() => { if (i >= steps.length) save(); }, [i, steps.length, save]);
   useEffect(() => () => { clear(); try { Awake?.deactivateKeepAwake('nidra'); } catch { /* fine */ } }, []);
 
-  const begin = () => { if (translating) return; saved.current = false; sat.current = 0; setI(0); setPlaying(true); };
+  const begin = () => { if (translating || preparing) return; saved.current = false; sat.current = 0; setI(0); setPlaying(true); };
   const close = () => { setPlaying(false); if (i >= 0) { if (since.current) { sat.current += Date.now() - since.current; since.current = null; } save(); } router.canGoBack() ? router.back() : router.replace('/'); };
 
   const step = i >= 0 && i < steps.length ? steps[i] : null;
@@ -96,11 +102,11 @@ export default function YogaNidra() {
               {tr('About {n} minutes. Lie on your back, eyes closed, and follow Myra\'s voice. Keep the body still; the mind stays gently awake.', { n: total })}
             </Text>
             <Text style={{ color: NIGHT.muted, fontSize: 14, lineHeight: 21 }}>
-              {Speech ? tr('Turn the sound up. If the phone is on silent, switch silent off so you can hear the voice.') : tr('Voice guidance comes with the next app version. For now the words appear here at a calm pace.')}
+              {canSpeak ? tr('Turn the sound up. If the phone is on silent, switch silent off so you can hear the voice.') : tr('Voice guidance comes with the next app version. For now the words appear here at a calm pace.')}
             </Text>
             <Pressable onPress={begin} accessibilityRole="button"
               style={({ pressed }) => ({ backgroundColor: NIGHT.glow, borderRadius: 99, paddingVertical: 16, alignItems: 'center', opacity: pressed ? 0.8 : 1, marginTop: 8 })}>
-              <Text style={{ color: '#fff', fontSize: 18, fontWeight: '700' }}>{tr('Begin Yoga Nidra')}</Text>
+              <Text style={{ color: '#fff', fontSize: 18, fontWeight: '700' }}>{translating || preparing ? tr('Preparing Myra\'s voice…') : tr('Begin Yoga Nidra')}</Text>
             </Pressable>
           </>
         ) : done ? (

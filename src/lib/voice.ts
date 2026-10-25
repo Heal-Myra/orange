@@ -4,6 +4,7 @@
 // With no voice for the language the session still plays, silently, with the words on screen.
 import { Platform } from 'react-native';
 import { optional } from './native';
+import { playUrl, sentences, serverVoiceFor, urlFor } from './serverVoice';
 
 const Speech = optional(['ExpoSpeech'], () => require('expo-speech') as typeof import('expo-speech'));
 const web = Platform.OS === 'web' && typeof window !== 'undefined' && 'speechSynthesis' in window ? window.speechSynthesis : null;
@@ -53,18 +54,31 @@ export async function pickVoice(bcp47: string): Promise<Picked | null> {
   return best;
 }
 
-/** Whether a voice exists for this language. */
-export async function hasVoice(bcp47: string): Promise<boolean> { return (await pickVoice(bcp47)) != null; }
+/** Whether a voice exists for this language: Myra's natural server voice (build 11 onward) or one on the phone. */
+export async function hasVoice(bcp47: string): Promise<boolean> {
+  return serverVoiceFor(bcp47.slice(0, 2).toLowerCase()) || (await pickVoice(bcp47)) != null;
+}
 
 /** Rates: guide = slow and calm. iOS multiplies by its default speed, so 0.8 is about 20% slower than normal speech. */
 const RATE = { guide: Platform.OS === 'ios' ? 0.78 : 0.82, normal: 0.95 };
 
 /** Speak, sentence by sentence with a short pause between, then call done. Returns a stop function. */
 export function speak(text: string, bcp47: string, done: () => void, opts: { pace?: 'guide' | 'normal'; pauseMs?: number } = {}): () => void {
-  let stopped = false, timer: ReturnType<typeof setTimeout> | null = null;
-  const parts = (text.match(/[^.!?।…]+[.!?।…]*/g) ?? [text]).map(x => x.trim()).filter(Boolean);
+  let stopped = false, timer: ReturnType<typeof setTimeout> | null = null, stopFile: (() => void) | null = null;
+  const parts = sentences(text);
+  const code = bcp47.slice(0, 2).toLowerCase();
   const rate = RATE[opts.pace ?? 'guide'], pause = opts.pauseMs ?? 650;
   const finish = () => { if (!stopped) { stopped = true; done(); } };
+  // Myra's natural voice when every sentence has its saved file; otherwise the phone's own voice.
+  if (parts.length && parts.every(p => urlFor(code, p))) {
+    const play = (k: number) => {
+      if (stopped) return;
+      if (k >= parts.length) { finish(); return; }
+      stopFile = playUrl(urlFor(code, parts[k])!, () => { if (!stopped) timer = setTimeout(() => play(k + 1), k + 1 < parts.length ? pause : 0); });
+    };
+    play(0);
+    return () => { stopped = true; if (timer) clearTimeout(timer); stopFile?.(); };
+  }
   if (!web && !Speech) { setTimeout(finish, 0); return () => { stopped = true; }; }
   const say = (k: number, picked: Picked | null) => {
     if (stopped) return;

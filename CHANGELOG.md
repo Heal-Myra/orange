@@ -4,6 +4,7 @@
 - To-dos (24 Oct): Pick a date from a month calendar when adding or moving a task; full days (3 in the group) are greyed.
 - Guided sessions (24 Oct, founder's test on build 10): a woman's voice, slower with pauses, softer wording, fewer repeated cues; voice language English, Hindi or regional (translated once, kept on the phone).
 - Quick updates apply by themselves (25 Oct): the app checks for a new version whenever it comes to the front and restarts into it when the person returns after a minute away (never during a guided session). Profile shows the running version.
+- Myra's natural voice (25 Oct, decision 0030): a calm woman's voice made once with Google and kept in our own storage, for guided breathing and Yoga Nidra in English, Hindi, Gujarati, Tamil, Bengali, Marathi, Telugu, Kannada, Malayalam, Urdu and Punjabi. Needs build 11 (adds expo-audio); older builds keep the phone's voice.
 - Names (25 Oct, decision 0029): betterhum.ai and behealed.ai noted as alternate names to keep in mind; Happy Orange stays.
 - Care plan off when well (25 Oct): "I feel okay", "my cold is gone" or "no cold now" clears every care card; only problems still present count.
 - Care plan woven into the cards (25 Oct, founder): food and drink (with what to avoid) in Food, rest in Sleep, movement in Movement, in Breathing & meditation the guided practice itself becomes "Care breathing for your cold" (no separate box, to avoid a duplicate). Today keeps a short Care plan card as the last card on the page, linking to each.

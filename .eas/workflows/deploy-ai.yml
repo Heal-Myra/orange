@@ -1,4 +1,4 @@
-# Publishes the AI server function (supabase/functions/heal-ai) to the Supabase project in Mumbai,
+# Publishes the AI server function (supabase/functions/heal-ai) and Myra's voice function (supabase/functions/voice) to the Supabase project in Mumbai,
 # only when that function changes. Tests run before every push on Claude's side; the website
 # (app.happyorange.in) is published by Cloudflare Pages, so EAS no longer deploys the web build.
 # Free plan: 60 CI minutes a month (founder, 20 Oct 2026), so keep this job small.
@@ -22,3 +22,4 @@ jobs:
             exit 0
           fi
           npx -y supabase@2.121.0 functions deploy heal-ai --project-ref vjhzlszubdinmesfvmex --use-api
+          npx -y supabase@2.121.0 functions deploy voice --project-ref vjhzlszubdinmesfvmex --use-api

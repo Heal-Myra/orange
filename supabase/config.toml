@@ -3,3 +3,6 @@ project_id = "vjhzlszubdinmesfvmex"
 
 [functions.heal-ai]
 verify_jwt = true
+
+[functions.voice]
+verify_jwt = true
