@@ -62,3 +62,22 @@ export function carePlan(symptoms: Symptom[]): Care | null {
     doctor: list.map(c => c.doctor).filter(Boolean).join(' ') || undefined,
   };
 }
+
+export type CarePart = 'food' | 'breath' | 'move' | 'rest';
+
+/** Which card an "avoid" line belongs in. */
+export function avoidPart(a: string): CarePart {
+  if (/Kapalbhati|Bhastrika|breathing/i.test(a)) return 'breath';
+  if (/exercise|workout|poses|core/i.test(a)) return 'move';
+  if (/screen/i.test(a)) return 'rest';
+  return 'food';
+}
+
+/** The care lines for one card (founder, 25 Oct 2026: each part goes into the card where it is done). */
+export function careFor(c: Care, part: CarePart): { lines: string[]; avoid: string[] } {
+  const avoid = c.avoid.filter(a => avoidPart(a) === part);
+  const nidra = (c.breath as string[]).includes('nidra');
+  const lines = part === 'food' ? c.food : part === 'move' ? [c.move] : part === 'rest' ? [c.rest]
+    : [nidra ? 'Yoga Nidra, lying down, to rest deeply.' : 'A 10-minute care session, made for this.'];
+  return { lines, avoid };
+}

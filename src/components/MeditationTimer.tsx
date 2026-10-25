@@ -10,6 +10,7 @@ import { newGoal, todaysLength } from '../lib/meditationPlan';
 import { lang, locale } from '../lib/i18n';
 import { MESSAGE_LANGS } from '../lib/foodPlan';
 import { carePlan } from '../lib/care';
+import { CareNote } from './CareCard';
 import { hasVoice, voiceLang } from '../lib/voice';
 import { Ionicons } from '@expo/vector-icons';
 import { PRACTICES, type PracticeId } from '../lib/pranayama';
@@ -72,6 +73,7 @@ export function MeditationTimer() {
       <Heading right={<Score value={Math.min(30, (30 * done) / target)} max={30} />}>{tr('Breathing & meditation')}</Heading>
       {!sitting ? (
         <>
+          <CareNote part="breath" />
           <Note>{plan ? tr('Today\'s plan: {m} minutes, on the way to {goal} minutes a day.', { m: plan.minutes, goal: goal!.minutes })
             : done >= target ? tr('You have sat {done} minutes today. Lovely. Another short sit is always welcome.', { done }) : tr('Suggested now: {suggested} minutes (today {done} of {target}).', { suggested, done, target })}</Note>
           <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>

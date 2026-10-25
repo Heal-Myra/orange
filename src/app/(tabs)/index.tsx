@@ -30,7 +30,6 @@ export default function Today() {
     }>
 
       {date === todayISO() ? <FeelingCard /> : null}
-      {date === todayISO() ? <CareCard /> : null}
 
       <Card style={{ alignItems: 'center' }}>
         <WellBeingRing w={w} label={label} labelColor={w.logged ? bandColor : colors.muted} />
@@ -39,6 +38,7 @@ export default function Today() {
       <PillarTiles w={w} />
 
       <GuidanceCard />
+      <CareCard />
 
       <View style={{ paddingHorizontal: 4 }}>
         <Note>{tr('Well-being = Body + Mind + Soul, each out of 100. A working model, not a medical measure.')}</Note>

@@ -10,3 +10,7 @@ for that consumer shall get activated: food, exercise, meditation and other acti
   Bhramari; fever: Yoga Nidra), the Food card shows what suits it, the Movement card says how much to move, Myra's
   suggestions and tomorrow's food plan follow it (decision 0023).
 - Everyday, traditional self-care; never a diagnosis or a medicine.
+
+
+## Update, 25 Oct 2026: woven into the cards
+Founder: the care plan should live in the cards where each thing is done, and sit below Myra recommends on Today. Food and drink plus food-related "avoid" lines go in Food; rest and screen limits in Sleep; movement and exercise limits in Movement; the care session button and breathing warnings in Breathing & meditation (`careFor` in `src/lib/care.ts`). Today keeps a short pointer card below Myra recommends with links, the see-a-doctor line and the self-care note.

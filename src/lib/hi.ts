@@ -1064,4 +1064,9 @@ export const HI: Record<string, string> = {
   'Version': 'संस्करण',
   'built-in': 'मूल',
   'update': 'अपडेट',
+  'For {what}': '{what} के लिए',
+  'Avoid: {list}': 'इनसे बचें: {list}',
+  'Added to your cards today:': 'आज आपके कार्ड में जोड़ा गया:',
+  'Food and drink': 'खाना और पीना',
+  'Rest and sleep': 'आराम और नींद',
 };
