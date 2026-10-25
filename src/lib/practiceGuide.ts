@@ -120,3 +120,27 @@ export function checksFor(s: GuideStep): Check[] {
   if (s.breath !== 'none') c.push({ kind: 'breath', breath: s.breath, seconds: s.seconds });
   return c;
 }
+
+// ---------- The guide character in the guided session (founder, 25 Oct 2026: "the character doing the exercise with the user") ----------
+type SessionPhase = { kind: 'in' | 'hold' | 'out' | 'pump' | 'hum' | 'chant' | 'rest'; seconds: number; side?: 'left' | 'right'; cue: string };
+
+/** What the guide character does during one phase of a guided session, so it breathes along with the person. */
+export function sessionStep(id: PracticeId | 'still', ph: SessionPhase): GuideStep {
+  const breath: Breath = ph.kind === 'rest' ? 'none' : ph.kind;
+  const pose: Pose = { ...SIT };
+  let through: Through | undefined = breath === 'none' || breath === 'hold' ? undefined : 'nose';
+  if (id === 'anulom') {
+    // Breathing on the left: the thumb closes the right nostril; on the right: the ring finger closes the left.
+    pose.right = ph.side === 'right' ? 'ring' : ph.side === 'left' ? 'thumb' : 'mudra';
+    if (ph.side) through = ph.side;
+  } else if (id === 'bhramari') {
+    pose.right = 'ear'; pose.left = 'ear';
+  } else if (id === 'sheetali' && ph.kind === 'in') {
+    pose.mouth = 'tongue'; through = 'mouth';
+  } else if (id === 'udgeeth' && ph.kind === 'chant') {
+    pose.mouth = 'om'; through = 'mouth';
+  } else if (id === 'kapalbhati' && ph.kind === 'rest') {
+    pose.right = 'knee';
+  }
+  return { pose, breath, through, seconds: Math.max(0.5, ph.seconds), say: ph.cue };
+}

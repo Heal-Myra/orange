@@ -17,7 +17,8 @@ import { carePlan } from '../lib/care';
 import { todayISO } from '../lib/dates';
 import { hasVoice, speak, voiceLang } from '../lib/voice';
 import { useServerVoice } from '../lib/serverVoice';
-import { hasGuide } from '../lib/practiceGuide';
+import { hasGuide, sessionStep } from '../lib/practiceGuide';
+import { GuideFigure } from '../components/GuideFigure';
 
 const Awake = optional(['ExpoKeepAwake'], () => require('expo-keep-awake') as typeof import('expo-keep-awake'));
 const C = { bg: '#10221F', ring: '#1C3934', ink: '#EAF2EF', muted: '#93AAA4', glow: '#E0794F', calm: '#6FB7A8' };
@@ -46,6 +47,8 @@ export default function Breathe() {
     return [...head, ...phasesFor({ ...seg, seconds: Math.max(10, seg.seconds - introSec) }).map(ph => ({ seg: k, phase: ph, rep: (seen[ph.cue] = (seen[ph.cue] ?? -1) + 1) }))];
   }), [plan]);
   const totalSec = useMemo(() => steps.reduce((t, s) => t + s.phase.seconds, 0), [steps]);
+  // The guide character breathes along with the person (founder, 25 Oct 2026), one pose per phase.
+  const figSteps = useMemo(() => steps.map(st => sessionStep(plan[st.seg].id, st.phase)), [steps, plan]);
   // Every line spoken or shown, in the session's own language (built in for English and Hindi; translated once otherwise).
   const allLines = useMemo(() => Array.from(new Set([...steps.map(s => s.phase.cue), 'Begin'])), [steps]);
   const { say, loading: translating, error: trError } = useGuideText(gLang, allLines);
@@ -151,17 +154,8 @@ export default function Breathe() {
             <Text style={{ color: C.muted, fontSize: 13, fontVariant: ['tabular-nums'] }}>{Math.floor(left / 60)}:{String(Math.round(left % 60)).padStart(2, '0')}</Text>
           </View>
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-            {/* Nostrils for Anulom Vilom */}
-            {step?.phase.side ? (
-              <View style={{ flexDirection: 'row', gap: D * 0.9, position: 'absolute', top: '18%' }}>
-                {(['left', 'right'] as const).map(sd => (
-                  <Text key={sd} style={{ color: step.phase.side === sd ? C.glow : C.muted, opacity: step.phase.side === sd ? 1 : 0.35, fontSize: 18, fontWeight: '700' }}>{sd === 'left' ? tr('Left') : tr('Right')}</Text>
-                ))}
-              </View>
-            ) : null}
-            <View style={{ width: D, height: D, borderRadius: D / 2, borderWidth: 2, borderColor: C.ring, alignItems: 'center', justifyContent: 'center' }}>
-              <Animated.View style={{ width: D, height: D, borderRadius: D / 2, backgroundColor: step?.phase.kind === 'hum' || step?.phase.kind === 'chant' ? C.glow + '55' : C.calm + '55', transform: [{ scale: size }] }} />
-            </View>
+            {/* Myra's guide character does the practice with the person: hands, nostrils, breath, hum (placeholder art, decision 0032). */}
+            {i >= 0 && i < figSteps.length ? <GuideFigure step={figSteps[i]} playing={playing} size={Math.min(300, D + 40)} /> : null}
             <Text style={{ color: C.ink, fontSize: step?.intro ? 18 : 26, fontWeight: '600', textAlign: 'center', marginTop: 28, paddingHorizontal: 28, lineHeight: step?.intro ? 26 : 34 }}>
               {step ? say(step.phase.cue) : ''}
             </Text>

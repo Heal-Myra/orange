@@ -25,3 +25,14 @@ describe('practice explainers', () => {
     }
   });
 });
+
+describe('guide character in the session', () => {
+  it('closes the right nostril when breathing on the left, and the left when on the right', async () => {
+    const { sessionStep } = await import('./practiceGuide');
+    expect(sessionStep('anulom', { kind: 'in', seconds: 4, side: 'left', cue: '' }).pose.right).toBe('thumb');
+    expect(sessionStep('anulom', { kind: 'out', seconds: 6, side: 'right', cue: '' }).pose.right).toBe('ring');
+    expect(sessionStep('bhramari', { kind: 'hum', seconds: 8, cue: '' }).pose.left).toBe('ear');
+    expect(sessionStep('sheetali', { kind: 'in', seconds: 4, cue: '' }).through).toBe('mouth');
+    expect(sessionStep('still', { kind: 'rest', seconds: 60, cue: '' }).breath).toBe('none');
+  });
+});
