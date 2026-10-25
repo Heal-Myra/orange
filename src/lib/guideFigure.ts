@@ -11,7 +11,8 @@ export type Shape =
   | { t: 'ellipse'; cx: number; cy: number; rx: number; ry: number; stroke?: string; fill?: string; w?: number; o?: number; dash?: string };
 
 // Calm sky tones (founder, 25 Oct 2026: the dark background was too dark).
-export const FIG = { w: 320, h: 330, ink: '#2F5D66', fill: '#FFFFFF', glow: '#E0794F', air: '#3E9CC4', shade: '#D3E6F1' };
+// Myra's look (founder, 25 Oct 2026: option 6, Indigo): white top, indigo trousers, dark hair in a bun, warm skin tone.
+export const FIG = { w: 320, h: 330, ink: '#2F5D66', fill: '#FFFFFF', bottom: '#3E4C8C', skin: '#E9B994', hair: '#2B2320', glow: '#E0794F', air: '#3E9CC4', shade: '#D3E6F1' };
 
 // Body landmarks (person's right is the viewer's left).
 const HEAD: Pt = [160, 84];
@@ -88,7 +89,7 @@ function arm(s: Pt, h: HandAt, outward: -1 | 1, settled: boolean): Shape[] {
     const cx = (hx + tx) / 2, cy = Math.min(hy, ty) - (Math.abs(tx - hx) > 14 ? 10 : 2);
     out.push({ t: 'path', d: `M${f(hx)} ${f(hy)} Q${f(cx)} ${f(cy)} ${f(tx)} ${f(ty)}`, stroke: FIG.ink, w: 4.5 });
   }
-  out.push({ t: 'circle', cx: f(h.hand[0]), cy: f(h.hand[1]), r: 8.5, fill: FIG.fill, stroke: FIG.ink, w: 2.2 });
+  out.push({ t: 'circle', cx: f(h.hand[0]), cy: f(h.hand[1]), r: 8.5, fill: FIG.skin, stroke: FIG.ink, w: 2.2 });
   if (h.tip && settled) out.push({ t: 'circle', cx: f(h.tip[0]), cy: f(h.tip[1]), r: 4.6, fill: FIG.glow });
   return out;
 }
@@ -108,15 +109,19 @@ export function figure(s: FigureState): Shape[] {
   const belly = s.breath === 'pump' ? -6 * Math.exp(-frac(s.time) * 6) : 0; // belly snaps in on each pump
   // Floor shadow, seated legs.
   out.push({ t: 'ellipse', cx: 160, cy: 304, rx: 122, ry: 9, fill: FIG.shade, o: 0.9 });
-  out.push({ t: 'path', d: 'M56 284 C96 254 224 254 264 284 C246 306 74 306 56 284 Z', fill: FIG.fill, stroke: FIG.ink, w: 2.2 });
-  out.push({ t: 'path', d: 'M112 287 C142 276 178 276 208 287', stroke: FIG.ink, w: 1.6, o: 0.55 });
+  out.push({ t: 'path', d: 'M56 284 C96 254 224 254 264 284 C246 306 74 306 56 284 Z', fill: FIG.bottom, stroke: FIG.ink, w: 2.2 });
+  out.push({ t: 'path', d: 'M112 287 C142 276 178 276 208 287', stroke: FIG.fill, w: 1.6, o: 0.45 });
+  out.push({ t: 'ellipse', cx: 128, cy: 296, rx: 11, ry: 6, fill: FIG.skin, stroke: FIG.ink, w: 2 });
+  out.push({ t: 'ellipse', cx: 192, cy: 296, rx: 11, ry: 6, fill: FIG.skin, stroke: FIG.ink, w: 2 });
   // Torso (breathes), neck, head.
   const x = (dx: number) => f(160 + dx);
   out.push({ t: 'path', fill: FIG.fill, stroke: FIG.ink, w: 2.2, d:
     `M${x(-46 * w)} 152 C${x(-58 * w)} 196 ${x(-52 * w + belly * -1)} 238 ${x(-44)} 270 L${x(44)} 270 ` +
     `C${x(52 * w + belly)} 238 ${x(58 * w)} 196 ${x(46 * w)} 152 C${x(22)} 142 ${x(-22)} 142 ${x(-46 * w)} 152 Z` });
-  out.push({ t: 'path', d: 'M152 116 L152 146 Q160 150 168 146 L168 116', fill: FIG.fill, stroke: FIG.ink, w: 2.2 });
-  out.push({ t: 'circle', cx: HEAD[0], cy: HEAD[1], r: 35, fill: FIG.fill, stroke: FIG.ink, w: 2.2 });
+  out.push({ t: 'path', d: 'M152 116 L152 146 Q160 150 168 146 L168 116', fill: FIG.skin, stroke: FIG.ink, w: 2.2 });
+  out.push({ t: 'circle', cx: 160, cy: 45, r: 12, fill: FIG.hair, stroke: FIG.ink, w: 2 }); // hair bun
+  out.push({ t: 'circle', cx: HEAD[0], cy: HEAD[1], r: 35, fill: FIG.skin, stroke: FIG.ink, w: 2.2 });
+  out.push({ t: 'path', d: 'M125 84 Q127 50 160 49 Q193 50 195 84 Q184 64 160 63 Q136 64 125 84 Z', fill: FIG.hair, stroke: FIG.ink, w: 1.8 });
   // Face: closed eyes, nose, mouth.
   out.push({ t: 'path', d: 'M141 82 q6.5 5 13 0 M166 82 q6.5 5 13 0', stroke: FIG.ink, w: 2 });
   out.push({ t: 'path', d: 'M160 84 L156.5 99 Q160 102 163.5 99', stroke: FIG.ink, w: 1.8 });

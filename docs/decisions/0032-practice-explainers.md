@@ -19,3 +19,5 @@ errors, and could not be reused by a camera check. Instead:
 4. **Camera check (later):** on-phone body and hand tracking (nothing uploaded) compared against `checksFor`, plus the
    microphone for humming, Om and Kapalbhati pumps.
 AI video may still be used for marketing (App Store previews, social posts).
+
+Myra's look (25 Oct 2026, founder): option 6, Indigo: white top, indigo trousers (#3E4C8C), dark hair in a bun, warm Indian skin tone (#E9B994). The seated in-app figure uses it now; the full-body skeleton character (standing, tree pose) follows with the asanas.
