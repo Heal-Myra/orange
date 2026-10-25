@@ -26,12 +26,12 @@ Learning was removed from Mind on 24 Oct 2026.
 ## Soul (100)
 | Part | Points | How |
 | --- | --- | --- |
-| Gratitude | 40 | 10 for each thing written, up to four |
-| Daily Wisdom | 30 | read the day's passage, open its meaning, tick "studied" |
-| Tao practice | 30 | the day's Tao Te Ching practice done (the card moved here from Mind on 24 Oct 2026) |
+| Gratitude | 30 | 7.5 for each thing written, up to four |
 | Love | 30 | whom I will love today, chosen (12) + how I will love myself today, chosen (12) + one of them done (6) |
+| Daily Wisdom | 20 | read the day's passage, open its meaning, tick "studied" |
+| Tao practice | 20 | the day's Tao Te Ching practice done (the card moved here from Mind on 24 Oct 2026) |
 
-The parts add up to 130; Soul is held at 100 until the founder decides what to trim.
+Founder's split, 25 Oct 2026 (before: 40 + 30 + 30 + 30 = 130, held at 100).
 
 ## Bands
 240+ Flourishing · 180+ Balanced · 120+ Finding your footing · below 120 Needs care.

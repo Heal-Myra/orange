@@ -99,10 +99,9 @@ export function bodyScore(d: DayLog, P: Profile): BodyScore | null {
  * Points per part (founder, 24 Oct 2026): no bonuses.
  * Body = Food 40 + Sleep 30 + Movement 30.
  * Mind = Focus to-dos 40 + Breathing & meditation 30 + Phone activity 30 (Learning removed).
- * Soul = Gratitude 40 + Daily Wisdom 30 + Tao practice 30 + Love 30 — adds up to 130, so Soul is held at 100 until the
- * founder decides what to trim.
+ * Soul = Gratitude 30 + Love 30 + Daily Wisdom 20 + Tao practice 20 = 100 (founder, 25 Oct 2026, ending the 130 overrun).
  */
-export const POINTS = { food: 40, sleep: 30, movement: 30, focus: 40, meditation: 30, phone: 30, gratitude: 40, wisdom: 30, tao: 30, love: 30 } as const;
+export const POINTS = { food: 40, sleep: 30, movement: 30, focus: 40, meditation: 30, phone: 30, gratitude: 30, wisdom: 20, tao: 20, love: 30 } as const;
 export const FOCUS_EACH = POINTS.focus / 2;          // each of up to two focus to-dos
 export const GRATITUDE_EACH = POINTS.gratitude / 4;  // each of up to four gratitudes
 
@@ -146,9 +145,9 @@ export const countGratitude = (list?: (string | null | undefined)[]) =>
 
 export interface SoulScore {
   total: number;
-  gratitude: number; // /40, 10 each up to four things
+  gratitude: number; // /30, 7.5 each up to four things
   verse: number;     // /30 Daily Wisdom studied
-  tao: number;       // /30 the day's Tao practice done
+  tao: number;       // /20 the day's Tao practice done
   love: number;      // /30: whom I love today 12, how I love myself 12, one of them done 6
 }
 

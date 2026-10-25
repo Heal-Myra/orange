@@ -2,7 +2,7 @@
 // This is Happy Orange's own practice guide, not a translation of the Tao Te Ching.
 // Since 24 Oct 2026 every day's practice sits on the Soul tab (founder); doing it scores TAO_POINTS of Soul (see docs/scoring.md).
 
-export const TAO_POINTS = 30; // Soul, 30 (founder, 24 Oct 2026)
+export const TAO_POINTS = 20; // Soul, 20 (founder, 25 Oct 2026; was 30)
 
 export interface TaoDay {
   weekday: number; // 0 = Sunday … 6 = Saturday (JavaScript getDay)

@@ -10,3 +10,7 @@ Date: 24 Oct 2026 · Decided by: founder
   switched off, for a later use.
 - Bedtime's Yoga Nidra suggestion now shows as Mind (with Breathing & meditation).
 - Older bonuses replaced: reflected actions no longer change Soul; Learning and Tao bonuses are gone.
+
+## Update, 25 Oct 2026: Soul trimmed to 100
+Founder's split: Gratitude 30 (7.5 each, up to four) + Love 30 + Daily Wisdom 20 + Tao practice 20 = 100. Ends the
+130 overrun that was held at 100. Body and Mind unchanged.

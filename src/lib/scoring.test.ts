@@ -103,30 +103,30 @@ describe('mind (focus to-dos 40, meditation 30, phone activity 30)', () => {
   });
 });
 
-describe('soul (gratitude 40, Daily Wisdom 30, Tao 30, love 30; held at 100)', () => {
+describe('soul (gratitude 30, love 30, Daily Wisdom 20, Tao 20)', () => {
   it('no longer scores the eight practices or reflected actions', () => {
     const d = day();
     d.dharma = { satya: true, nyaya: true };
     d.actions = [{ text: 'helped', principle: 'Seva', alignment: 2 }];
     expect(soulScore(d)).toBeNull();
   });
-  it('scores Daily Wisdom 30 and gratitude 10 each up to four', () => {
+  it('scores Daily Wisdom 20 and gratitude 7.5 each up to four', () => {
     const d = day();
     d.soul = { verseStudied: true, gratitude: ['family', 'health', 'rain', 'tea', 'books'] };
     const s = soulScore(d)!;
-    expect([s.verse, s.gratitude, s.total]).toEqual([30, 40, 70]);
+    expect([s.verse, s.gratitude, s.total]).toEqual([20, 30, 50]);
   });
-  it('scores the Tao practice 30 on any day', () => {
+  it('scores the Tao practice 20 on any day', () => {
     const d = emptyDay('2026-10-21');
     d.tao = { done: true };
-    expect(soulScore(d)!.tao).toBe(30);
+    expect(soulScore(d)!.tao).toBe(20);
     expect(mindScore(d, P)).toBeNull();
   });
   it('skips empty gratitude boxes instead of crashing', () => {
     const d = { ...emptyDay('2026-10-23'), soul: { gratitude: [null, null, 'My family'] as unknown as string[] } };
-    expect(soulScore(d)!.gratitude).toBe(10);
+    expect(soulScore(d)!.gratitude).toBe(7.5);
   });
-  it('scores love: whom 12, myself 12, done 6, and holds Soul at 100', () => {
+  it('scores love: whom 12, myself 12, done 6; everything done is exactly 100', () => {
     const d = { ...emptyDay('2026-10-24'), love: { whom: 'Talk to a friend', self: 'A coffee or a treat', done: true } };
     expect(soulScore(d)!.love).toBe(30);
     const full = { ...d, tao: { done: true }, soul: { gratitude: ['a', 'b', 'c', 'd'], verseStudied: true } };

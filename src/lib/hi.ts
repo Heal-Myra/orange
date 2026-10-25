@@ -1127,4 +1127,5 @@ export const HI: Record<string, string> = {
   'Breathe out with a long, soft Om: mostly O, then a gentle M.': 'लंबे, कोमल ॐ के साथ साँस छोड़िए: ज़्यादातर ओ, फिर हल्का म।',
   'Feel the stillness after the sound.': 'आवाज़ के बाद की शांति महसूस कीजिए।',
   'Sharing is not available here. Send this link yourself: https://testflight.apple.com/join/Mcp2jHbc': 'यहाँ शेयर नहीं हो सकता। यह लिंक खुद भेजें: https://testflight.apple.com/join/Mcp2jHbc',
+  'Up to four things, 30 points.': 'चार बातों तक, 30 अंक।',
 };

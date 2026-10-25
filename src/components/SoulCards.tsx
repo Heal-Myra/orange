@@ -1,11 +1,11 @@
 // Soul tab cards: Gita verse to study, thought of the day, gratitude, and one simple check for the eight practices.
-// Points (docs/scoring.md): gratitude 10 each up to four (40), meditation 30, Daily Wisdom 30 (founder, 21 Oct 2026).
+// Points (docs/scoring.md): gratitude 7.5 each up to four (30), Daily Wisdom 20 (founder, 25 Oct 2026).
 
 import { Pressable, Text, TextInput, View } from 'react-native';
 import { useAuth } from '../lib/auth';
 import { verseOfDay } from '../lib/gita';
 import { passageOfDay, sourceOf, traditionName } from '../lib/wisdom';
-import { PRACTICES } from '../lib/scoring';
+import { POINTS, PRACTICES } from '../lib/scoring';
 import { useHeal } from '../lib/store';
 import { thoughtOfDay } from '../lib/thoughts';
 import { colors } from '../theme';
@@ -48,7 +48,7 @@ export function VerseStudyCard() {
       <TextField key={date + 'verse'} label={tr('What it means to me today')} value={so.verseNote ?? ''} multiline
         onChangeText={t => update(d => { d.soul = { ...d.soul, verseNote: t }; })} placeholder={tr('One line is enough')} />
       <Check checked={!!so.verseStudied} onToggle={() => update(d => { d.soul = { ...d.soul, verseStudied: !d.soul?.verseStudied }; })}
-        title={tr('I studied today\'s wisdom')} points={30} />
+        title={tr('I studied today\'s wisdom')} points={POINTS.wisdom} />
     </Card>
   );
 }
@@ -96,7 +96,7 @@ export function GratitudeCard() {
             onFocus={() => setTimeout(keep, 300)} onContentSizeChange={() => keep()} />
         </View>
       ))}
-      <Note>{filled ? tr('{n} of 4 written.', { n: Math.min(4, filled) }) : tr('10 points each, up to 40.')}</Note>
+      <Note>{filled ? tr('{n} of 4 written.', { n: Math.min(4, filled) }) : tr('Up to four things, 30 points.')}</Note>
     </Card>
   );
 }
