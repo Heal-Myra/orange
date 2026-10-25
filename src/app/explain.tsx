@@ -15,7 +15,8 @@ import { useServerVoice } from '../lib/serverVoice';
 import { useHeal } from '../lib/store';
 import { speak, voiceLang } from '../lib/voice';
 
-const C = { bg: '#EAF4FA', ink: '#24414A', muted: '#6B8794', glow: '#E0794F', track: '#CFE2EC' };
+// Sky blue with black text (founder's choice, 25 Oct 2026).
+const C = { bg: '#C4E4F8', ink: '#111111', muted: '#41606E', glow: '#E0794F', track: '#A9CDE3' };
 
 export default function Explain() {
   const { profile } = useHeal();

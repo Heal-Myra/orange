@@ -160,7 +160,7 @@ export function figure(s: FigureState): Shape[] {
 }
 
 /** The same picture as an SVG string (previews and tests). */
-export function figureSvg(s: FigureState, bg = '#EAF4FA'): string {
+export function figureSvg(s: FigureState, bg = '#C4E4F8'): string {
   const a = (sh: Shape) => `${sh.stroke ? ` stroke="${sh.stroke}"` : ''} fill="${sh.fill ?? 'none'}"${sh.w ? ` stroke-width="${sh.w}"` : ''}${sh.o != null ? ` opacity="${sh.o}"` : ''} stroke-linecap="round" stroke-linejoin="round"`;
   const body = figure(s).map(sh => sh.t === 'path' ? `<path d="${sh.d}"${a(sh)}${sh.dash ? ` stroke-dasharray="${sh.dash}"` : ''}/>`
     : sh.t === 'circle' ? `<circle cx="${sh.cx}" cy="${sh.cy}" r="${sh.r}"${a(sh)}/>`
