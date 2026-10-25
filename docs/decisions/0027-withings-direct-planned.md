@@ -15,3 +15,15 @@ Myra's food suggestions, so it must arrive by itself.
 - Server: store the person's Withings tokens (new table, own rows only), subscribe to Withings notifications for weight; on each
   notification fetch the new measures (weight, body fat) and save them to that day's log; refresh tokens as needed.
 - Apple Health stays for steps, sleep and heart; a reading from Withings wins over an older one from Apple Health.
+
+## Update, 25 Oct 2026: not doing the direct connection
+When registering the app, the Withings API terms (version of 13 Oct 2026) showed three blockers: Withings data may not be
+used to "prompt or otherwise provide input or data to an AI Model" without Withings' written agreement (section 11.2;
+Myra is an AI); each user needs a paid Withings+ subscription (5.2); and only 10 users until Withings reviews the app (5.5).
+The founder agreed to drop it. The terms were not accepted; only an empty organization "Happy Orange" was created on the
+Withings developer dashboard.
+
+Instead: weight keeps coming Withings app → Apple Health → Happy Orange (the person's own data on their phone), and a
+local reminder at 3 pm says "No weight today yet. Open the Withings app once to sync it." when today has no weight
+(only for people whose scale weighings reached the app in the last two weeks; `src/lib/weightNudge.ts`). Tapping it opens
+Body › Body. HealthKit background delivery was considered and left out: the delay is in the Withings app, not ours.

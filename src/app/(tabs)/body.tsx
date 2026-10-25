@@ -95,7 +95,7 @@ export default function Body() {
       </Card></Anchor>
 
       {h || profile.me ? (
-        <Card>
+        <Anchor id="body"><Card>
           <Heading>{tr('Body')}</Heading>
           <Rows>
             <StatRow first label={tr('Weight')} value={h?.weightKg ?? profile.me?.weightKg} unit="kg" decimal
@@ -106,7 +106,7 @@ export default function Body() {
             {h?.bodyFatPct != null ? <StatRow label={tr('Body fat')} value={h.bodyFatPct} unit="%" /> : null}
             {profile.me ? <StatRow label="BMI" value={Math.round(bmiOf(h?.weightKg ?? profile.me.weightKg, profile.me.heightCm) * 10) / 10} /> : null}
           </Rows>
-        </Card>
+        </Card></Anchor>
       ) : null}
 
       {h && (h.restingHr != null || h.hrv != null || h.vo2max != null) ? (

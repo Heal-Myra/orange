@@ -50,6 +50,8 @@ export function HealthProvider({ children }: { children: ReactNode }) {
       for (const k of ['weightKg', 'bodyFatPct', 'restingHr', 'hrv', 'vo2max', 'activeKcal', 'mindfulMin', 'workouts', 'sleepStages'] as const) {
         if (h[k] != null && !(k === 'weightKg' && health.weightTyped)) (health as Record<string, unknown>)[k] = h[k];
       }
+      // When the scale's weighing was taken, so the 3 pm "no weight yet" nudge knows whether today has one (25 Oct 2026).
+      if (h.weightKg != null && h.weightAt != null && !health.weightTyped) health.weightAt = h.weightAt;
       if (Object.keys(health).length) d.health = health;
       // Mindful minutes from Apple Watch or other apps count as meditation (the larger of the two, never both).
       if (h.mindfulMin != null && h.mindfulMin > (d.mind.meditationMin ?? 0)) d.mind.meditationMin = h.mindfulMin;

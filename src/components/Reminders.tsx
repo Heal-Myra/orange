@@ -14,6 +14,7 @@ import { habitsToday } from '../lib/habits';
 import { lang, tr } from '../lib/i18n';
 import { todayISO } from '../lib/dates';
 import { optional } from '../lib/native';
+import { WEIGHT_NUDGE, usesScale, weighedOn } from '../lib/weightNudge';
 
 // Arrived with build 7; older installed builds simply schedule nothing.
 let N: typeof import('expo-notifications') | null = null;
@@ -42,6 +43,9 @@ export function nudgeFor(it: RoutineItem, take: (area: Task['area']) => Task | u
 
 export function ReminderScheduler() {
   const { profile, days } = useHeal();
+  const dayStart = (() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d.getTime(); })();
+  const weighed = weighedOn(days[todayISO()], dayStart);
+  const scale = usesScale(days);
   const fastingToday = !!days[todayISO()]?.fasting;
   const { open, habits } = useTasks();
   const doneToday = days[todayISO()]?.habitsDone ?? [];
@@ -49,7 +53,7 @@ export function ReminderScheduler() {
   const routine = profile.me?.routine;
 
   useEffect(() => {
-    if (!N || (!routine?.length && !habits.length)) return;
+    if (!N || (!routine?.length && !habits.length && !scale)) return;
     const Notif = N;
     let cancelled = false;
     const plan = async () => {
@@ -65,6 +69,18 @@ export function ReminderScheduler() {
       const now = Date.now(), horizon = now + 26 * 3600 * 1000;
       for (const offset of [0, 1]) {
         const day = new Date(); day.setDate(day.getDate() + offset);
+        // No weight by 3 pm (founder, 25 Oct 2026): the Withings app sends weighings to Apple Health only when it runs.
+        if (scale && !(offset === 0 && weighed)) {
+          const [h, m] = WEIGHT_NUDGE.split(':').map(Number);
+          const when = new Date(day); when.setHours(h, m, 0, 0);
+          if (when.getTime() > now + 30_000 && when.getTime() <= horizon) {
+            await Notif.scheduleNotificationAsync({
+              content: { title: tr('Weight'), body: tr('No weight today yet. Open the Withings app once to sync it.'), data: { kind: 'weight', lang: lang() } },
+              trigger: { type: Notif.SchedulableTriggerInputTypes.DATE, date: when },
+            });
+            if (cancelled) return;
+          }
+        }
         // Habits at their time (founder, 23 Oct 2026), five minutes early like the rest.
         for (const h of habitsToday(habits, day)) {
           if (!h.at || (offset === 0 && doneToday.includes(h.id))) continue;
@@ -93,12 +109,14 @@ export function ReminderScheduler() {
     let tap: { remove: () => void } | null = null;
     try {
       tap = Notif.addNotificationResponseReceivedListener(r => {
-        if ((r.notification.request.content.data as { kind?: string } | undefined)?.kind === 'sleep') router.push('/yoga-nidra');
+        const kind = (r.notification.request.content.data as { kind?: string } | undefined)?.kind;
+        if (kind === 'sleep') router.push('/yoga-nidra');
+        else if (kind === 'weight') router.navigate({ pathname: '/body', params: { card: 'body', at: String(Date.now()) } });
       });
     } catch { tap = null; }
     const sub = AppState.addEventListener('change', s => { if (s === 'active') plan().catch(() => {}); });
     return () => { cancelled = true; sub.remove(); tap?.remove(); };
-  }, [routine, open, fastingToday, habits, doneKey]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [routine, open, fastingToday, habits, doneKey, weighed, scale]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return null;
 }

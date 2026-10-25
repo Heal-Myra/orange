@@ -1070,4 +1070,5 @@ export const HI: Record<string, string> = {
   'Food and drink': 'खाना और पीना',
   'Rest and sleep': 'आराम और नींद',
   'Preparing Myra\'s voice…': 'मायरा की आवाज़ तैयार हो रही है…',
+  'No weight today yet. Open the Withings app once to sync it.': 'आज का वज़न अभी नहीं आया। सिंक के लिए Withings ऐप एक बार खोलें।',
 };

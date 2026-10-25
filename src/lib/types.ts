@@ -69,7 +69,7 @@ export interface DayLog {
   tao?: { done?: boolean; note?: string };
   // Read from Apple Health (20 Oct 2026). Body measures are the latest reading; the rest are for this day.
   health?: {
-    weightKg?: number; weightTyped?: boolean; weightTypedAt?: number; bodyFatPct?: number; restingHr?: number; hrv?: number; vo2max?: number;
+    weightKg?: number; weightAt?: number; weightTyped?: boolean; weightTypedAt?: number; bodyFatPct?: number; restingHr?: number; hrv?: number; vo2max?: number;
     activeKcal?: number; mindfulMin?: number;
     workouts?: { type: string; min: number; kcal?: number }[];
     sleepStages?: { deep?: number; core?: number; rem?: number; awake?: number }; // hours
