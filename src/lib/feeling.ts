@@ -58,4 +58,18 @@ const WORDS: [Symptom, RegExp][] = [
   ['stressed', /\b(stress|anxious|anxiety|worried|tense|overwhelm)|तनाव|चिंता/i],
   ['sleepless', /\b(slept badly|could not sleep|couldn't sleep|insomnia|no sleep|poor sleep)|नींद नहीं/i],
 ];
-export const symptomsIn = (text: string): Symptom[] => WORDS.filter(([, re]) => re.test(text)).map(([s]) => s);
+// "My cold is gone", "no headache now", "cough is better" must not switch the care plan on (founder, 25 Oct 2026: when the
+// person feels okay, every care card vanishes). Each part of the sentence is read on its own; a part that says the problem
+// is gone or absent is skipped.
+const RECOVERED = /\b(gone|better|cured|recovered|cleared|over|fine|okay|ok|no longer|no more|went away|healed|theek|thik|chala gaya)\b|ठीक|चला गया|चली गई|नहीं रहा/i;
+const ABSENT = /\b(no|not|without|nahi|nahin)\b|नहीं/i; // "no cold"; not for sleep ("could not sleep" is a problem)
+export const symptomsIn = (text: string): Symptom[] => {
+  const parts = text.split(/[.,;!?\n]+|\b(?:but|and now|now|however|par|lekin)\b|लेकिन|पर /i).filter(Boolean);
+  const found = new Set<Symptom>();
+  for (const part of parts) for (const [s, re] of WORDS) {
+    if (!re.test(part) || RECOVERED.test(part)) continue;
+    if (s !== 'sleepless' && ABSENT.test(part)) continue;
+    found.add(s);
+  }
+  return WORDS.map(([s]) => s).filter(s => found.has(s));
+};

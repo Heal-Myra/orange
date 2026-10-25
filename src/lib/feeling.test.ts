@@ -24,6 +24,13 @@ describe('reading how I feel from my own words', () => {
     expect(symptomsIn('I have a cold and a mild headache')).toEqual(['cold', 'headache']);
     expect(symptomsIn('आज ज़ुकाम है')).toEqual(['cold']);
     expect(symptomsIn('Feeling great today')).toEqual([]);
+    // Feeling okay again: no care plan (founder, 25 Oct 2026)
+    expect(symptomsIn('I feel okay')).toEqual([]);
+    expect(symptomsIn('My cold is gone')).toEqual([]);
+    expect(symptomsIn('No cold now, feeling happy')).toEqual([]);
+    expect(symptomsIn('Cough is better but I have a headache')).toEqual(['headache']);
+    expect(symptomsIn('ज़ुकाम ठीक हो गया')).toEqual([]);
+    expect(symptomsIn('Could not sleep last night')).toEqual(['sleepless']);
   });
 });
 
