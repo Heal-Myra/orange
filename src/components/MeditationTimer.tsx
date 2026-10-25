@@ -10,6 +10,7 @@ import { newGoal, todaysLength } from '../lib/meditationPlan';
 import { lang, locale } from '../lib/i18n';
 import { MESSAGE_LANGS } from '../lib/foodPlan';
 import { carePlan } from '../lib/care';
+import { hasGuide } from '../lib/practiceGuide';
 import { hasVoice, voiceLang } from '../lib/voice';
 import { Ionicons } from '@expo/vector-icons';
 import { PRACTICES, type PracticeId } from '../lib/pranayama';
@@ -102,6 +103,11 @@ export function MeditationTimer() {
                           {pr.id === 'mix' && careName ? tr('Care breathing for {what}', { what: tr(careName) }) : tr(pr.name)}{pr.id === 'mix' ? ` · ${tr('Recommended')}` : ''}{pr.energising && night ? ` · ${tr('better in the morning')}` : ''}
                         </Text>
                         {on ? <Text style={{ color: colors.muted, fontSize: 13, lineHeight: 18 }}>{tr(pr.line)}</Text> : null}
+                        {on && !choosing && hasGuide(pr.id) ? (
+                          <Pressable onPress={() => router.push({ pathname: '/explain', params: { practice: pr.id, lang: gLang } })} hitSlop={6} accessibilityRole="button">
+                            <Text style={{ color: colors.insight, fontSize: 13, fontWeight: '700', marginTop: 4 }}>▶ {tr('How to do it')}</Text>
+                          </Pressable>
+                        ) : null}
                         {on && !choosing ? <Text style={{ color: colors.accent, fontSize: 13, fontWeight: '600', marginTop: 2 }}>{tr('Choose another practice')} ›</Text> : null}
                         {on && pr.caution ? <Text style={{ color: colors.warn, fontSize: 13, lineHeight: 18 }}>{tr(pr.caution)}</Text> : null}
                       </View>

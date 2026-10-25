@@ -17,6 +17,7 @@ import { carePlan } from '../lib/care';
 import { todayISO } from '../lib/dates';
 import { hasVoice, speak, voiceLang } from '../lib/voice';
 import { useServerVoice } from '../lib/serverVoice';
+import { hasGuide } from '../lib/practiceGuide';
 
 const Awake = optional(['ExpoKeepAwake'], () => require('expo-keep-awake') as typeof import('expo-keep-awake'));
 const C = { bg: '#10221F', ring: '#1C3934', ink: '#EAF2EF', muted: '#93AAA4', glow: '#E0794F', calm: '#6FB7A8' };
@@ -120,6 +121,11 @@ export default function Breathe() {
         <View style={{ flex: 1, paddingHorizontal: 28, justifyContent: 'center', gap: 16 }}>
           <Text style={{ color: C.ink, fontSize: 30, fontWeight: '600' }}>{pr ? tr(pr.name) : care?.length ? tr('Care breathing') : tr("Myra's mix")}</Text>
           <Text style={{ color: C.muted, fontSize: 16 }}>{tr('{n} minutes', { n: mins })} · {plan.filter(s => s.id !== 'still').map(s => tr(segmentName(s.id))).join(' → ')} → {tr('Stillness')}</Text>
+          {pr && hasGuide(pr.id) ? (
+            <Pressable onPress={() => router.push({ pathname: '/explain', params: { practice: pr.id, lang: gLang } })} accessibilityRole="button">
+              <Text style={{ color: C.glow, fontSize: 15, fontWeight: '700' }}>▶ {tr('How to do it')}</Text>
+            </Pressable>
+          ) : null}
           {pr?.caution ? <Text style={{ color: C.glow, fontSize: 14, lineHeight: 20 }}>{tr(pr.caution)}</Text> : null}
           {!pr && plan.some(s => s.id !== 'still' && practice(s.id).energising) ? <Text style={{ color: C.glow, fontSize: 14, lineHeight: 20 }}>{tr('Bhastrika and Kapalbhati are strong breaths: skip them if pregnant, or with high blood pressure, heart disease, hernia or recent surgery. Empty stomach. Stop if dizzy.')}</Text> : null}
           <Text style={{ color: C.muted, fontSize: 14 }}>{tr('Sit tall and comfortable. Turn the sound up to hear Myra\'s voice.')}</Text>
