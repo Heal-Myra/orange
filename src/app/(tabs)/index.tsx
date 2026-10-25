@@ -38,11 +38,13 @@ export default function Today() {
       <PillarTiles w={w} />
 
       <GuidanceCard />
-      <CareCard />
 
       <View style={{ paddingHorizontal: 4 }}>
         <Note>{tr('Well-being = Body + Mind + Soul, each out of 100. A working model, not a medical measure.')}</Note>
       </View>
+
+      {/* Care plan: the last card on Today (founder, 25 Oct 2026). */}
+      <CareCard />
     </Screen>
   );
 }
