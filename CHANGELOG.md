@@ -4,7 +4,7 @@
 - To-dos (24 Oct): Pick a date from a month calendar when adding or moving a task; full days (3 in the group) are greyed.
 - Guided sessions (24 Oct, founder's test on build 10): a woman's voice, slower with pauses, softer wording, fewer repeated cues; voice language English, Hindi or regional (translated once, kept on the phone).
 - Quick updates apply by themselves (25 Oct): the app checks for a new version whenever it comes to the front and restarts into it when the person returns after a minute away (never during a guided session). Profile shows the running version.
-- Care plan woven into the cards (25 Oct, founder): food and drink (with what to avoid) in Food, rest in Sleep, movement in Movement, the care breathing button in Breathing & meditation. Today keeps a short Care plan card as the last card on the page, linking to each.
+- Care plan woven into the cards (25 Oct, founder): food and drink (with what to avoid) in Food, rest in Sleep, movement in Movement, in Breathing & meditation the guided practice itself becomes "Care breathing for your cold" (no separate box, to avoid a duplicate). Today keeps a short Care plan card as the last card on the page, linking to each.
 - Care plan (25 Oct, decision 0028): saying you have a cold (or cough, fever, headache…) switches on a Care plan on Today and care hints in Food, Movement and Breathing; the breathing mix becomes a care session.
 - Planned (25 Oct, decision 0027): connect the Withings scale directly, because Apple Health only gets weighings when the Withings app runs.
 - Share to Happy Orange (24 Oct, decision 0026): save a video or article to my journey (Library › Saved; Myra knows it) or send it to the team as inspiration (Admin › Feedback).
