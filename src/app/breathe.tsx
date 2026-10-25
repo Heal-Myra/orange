@@ -21,7 +21,8 @@ import { hasGuide, sessionStep } from '../lib/practiceGuide';
 import { GuideFigure } from '../components/GuideFigure';
 
 const Awake = optional(['ExpoKeepAwake'], () => require('expo-keep-awake') as typeof import('expo-keep-awake'));
-const C = { bg: '#10221F', ring: '#1C3934', ink: '#EAF2EF', muted: '#93AAA4', glow: '#E0794F', calm: '#6FB7A8' };
+// Calm sky tones (founder, 25 Oct 2026).
+const C = { bg: '#EAF4FA', ring: '#D3E6F1', ink: '#24414A', muted: '#6B8794', glow: '#E0794F', calm: '#3E9CC4' };
 const QUICK = (ph: Phase) => ph.seconds < 2;
 
 interface Step { seg: number; phase: Phase; intro?: string; rep?: number } // rep: how many times this cue came before in the part

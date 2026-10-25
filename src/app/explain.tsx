@@ -15,7 +15,7 @@ import { useServerVoice } from '../lib/serverVoice';
 import { useHeal } from '../lib/store';
 import { speak, voiceLang } from '../lib/voice';
 
-const C = { bg: '#10221F', ink: '#E8EEEE', muted: '#93A6A8', glow: '#E0794F', track: '#24403B' };
+const C = { bg: '#EAF4FA', ink: '#24414A', muted: '#6B8794', glow: '#E0794F', track: '#CFE2EC' };
 
 export default function Explain() {
   const { profile } = useHeal();

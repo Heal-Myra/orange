@@ -10,7 +10,8 @@ export type Shape =
   | { t: 'circle'; cx: number; cy: number; r: number; stroke?: string; fill?: string; w?: number; o?: number }
   | { t: 'ellipse'; cx: number; cy: number; rx: number; ry: number; stroke?: string; fill?: string; w?: number; o?: number; dash?: string };
 
-export const FIG = { w: 320, h: 330, ink: '#E8EEEE', fill: '#16302B', glow: '#E0794F', air: '#8FDCCB', shade: '#0C1A17' };
+// Calm sky tones (founder, 25 Oct 2026: the dark background was too dark).
+export const FIG = { w: 320, h: 330, ink: '#2F5D66', fill: '#FFFFFF', glow: '#E0794F', air: '#3E9CC4', shade: '#D3E6F1' };
 
 // Body landmarks (person's right is the viewer's left).
 const HEAD: Pt = [160, 84];
@@ -159,7 +160,7 @@ export function figure(s: FigureState): Shape[] {
 }
 
 /** The same picture as an SVG string (previews and tests). */
-export function figureSvg(s: FigureState, bg = '#10221F'): string {
+export function figureSvg(s: FigureState, bg = '#EAF4FA'): string {
   const a = (sh: Shape) => `${sh.stroke ? ` stroke="${sh.stroke}"` : ''} fill="${sh.fill ?? 'none'}"${sh.w ? ` stroke-width="${sh.w}"` : ''}${sh.o != null ? ` opacity="${sh.o}"` : ''} stroke-linecap="round" stroke-linejoin="round"`;
   const body = figure(s).map(sh => sh.t === 'path' ? `<path d="${sh.d}"${a(sh)}${sh.dash ? ` stroke-dasharray="${sh.dash}"` : ''}/>`
     : sh.t === 'circle' ? `<circle cx="${sh.cx}" cy="${sh.cy}" r="${sh.r}"${a(sh)}/>`
