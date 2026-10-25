@@ -10,6 +10,20 @@ import { traditionName } from '../lib/wisdom';
 import { useHeal } from '../lib/store';
 import { colors } from '../theme';
 import { lang, tr } from '../lib/i18n';
+import Constants from 'expo-constants';
+import { Platform } from 'react-native';
+
+/** "Version 1.0.0 (10) · update 25 Oct 06:20" — the build, and the quick update it is running. */
+function versionLine(): string {
+  const v = Constants.expoConfig?.version ?? '';
+  const build = Constants.expoConfig?.ios?.buildNumber ?? (Constants as unknown as { nativeBuildVersion?: string }).nativeBuildVersion ?? '';
+  if (Platform.OS === 'web') return `${tr('Version')} ${v} · web`;
+  try {
+    const U = require('expo-updates') as typeof import('expo-updates');
+    const when = U.createdAt ? U.createdAt.toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '';
+    return `${tr('Version')} ${v}${build ? ` (${build})` : ''} · ${U.isEmbeddedLaunch ? tr('built-in') : `${tr('update')} ${when}`}`;
+  } catch { return `${tr('Version')} ${v}`; }
+}
 
 // The tester invitation (founder's wording, 19 Oct 2026). Shared through the phone's own share menu,
 // so people are picked from the contacts in WhatsApp, Messages or any other app.
@@ -131,6 +145,8 @@ export default function Account() {
           {message ? <Text style={{ color: colors.bad }}>{message}</Text> : null}
         </Card>
       )}
+      {/* Which version is running (25 Oct 2026), so a missing quick update can be spotted. */}
+      <Text style={{ color: colors.muted, fontSize: 12, textAlign: 'center' }}>{versionLine()}</Text>
     </Screen>
   );
 }

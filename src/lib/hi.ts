@@ -1061,4 +1061,7 @@ export const HI: Record<string, string> = {
   'For {what}: {food}': '{what} के लिए: {food}',
   'Care breathing': 'देखभाल वाली साँस',
   'Care breathing for {what}': '{what} के लिए देखभाल वाली साँस',
+  'Version': 'संस्करण',
+  'built-in': 'मूल',
+  'update': 'अपडेट',
 };
