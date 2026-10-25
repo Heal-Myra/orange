@@ -10,6 +10,7 @@ import { HealthProvider } from '../components/HealthSync';
 import { ReminderScheduler } from '../components/Reminders';
 import { ShareProvider, ShareReceiver } from '../components/ShareReceiver';
 import { RangeProvider } from '../lib/range';
+import { UpdateWatcher } from '../components/UpdateWatcher';
 import { LangProvider, tr, useLang } from '../lib/i18n';
 import { colors } from '../theme';
 
@@ -149,6 +150,7 @@ export default function RootLayout() {
           <Gate key={iconGeneration} />
           <ReminderScheduler />
           <ShareReceiver />
+          <UpdateWatcher />
         </TasksProvider>
         </HealthProvider>
       </HealProvider>
