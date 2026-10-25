@@ -23,3 +23,4 @@ jobs:
           fi
           npx -y supabase@2.121.0 functions deploy heal-ai --project-ref vjhzlszubdinmesfvmex --use-api
           npx -y supabase@2.121.0 functions deploy voice --project-ref vjhzlszubdinmesfvmex --use-api
+          npx -y supabase@2.121.0 functions deploy review-login --project-ref vjhzlszubdinmesfvmex --use-api --no-verify-jwt

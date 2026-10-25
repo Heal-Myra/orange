@@ -18,8 +18,9 @@ const KEY = 'heal.health.connected';
 const VERSION_KEY = 'heal.health.version';
 export const HEALTH_SOURCE = 'Apple Health';
 
-interface HealthState { available: boolean; connected: boolean; lastSync: Date | null; connect: () => Promise<void>; syncNow: () => Promise<void> }
-const Ctx = createContext<HealthState>({ available: false, connected: false, lastSync: null, connect: async () => {}, syncNow: async () => {} });
+interface HealthState { available: boolean; connected: boolean; lastSync: Date | null; connect: () => Promise<void>; syncNow: () => Promise<void>; asked: boolean | null; markAsked: () => void }
+const Ctx = createContext<HealthState>({ available: false, connected: false, lastSync: null, connect: async () => {}, syncNow: async () => {}, asked: null, markAsked: () => {} });
+const ASKED_KEY = 'heal.health.asked'; // the start-up Apple Health step was shown (25 Oct 2026)
 
 const dayStartMs = (iso: string) => { const [y, m, d] = iso.split('-').map(Number); return new Date(y, m - 1, d).getTime(); };
 
@@ -31,7 +32,12 @@ export function HealthProvider({ children }: { children: ReactNode }) {
   const [connected, setConnected] = useState(false);
   const [lastSync, setLastSync] = useState<Date | null>(null);
 
-  useEffect(() => { AsyncStorage.getItem(KEY).then(v => setConnected(v === '1')).catch(() => {}); }, []);
+  const [asked, setAsked] = useState<boolean | null>(null);
+  useEffect(() => {
+    AsyncStorage.getItem(KEY).then(v => setConnected(v === '1')).catch(() => {});
+    AsyncStorage.getItem(ASKED_KEY).then(v => setAsked(v === '1')).catch(() => setAsked(true));
+  }, []);
+  const markAsked = useCallback(() => { setAsked(true); AsyncStorage.setItem(ASKED_KEY, '1').catch(() => {}); }, []);
 
   const syncNow = useCallback(async () => {
     if (!available || !connected || !ready) return;
@@ -93,7 +99,7 @@ export function HealthProvider({ children }: { children: ReactNode }) {
     return () => { sub.remove(); clearInterval(t); };
   }, [connected, syncNow]);
 
-  const value = useMemo(() => ({ available, connected, lastSync, connect, syncNow }), [available, connected, lastSync, connect, syncNow]);
+  const value = useMemo(() => ({ available, connected, lastSync, connect, syncNow, asked, markAsked }), [available, connected, lastSync, connect, syncNow, asked, markAsked]);
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
 

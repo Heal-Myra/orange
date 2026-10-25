@@ -6,3 +6,6 @@ verify_jwt = true
 
 [functions.voice]
 verify_jwt = true
+
+[functions.review-login]
+verify_jwt = false

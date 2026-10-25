@@ -3,12 +3,12 @@
 import { useState } from 'react';
 import { Pressable, Text, TextInput, View } from 'react-native';
 import { Button, Card, Note, Screen, s } from '../components/ui';
-import { useAuth } from '../lib/auth';
+import { REVIEW_EMAIL, useAuth } from '../lib/auth';
 import { colors } from '../theme';
 import { tr } from '../lib/i18n';
 
 export default function SignIn() {
-  const { sendCode, verifyCode, continueAsGuest } = useAuth();
+  const { sendCode, verifyCode } = useAuth();
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
   const [sentTo, setSentTo] = useState<string | null>(null);
@@ -16,8 +16,12 @@ export default function SignIn() {
   const [message, setMessage] = useState<string | null>(null);
 
   const emailOk = /^\S+@\S+\.\S+$/.test(email.trim());
+  const review = sentTo === REVIEW_EMAIL;
+  const len = review ? 10 : 6; // the reviewer's fixed code is 10 digits
 
   const send = async () => {
+    // Apple's reviewer has a fixed code: no email is sent.
+    if (email.trim().toLowerCase() === REVIEW_EMAIL) { setSentTo(REVIEW_EMAIL); setCode(''); setMessage(null); return; }
     setBusy(true); setMessage(null);
     const err = await sendCode(email);
     setBusy(false);
@@ -54,9 +58,9 @@ export default function SignIn() {
             <Text style={{ fontSize: 18, fontWeight: '600', color: colors.ink }}>{tr('Check your email')}</Text>
             <Note>{tr('We sent a 6-digit code to {email}. It can take a minute; look in Spam too. Type the code here:', { email: sentTo })}</Note>
             <Text style={s.fieldLabel}>{tr('6-digit code')}</Text>
-            <TextInput style={[s.input, { fontSize: 24, letterSpacing: 6 }]} value={code} onChangeText={t => { const c = t.replace(/\D/g, '').slice(0, 6); setCode(c); if (c.length === 6) verify(c); }}
+            <TextInput style={[s.input, { fontSize: 24, letterSpacing: 6 }]} value={code} onChangeText={t => { const c = t.replace(/\D/g, '').slice(0, len); setCode(c); if (c.length === len) verify(c); }}
               autoFocus placeholder="123456" placeholderTextColor={colors.muted} keyboardType="number-pad" textContentType="oneTimeCode" autoComplete="one-time-code" />
-            <Button title={busy ? tr('Checking…') : tr('Sign in')} onPress={() => verify()} disabled={code.length !== 6 || busy} />
+            <Button title={busy ? tr('Checking…') : tr('Sign in')} onPress={() => verify()} disabled={code.length !== len || busy} />
             <Pressable onPress={() => { setSentTo(null); setMessage(null); }}>
               <Text style={{ color: colors.accent, fontWeight: '600' }}>{tr('Use a different email')}</Text>
             </Pressable>
@@ -65,9 +69,6 @@ export default function SignIn() {
         {message ? <Text style={{ color: colors.bad }}>{message}</Text> : null}
       </Card>
 
-      <Pressable onPress={continueAsGuest} style={{ alignItems: 'center', padding: 8 }}>
-        <Text style={{ color: colors.muted }}>{tr('Use without an account (saved on this device only)')}</Text>
-      </Pressable>
     </Screen>
   );
 }

@@ -1071,4 +1071,11 @@ export const HI: Record<string, string> = {
   'Rest and sleep': 'आराम और नींद',
   'Preparing Myra\'s voice…': 'मायरा की आवाज़ तैयार हो रही है…',
   'No weight today yet. Open the Withings app once to sync it.': 'आज का वज़न अभी नहीं आया। सिंक के लिए Withings ऐप एक बार खोलें।',
+  'Happy Orange works best with it: Myra sees your day without you typing anything.': 'Happy Orange इसके साथ सबसे अच्छा चलता है: मायरा बिना कुछ टाइप किए आपका दिन देख पाती है।',
+  'Steps and workouts fill Movement': 'कदम और वर्कआउट Movement में अपने आप भरते हैं',
+  'Last night\'s sleep fills Sleep': 'पिछली रात की नींद Sleep में भरती है',
+  'Weight from your scale keeps your targets right': 'वज़न मशीन से वज़न आपके लक्ष्य सही रखता है',
+  'Heart rate and HRV guide rest days': 'दिल की धड़कन और HRV आराम के दिन तय करने में मदद करते हैं',
+  'Read only: nothing is written to Apple Health. On the next screen, tap Turn On All, then Allow.': 'केवल पढ़ना: Apple Health में कुछ नहीं लिखा जाता। अगली स्क्रीन पर Turn On All, फिर Allow दबाएँ।',
+  'Not now (you can connect later on the Body tab)': 'अभी नहीं (बाद में Body टैब पर जोड़ सकते हैं)',
 };

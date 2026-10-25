@@ -6,7 +6,7 @@ import { Platform, Pressable, Text, View } from 'react-native';
 import { AuthProvider, useAuth } from '../lib/auth';
 import { HealProvider, useHeal } from '../lib/store';
 import { TasksProvider } from '../lib/tasks';
-import { HealthProvider } from '../components/HealthSync';
+import { HealthProvider, useHealth } from '../components/HealthSync';
 import { ReminderScheduler } from '../components/Reminders';
 import { ShareProvider, ShareReceiver } from '../components/ShareReceiver';
 import { RangeProvider } from '../lib/range';
@@ -16,9 +16,10 @@ import { colors } from '../theme';
 
 /** Sends people to sign-in or the privacy screen when they need it. */
 function Gate() {
-  const { ready, online, session, guest, consented, tradition, traditionReady } = useAuth();
+  const { ready, online, session, consented, tradition, traditionReady } = useAuth();
   const langState = useLang();
   const { meAsked, sync } = useHeal();
+  const health = useHealth();
   const segments = useSegments();
   const router = useRouter();
 
@@ -29,7 +30,8 @@ function Gate() {
     if (here === 'cook') return;
     // First of all: the language (founder, 20 Oct 2026).
     if (!langState.chosen) { if (here !== 'language') router.replace('/language'); return; }
-    const needsSignIn = online && !session && !guest;
+    // Everyone signs in (founder, 25 Oct 2026: no guest mode, so every person gets the full app: food photos, Myra).
+    const needsSignIn = online && !session;
     const needsConsent = !!session && !consented;
     // Asked once after sign-up (optional: "Prefer not to say"); changeable later in Profile.
     // Religion (Daily Wisdom) is chosen on About you since 21 Oct 2026; the separate step is no longer forced.
@@ -39,8 +41,10 @@ function Gate() {
     else if (needsTradition && here !== 'tradition') router.replace('/tradition');
     // Then "About you" once (name, age, sex, height, weight, religion, goal; skippable), after the account has loaded.
     else if (!needsSignIn && !needsConsent && !needsTradition && session && meAsked === false && sync !== 'syncing' && here !== 'about-you' && here !== 'tradition') router.replace('/about-you');
+    // Then Apple Health, once, explained clearly (founder, 25 Oct 2026). Apple requires that saying no is allowed.
+    else if (session && meAsked === true && health.available && !health.connected && health.asked === false && here !== 'connect-health' && here !== 'about-you') router.replace('/connect-health');
     else if (!needsSignIn && !needsConsent && !needsTradition && (here === 'sign-in' || here === 'consent')) router.replace('/');
-  }, [ready, online, session, guest, consented, tradition, traditionReady, segments, router, langState.ready, langState.chosen, meAsked, sync]);
+  }, [ready, online, session, consented, tradition, traditionReady, segments, router, langState.ready, langState.chosen, meAsked, sync, health.available, health.connected, health.asked]);
 
   return (
     <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }}>
@@ -48,6 +52,7 @@ function Gate() {
       <Stack.Screen name="language" />
       <Stack.Screen name="sign-in" />
       <Stack.Screen name="consent" />
+      <Stack.Screen name="connect-health" />
       <Stack.Screen name="tradition" options={{ headerShown: true, title: tr('Daily Wisdom'), headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
       <Stack.Screen name="about-you" options={{ headerShown: true, title: tr('About you'), headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
       <Stack.Screen name="account" options={{ headerShown: true, title: tr('Profile'), presentation: 'modal', headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />

@@ -549,7 +549,10 @@ export default {
     // Access: on the AI_ALLOWED_EMAILS list, or approved by an admin in the app (table ai_access, migration 0004).
     if (ALLOWED.length && !ALLOWED.includes(email)) {
       const { data: access } = await ctx.supabase.from('ai_access').select('status').maybeSingle();
-      if (access?.status !== 'approved') {
+      // Everyone gets the AI from the first minute (founder, 25 Oct 2026), unless an admin turned it off for them.
+      // Set the secret AI_AUTO_APPROVE to "false" to go back to approving each person in Admin.
+      const auto = (Deno.env.get('AI_AUTO_APPROVE') ?? 'true').toLowerCase() !== 'false';
+      if (access?.status !== 'approved' && !(auto && access?.status !== 'declined')) {
         return Response.json({ error: access?.status === 'declined'
           ? 'AI features are not open for your account during testing.'
           : 'Your request for AI features is waiting for approval by the Happy Orange team. You will be able to use them as soon as it is approved.' }, { status: 403 });

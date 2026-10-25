@@ -10,6 +10,8 @@ import type { Tradition } from './wisdom';
 
 export const CONSENT_VERSION = '2026-10-17';
 const GUEST_KEY = 'heal.guest';
+/** Apple's app reviewer signs in with this email and a fixed code kept in Supabase secrets (supabase/functions/review-login). */
+export const REVIEW_EMAIL = 'review@happyorange.in';
 const TRADITION_KEY = 'heal.tradition'; // Daily Wisdom tradition; also kept in the account's private metadata
 
 interface AuthState {
@@ -108,8 +110,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     verifyCode: async (email, code) => {
       if (!supabase) return tr('Online accounts are not set up in this version.');
-      const { error } = await supabase.auth.verifyOtp({ email: email.trim().toLowerCase(), token: code.trim(), type: 'email' });
-      if (error) return explain(error.message);
+      const e = email.trim().toLowerCase();
+      if (e === REVIEW_EMAIL) {
+        // Apple's reviewer: the server checks the fixed code and hands back a one-time sign-in token.
+        const { data, error: fe } = await supabase.functions.invoke('review-login', { body: { email: e, code: code.trim() } });
+        if (fe || !data?.token_hash) return tr('That code is wrong or has expired. Check the latest email, or ask for a new code.');
+        const { error } = await supabase.auth.verifyOtp({ token_hash: data.token_hash, type: 'magiclink' });
+        if (error) return explain(error.message);
+      } else {
+        const { error } = await supabase.auth.verifyOtp({ email: e, token: code.trim(), type: 'email' });
+        if (error) return explain(error.message);
+      }
       await AsyncStorage.removeItem(GUEST_KEY).catch(() => {});
       setGuest(false);
       return null;
