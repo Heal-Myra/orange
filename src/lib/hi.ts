@@ -1126,4 +1126,5 @@ export const HI: Record<string, string> = {
   'Breathe in deeply through the nose.': 'नाक से गहरी साँस अंदर लीजिए।',
   'Breathe out with a long, soft Om: mostly O, then a gentle M.': 'लंबे, कोमल ॐ के साथ साँस छोड़िए: ज़्यादातर ओ, फिर हल्का म।',
   'Feel the stillness after the sound.': 'आवाज़ के बाद की शांति महसूस कीजिए।',
+  'Sharing is not available here. Send this link yourself: https://testflight.apple.com/join/Mcp2jHbc': 'यहाँ शेयर नहीं हो सकता। यह लिंक खुद भेजें: https://testflight.apple.com/join/Mcp2jHbc',
 };

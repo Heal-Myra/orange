@@ -25,18 +25,17 @@ function versionLine(): string {
   } catch { return `${tr('Version')} ${v}`; }
 }
 
-// The tester invitation (founder's wording, 19 Oct 2026). Shared through the phone's own share menu,
+// The tester invitation (founder's wording, 19 Oct 2026; iPhone TestFlight version approved 25 Oct 2026). Shared through the phone's own share menu,
 // so people are picked from the contacts in WhatsApp, Messages or any other app.
 const INVITE = `Hi! 🍊 I’m building Happy Orange, an app that helps you restore healthy body and mind to connect with your inner self. Would you test it for me for a week and tell me honestly what you think?
 
-How to start (2 minutes):
-1. On your phone, open app.happyorange.in in Safari (iPhone) or Chrome (Android).
-2. Add it to your home screen: iPhone: Share → Add to Home Screen. Android: ⋮ → Add to Home screen.
-3. Open it, type your email and enter the 6-digit code you receive (check Spam if it doesn't arrive).
+How to start (3 minutes, iPhone only):
+1. Install Apple's free TestFlight app from the App Store.
+2. Open this link on your iPhone: https://testflight.apple.com/join/Mcp2jHbc, then tap Accept and Install.
+3. Open Happy Orange, type your email and enter the 6-digit code you receive (check Spam if it doesn't arrive).
+4. When asked, allow Apple Health, so your steps, sleep and weight fill in by themselves.
 
-The AI features (meal photos, Myra's recommendations and chat) open up for you soon after you sign up.
-
-Write in the feedback box at the top of any page whenever something works, confuses you, or you wish it did more. Every feedback counts.`;
+Write in the feedback box at the top of any page. Every feedback counts.`;
 
 const SYNC_TEXT = {
   device: 'Saved on this device only.',
@@ -53,7 +52,7 @@ export default function Account() {
 
   const invite = async () => {
     try { await Share.share({ message: INVITE }); }
-    catch { setMessage(tr('Sharing is not available here. Copy the link app.happyorange.in and send it yourself.')); }
+    catch { setMessage(tr('Sharing is not available here. Send this link yourself: https://testflight.apple.com/join/Mcp2jHbc')); }
   };
 
   const remove = async () => {
