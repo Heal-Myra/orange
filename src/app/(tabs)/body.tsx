@@ -11,6 +11,7 @@ import { bmiOf, fibreTarget, planFor } from '../../lib/targets';
 import { MealPhoto } from '../../components/MealPhoto';
 import { FoodPlanRow } from '../../components/FoodPlan';
 import { MealRow } from '../../components/MealRow';
+import { carePlan } from '../../lib/care';
 import { todayISO } from '../../lib/dates';
 import { Anchor, Card, Heading, Note, Screen, Score, s } from '../../components/ui';
 import { FAST_KCAL, bodyScore, mealTotals } from '../../lib/scoring';
@@ -27,10 +28,12 @@ export default function Body() {
   const auto = connected; // Apple Health fills sleep and movement; typing is only for phones without it
   const h = day.health;
   const st = h?.sleepStages;
+  const care = date === todayISO() ? carePlan(day.feeling?.symptoms ?? []) : null; // care plan (25 Oct 2026)
 
   return (
     <Screen feedback="Body" trends="body">
       <Anchor id="food"><MealPhoto right={<Score value={score?.nutrition} max={40} />}>
+        {care ? <Text style={{ color: colors.insight, paddingTop: 8, borderTopWidth: 1, borderTopColor: colors.line }}>{tr('For {what}: {food}', { what: tr(care.name), food: care.food.slice(0, 3).map(f => tr(f)).join(' · ') })}</Text> : null}
         {/* "I'm fasting today" (founder, 22 Oct 2026): a declared fast scores Food in full while only water, black tea
             or black coffee go in, and Myra changes her advice. */}
         <Pressable accessibilityRole="switch" accessibilityState={{ checked: !!day.fasting }} onPress={() => update(d => { d.fasting = !d.fasting; })}
@@ -78,6 +81,7 @@ export default function Body() {
 
       <Anchor id="movement"><Card>
         <Heading right={<Score value={score?.movement} max={30} />}>{tr('Movement')}</Heading>
+        {care ? <Note>{tr(care.move)}</Note> : null}
         <Rows>
           <StatRow first label={tr('Steps')} value={day.activity.steps} target={profile.steps} key={date + 'steps'}
             onEdit={v => update(d => { d.activity.steps = v; d.activity.stepsTyped = v != null; })} />

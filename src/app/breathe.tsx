@@ -13,6 +13,7 @@ import { optional } from '../lib/native';
 import { phasesFor, practice, segmentName, sessionPlan, type Phase, type PracticeId, type Segment } from '../lib/pranayama';
 import { useHeal } from '../lib/store';
 import { gentleToday } from '../lib/feeling';
+import { carePlan } from '../lib/care';
 import { todayISO } from '../lib/dates';
 import { hasVoice, speak, voiceLang } from '../lib/voice';
 
@@ -30,7 +31,9 @@ export default function Breathe() {
   const mins = Math.max(1, Math.min(60, Number(minutes) || 10));
   const { days } = useHeal();
   const gentle = gentleToday(days[todayISO()]?.feeling);
-  const plan = useMemo<Segment[]>(() => sessionPlan(choice, mins, undefined, gentle), [choice, mins, gentle]);
+  const feel = days[todayISO()]?.feeling;
+  const care = useMemo(() => carePlan(feel?.symptoms ?? [])?.breath.filter(b => (b as string) !== 'nidra'), [feel]);
+  const plan = useMemo<Segment[]>(() => sessionPlan(choice, mins, undefined, gentle, care), [choice, mins, gentle, care]);
   // Each part opens with a short spoken "how to", then its breaths.
   const steps = useMemo<Step[]>(() => plan.flatMap((seg, k): Step[] => {
     const how = seg.id === 'still' ? '' : practice(seg.id).how;
@@ -111,7 +114,7 @@ export default function Breathe() {
 
       {i < 0 ? (
         <View style={{ flex: 1, paddingHorizontal: 28, justifyContent: 'center', gap: 16 }}>
-          <Text style={{ color: C.ink, fontSize: 30, fontWeight: '600' }}>{pr ? tr(pr.name) : tr("Myra's mix")}</Text>
+          <Text style={{ color: C.ink, fontSize: 30, fontWeight: '600' }}>{pr ? tr(pr.name) : care?.length ? tr('Care breathing') : tr("Myra's mix")}</Text>
           <Text style={{ color: C.muted, fontSize: 16 }}>{tr('{n} minutes', { n: mins })} · {plan.filter(s => s.id !== 'still').map(s => tr(segmentName(s.id))).join(' → ')} → {tr('Stillness')}</Text>
           {pr?.caution ? <Text style={{ color: C.glow, fontSize: 14, lineHeight: 20 }}>{tr(pr.caution)}</Text> : null}
           {!pr && plan.some(s => s.id !== 'still' && practice(s.id).energising) ? <Text style={{ color: C.glow, fontSize: 14, lineHeight: 20 }}>{tr('Bhastrika and Kapalbhati are strong breaths: skip them if pregnant, or with high blood pressure, heart disease, hernia or recent surgery. Empty stomach. Stop if dizzy.')}</Text> : null}

@@ -26,3 +26,19 @@ describe('reading how I feel from my own words', () => {
     expect(symptomsIn('Feeling great today')).toEqual([]);
   });
 });
+
+describe('care plan', () => {
+  it('switches on food, breathing, movement and rest for a cold', async () => {
+    const { carePlan } = await import('./care');
+    const c = carePlan(['cold'])!;
+    expect(c.food.join(' ')).toMatch(/Ginger-tulsi/);
+    expect(c.breath).toEqual(['anulom', 'ujjayi', 'bhramari']);
+    expect(c.move).toMatch(/gentle/);
+    const plan = sessionPlan('mix', 10, 9, true, c.breath).map(s => s.id);
+    expect(plan).toEqual(['anulom', 'ujjayi', 'bhramari', 'still']);
+  });
+  it('a fever means rest, not exercise', async () => {
+    const { carePlan } = await import('./care');
+    expect(carePlan(['cold', 'fever'])!.move).toMatch(/No exercise/);
+  });
+});

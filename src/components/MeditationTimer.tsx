@@ -9,6 +9,7 @@ import { Button, Card, Expandable, Heading, Meter, Note, Score, Segmented } from
 import { newGoal, todaysLength } from '../lib/meditationPlan';
 import { lang, locale } from '../lib/i18n';
 import { MESSAGE_LANGS } from '../lib/foodPlan';
+import { carePlan } from '../lib/care';
 import { hasVoice, voiceLang } from '../lib/voice';
 import { Ionicons } from '@expo/vector-icons';
 import { PRACTICES, type PracticeId } from '../lib/pranayama';
@@ -31,6 +32,7 @@ export function MeditationTimer() {
   const [mode, setMode] = useState<'guided' | 'self'>('guided');
   const [pick, setPick] = useState<PracticeId>('mix');
   const [choosing, setChoosing] = useState(false);
+  const careName = carePlan(day.feeling?.symptoms ?? [])?.name; // care plan (25 Oct 2026)
   const [gLangLocal, setGLangLocal] = useState<string | null>(null);
   const gLang = gLangLocal ?? profile.me?.guideLang ?? lang();
   // Which languages this phone can speak (founder, 24 Oct 2026: Gujarati was silent). Checked once.
@@ -97,7 +99,7 @@ export function MeditationTimer() {
                       <Ionicons name={on ? 'radio-button-on' : 'radio-button-off'} size={20} color={on ? colors.soul : colors.muted} style={{ marginTop: 1 }} />
                       <View style={{ flex: 1 }}>
                         <Text style={{ color: colors.ink, fontWeight: on ? '700' : '600' }}>
-                          {tr(pr.name)}{pr.id === 'mix' ? ` · ${tr('Recommended')}` : ''}{pr.energising && night ? ` · ${tr('better in the morning')}` : ''}
+                          {pr.id === 'mix' && careName ? tr('Care breathing for {what}', { what: tr(careName) }) : tr(pr.name)}{pr.id === 'mix' ? ` · ${tr('Recommended')}` : ''}{pr.energising && night ? ` · ${tr('better in the morning')}` : ''}
                         </Text>
                         {on ? <Text style={{ color: colors.muted, fontSize: 13, lineHeight: 18 }}>{tr(pr.line)}</Text> : null}
                         {on && !choosing ? <Text style={{ color: colors.accent, fontSize: 13, fontWeight: '600', marginTop: 2 }}>{tr('Choose another practice')} ›</Text> : null}

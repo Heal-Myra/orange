@@ -4,6 +4,7 @@
 import { Text, View } from 'react-native';
 import { GuidanceCard } from '../../components/AiBits';
 import { FeelingCard } from '../../components/FeelingCard';
+import { CareCard } from '../../components/CareCard';
 import { todayISO } from '../../lib/dates';
 import { PillarTiles, WellBeingRing } from '../../components/WellBeingRing';
 import { useAuth } from '../../lib/auth';
@@ -29,6 +30,7 @@ export default function Today() {
     }>
 
       {date === todayISO() ? <FeelingCard /> : null}
+      {date === todayISO() ? <CareCard /> : null}
 
       <Card style={{ alignItems: 'center' }}>
         <WellBeingRing w={w} label={label} labelColor={w.logged ? bandColor : colors.muted} />
