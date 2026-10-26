@@ -1147,4 +1147,5 @@ export const HI: Record<string, string> = {
   'e.g. I paused and took three breaths before replying in anger.': 'जैसे: गुस्से में जवाब देने से पहले मैंने रुककर तीन साँसें लीं।',
   'I read today\'s practice': 'मैंने आज का अभ्यास पढ़ा',
   'e.g. I let go of being right in a family discussion.': 'जैसे: परिवार की बातचीत में मैंने सही साबित होने की ज़िद छोड़ी।',
+  'Over 4 hours. If part was the TV or family, lower the minutes.': '4 घंटे से ज़्यादा। अगर कुछ टीवी या परिवार का था, तो मिनट कम करें।',
 };

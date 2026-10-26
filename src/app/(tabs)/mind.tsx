@@ -59,9 +59,6 @@ export default function Mind() {
                 <NumberField label={tr('Minutes')} value={m.minutes} onChange={v => update(d => { d.media[i].minutes = v ?? 0; })} />
                 <Chips options={CONTENT_CATEGORIES.map(c => c.id)} labels={Object.fromEntries(CONTENT_CATEGORIES.map(c => [c.id, tr(c.name)]))}
                   value={m.category} onChange={v => update(d => { d.media[i].category = v as ContentCategoryId; })} />
-                <Pressable onPress={() => update(d => { d.media[i].notMe = !d.media[i].notMe; })} accessibilityRole="checkbox" accessibilityState={{ checked: !!m.notMe }}>
-                  <Text style={{ color: colors.ink }}>{m.notMe ? '☑' : '☐'} {tr('Not me (TV / family)')}</Text>
-                </Pressable>
                 <Pressable onPress={() => { setEditing(null); update(d => { d.media.splice(i, 1); }); }} hitSlop={8}><Text style={{ color: colors.bad }}>{tr('Remove')}</Text></Pressable>
               </View>
             ) : null}

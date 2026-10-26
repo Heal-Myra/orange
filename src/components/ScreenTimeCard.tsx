@@ -119,10 +119,8 @@ export function ScreenTimeCard({ children }: { children?: ReactNode }) {
           <Pressable onPress={() => setOpen(open === i ? null : i)}>
             <Text style={{ color: colors.accent, fontWeight: '600' }}>{nameOf(r.category)} ▾</Text>
           </Pressable>
-          {r.minutes > 240 && !r.notMe ? <Text style={{ color: colors.warn, fontSize: 13 }}>{tr('Over 4 hours. Was it all you? Lower the minutes, or tap Not me if it was the TV or family.')}</Text> : null}
-          <Pressable onPress={() => setRow(i, { notMe: !r.notMe })} accessibilityRole="checkbox" accessibilityState={{ checked: !!r.notMe }}>
-            <Text style={{ color: colors.muted, fontSize: 13 }}>{r.notMe ? '☑' : '☐'} {tr('Not me (TV / family)')}</Text>
-          </Pressable>
+          {/* "Not me" button removed (founder, 26 Oct 2026: looked tacky); lowering the minutes does the job. */}
+          {r.minutes > 240 ? <Text style={{ color: colors.warn, fontSize: 13 }}>{tr('Over 4 hours. If part was the TV or family, lower the minutes.')}</Text> : null}
           {open === i && (
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
               {CONTENT_CATEGORIES.map(c => (
