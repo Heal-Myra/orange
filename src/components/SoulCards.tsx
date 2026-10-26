@@ -5,7 +5,7 @@ import { Pressable, Text, TextInput, View } from 'react-native';
 import { useAuth } from '../lib/auth';
 import { verseOfDay } from '../lib/gita';
 import { passageOfDay, sourceOf, traditionName } from '../lib/wisdom';
-import { POINTS, PRACTICES } from '../lib/scoring';
+import { LEARN_SHARE, POINTS, PRACTICES } from '../lib/scoring';
 import { useHeal } from '../lib/store';
 import { thoughtOfDay } from '../lib/thoughts';
 import { colors } from '../theme';
@@ -48,7 +48,10 @@ export function VerseStudyCard() {
       <TextField key={date + 'verse'} label={tr('What it means to me today')} value={so.verseNote ?? ''} multiline
         onChangeText={t => update(d => { d.soul = { ...d.soul, verseNote: t }; })} placeholder={tr('One line is enough')} />
       <Check checked={!!so.verseStudied} onToggle={() => update(d => { d.soul = { ...d.soul, verseStudied: !d.soul?.verseStudied }; })}
-        title={tr('I studied today\'s wisdom')} points={POINTS.wisdom} />
+        title={tr('I studied today\'s wisdom')} points={LEARN_SHARE * POINTS.wisdom} />
+      {/* Living it earns the other 75 % (founder, 26 Oct 2026). Usually written later in the day. */}
+      <TextField key={date + 'lived'} label={tr('How I lived it today · {n} points', { n: (1 - LEARN_SHARE) * POINTS.wisdom })} value={so.verseLived ?? ''} multiline
+        onChangeText={t => update(d => { d.soul = { ...d.soul, verseLived: t }; })} placeholder={tr('e.g. I paused and took three breaths before replying in anger.')} />
     </Card>
   );
 }

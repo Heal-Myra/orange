@@ -110,15 +110,21 @@ describe('soul (gratitude 30, love 30, Daily Wisdom 20, Tao 20)', () => {
     d.actions = [{ text: 'helped', principle: 'Seva', alignment: 2 }];
     expect(soulScore(d)).toBeNull();
   });
-  it('scores Daily Wisdom 20 and gratitude 7.5 each up to four', () => {
+  it('scores Daily Wisdom (5 for studying, 15 for living it) and gratitude 7.5 each up to four', () => {
     const d = day();
     d.soul = { verseStudied: true, gratitude: ['family', 'health', 'rain', 'tea', 'books'] };
     const s = soulScore(d)!;
-    expect([s.verse, s.gratitude, s.total]).toEqual([20, 30, 50]);
+    expect([s.verse, s.gratitude, s.total]).toEqual([5, 30, 35]);
+    d.soul.verseLived = 'Paused before replying in anger';
+    expect(soulScore(d)!.verse).toBe(20);
+    d.soul.verseLived = 'yes';
+    expect(soulScore(d)!.verse).toBe(5); // a line of at least three words
   });
-  it('scores the Tao practice 20 on any day', () => {
+  it('scores the Tao practice: 5 for reading it, 15 for living it', () => {
     const d = emptyDay('2026-10-21');
     d.tao = { done: true };
+    expect(soulScore(d)!.tao).toBe(5);
+    d.tao = { done: true, lived: 'Let go of being right' };
     expect(soulScore(d)!.tao).toBe(20);
     expect(mindScore(d, P)).toBeNull();
   });
@@ -129,7 +135,7 @@ describe('soul (gratitude 30, love 30, Daily Wisdom 20, Tao 20)', () => {
   it('scores love: whom 12, myself 12, done 6; everything done is exactly 100', () => {
     const d = { ...emptyDay('2026-10-24'), love: { whom: 'Talk to a friend', self: 'A coffee or a treat', done: true } };
     expect(soulScore(d)!.love).toBe(30);
-    const full = { ...d, tao: { done: true }, soul: { gratitude: ['a', 'b', 'c', 'd'], verseStudied: true } };
+    const full = { ...d, tao: { done: true, lived: 'let go of anger' }, soul: { gratitude: ['a', 'b', 'c', 'd'], verseStudied: true, verseLived: 'paused before reacting' } };
     expect(soulScore(full)!.total).toBe(100);
   });
 });

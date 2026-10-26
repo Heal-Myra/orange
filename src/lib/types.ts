@@ -71,7 +71,7 @@ export interface DayLog {
   mind: { meditationMin?: number; attention?: boolean; learning?: boolean; focusDone?: number; learned?: { text?: string; link?: string; by?: 'myra' } }; // focusDone: Myra's focus tasks ticked off today (attention/learning: older days only)
   dharma: Partial<Record<PracticeId, boolean>>;
   actions: ReflectedAction[];
-  tao?: { done?: boolean; note?: string };
+  tao?: { done?: boolean; note?: string; lived?: string }; // lived: how I used it today (26 Oct 2026)
   // Read from Apple Health (20 Oct 2026). Body measures are the latest reading; the rest are for this day.
   health?: {
     weightKg?: number; weightAt?: number; weightTyped?: boolean; weightTypedAt?: number; bodyFatPct?: number; restingHr?: number; hrv?: number; vo2max?: number;
@@ -83,6 +83,7 @@ export interface DayLog {
     checked?: boolean;      // answered the eight-practices check today
     verseStudied?: boolean; // studied the Gita verse of the day
     verseNote?: string;     // what the verse means to me
+    verseLived?: string;    // how I lived today's wisdom (founder, 26 Oct 2026: living it earns 75%)
     gratitude?: string[];   // up to four things I am grateful for (10 points each)
     thought?: string;       // my thought for the day
   };

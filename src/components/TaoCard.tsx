@@ -6,6 +6,7 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { useHeal } from '../lib/store';
+import { LEARN_SHARE } from '../lib/scoring';
 import { TAO_CORE, TAO_POINTS, TAO_WEEK, WEEK_REVIEW, mondayOf, taoForDate } from '../lib/tao';
 import { colors } from '../theme';
 import { Card, Check, Expandable, Heading, Label, Note, TextField } from './ui';
@@ -50,7 +51,10 @@ export function TaoCard({ on }: { on: 'mind' | 'soul' }) {
       </Expandable>
 
       <Check color={color} checked={!!day.tao?.done} onToggle={() => update(d => { d.tao = { ...d.tao, done: !d.tao?.done }; })}
-        title={tr('I did today\'s practice')} points={TAO_POINTS} />
+        title={tr('I read today\'s practice')} points={LEARN_SHARE * TAO_POINTS} />
+      {/* Living it earns the other 75 % (founder, 26 Oct 2026). */}
+      <TextField key={date + 'taolived'} label={tr('How I lived it today · {n} points', { n: (1 - LEARN_SHARE) * TAO_POINTS })} value={day.tao?.lived ?? ''} multiline
+        onChangeText={v => update(d => { d.tao = { ...d.tao, lived: v }; })} placeholder={tr('e.g. I let go of being right in a family discussion.')} />
 
       <Pressable onPress={() => setMore(m => !m)} hitSlop={6}>
         <Text style={{ color: colors.accent, fontWeight: '600' }}>{more ? tr('Show less') : tr('Read the full practice')}</Text>

@@ -14,3 +14,7 @@ Date: 24 Oct 2026 · Decided by: founder
 ## Update, 25 Oct 2026: Soul trimmed to 100
 Founder's split: Gratitude 30 (7.5 each, up to four) + Love 30 + Daily Wisdom 20 + Tao practice 20 = 100. Ends the
 130 overrun that was held at 100. Body and Mind unchanged.
+
+## Update, 26 Oct 2026: learning 25 %, living it 75 %
+Founder: score Daily Wisdom and Tao on how the person used the learning during the day, not only on reading it.
+Each part: tick for studying = 25 % (5 of 20); "How I lived it today", at least three words = 75 % (15 of 20).

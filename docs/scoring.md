@@ -28,8 +28,10 @@ Learning was removed from Mind on 24 Oct 2026.
 | --- | --- | --- |
 | Gratitude | 30 | 7.5 for each thing written, up to four |
 | Love | 30 | whom I will love today, chosen (12) + how I will love myself today, chosen (12) + one of them done (6) |
-| Daily Wisdom | 20 | read the day's passage, open its meaning, tick "studied" |
-| Tao practice | 20 | the day's Tao Te Ching practice done (the card moved here from Mind on 24 Oct 2026) |
+| Daily Wisdom | 20 | studied (tick) 5 + "How I lived it today", at least three words, 15 |
+| Tao practice | 20 | read the day's practice (tick) 5 + "How I lived it today", at least three words, 15 |
+
+Learning earns 25 %, living it during the day earns 75 % (founder, 26 Oct 2026).
 
 Founder's split, 25 Oct 2026 (before: 40 + 30 + 30 + 30 = 130, held at 100).
 

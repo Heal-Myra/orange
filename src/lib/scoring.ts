@@ -104,6 +104,10 @@ export function bodyScore(d: DayLog, P: Profile): BodyScore | null {
 export const POINTS = { food: 40, sleep: 30, movement: 30, focus: 40, meditation: 30, phone: 30, gratitude: 30, wisdom: 20, tao: 20, love: 30 } as const;
 export const FOCUS_EACH = POINTS.focus / 2;          // each of up to two focus to-dos
 export const GRATITUDE_EACH = POINTS.gratitude / 4;  // each of up to four gratitudes
+/** Daily Wisdom and Tao: reading earns this share, living it (a line on how it was used today) the rest. */
+export const LEARN_SHARE = 0.25;
+/** A line on how the learning was lived: at least three words. */
+export const lived = (text?: string) => (text ?? '').trim().split(/\s+/).filter(Boolean).length >= 3;
 
 export interface MindScore {
   total: number;
@@ -166,8 +170,9 @@ export function soulScore(d: DayLog, _P: Profile = DEFAULT_PROFILE): SoulScore |
   const so = d.soul ?? {};
   // Boxes can be left empty in between (saved as null), so check each one is text (crash, 23 Oct 2026).
   const gratitude = Math.min(4, countGratitude(so.gratitude)) * GRATITUDE_EACH;
-  const verse = so.verseStudied ? POINTS.wisdom : 0;
-  const tao = d.tao?.done ? POINTS.tao : 0;
+  // Learning earns 25 %, living it during the day earns 75 % (founder, 26 Oct 2026).
+  const verse = (so.verseStudied ? LEARN_SHARE * POINTS.wisdom : 0) + (lived(so.verseLived) ? (1 - LEARN_SHARE) * POINTS.wisdom : 0);
+  const tao = (d.tao?.done ? LEARN_SHARE * POINTS.tao : 0) + (lived(d.tao?.lived) ? (1 - LEARN_SHARE) * POINTS.tao : 0);
   const love = lovePoints(d);
   if (!gratitude && !verse && !tao && !love) return null;
   return { total: Math.min(100, gratitude + verse + tao + love), gratitude, verse, tao, love };

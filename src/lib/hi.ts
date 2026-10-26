@@ -1143,4 +1143,8 @@ export const HI: Record<string, string> = {
   'Day {n} of {total} · done {times} times': '{total} में से दिन {n} · {times} बार किया',
   'Stop this habit': 'यह आदत बंद करें',
   'Added to Making a habit{at}: on Myra recommends every day, 21 days to make it stick.': 'आदत बनाना में जोड़ा गया{at}: हर दिन मायरा की सलाह में, 21 दिन ताकि यह पक्की हो जाए।',
+  'How I lived it today · {n} points': 'आज मैंने इसे कैसे जिया · {n} अंक',
+  'e.g. I paused and took three breaths before replying in anger.': 'जैसे: गुस्से में जवाब देने से पहले मैंने रुककर तीन साँसें लीं।',
+  'I read today\'s practice': 'मैंने आज का अभ्यास पढ़ा',
+  'e.g. I let go of being right in a family discussion.': 'जैसे: परिवार की बातचीत में मैंने सही साबित होने की ज़िद छोड़ी।',
 };
