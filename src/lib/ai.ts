@@ -33,8 +33,8 @@ export const analyseMeal = (image_base64: string, media_type: string, hint: stri
 
 export const analyseMealText = (text: string) => call<MealResult>('meal_text', { text });
 
-export interface ScreenTimeResult { sessions: { platform: string; app: string; minutes: number; category: ContentCategoryId }[]; period: string; note: string }
-export const readScreenTime = (image_base64: string, media_type: string) => call<ScreenTimeResult>('screen_time', { image_base64, media_type });
+export interface ScreenTimeResult { sessions: { platform: string; app: string; minutes: number; category: ContentCategoryId; group?: 'social' | 'learning' | 'tool' }[]; period: string; date?: string | null; note: string }
+export const readScreenTime = (image_base64: string, media_type: string, today: string) => call<ScreenTimeResult>('screen_time', { image_base64, media_type, today });
 
 export interface GoalReading { goal: 'lose' | 'keep' | 'gain'; kg: number | null; weeks: number | null; aims: string; verdict: string; message: string }
 /** Myra reads a goal written in plain words (About you). */

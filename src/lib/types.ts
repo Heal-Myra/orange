@@ -30,6 +30,11 @@ export interface MediaSession {
   minutes: number;
   category: ContentCategoryId;
   source?: 'screen' | 'manual'; // 'screen' = read from a Screen Time screenshot
+  /** social = social, video, messaging, news (counts toward the limit); learning = AI assistants, reading, courses
+   *  (raises quality, never counts toward the limit); tool = payments, maps, rides… (shown, not scored). Founder, 26 Oct 2026. */
+  group?: 'social' | 'learning' | 'tool';
+  app?: string;     // name as shown on the screenshot
+  notMe?: boolean;  // "Not me (TV / family)": kept for the record, not scored
 }
 
 export type PracticeId =

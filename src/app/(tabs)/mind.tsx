@@ -25,6 +25,7 @@ export default function Mind() {
   const [minutes, setMinutes] = useState<number | undefined>();
   const [formKey, setFormKey] = useState(0);
   const [adding, setAdding] = useState(false);
+  const [editing, setEditing] = useState<number | null>(null);
 
   const add = () => {
     if (!minutes || minutes <= 0) return;
@@ -45,12 +46,30 @@ export default function Mind() {
       <Anchor id="meditation"><MeditationTimer /></Anchor>
 
       <Anchor id="phone"><ScreenTimeCard>
-        {day.media.map((m, i) => (
-          <View key={i} style={[s.headingRow, { borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 8 }]}>
-            <Text style={{ flex: 1, color: colors.ink }}>{m.platform} · {tr(CONTENT_CATEGORIES.find(c => c.id === m.category)?.name ?? '')} · {m.minutes} {tr('min')}{m.source === 'screen' ? ' · from screenshot' : ''}</Text>
-            <Pressable onPress={() => update(d => { d.media.splice(i, 1); })} hitSlop={8}><Text style={{ color: colors.bad }}>{tr('Remove')}</Text></Pressable>
+        {/* Each session can be corrected (founder, 26 Oct 2026: 6 hours of YouTube was the TV): tap to change the minutes or
+            the kind, or mark "Not me". Everyday tools sit in one quiet line, unscored. */}
+        {day.media.map((m, i) => m.group === 'tool' ? null : (
+          <View key={i} style={{ borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 8, gap: 8, opacity: m.notMe ? 0.55 : 1 }}>
+            <Pressable onPress={() => setEditing(editing === i ? null : i)} style={s.headingRow} accessibilityRole="button">
+              <Text style={{ flex: 1, color: colors.ink }}>{m.app || m.platform} · {tr(CONTENT_CATEGORIES.find(c => c.id === m.category)?.name ?? '')} · {m.minutes} {tr('min')}{m.notMe ? ` · ${tr('not me')}` : m.group === 'learning' ? ` · ${tr('learning & AI')}` : ''}</Text>
+              <Text style={{ color: colors.accent, fontWeight: '600' }}>{editing === i ? tr('Done') : tr('Edit')}</Text>
+            </Pressable>
+            {editing === i ? (
+              <View style={{ gap: 8 }}>
+                <NumberField label={tr('Minutes')} value={m.minutes} onChange={v => update(d => { d.media[i].minutes = v ?? 0; })} />
+                <Chips options={CONTENT_CATEGORIES.map(c => c.id)} labels={Object.fromEntries(CONTENT_CATEGORIES.map(c => [c.id, tr(c.name)]))}
+                  value={m.category} onChange={v => update(d => { d.media[i].category = v as ContentCategoryId; })} />
+                <Pressable onPress={() => update(d => { d.media[i].notMe = !d.media[i].notMe; })} accessibilityRole="checkbox" accessibilityState={{ checked: !!m.notMe }}>
+                  <Text style={{ color: colors.ink }}>{m.notMe ? '☑' : '☐'} {tr('Not me (TV / family)')}</Text>
+                </Pressable>
+                <Pressable onPress={() => { setEditing(null); update(d => { d.media.splice(i, 1); }); }} hitSlop={8}><Text style={{ color: colors.bad }}>{tr('Remove')}</Text></Pressable>
+              </View>
+            ) : null}
           </View>
         ))}
+        {day.media.some(m => m.group === 'tool') ? (
+          <Note>{tr('Everyday tools, not scored: {list}', { list: day.media.filter(m => m.group === 'tool').map(t => `${t.app || t.platform} ${t.minutes}`).join(' · ') + ' ' + tr('min') })}</Note>
+        ) : null}
 
         {!day.noMedia && (adding ? (
           <View style={{ gap: 10, borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 10 }} key={formKey}>
@@ -67,7 +86,7 @@ export default function Mind() {
             </View>
           </View>
         ) : <Button kind="plain" title={tr('+ Add a social-media session by hand')} onPress={() => setAdding(true)} />)}
-        <Note>{tr('Content quality earns up to 40 points and staying within your {limit}-minute limit earns up to 30.', { limit: profile.mediaLimit })}</Note>
+        <Note>{tr('Content quality earns up to 18 points and staying within your {limit}-minute limit up to 12. Learning and AI tools never count against the limit.', { limit: profile.mediaLimit })}</Note>
       </ScreenTimeCard></Anchor>
     </Screen>
   );

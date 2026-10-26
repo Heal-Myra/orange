@@ -300,14 +300,21 @@ Reply with JSON only:
       return mealAnalyse(null, text, hindi);
     }
     case 'screen_time': {
+      // Every app, in three groups (founder, 26 Oct 2026: Claude was not captured): social and video count toward the
+      // limit; learning and AI tools raise quality; everyday tools are shown but not scored. The day shown is read too.
+      const today = String(p.today ?? '').slice(0, 10);
       return (await askJson(ask, 'smart', ORANGE_BOOK,
-`This is a screenshot of a phone's Screen Time (iPhone) or Digital Wellbeing (Android) screen. Read the time spent per app.
-Include only social media, video, messaging and news apps (e.g. Instagram, YouTube, WhatsApp, Facebook, X/Twitter, LinkedIn, Snapchat, Telegram, Reddit, ShareChat, Moj, news apps). Skip tools such as Settings, Camera, Maps, Phone, banking.
-For each, give the platform (one of Instagram, YouTube, WhatsApp, Facebook, X, LinkedIn, or Other), whole minutes, and the most likely kind of content from: ${CATEGORIES}
-(typical defaults: Instagram scrolling, YouTube fun, WhatsApp connect, LinkedIn news, Facebook scrolling, X news; the person can change it).
+`This is a screenshot of a phone's Screen Time (iPhone) or Digital Wellbeing (Android) screen. Read the time spent on EVERY app and website listed.
+Put each in one group:
+- "social": social media, video, messaging, news, games (Instagram, YouTube, WhatsApp, Facebook, X/Twitter, LinkedIn, Snapchat, Telegram, Reddit, ShareChat, Moj, Netflix, Hotstar, news apps, games).
+- "learning": AI assistants and learning (Claude, ChatGPT, Gemini, Perplexity, Kindle, Audible, Coursera, Duolingo, Udemy, Notion, Google Docs, books, podcasts about learning).
+- "tool": everyday tools (Google Pay, PhonePe, Paytm, banking, Maps, Uber, Ola, Calculator, Settings, Camera, Photos, Phone, Clock, shopping, food delivery, plain web search like google.com, Safari or Chrome when no site is named).
+For each, give the platform (one of Instagram, YouTube, WhatsApp, Facebook, X, LinkedIn, or Other), the app name as shown, whole minutes, the group, and the most likely kind of content from: ${CATEGORIES}
+(typical defaults: Instagram scrolling, YouTube fun, WhatsApp connect, LinkedIn news, Facebook scrolling, X news; learning group = learning; tool group = news).
 If the screenshot shows a week, use the daily average if shown, otherwise divide by 7.
-Reply with JSON only: {"sessions":[{"platform":"Instagram","app":"name as shown","minutes":number,"category":"one of the categories"}],"period":"today"|"daily average"|"unclear","note":"one short sentence"}
-If this is not a Screen Time screenshot: {"sessions":[],"period":"unclear","note":"This does not look like a Screen Time screenshot."}`,
+The day the screenshot shows: today is ${today || 'unknown'}. If it shows a specific day (e.g. "Saturday, 24 October" or "Yesterday"), give that date as YYYY-MM-DD (same year as today unless that would be in the future); "Today" = today; a week = null.
+Reply with JSON only: {"sessions":[{"platform":"YouTube","app":"name as shown","minutes":number,"group":"social"|"learning"|"tool","category":"one of the categories"}],"period":"today"|"daily average"|"unclear","date":"YYYY-MM-DD"|null,"note":"one short sentence"}
+If this is not a Screen Time screenshot: {"sessions":[],"period":"unclear","date":null,"note":"This does not look like a Screen Time screenshot."}`,
         { media_type: String(p.media_type ?? 'image/jpeg'), data: String(p.image_base64 ?? '') }));
     }
     case 'learn_link': {

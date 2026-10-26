@@ -95,7 +95,7 @@ export const METRICS: Metric[] = [
 
   { id: 'mind', name: 'Mind score', unit: 'of 100', pillar: 'mind', better: 'up', value: (d, P) => num(mindScore(d, P)?.total) },
   { id: 'focus', name: 'Focus to-dos done', unit: 'per day', decimals: 1, pillar: 'mind', better: 'up', value: d => num(d.mind.focusDone) },
-  { id: 'social', name: 'Social media', unit: 'min', pillar: 'mind', better: 'down', target: P => P.mediaLimit, value: d => (d.noMedia ? 0 : d.media.length ? d.media.reduce((s, x) => s + (x.minutes || 0), 0) : null) },
+  { id: 'social', name: 'Social media', unit: 'min', pillar: 'mind', better: 'down', target: P => P.mediaLimit, value: d => { if (d.noMedia) return 0; const own = d.media.filter(x => !x.notMe && (x.group ?? 'social') === 'social'); return d.media.length ? own.reduce((s, x) => s + (x.minutes || 0), 0) : null; } },
 
 
   { id: 'soul', name: 'Soul score', unit: 'of 100', pillar: 'soul', better: 'up', value: (d, P) => num(soulScore(d, P)?.total) },

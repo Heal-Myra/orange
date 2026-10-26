@@ -125,11 +125,15 @@ export function mindScore(d: DayLog, P: Profile): MindScore | null {
   if (d.noMedia) {
     content = POINTS.phone; quality = 1;
   } else {
-    minutes = d.media.reduce((s, x) => s + (x.minutes || 0), 0);
+    // Scored: social and learning sessions that were the person's own; tools and "Not me" are left out (26 Oct 2026).
+    const scored = d.media.filter(x => !x.notMe && x.group !== 'tool');
+    const social = scored.filter(x => x.group !== 'learning').reduce((s, x) => s + (x.minutes || 0), 0);
+    minutes = scored.reduce((s, x) => s + (x.minutes || 0), 0);
     if (minutes > 0) {
-      quality = d.media.reduce((s, x) => s + (x.minutes || 0) * weightOf(x.category), 0) / minutes;
+      quality = scored.reduce((s, x) => s + (x.minutes || 0) * weightOf(x.category), 0) / minutes;
       const L = P.mediaLimit;
-      const quantity = minutes <= L ? 1 : c01(1 - (minutes - L) / (2 * L));
+      // Only social and video time counts toward the limit; learning and AI tools never use it up.
+      const quantity = social <= L ? 1 : c01(1 - (social - L) / (2 * L));
       content = 18 * quality + 12 * quantity;
     }
   }

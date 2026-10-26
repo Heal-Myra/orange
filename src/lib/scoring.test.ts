@@ -143,3 +143,19 @@ describe('band', () => {
   });
 });
 
+
+describe('phone activity groups (26 Oct 2026)', () => {
+  it('learning and AI tools raise quality without using up the limit; tools and "Not me" are not scored', () => {
+    const d = emptyDay('2026-10-26');
+    d.media = [
+      { platform: 'Other', app: 'Claude', minutes: 55, category: 'learning', group: 'learning', source: 'screen' },
+      { platform: 'WhatsApp', minutes: 40, category: 'connect', group: 'social', source: 'screen' },
+      { platform: 'YouTube', minutes: 409, category: 'fun', group: 'social', source: 'screen', notMe: true },
+      { platform: 'Other', app: 'Google Pay', minutes: 15, category: 'news', group: 'tool', source: 'screen' },
+    ];
+    const m = mindScore(d, P)!;
+    expect(m.minutes).toBe(95);
+    // 40 social minutes is within the 60-minute limit: full 12 for quantity.
+    expect(m.content).toBeCloseTo(18 * ((55 * 1 + 40 * 0.8) / 95) + 12, 5);
+  });
+});
