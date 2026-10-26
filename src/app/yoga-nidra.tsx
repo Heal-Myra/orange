@@ -7,7 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { FullScreen } from '../components/FullScreen';
 import { lang, tr } from '../lib/i18n';
 import { partOfDay } from '../lib/context';
 import { momentOf } from '../lib/routine';
@@ -89,7 +89,7 @@ export default function YogaNidra() {
   const progress = i < 0 ? 0 : Math.min(1, i / steps.length);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: NIGHT.bg }}>
+    <FullScreen style={{ flex: 1, backgroundColor: NIGHT.bg }}>
       <View style={{ flexDirection: 'row', justifyContent: 'flex-end', padding: 16 }}>
         <Pressable onPress={close} accessibilityLabel={tr('Close')} hitSlop={12}><Ionicons name="close" size={28} color={NIGHT.muted} /></Pressable>
       </View>
@@ -134,6 +134,6 @@ export default function YogaNidra() {
           </View>
         </View>
       ) : null}
-    </SafeAreaView>
+    </FullScreen>
   );
 }

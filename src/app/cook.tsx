@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, Platform, Pressable, ScrollView, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { FullScreen } from '../components/FullScreen';
 import { decodeGuide, iconFor, scenes, VOICE_LANG } from '../lib/cookGuide';
 import { hasVoice, speak } from '../lib/voice';
 import { optional } from '../lib/native';
@@ -51,9 +51,9 @@ export default function Cook() {
 
   if (!guide) {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: C.bg, justifyContent: 'center', padding: 28 }}>
+      <FullScreen style={{ flex: 1, backgroundColor: C.bg, justifyContent: 'center', padding: 28 }}>
         <Text style={{ fontSize: 20, color: C.ink }}>{tr('This cooking guide link is incomplete. Please ask for it to be sent again.')}</Text>
-      </SafeAreaView>
+      </FullScreen>
     );
   }
 
@@ -62,7 +62,7 @@ export default function Cook() {
   const start = () => { if (done) setI(0); setPlaying(true); };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }}>
+    <FullScreen style={{ flex: 1, backgroundColor: C.bg }}>
       {/* Progress, one segment per scene, like short videos. */}
       <View style={{ flexDirection: 'row', gap: 4, paddingHorizontal: 16, paddingTop: 12 }}>
         {list.map((_, k) => (
@@ -129,6 +129,6 @@ export default function Cook() {
         </Pressable>
       </View>
       <Text style={{ textAlign: 'center', color: C.muted, fontSize: 12, paddingBottom: 12 }}>{tr('Made with Happy Orange · happyorange.in')}</Text>
-    </SafeAreaView>
+    </FullScreen>
   );
 }

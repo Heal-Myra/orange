@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { FullScreen } from '../components/FullScreen';
 import { GuideFigure } from '../components/GuideFigure';
 import { useGuideText } from '../lib/guideText';
 import { lang, tr } from '../lib/i18n';
@@ -54,7 +54,7 @@ export default function Explain() {
   const ready = !translating && !preparing;
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }}>
+    <FullScreen style={{ flex: 1, backgroundColor: C.bg }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16 }}>
         <Text style={{ color: C.glow, fontWeight: '700', letterSpacing: 1.2, fontSize: 12 }}>{tr('HOW TO')} · {tr(pr.name).toUpperCase()}</Text>
         <Pressable onPress={close} hitSlop={12} accessibilityLabel={tr('Close')}><Ionicons name="close" size={26} color={C.muted} /></Pressable>
@@ -90,6 +90,6 @@ export default function Explain() {
         )}
         <Text style={{ color: C.muted, fontSize: 12, textAlign: 'center' }}>{tr('Everyday self-care, not medical advice.')}</Text>
       </View>
-    </SafeAreaView>
+    </FullScreen>
   );
 }

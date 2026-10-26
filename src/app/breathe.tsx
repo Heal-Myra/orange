@@ -6,7 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, Easing, Platform, Pressable, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { FullScreen } from '../components/FullScreen';
 import { lang, tr } from '../lib/i18n';
 import { useGuideText } from '../lib/guideText';
 import { optional } from '../lib/native';
@@ -115,7 +115,7 @@ export default function Breathe() {
   const D = 240;
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }}>
+    <FullScreen style={{ flex: 1, backgroundColor: C.bg }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16 }}>
         <Text style={{ color: C.glow, fontWeight: '700', letterSpacing: 1 }}>{tr('HAPPY ORANGE · BREATHE')}</Text>
         <Pressable onPress={close} hitSlop={12} accessibilityLabel={tr('Close')}><Ionicons name="close" size={26} color={C.muted} /></Pressable>
@@ -175,6 +175,6 @@ export default function Breathe() {
           </View>
         </>
       )}
-    </SafeAreaView>
+    </FullScreen>
   );
 }
