@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { Pressable, Text, TextInput, View } from 'react-native';
 import { shiftISO, todayISO } from '../lib/dates';
 import { AREAS, areaName, useTasks, type Area, type Task } from '../lib/tasks';
-import { habitsToday, readHabit, repeatName, type Repeat } from '../lib/habits';
+import { FORMING_DAYS, forming, habitDay, habitsToday, readHabit, repeatName, timesDone, type Repeat } from '../lib/habits';
 import { DatePicker } from './DatePicker';
 import { loadOn, PER_AREA_DAY } from '../lib/taskPlan';
 import { colors } from '../theme';
@@ -78,8 +78,43 @@ export function TasksCard() {
       ) : null}
       {all ? later.map(t => <TaskRow key={t.id} t={t} inFocus={false} />) : null}
 
+      <MakingAHabit />
+
       {doneToday ? <Note>{tr('Done today: {n} ✓', { n: doneToday })}</Note> : null}
     </Card>
+  );
+}
+
+/** Making a habit (founder, 26 Oct 2026): for its first 21 days a habit sits here, inside Clear your mind, with its day
+ *  count; after that it moves to the Habits card. */
+function MakingAHabit() {
+  const { habits, tickHabit, removeHabit } = useTasks();
+  const { day, days, date } = useHeal();
+  const [y, m, d] = date.split('-').map(Number);
+  const list = habitsToday(habits, new Date(y, m - 1, d)).filter(h => forming(h, date));
+  if (!list.length) return null;
+  const done = day.habitsDone ?? [];
+  return (
+    <View style={{ gap: 8, borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 10 }}>
+      <Text style={{ fontWeight: '700', color: colors.ink }}>{tr('Making a habit')}</Text>
+      {list.map(h => {
+        const on = done.includes(h.id);
+        return (
+          <View key={h.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+            <Pressable onPress={() => tickHabit(h.id)} accessibilityRole="checkbox" accessibilityState={{ checked: on }} hitSlop={8}>
+              <Ionicons name={on ? 'checkmark-circle' : 'ellipse-outline'} size={24} color={colors.accent} />
+            </Pressable>
+            <View style={{ flex: 1 }}>
+              <Text style={{ color: colors.ink, textDecorationLine: on ? 'line-through' : 'none' }}>{h.at ? `${h.at} · ` : ''}{h.title}</Text>
+              <Text style={{ color: colors.muted, fontSize: 12 }}>{tr('Day {n} of {total} · done {times} times', { n: habitDay(h, date), total: FORMING_DAYS, times: timesDone(h, days) })}</Text>
+            </View>
+            <Pressable onPress={() => removeHabit(h.id)} hitSlop={8} accessibilityLabel={tr('Stop this habit')}>
+              <Ionicons name="close" size={18} color={colors.muted} />
+            </Pressable>
+          </View>
+        );
+      })}
+    </View>
   );
 }
 
@@ -104,7 +139,7 @@ function AddTask({ area }: { area: Area }) {
     if (rep !== 'once') {
       // A repeating to-do is a habit (founder, 23 Oct 2026): its own bar, and Myra shows it at its time.
       addHabit({ title, area, repeat: rep, at: read.at, weekday: rep === 'weekly' ? read.weekday ?? new Date().getDay() : undefined });
-      setNote(tr('Added to Habits{at}.', { at: read.at ? ` · ${read.at}` : '' }));
+      setNote(tr('Added to Making a habit{at}: on Myra recommends every day, 21 days to make it stick.', { at: read.at ? ` · ${read.at}` : '' }));
     } else {
       const asked = picked ?? (days == null ? undefined : shiftISO(todayISO(), days));
       const placed = add(title, area, asked);
@@ -215,7 +250,9 @@ export function HabitsBar() {
   const [edit, setEdit] = useState(false);
   if (!habits.length) return null;
   const [y, m, d] = date.split('-').map(Number);
-  const list = habitsToday(habits, new Date(y, m - 1, d));
+  // Only habits past their first 21 days; newer ones are in Clear your mind › Making a habit (26 Oct 2026).
+  const list = habitsToday(habits, new Date(y, m - 1, d)).filter(h => !forming(h, date));
+  if (!list.length && !habits.some(h => !forming(h, date))) return null;
   const done = day.habitsDone ?? [];
   return (
     <Card style={{ gap: 10 }}>
@@ -236,7 +273,7 @@ export function HabitsBar() {
         </View>
       ) : <Note>{tr('No habits today.')}</Note>}
       {edit ? <Note>{tr('Tap a habit to remove it.')}</Note> : <Note>{tr('{done} of {n} done today', { done: list.filter(h => done.includes(h.id)).length, n: list.length })}</Note>}
-      {edit ? habits.filter(h => !list.includes(h)).map(h => (
+      {edit ? habits.filter(h => !list.includes(h) && !forming(h, date)).map(h => (
         <Pressable key={h.id} onPress={() => removeHabit(h.id)}><Text style={{ color: colors.muted }}>✕ {h.title} · {tr(repeatName(h.repeat))}</Text></Pressable>
       )) : null}
     </Card>

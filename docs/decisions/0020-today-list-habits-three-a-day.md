@@ -14,3 +14,10 @@ Date: 23 Oct 2026 · Decided by: founder
 - At a habit's time (from five minutes before, for an hour, until ticked) it is the one thing on Today's Clear your mind,
   with a tick; a phone reminder five minutes before (builds with reminders). Myra is told today's habits.
 - Habits are saved with About you (profiles.about), so they sync with the account; ticks are saved on the day (habitsDone).
+
+## Update, 26 Oct 2026: habits on Myra recommends, and 21 days of "Making a habit"
+Founder: once a daily task is recorded it pops up on Myra recommends directly, and for 21 days it shows under a
+"Making a habit" part of the Clear your mind card. Every habit due today stays on Myra recommends from its time (five
+minutes before) until ticked; without a time, all day. It sits above Myra's own line instead of replacing it. Days 1–21
+live in Making a habit (`forming`, `habitDay`, `timesDone` in src/lib/habits.ts); from day 22 the habit moves to the
+Habits card.

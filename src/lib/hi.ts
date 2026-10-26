@@ -1139,4 +1139,8 @@ export const HI: Record<string, string> = {
   'This screenshot is from {day}; it will be added to that day.': 'यह स्क्रीनशॉट {day} का है; यह उसी दिन में जुड़ेगा।',
   'Social and video: {total} of your {limit}-minute limit.': 'सोशल और वीडियो: आपकी {limit} मिनट की सीमा में से {total}।',
   'Learning and AI tools: {n} min (never counts against the limit).': 'सीखना और AI टूल: {n} मिनट (सीमा में कभी नहीं गिना जाता)।',
+  'Making a habit': 'आदत बनाना',
+  'Day {n} of {total} · done {times} times': '{total} में से दिन {n} · {times} बार किया',
+  'Stop this habit': 'यह आदत बंद करें',
+  'Added to Making a habit{at}: on Myra recommends every day, 21 days to make it stick.': 'आदत बनाना में जोड़ा गया{at}: हर दिन मायरा की सलाह में, 21 दिन ताकि यह पक्की हो जाए।',
 };

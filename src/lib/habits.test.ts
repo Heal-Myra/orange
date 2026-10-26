@@ -15,7 +15,17 @@ describe('habits', () => {
     expect(habitNow([h], [], at(8, 54))).toBeNull();
     expect(habitNow([h], [], at(8, 55))?.id).toBe('h');
     expect(habitNow([h], ['h'], at(9, 5))).toBeNull();
-    expect(habitNow([h], [], at(10, 30))).toBeNull();
+    // Stays on Myra recommends until ticked (founder, 26 Oct 2026).
+    expect(habitNow([h], [], at(10, 30))?.id).toBe('h');
+  });
+  it('a habit without a time is due all day; the first 21 days are "making a habit"', async () => {
+    const { habitsDue, habitDay, forming, timesDone } = await import('./habits');
+    const h: Habit = { id: 'x', title: 'Read 10 pages', area: 'self', repeat: 'daily', createdAt: '2026-10-05T10:00:00' };
+    expect(habitsDue([h], [], new Date(2026, 9, 26, 7, 0)).map(x => x.id)).toEqual(['x']);
+    expect(habitDay(h, '2026-10-05')).toBe(1);
+    expect(forming(h, '2026-10-25')).toBe(true);   // day 21
+    expect(forming(h, '2026-10-26')).toBe(false);  // day 22: moves to Habits
+    expect(timesDone(h, { '2026-10-04': { habitsDone: ['x'] }, '2026-10-06': { habitsDone: ['x'] }, '2026-10-07': {} })).toBe(1);
   });
 });
 

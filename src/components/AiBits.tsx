@@ -7,7 +7,7 @@ import { traditionName, type Passage, type Tradition } from '../lib/wisdom';
 import { useAuth } from '../lib/auth';
 import { buildContext, daySignature, partOfDay, type Slot } from '../lib/context';
 import { momentOf, type RoutineKind } from '../lib/routine';
-import { habitNow } from '../lib/habits';
+import { habitsDue } from '../lib/habits';
 import { tasksForAI, useTasks } from '../lib/tasks';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -103,7 +103,7 @@ export function GuidanceCard() {
 
   // Which one to show now. The moment decides first, so bedtime is always about winding down (founder, 22 Oct 2026:
   // at 10 pm Myra showed a dinner tip); Myra's own pick only when the moment does not say.
-  const hNow = isToday ? habitNow(habits, day.habitsDone ?? []) : null; // re-checked every minute (tick)
+  const due = isToday ? habitsDue(habits, day.habitsDone ?? []) : []; // re-checked every minute (tick)
   const nowKind = momentOf(profile.me?.routine)?.now.kind;
   const pick = pickForMoment(nowKind, partOfDay(), g?.pick);
   // After the usual sleep time (or 9:30 pm), only winding down: never a target to chase (founder, 22 Oct 2026:
@@ -123,16 +123,18 @@ export function GuidanceCard() {
       {/* Three very simple tasks, one each (founder, 21 Oct 2026). When the Mind task is a to-do, it can be ticked here;
           Myra then rotates to the next thing. */}
       {/* A habit at its time comes first (founder, 23 Oct 2026: "Call Dad daily at 9 AM" pops up at 9). */}
-      {hNow ? (
-        <Card style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 12, borderLeftWidth: 5, borderLeftColor: colors.mind }}>
-          <Text style={{ color: colors.mind, fontWeight: '700', fontSize: 14, width: 44 }}>{hNow.at}</Text>
-          <Text style={{ color: colors.ink, flex: 1, fontSize: 14, lineHeight: 20 }}>{hNow.title} <Text style={{ color: colors.muted, fontSize: 12 }}>· {tr('Habit')}</Text></Text>
-          <Pressable accessibilityRole="checkbox" accessibilityLabel={`Done: ${hNow.title}`} hitSlop={10} onPress={() => tickHabit(hNow.id)}>
+      {/* Since 26 Oct 2026 (founder): every habit due today stays on Myra recommends from its time until ticked,
+          above Myra's own suggestion rather than instead of it. */}
+      {due.map(h => (
+        <Card key={h.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 12, borderLeftWidth: 5, borderLeftColor: colors.mind }}>
+          <Text style={{ color: colors.mind, fontWeight: '700', fontSize: 14, width: 44 }}>{h.at ?? tr('Today')}</Text>
+          <Text style={{ color: colors.ink, flex: 1, fontSize: 14, lineHeight: 20 }}>{h.title} <Text style={{ color: colors.muted, fontSize: 12 }}>· {tr('Habit')}</Text></Text>
+          <Pressable accessibilityRole="checkbox" accessibilityLabel={`Done: ${h.title}`} hitSlop={10} onPress={() => tickHabit(h.id)}>
             <Ionicons name="ellipse-outline" size={24} color={colors.accent} />
           </Pressable>
         </Card>
-      ) : null}
-      {g && !hNow ? blocks.map(([name, color, list], i) => {
+      ))}
+      {g ? blocks.map(([name, color, list], i) => {
         if ((['body', 'mind', 'soul'] as const)[i] !== pick) return null; // one thing at a time (founder, 22 Oct 2026)
         const task = i === 1 && isToday && !bedtime ? focus.find(t => (g.focus ?? []).includes(t.id)) : undefined;
         const pillar = (['body', 'mind', 'soul'] as const)[i];
