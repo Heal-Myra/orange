@@ -4,7 +4,6 @@
 import { Text, View } from 'react-native';
 import { GuidanceCard } from '../../components/AiBits';
 import { FeelingCard } from '../../components/FeelingCard';
-import { CareCard } from '../../components/CareCard';
 import { todayISO } from '../../lib/dates';
 import { PillarTiles, WellBeingRing } from '../../components/WellBeingRing';
 import { useAuth } from '../../lib/auth';
@@ -43,8 +42,8 @@ export default function Today() {
         <Note>{tr('Well-being = Body + Mind + Soul, each out of 100. A working model, not a medical measure.')}</Note>
       </View>
 
-      {/* Care plan: the last card on Today (founder, 25 Oct 2026). */}
-      <CareCard />
+      {/* The Care plan card was removed (founder, 26 Oct 2026): care shows only inside Food, Sleep and Movement, and as
+          the care breathing session; the see-a-doctor line sits under How I feel today. */}
     </Screen>
   );
 }

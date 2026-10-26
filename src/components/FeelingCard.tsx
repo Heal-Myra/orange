@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { shiftISO } from '../lib/dates';
 import { MOODS, SYMPTOMS, symptomsIn, type Feeling, type Mood, type Symptom } from '../lib/feeling';
+import { carePlan } from '../lib/care';
 import { tr } from '../lib/i18n';
 import { useHeal } from '../lib/store';
 import { colors } from '../theme';
@@ -29,6 +30,7 @@ export function FeelingCard() {
 
   const summary = f ? (f.note?.trim() || [tr(MOODS.find(x => x.id === f.mood)!.label), ...f.symptoms.map(s => tr(SYMPTOMS.find(x => x.id === s)!.label))].join(' · ')) : '';
   const unwell = f && (f.mood === 'unwell' || f.mood === 'low' || f.symptoms.length > 0);
+  const care = carePlan(f?.symptoms ?? []); // its see-a-doctor line (the Care plan card was removed, 26 Oct 2026)
 
   // Just the words (founder, 24 Oct 2026: no buttons). Symptoms and mood are read from what is written.
   const picker = (
@@ -46,7 +48,7 @@ export function FeelingCard() {
           {null}
         </Expandable>
         {unwell ? <Note>{tr('Myra is fitting today\'s suggestions to this.')}</Note> : null}
-        {f.symptoms.includes('fever') ? <Note>{tr('See a doctor if the fever lasts over 3 days, is very high, or comes with breathlessness, a rash or a stiff neck.')}</Note> : null}
+        {care?.doctor ? <Note>{tr(care.doctor)}</Note> : null}
       </Card>
     );
   }

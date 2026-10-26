@@ -16,3 +16,5 @@ for that consumer shall get activated: food, exercise, meditation and other acti
 Founder: the care plan should live in the cards where each thing is done, and sit below Myra recommends on Today. Food and drink plus food-related "avoid" lines go in Food; rest and screen limits in Sleep; movement and exercise limits in Movement; the care session button and breathing warnings in Breathing & meditation (`careFor` in `src/lib/care.ts`). Today keeps a short pointer card below Myra recommends with links, the see-a-doctor line and the self-care note.
 
 Later the same day the founder removed the care box from Breathing & meditation because it duplicated the session: the guided practice there is already the care mix ("Care breathing for your cold · Recommended").
+
+Update, 26 Oct 2026: the Care plan card on Today was removed (founder). Care appears only inside Food, Sleep and Movement and as the care breathing session; the see-a-doctor line sits under How I feel today.
