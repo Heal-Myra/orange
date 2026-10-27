@@ -5,7 +5,7 @@
 
 import * as ImagePicker from 'expo-image-picker';
 import { useState, type ReactNode } from 'react';
-import { Platform, Pressable, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Image, Platform, Pressable, Text, TextInput, View } from 'react-native';
 import { readScreenTime } from '../lib/ai';
 import { useAuth } from '../lib/auth';
 import { CONTENT_CATEGORIES, mindScore } from '../lib/scoring';
@@ -46,6 +46,7 @@ export function ScreenTimeCard({ children }: { children?: ReactNode }) {
   const { day, profile, updateOn, date } = useHeal();
   const [busy, setBusy] = useState(false);
   const [shotDate, setShotDate] = useState<string | null>(null);
+  const [preview, setPreview] = useState<string | null>(null); // the screenshot being read, shown at once (founder, 27 Oct 2026)
   const [message, setMessage] = useState<string | null>(null);
   const [rows, setRows] = useState<MediaSession[] | null>(null);
   const [open, setOpen] = useState<number | null>(null);
@@ -59,6 +60,7 @@ export function ScreenTimeCard({ children }: { children?: ReactNode }) {
     const res = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.8, base64: true });
     if (res.canceled) return;
     const a = res.assets[0];
+    setPreview(a.uri);
     await read(() => shrink(a.uri, a.base64, a.mimeType));
   };
 
@@ -67,6 +69,7 @@ export function ScreenTimeCard({ children }: { children?: ReactNode }) {
     setMessage(null); setRows(null);
     const img = await pastedImage().catch(() => null);
     if (!img) { setMessage(Platform.OS !== 'web' && !Clip ? tr('Paste works from the next app version. For now, choose the screenshot.') : tr('No picture to paste. Take the screenshot, tap Copy, then Paste here.')); return; }
+    setPreview(img.uri.startsWith('data:') || img.uri.startsWith('file:') || img.uri.startsWith('http') ? img.uri : `data:${img.type};base64,${img.data}`);
     await read(async () => img.uri.startsWith('data:') && Platform.OS !== 'web' ? shrink(img.uri, img.data, img.type) : { data: img.data, type: img.type });
   };
 
@@ -79,7 +82,7 @@ export function ScreenTimeCard({ children }: { children?: ReactNode }) {
       setShotDate(r.date && /^\d{4}-\d{2}-\d{2}$/.test(r.date) && r.date <= todayISO() ? r.date : null);
       setMessage(r.sessions.length ? `${r.period === 'daily average' ? tr('Using the daily average. ') : ''}${tr('Check the minutes and the kind of content, then add.')}` : r.note);
     } catch (e) { setMessage(e instanceof Error ? e.message : tr('Something went wrong. Try again.')); }
-    finally { setBusy(false); }
+    finally { setBusy(false); setPreview(null); }
   };
 
   const add = () => {
@@ -107,7 +110,19 @@ export function ScreenTimeCard({ children }: { children?: ReactNode }) {
           <View style={{ flex: 1 }}><Button kind="plain" title={tr('Paste screenshot')} onPress={paste} disabled={busy} /></View>
         </View>
       ) : <Note>{tr('Sign in to read a screenshot. You can still add sessions by hand below.')}</Note>}
-      {message ? <Text style={{ color: colors.muted }}>{message}</Text> : null}
+      {/* The screenshot appears at once with a reading spinner, so it is clear the app is working (founder, 27 Oct 2026). */}
+      {busy && preview ? (
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, padding: 10, borderRadius: 14, backgroundColor: colors.bg }}>
+          <Image source={{ uri: preview }} style={{ width: 54, height: 96, borderRadius: 8, backgroundColor: colors.line }} resizeMode="cover" />
+          <View style={{ flex: 1, gap: 6 }}>
+            <Text style={{ color: colors.ink, fontWeight: '600' }}>{tr('Screenshot attached')}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <ActivityIndicator size="small" color={colors.insight} />
+              <Text style={{ color: colors.muted }}>{tr('Reading your Screen Time…')}</Text>
+            </View>
+          </View>
+        </View>
+      ) : message ? <Text style={{ color: colors.muted }}>{message}</Text> : null}
       {rows?.map((r, i) => r.group === 'tool' ? null : (
         <View key={i} style={{ gap: 6, borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 8, opacity: r.notMe ? 0.55 : 1 }}>
           <View style={s.headingRow}>
