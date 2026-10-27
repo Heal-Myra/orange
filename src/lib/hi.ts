@@ -1149,4 +1149,6 @@ export const HI: Record<string, string> = {
   'e.g. I let go of being right in a family discussion.': 'जैसे: परिवार की बातचीत में मैंने सही साबित होने की ज़िद छोड़ी।',
   'Over 4 hours. If part was the TV or family, lower the minutes.': '4 घंटे से ज़्यादा। अगर कुछ टीवी या परिवार का था, तो मिनट कम करें।',
   'Screenshot attached': 'स्क्रीनशॉट जुड़ गया',
+  'Phone activity · yesterday': 'फ़ोन गतिविधि · कल',
+  'Each morning, add yesterday: in Settings → Screen Time → See All App & Website Activity, go back one day, take a screenshot, then paste it here. The app reads every app for you.': 'हर सुबह कल का जोड़ें: Settings → Screen Time → See All App & Website Activity में एक दिन पीछे जाएँ, स्क्रीनशॉट लें, फिर यहाँ पेस्ट करें। ऐप हर ऐप का समय आपके लिए पढ़ लेता है।',
 };

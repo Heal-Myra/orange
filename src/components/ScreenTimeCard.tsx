@@ -10,7 +10,8 @@ import { readScreenTime } from '../lib/ai';
 import { useAuth } from '../lib/auth';
 import { CONTENT_CATEGORIES, mindScore } from '../lib/scoring';
 import { useHeal } from '../lib/store';
-import { todayISO } from '../lib/dates';
+import { shiftISO, todayISO } from '../lib/dates';
+import { emptyDay } from '../lib/types';
 import type { ContentCategoryId, MediaSession } from '../lib/types';
 import { colors } from '../theme';
 import { shrink } from './MealPhoto';
@@ -41,9 +42,16 @@ async function pastedImage(): Promise<{ uri: string; data: string; type: string 
 
 const nameOf = (id: ContentCategoryId) => CONTENT_CATEGORIES.find(c => c.id === id)?.name ?? id;
 
+/** The day the Phone activity card shows: yesterday when looking at today, otherwise the day itself. */
+export const phoneDayFor = (date: string) => (date === todayISO() ? shiftISO(date, -1) : date);
+
 export function ScreenTimeCard({ children }: { children?: ReactNode }) {
   const { session } = useAuth();
-  const { day, profile, updateOn, date } = useHeal();
+  const { days, profile, updateOn, date } = useHeal();
+  // Phone activity is for yesterday (founder, 27 Oct 2026): a full 24 hours is only known the next morning, and it is
+  // added once a day. On today's Mind tab the card shows and fills yesterday; on a past day, that day.
+  const phoneDate = phoneDayFor(date);
+  const day = days[phoneDate] ?? emptyDay(phoneDate);
   const [busy, setBusy] = useState(false);
   const [shotDate, setShotDate] = useState<string | null>(null);
   const [preview, setPreview] = useState<string | null>(null); // the screenshot being read, shown at once (founder, 27 Oct 2026)
@@ -88,21 +96,21 @@ export function ScreenTimeCard({ children }: { children?: ReactNode }) {
   const add = () => {
     if (!rows?.length) return;
     // The day the screenshot shows (e.g. Saturday), else the day on screen.
-    const target = shotDate ?? date;
+    const target = shotDate ?? phoneDate;
     updateOn(target, d => {
       d.noMedia = false;
       d.media = [...d.media.filter(m => m.source !== 'screen'), ...rows.filter(r => r.minutes > 0)];
     });
     setRows(null);
-    setMessage(target === date ? tr('Added. Your content diet score is updated.') : tr('Added to {day}, the day the screenshot shows.', { day: new Date(target + 'T12:00:00').toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'short' }) }));
+    setMessage(target === phoneDate ? tr('Added. Your content diet score is updated.') : tr('Added to {day}, the day the screenshot shows.', { day: new Date(target + 'T12:00:00').toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'short' }) }));
   };
   const setRow = (i: number, change: Partial<MediaSession>) => setRows(list => list && list.map((x, n) => (n === i ? { ...x, ...change } : x)));
   const toolRows = rows?.filter(r => r.group === 'tool') ?? [];
 
   return (
     <Card>
-      <Heading right={<Score value={score?.content ?? undefined} max={30} />}>{tr('Phone activity')}</Heading>
-      <Note>{tr('Take a screenshot of Screen Time (iPhone: Settings → Screen Time → See All App & Website Activity), then choose it or paste it here. The app reads every app for you.')}</Note>
+      <Heading right={<Score value={score?.content ?? undefined} max={30} />}>{phoneDate === date ? tr('Phone activity') : tr('Phone activity · yesterday')}</Heading>
+      <Note>{tr('Each morning, add yesterday: in Settings → Screen Time → See All App & Website Activity, go back one day, take a screenshot, then paste it here. The app reads every app for you.')}</Note>
       {/* "I used no social media today" removed (founder, 23 Oct 2026). Older days that have it still count. */}
       {session ? (
         <View style={s.row}>
@@ -149,7 +157,7 @@ export function ScreenTimeCard({ children }: { children?: ReactNode }) {
         </View>
       ))}
       {toolRows.length ? <Note>{tr('Everyday tools, not scored: {list}', { list: toolRows.map(t => `${t.app || t.platform} ${t.minutes}`).join(' · ') + ' ' + tr('min') })}</Note> : null}
-      {rows?.length && shotDate && shotDate !== date ? <Note>{tr('This screenshot is from {day}; it will be added to that day.', { day: new Date(shotDate + 'T12:00:00').toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'short' }) })}</Note> : null}
+      {rows?.length && shotDate && shotDate !== phoneDate ? <Note>{tr('This screenshot is from {day}; it will be added to that day.', { day: new Date(shotDate + 'T12:00:00').toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'short' }) })}</Note> : null}
       {rows?.length ? (
         <View style={s.row}>
           <Button title={tr('Add to my day')} onPress={add} />
