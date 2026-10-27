@@ -1,5 +1,8 @@
 # Changelog
 
+## 27 Oct 2026 — Admin dot on Profile
+- Today's Profile button shows a small coral dot when AI access requests are waiting (admins only; testers never see it). The Profile page's Admin card says how many. Checked on open, when the app comes back, every minute, and right after approving or declining (`src/lib/adminAlerts.ts`).
+
 ## 0.10.0 — 22–24 October 2026 (Trends, food plans, habits, guided breathing, how I feel)
 - To-dos (24 Oct): Pick a date from a month calendar when adding or moving a task; full days (3 in the group) are greyed.
 - Guided sessions (24 Oct, founder's test on build 10): a woman's voice, slower with pauses, softer wording, fewer repeated cues; voice language English, Hindi or regional (translated once, kept on the phone).

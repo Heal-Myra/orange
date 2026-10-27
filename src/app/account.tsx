@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Pressable, Share, Text, View } from 'react-native';
 import { Button, Card, Heading, Note, Screen } from '../components/ui';
 import { useAuth } from '../lib/auth';
+import { usePendingRequests } from '../lib/adminAlerts';
 import { traditionName } from '../lib/wisdom';
 import { useHeal } from '../lib/store';
 import { colors } from '../theme';
@@ -46,6 +47,7 @@ const SYNC_TEXT = {
 
 export default function Account() {
   const { session, online, signOut, deleteMyData, leaveGuest, admin, tradition } = useAuth();
+  const pending = usePendingRequests(); // 0 for everyone except admins
   const { sync, syncError, clearDevice, profile } = useHeal();
   const [confirm, setConfirm] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -125,6 +127,7 @@ export default function Account() {
         <Card>
           <Heading>{tr('Admin')}</Heading>
           <Note>{tr('Approve AI access for testers and read their feedback.')}</Note>
+          {pending > 0 && <Text style={{ color: colors.brand, fontWeight: '700' }}>● {tr('{n} AI requests waiting for you', { n: pending })}</Text>}
           <Button title={tr('Open admin')} onPress={() => router.push('/admin')} />
           <Button kind="plain" title={tr('Invite a friend to test')} onPress={invite} />
         </Card>

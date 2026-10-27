@@ -1158,4 +1158,6 @@ export const HI: Record<string, string> = {
   'I was kind to': 'मैंने दया दिखाई',
   'Someone, and how': 'किसको, और कैसे',
   'Best part of my day': 'मेरे दिन का सबसे अच्छा पल',
+  'Profile, {n} requests waiting': 'प्रोफ़ाइल, {n} अनुरोध इंतज़ार में',
+  '{n} AI requests waiting for you': '{n} AI अनुरोध आपका इंतज़ार कर रहे हैं',
 };

@@ -8,6 +8,7 @@ import { useAuth } from '../lib/auth';
 import { supabase } from '../lib/supabase';
 import { colors } from '../theme';
 import { tr } from '../lib/i18n';
+import { pendingChanged } from '../lib/adminAlerts';
 
 type Access = { user_id: string; email: string; status: 'pending' | 'approved' | 'declined'; requested_at: string; decided_at: string | null };
 type Fb = { id: number; email: string | null; area: string | null; rating: number | null; message: string; created_at: string };
@@ -37,7 +38,7 @@ export default function Admin() {
     if (!supabase) return;
     const { error: e } = await supabase.from('ai_access')
       .update({ status, decided_at: new Date().toISOString(), decided_by: session?.user.email ?? null }).eq('user_id', row.user_id);
-    if (e) setError(e.message); else setAccess(list => list.map(x => x.user_id === row.user_id ? { ...x, status, decided_at: new Date().toISOString() } : x));
+    if (e) setError(e.message); else { setAccess(list => list.map(x => x.user_id === row.user_id ? { ...x, status, decided_at: new Date().toISOString() } : x)); pendingChanged(); }
   };
 
   if (!admin) return <Screen showDay={false}><Card><Note>{tr('This page is only for the Happy Orange team.')}</Note></Card></Screen>;
