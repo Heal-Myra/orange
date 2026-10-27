@@ -64,7 +64,7 @@ export interface DayLog {
   meals: Meal[];
   fasting?: boolean;
   // Love (founder, 24 Oct 2026): whom I love today and how, what makes me happy today, the friend I meet this week.
-  love?: { whom?: string; self?: string; done?: boolean; act?: string; happy?: string; friend?: string }; // self: how I love myself (happy: older days)
+  love?: { whom?: string; self?: string; done?: boolean; act?: string; happy?: string; friend?: string; kindTo?: string }; // self: how I love myself (happy: older days); kindTo: Gratitude journal, I was kind to (27 Oct 2026)
   feeling?: import('./feeling').Feeling; // "How do you feel today?" (24 Oct 2026)
   habitsDone?: string[]; // habits ticked off this day (23 Oct 2026)
   plan?: import('./foodPlan').FoodPlan; // the food planned for this day (made the day before; founder, 23 Oct 2026) // "I'm fasting today" (founder, 22 Oct 2026): water, black tea and black coffee are fine
@@ -86,6 +86,8 @@ export interface DayLog {
     verseStudied?: boolean; // studied the Gita verse of the day
     verseNote?: string;     // what the verse means to me
     verseLived?: string;    // how I lived today's wisdom (founder, 26 Oct 2026: living it earns 75%)
+    laugh?: string;         // Gratitude journal: something made me laugh today (27 Oct 2026)
+    best?: string;          // Gratitude journal: the best part of my day
     gratitude?: string[];   // up to four things I am grateful for (10 points each)
     thought?: string;       // my thought for the day
   };

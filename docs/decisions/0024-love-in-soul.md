@@ -16,3 +16,9 @@ stranger, help a colleague, hug someone at home, write to someone I miss, or my 
 (a thank-you note to myself, a walk I enjoy, music I love, time for a hobby, an early night, ten quiet minutes; at the weekend
 a coffee or a treat, a long walk, a nap), then "Done today". Friend of the week and party planning removed.
 Bonus: +5 each chosen, +5 when done (up to +15).
+
+## Update, 27 Oct 2026: the Gratitude journal
+Founder shared his paper gratitude journal as the format and chose its panels: I'm thankful for (three), Made me laugh,
+I was kind to, Best part of my day ("I learnt today", "ways to love myself" and "Today I feel" removed). One card replaces
+Gratitude and Love: thank-yous 5 each + laugh 7.5 + best part 7.5 = Gratitude 30; I was kind to = Love 30. Our own panels
+and colours; nothing copied from the journal's drawings. Days before 27 Oct keep the old cards and scoring.

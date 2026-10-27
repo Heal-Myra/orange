@@ -175,3 +175,13 @@ describe('phone points count the next day (27 Oct 2026)', () => {
     expect(mindScore(d, P)!.content).toBeCloseTo(18 * 0.8 + 12, 5);
   });
 });
+
+describe('Gratitude journal (27 Oct 2026)', () => {
+  it('thank-yous 5 each up to three, laugh 7.5, best part 7.5, kind to someone 30', () => {
+    const d = emptyDay('2026-10-27');
+    d.soul = { gratitude: ['Saurabh', 'Sleep', 'Rain', 'extra'], laugh: 'Babuji story', best: 'Evening walk' };
+    d.love = { kindTo: 'Helped the guard' };
+    const s = soulScore(d)!;
+    expect([s.gratitude, s.love]).toEqual([30, 30]);
+  });
+});

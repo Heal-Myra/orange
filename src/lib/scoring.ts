@@ -106,6 +106,9 @@ export const FOCUS_EACH = POINTS.focus / 2;          // each of up to two focus 
 export const GRATITUDE_EACH = POINTS.gratitude / 4;  // each of up to four gratitudes
 /** Daily Wisdom and Tao: reading earns this share, living it (a line on how it was used today) the rest. */
 export const LEARN_SHARE = 0.25;
+/** The Gratitude journal replaces the Gratitude and Love cards from this day. */
+export const JOURNAL_FROM = '2026-10-27';
+const filledText = (t?: string) => !!t && t.trim().length >= 2;
 /** A line on how the learning was lived: at least three words. */
 export const lived = (text?: string) => (text ?? '').trim().split(/\s+/).filter(Boolean).length >= 3;
 
@@ -175,11 +178,16 @@ export function lovePoints(d: DayLog): number {
 export function soulScore(d: DayLog, _P: Profile = DEFAULT_PROFILE): SoulScore | null {
   const so = d.soul ?? {};
   // Boxes can be left empty in between (saved as null), so check each one is text (crash, 23 Oct 2026).
-  const gratitude = Math.min(4, countGratitude(so.gratitude)) * GRATITUDE_EACH;
+  // Gratitude journal from 27 Oct 2026 (founder): three thank-yous 5 each + made me laugh 7.5 + best part of my day 7.5
+  // = 30; I was kind to someone = Love 30. Older days keep four gratitudes and the old Love card.
+  const journal = (d.date ?? '') >= JOURNAL_FROM;
+  const gratitude = journal
+    ? Math.min(3, countGratitude(so.gratitude)) * 5 + (filledText(so.laugh) ? 7.5 : 0) + (filledText(so.best) ? 7.5 : 0)
+    : Math.min(4, countGratitude(so.gratitude)) * GRATITUDE_EACH;
   // Learning earns 25 %, living it during the day earns 75 % (founder, 26 Oct 2026).
   const verse = (so.verseStudied ? LEARN_SHARE * POINTS.wisdom : 0) + (lived(so.verseLived) ? (1 - LEARN_SHARE) * POINTS.wisdom : 0);
   const tao = (d.tao?.done ? LEARN_SHARE * POINTS.tao : 0) + (lived(d.tao?.lived) ? (1 - LEARN_SHARE) * POINTS.tao : 0);
-  const love = lovePoints(d);
+  const love = journal ? (filledText(d.love?.kindTo) ? POINTS.love : 0) : lovePoints(d);
   if (!gratitude && !verse && !tao && !love) return null;
   return { total: Math.min(100, gratitude + verse + tao + love), gratitude, verse, tao, love };
 }

@@ -19,12 +19,17 @@ import type { ContentCategoryId } from '../lib/types';
 import { colors } from '../theme';
 import { Button, Card, Heading, Note, TextField } from './ui';
 import { lang, tr } from '../lib/i18n';
+import { JOURNAL_FROM } from '../lib/scoring';
 
 const errText = (e: unknown) => (e instanceof Error ? e.message : tr('Something went wrong. Try again.'));
 
 /** Which card on the tab a recommendation belongs to: Myra's own answer when she gave one, otherwise read from the words
  *  (English or Hindi). Used to open the tab right at that card (founder, 21 Oct 2026). */
 export function cardFor(pillar: 'body' | 'mind' | 'soul', text: string, isTask: boolean, given?: string): string {
+  const c = cardForRaw(pillar, text, isTask, given);
+  return c === 'love' && todayISO() >= JOURNAL_FROM ? 'gratitude' : c; // Love lives in the Gratitude journal (27 Oct 2026)
+}
+function cardForRaw(pillar: 'body' | 'mind' | 'soul', text: string, isTask: boolean, given?: string): string {
   const ok: Record<string, string[]> = { body: ['food', 'sleep', 'movement'], mind: ['tasks', 'meditation', 'phone'], soul: ['gratitude', 'tao', 'wisdom', 'love'] };
   if (given && ok[pillar].includes(given)) return given;
   const t = text.toLowerCase();

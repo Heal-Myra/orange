@@ -28,14 +28,14 @@ Phone activity is added each morning for **yesterday** (a full day is only known
 ## Soul (100)
 | Part | Points | How |
 | --- | --- | --- |
-| Gratitude | 30 | 7.5 for each thing written, up to four |
-| Love | 30 | whom I will love today, chosen (12) + how I will love myself today, chosen (12) + one of them done (6) |
+| Gratitude journal: gratitude | 30 | I'm thankful for: 5 each, up to three; made me laugh 7.5; best part of my day 7.5 |
+| Gratitude journal: love | 30 | I was kind to (someone, and how) |
 | Daily Wisdom | 20 | studied (tick) 5 + "How I lived it today", at least three words, 15 |
 | Tao practice | 20 | read the day's practice (tick) 5 + "How I lived it today", at least three words, 15 |
 
 Learning earns 25 %, living it during the day earns 75 % (founder, 26 Oct 2026).
 
-Founder's split, 25 Oct 2026 (before: 40 + 30 + 30 + 30 = 130, held at 100).
+Founder's split, 25 Oct 2026; Gratitude journal from 27 Oct 2026 (days before keep four gratitudes 7.5 each and the old Love card: whom 12, myself 12, done 6).
 
 ## Bands
 240+ Flourishing · 180+ Balanced · 120+ Finding your footing · below 120 Needs care.
