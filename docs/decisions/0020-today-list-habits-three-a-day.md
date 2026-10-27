@@ -21,3 +21,5 @@ Founder: once a daily task is recorded it pops up on Myra recommends directly, a
 minutes before) until ticked; without a time, all day. It sits above Myra's own line instead of replacing it. Days 1–21
 live in Making a habit (`forming`, `habitDay`, `timesDone` in src/lib/habits.ts); from day 22 the habit moves to the
 Habits card.
+
+Update, 27 Oct 2026: personal/professional tags were considered (three options) and the founder chose to keep the three groups as they are. Myra shows only Work-group to-dos during office hours (26 Oct rule); personal projects go in Better me.
