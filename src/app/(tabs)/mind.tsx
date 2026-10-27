@@ -5,7 +5,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Linking, Platform, Pressable, Text, TextInput, View } from 'react-native';
 import { ClassifyHelper } from '../../components/AiBits';
-import { ScreenTimeCard, phoneDayFor } from '../../components/ScreenTimeCard';
+import { ScreenTimeCard, phoneDayFor, usePhoneUpdate } from '../../components/ScreenTimeCard';
 import { emptyDay, type DayLog } from '../../lib/types';
 import { MeditationTimer } from '../../components/MeditationTimer';
 import { HabitsBar, TasksCard } from '../../components/TasksCard';
@@ -19,11 +19,12 @@ import { tr } from '../../lib/i18n';
 const PLATFORMS = ['Instagram', 'YouTube', 'WhatsApp', 'Facebook', 'X', 'LinkedIn', 'Other'];
 
 export default function Mind() {
-  const { day, days, date, profile, update, updateOn } = useHeal();
+  const { day, days, date, profile, update } = useHeal();
   // The Phone activity list belongs to yesterday when looking at today (founder, 27 Oct 2026).
   const phoneDate = phoneDayFor(date);
   const phone = days[phoneDate] ?? emptyDay(phoneDate);
-  const updatePhone = (f: (d: DayLog) => void) => updateOn(phoneDate, f);
+  const updatePhoneOn = usePhoneUpdate();
+  const updatePhone = (f: (d: DayLog) => void) => updatePhoneOn(phoneDate, f);
   const score = mindScore(day, profile);
   const [platform, setPlatform] = useState('Instagram');
   const [category, setCategory] = useState<ContentCategoryId>('learning');

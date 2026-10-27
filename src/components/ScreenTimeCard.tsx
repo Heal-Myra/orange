@@ -4,14 +4,14 @@
 // Websites cannot read Screen Time directly, so a screenshot is the practical way. Every number can be checked and changed.
 
 import * as ImagePicker from 'expo-image-picker';
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { ActivityIndicator, Image, Platform, Pressable, Text, TextInput, View } from 'react-native';
 import { readScreenTime } from '../lib/ai';
 import { useAuth } from '../lib/auth';
-import { CONTENT_CATEGORIES, mindScore } from '../lib/scoring';
+import { CONTENT_CATEGORIES, phoneContent } from '../lib/scoring';
 import { useHeal } from '../lib/store';
 import { shiftISO, todayISO } from '../lib/dates';
-import { emptyDay } from '../lib/types';
+import { emptyDay, type DayLog } from '../lib/types';
 import type { ContentCategoryId, MediaSession } from '../lib/types';
 import { colors } from '../theme';
 import { shrink } from './MealPhoto';
@@ -45,9 +45,20 @@ const nameOf = (id: ContentCategoryId) => CONTENT_CATEGORIES.find(c => c.id === 
 /** The day the Phone activity card shows: yesterday when looking at today, otherwise the day itself. */
 export const phoneDayFor = (date: string) => (date === todayISO() ? shiftISO(date, -1) : date);
 
+/** Change a day's phone sessions and keep the next day's copy in step: its Mind score counts them (27 Oct 2026). */
+export function usePhoneUpdate() {
+  const { days, updateOn } = useHeal();
+  return (iso: string, change: (d: DayLog) => void) => {
+    updateOn(iso, change);
+    const copy: DayLog = JSON.parse(JSON.stringify(days[iso] ?? emptyDay(iso)));
+    change(copy);
+    updateOn(shiftISO(iso, 1), next => { next.phoneFrom = { date: iso, media: copy.media, noMedia: copy.noMedia }; });
+  };
+}
+
 export function ScreenTimeCard({ children }: { children?: ReactNode }) {
   const { session } = useAuth();
-  const { days, profile, updateOn, date } = useHeal();
+  const { days, profile, date } = useHeal();
   // Phone activity is for yesterday (founder, 27 Oct 2026): a full 24 hours is only known the next morning, and it is
   // added once a day. On today's Mind tab the card shows and fills yesterday; on a past day, that day.
   const phoneDate = phoneDayFor(date);
@@ -58,7 +69,14 @@ export function ScreenTimeCard({ children }: { children?: ReactNode }) {
   const [message, setMessage] = useState<string | null>(null);
   const [rows, setRows] = useState<MediaSession[] | null>(null);
   const [open, setOpen] = useState<number | null>(null);
-  const score = mindScore(day, profile);
+  const score = phoneContent(day.media, day.noMedia, profile); // this card's own day (yesterday)
+  const updatePhoneOn = usePhoneUpdate();
+  // Today's Mind score counts yesterday's phone activity: if yesterday has sessions but today has no copy yet, copy them.
+  const { updateOn } = useHeal();
+  useEffect(() => {
+    if (phoneDate === date || days[date]?.phoneFrom || !(day.media.length || day.noMedia)) return;
+    updateOn(date, x => { x.phoneFrom = { date: phoneDate, media: day.media, noMedia: day.noMedia }; });
+  }, [date, phoneDate]); // eslint-disable-line react-hooks/exhaustive-deps
   const mine = day.media.filter(m => !m.notMe);
   const total = mine.filter(m => (m.group ?? 'social') === 'social').reduce((t, m) => t + m.minutes, 0);
   const learning = mine.filter(m => m.group === 'learning').reduce((t, m) => t + m.minutes, 0);
@@ -97,7 +115,7 @@ export function ScreenTimeCard({ children }: { children?: ReactNode }) {
     if (!rows?.length) return;
     // The day the screenshot shows (e.g. Saturday), else the day on screen.
     const target = shotDate ?? phoneDate;
-    updateOn(target, d => {
+    updatePhoneOn(target, d => {
       d.noMedia = false;
       d.media = [...d.media.filter(m => m.source !== 'screen'), ...rows.filter(r => r.minutes > 0)];
     });

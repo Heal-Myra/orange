@@ -23,6 +23,8 @@ No bonuses: each tab's 100 is shared out between its parts.
 
 Learning was removed from Mind on 24 Oct 2026.
 
+Phone activity is added each morning for **yesterday** (a full day is only known then) and its 30 points count in **today's** Mind score (founder, 27 Oct 2026; `phoneFrom` on the day, from 27 Oct 2026 on).
+
 ## Soul (100)
 | Part | Points | How |
 | --- | --- | --- |

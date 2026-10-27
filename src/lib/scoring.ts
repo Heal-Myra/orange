@@ -3,7 +3,7 @@
 // A working model to help people understand themselves, not a medical measure
 // (The Orange Book, Chapter 2). Weights are documented in docs/scoring.md.
 
-import { DEFAULT_PROFILE, type ContentCategoryId, type DayLog, type Meal, type PracticeId, type Profile } from './types';
+import { DEFAULT_PROFILE, type ContentCategoryId, type DayLog, type Meal, type MediaSession, type PracticeId, type Profile } from './types';
 
 export const CONTENT_CATEGORIES: { id: ContentCategoryId; name: string; weight: number }[] = [
   { id: 'learning', name: 'Learning or skill-building', weight: 1.0 },
@@ -118,6 +118,24 @@ export interface MindScore {
   quality: number | null; // 0–1 share of nourishing content
 }
 
+/** From this day on, a day's phone points come from the day before (the screenshot is added the next morning). */
+export const PHONE_LAG_FROM = '2026-10-27';
+
+/** Phone activity points for a set of sessions: quality 18 + within the limit 12 (null when nothing logged). */
+export function phoneContent(media: MediaSession[], noMedia: boolean | undefined, P: Profile): { content: number | null; minutes: number; quality: number | null } {
+  if (noMedia) return { content: POINTS.phone, minutes: 0, quality: 1 };
+  // Scored: social and learning sessions that were the person's own; tools and "Not me" are left out (26 Oct 2026).
+  const scored = media.filter(x => !x.notMe && x.group !== 'tool');
+  const social = scored.filter(x => x.group !== 'learning').reduce((s, x) => s + (x.minutes || 0), 0);
+  const minutes = scored.reduce((s, x) => s + (x.minutes || 0), 0);
+  if (minutes <= 0) return { content: null, minutes: 0, quality: null };
+  const quality = scored.reduce((s, x) => s + (x.minutes || 0) * weightOf(x.category), 0) / minutes;
+  const L = P.mediaLimit;
+  // Only social and video time counts toward the limit; learning and AI tools never use it up.
+  const quantity = social <= L ? 1 : c01(1 - (social - L) / (2 * L));
+  return { content: 18 * quality + 12 * quantity, minutes, quality };
+}
+
 export function mindScore(d: DayLog, P: Profile): MindScore | null {
   const m = d.mind;
   // Older days with the Attention/Learning ticks count them as done focus tasks.
@@ -125,22 +143,10 @@ export function mindScore(d: DayLog, P: Profile): MindScore | null {
   const practices = done * FOCUS_EACH;
   const meditation = POINTS.meditation * c01((m.meditationMin ?? 0) / P.meditation);
 
-  let content: number | null = null, minutes = 0, quality: number | null = null;
-  if (d.noMedia) {
-    content = POINTS.phone; quality = 1;
-  } else {
-    // Scored: social and learning sessions that were the person's own; tools and "Not me" are left out (26 Oct 2026).
-    const scored = d.media.filter(x => !x.notMe && x.group !== 'tool');
-    const social = scored.filter(x => x.group !== 'learning').reduce((s, x) => s + (x.minutes || 0), 0);
-    minutes = scored.reduce((s, x) => s + (x.minutes || 0), 0);
-    if (minutes > 0) {
-      quality = scored.reduce((s, x) => s + (x.minutes || 0) * weightOf(x.category), 0) / minutes;
-      const L = P.mediaLimit;
-      // Only social and video time counts toward the limit; learning and AI tools never use it up.
-      const quantity = social <= L ? 1 : c01(1 - (social - L) / (2 * L));
-      content = 18 * quality + 12 * quantity;
-    }
-  }
+  // Since 27 Oct 2026 the phone points are yesterday's (copied in as phoneFrom); older days keep their own.
+  const lag = (d.date ?? '') >= PHONE_LAG_FROM;
+  const src = lag ? d.phoneFrom : { media: d.media, noMedia: d.noMedia };
+  const { content, minutes, quality } = src ? phoneContent(src.media ?? [], src.noMedia, P) : { content: null, minutes: 0, quality: null };
   if (!practices && m.meditationMin == null && content == null) return null;
   return { total: Math.min(100, practices + meditation + (content ?? 0)), practices, meditation, content, minutes, quality };
 }

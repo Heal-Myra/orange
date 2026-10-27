@@ -165,3 +165,13 @@ describe('phone activity groups (26 Oct 2026)', () => {
     expect(m.content).toBeCloseTo(18 * ((55 * 1 + 40 * 0.8) / 95) + 12, 5);
   });
 });
+
+describe('phone points count the next day (27 Oct 2026)', () => {
+  it('from 27 Oct a day scores yesterday\'s phone activity, not its own', () => {
+    const d = emptyDay('2026-10-28');
+    d.media = [{ platform: 'YouTube', minutes: 500, category: 'fun', group: 'social' }]; // ignored: belongs to the 29th's score
+    expect(mindScore(d, P)?.content ?? null).toBeNull();
+    d.phoneFrom = { date: '2026-10-27', media: [{ platform: 'WhatsApp', minutes: 40, category: 'connect', group: 'social' }] };
+    expect(mindScore(d, P)!.content).toBeCloseTo(18 * 0.8 + 12, 5);
+  });
+});
