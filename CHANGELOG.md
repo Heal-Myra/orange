@@ -1,5 +1,11 @@
 # Changelog
 
+## 30 Oct 2026 — "+" to read a photo into text boxes (decision 0034)
+- Clear your mind: + → Camera, Photos or Files; Myra reads a notebook page into to-dos (group, date, repeat) to tick and add.
+- Gratitude journal: + fills the empty panels from a photo of the paper journal.
+- Every writing box (multi-line fields) and the feedback box: + adds the words in a photo. Myra chat's paperclip is now +.
+- Server: heal-ai action `read_note` (modes tasks, journal, text). Photo helper moved to `src/lib/photo.ts`.
+
 ## 27 Oct 2026 — Admin dot on Profile
 - Today's Profile button shows a small coral dot when AI access requests are waiting (admins only; testers never see it). The Profile page's Admin card says how many. Checked on open, when the app comes back, every minute, and right after approving or declining (`src/lib/adminAlerts.ts`).
 

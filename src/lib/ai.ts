@@ -36,6 +36,15 @@ export const analyseMealText = (text: string) => call<MealResult>('meal_text', {
 export interface ScreenTimeResult { sessions: { platform: string; app: string; minutes: number; category: ContentCategoryId; group?: 'social' | 'learning' | 'tool' }[]; period: string; date?: string | null; note: string }
 export const readScreenTime = (image_base64: string, media_type: string, today: string) => call<ScreenTimeResult>('screen_time', { image_base64, media_type, today });
 
+/** A photo attached with "+" in a text box: a notebook page, a list or a screenshot (founder, 30 Oct 2026). */
+export interface NoteTask { title: string; area: 'family' | 'work' | 'self'; due: string | null; repeat: null | 'daily' | 'weekdays' | 'weekly'; at: string | null }
+export const readNoteTasks = (image_base64: string, media_type: string, today: string, weekday: string, area?: string) =>
+  call<{ tasks: NoteTask[]; note: string }>('read_note', { mode: 'tasks', image_base64, media_type, today, weekday, area });
+export const readNoteJournal = (image_base64: string, media_type: string) =>
+  call<{ thankful: string[]; laugh: string; kindTo: string; best: string; note: string }>('read_note', { mode: 'journal', image_base64, media_type });
+export const readNoteText = (image_base64: string, media_type: string, field?: string) =>
+  call<{ text: string }>('read_note', { mode: 'text', image_base64, media_type, field });
+
 export interface GoalReading { goal: 'lose' | 'keep' | 'gain'; kg: number | null; weeks: number | null; aims: string; verdict: string; message: string }
 /** Myra reads a goal written in plain words (About you). */
 export const understandGoal = (goal: string, me: { age: number; sex: string; heightCm: number; weightKg: number }, today: string) =>

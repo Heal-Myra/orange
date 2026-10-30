@@ -9,6 +9,8 @@ import { supabase } from '../lib/supabase';
 import { colors } from '../theme';
 import { Button, s, useKeepVisible } from './ui';
 import { tr } from '../lib/i18n';
+import { readNoteText } from '../lib/ai';
+import { useAttach } from './AttachPlus';
 
 export const SHOW_FEEDBACK = true; // testing phase
 const FACES = ['😞', '😕', '😐', '🙂', '😍'];
@@ -21,6 +23,14 @@ export function FeedbackBox({ area }: { area: string }) {
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // "+": read a photo (a note, a screenshot) into the feedback (founder, 30 Oct 2026: the + in every text box).
+  const plus = useAttach(async img => {
+    const r = await readNoteText(img.data, img.media_type, 'Feedback about the app');
+    const t = (r.text ?? '').trim();
+    if (!t) return tr('No words found in that photo. Try a clearer one.');
+    setText(x => (x.trim() ? `${x.trim()} ${t}` : t));
+    return null;
+  }, { size: 36 });
   if (!SHOW_FEEDBACK || !session || !supabase) return null;
 
   const send = async () => {
@@ -40,8 +50,12 @@ export function FeedbackBox({ area }: { area: string }) {
   const open = text.trim().length > 0;
   return (
     <View style={{ gap: 8, backgroundColor: colors.surface, borderRadius: 16, borderWidth: 1, borderColor: colors.accent + '55', padding: 10 }}>
-      <TextInput style={[s.input, { borderColor: 'transparent' }, open && { minHeight: 60 }]} value={text} onChangeText={setText} multiline={open} onFocus={() => setTimeout(keep, 300)} onContentSizeChange={() => keep()}
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+      <TextInput style={[s.input, { borderColor: 'transparent', flex: 1, minWidth: 0 }, open && { minHeight: 60 }]} value={text} onChangeText={setText} multiline={open} onFocus={() => setTimeout(keep, 300)} onContentSizeChange={() => keep()}
         placeholder={tr('💬 Your feedback on {area}: type here', { area: tr(area) })} placeholderTextColor={colors.muted} />
+        {plus.button}
+      </View>
+      {plus.status}
       {open && (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
           {FACES.map((f, i) => (

@@ -209,7 +209,7 @@ export default function Myra() {
               {listening ? <Text style={{ color: colors.insight, fontWeight: '600' }}>{tr('Listening… tap the microphone again when you finish.')}</Text> : null}
               {note ? <Text style={{ color: colors.muted }}>{note}</Text> : null}
               <View style={{ flexDirection: 'row', gap: 8, alignItems: 'flex-end' }}>
-                {iconBtn('attach', tr('Attach a photo or document'), () => setMenu(x => !x), menu)}
+                {iconBtn('add', tr('Attach a photo or document'), () => setMenu(x => !x), menu)}
                 <TextInput style={[s.input, { flex: 1, maxHeight: 120 }]} value={text} onChangeText={setText} placeholder={tr('Ask Myra anything…')}
                   placeholderTextColor={colors.muted} multiline onFocus={() => setTimeout(() => scroll.current?.scrollToEnd({ animated: true }), 300)} />
                 {iconBtn(listening ? 'stop' : 'mic-outline', tr('Speak'), speak, listening)}

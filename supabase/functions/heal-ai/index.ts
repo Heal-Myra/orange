@@ -317,6 +317,39 @@ Reply with JSON only: {"sessions":[{"platform":"YouTube","app":"name as shown","
 If this is not a Screen Time screenshot: {"sessions":[],"period":"unclear","date":null,"note":"This does not look like a Screen Time screenshot."}`,
         { media_type: String(p.media_type ?? 'image/jpeg'), data: String(p.image_base64 ?? '') }));
     }
+    case 'read_note': {
+      // A photo of a notebook page, a printed list or a screenshot, attached with "+" in a text box (founder, 30 Oct 2026:
+      // "upload a picture from notebooks and it can auto populate the task list", and the same in every text box).
+      // mode "tasks": a to-do list; "journal": the Gratitude journal panels; "text": the words for one box.
+      const mode = String(p.mode ?? 'text');
+      const image = { media_type: String(p.media_type ?? 'image/jpeg'), data: String(p.image_base64 ?? '') };
+      const keepLang = 'Keep the words in the language and script they are written in; do not translate. Fix obvious spelling slips only.';
+      if (mode === 'tasks') {
+        const today = String(p.today ?? '').slice(0, 10);
+        return await askJson(ask, 'smart', ORANGE_BOOK,
+`This is a photo of a handwritten or printed note, list or page. Read every to-do or action item on it.
+Today is ${today || 'unknown'} (${String(p.weekday ?? '')}). ${keepLang}
+For each item give:
+- "title": short and clear, as written (at most 12 words). Leave out ticked or struck-through items.
+- "area": "family" (home, family, friends, errands, health appointments), "work" (job, office, business, clients, study for work), or "self" (Better me: learning, fitness, reading, hobbies, self-care).${p.area ? ` If unclear, use "${String(p.area)}".` : ''}
+- "due": the date written or meant (e.g. "Fri", "tomorrow", "2/11") as YYYY-MM-DD, never in the past; null if none.
+- "repeat": "daily", "weekdays" or "weekly" only if it clearly repeats (e.g. "every day walk"); otherwise null. "at": a time like "7 am" if written; otherwise null.
+Reply with JSON only: {"tasks":[{"title":"…","area":"family"|"work"|"self","due":"YYYY-MM-DD"|null,"repeat":null|"daily"|"weekdays"|"weekly","at":null|"…"}],"note":"one short sentence"}
+If you cannot read any to-dos: {"tasks":[],"note":"say briefly why, e.g. the photo is blurred"}`, image);
+      }
+      if (mode === 'journal') {
+        return await askJson(ask, 'smart', ORANGE_BOOK,
+`This is a photo of a gratitude journal page (handwritten or printed). ${keepLang}
+Fill these from it, in the person's own words; leave a field "" if the page does not say it:
+- "thankful": up to three things they are thankful for.
+- "laugh": what made them laugh. "kindTo": whom they were kind to and how. "best": the best part of their day.
+Reply with JSON only: {"thankful":["…"],"laugh":"…","kindTo":"…","best":"…","note":"one short sentence"}`, image);
+      }
+      return await askJson(ask, 'quick', ORANGE_BOOK,
+`This is a photo for a text box in the app${p.field ? ` called "${String(p.field).slice(0, 80)}"` : ''}. Write out the handwritten or printed words in it, as written. ${keepLang}
+If it has no words (e.g. a picture or an app screen), describe what it shows in one short sentence instead.
+Reply with JSON only: {"text":"…"}`, image);
+    }
     case 'learn_link': {
       // Learning (founder, 22 Oct 2026): the person pastes or shares a link; Myra writes what it teaches in up to 10 words,
       // from the page's own title and description. The person can change the words.

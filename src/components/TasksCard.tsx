@@ -15,6 +15,8 @@ import { Button, Card, Heading, Note, Score, s, useKeepVisible } from './ui';
 import { useHeal } from '../lib/store';
 import { FOCUS_EACH } from '../lib/scoring';
 import { tr } from '../lib/i18n';
+import { readNoteTasks, type NoteTask } from '../lib/ai';
+import { useAttach } from './AttachPlus';
 
 const WHEN = [
   { label: 'Today', days: 0 },
@@ -147,9 +149,33 @@ function AddTask({ area }: { area: Area }) {
     }
     setTitle(''); setDays(null); setPicked(null); setCal(false); setRepeat(null);
   };
+  // "+": a photo of a notebook page becomes to-dos to check before adding (founder, 30 Oct 2026).
+  const [found, setFound] = useState<(NoteTask & { on: boolean })[] | null>(null);
+  const attach = useAttach(async img => {
+    const today = todayISO();
+    const r = await readNoteTasks(img.data, img.media_type, today, new Date().toLocaleDateString('en-IN', { weekday: 'long' }), area);
+    const list = (r.tasks ?? []).filter(t => t.title?.trim()).map(t => ({ ...t, area: (['family', 'work', 'self'] as const).includes(t.area) ? t.area : area, due: t.due && t.due >= today ? t.due : null, on: true }));
+    if (!list.length) return r.note || tr('No to-dos found in that photo. Try a clearer one.');
+    setFound(list); setNote(null);
+    return null;
+  });
+  const addFound = () => {
+    if (!found) return;
+    const chosen = found.filter(t => t.on);
+    let moved = 0;
+    for (const t of chosen) {
+      if (t.repeat) addHabit({ title: t.title, area: t.area, repeat: t.repeat, at: t.at ?? undefined, weekday: t.repeat === 'weekly' ? (t.due ? new Date(+t.due.slice(0, 4), +t.due.slice(5, 7) - 1, +t.due.slice(8, 10)).getDay() : new Date().getDay()) : undefined });
+      else { const placed = add(t.title, t.area, t.due ?? undefined); if (t.due && placed && placed !== t.due) moved++; }
+    }
+    setFound(null);
+    setNote(tr('Added {n} to-dos from your photo.', { n: chosen.length }) + (moved ? ' ' + tr('{n} went to the next free day (3 a day per group).', { n: moved }) : ''));
+  };
+  const cycle = (a: Area): Area => (a === 'family' ? 'work' : a === 'work' ? 'self' : 'family');
+
   return (
     <View style={{ gap: 8 }}>
-      <View style={{ flexDirection: 'row', gap: 8 }}>
+      <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
+        {attach.button}
         <TextInput style={[s.input, { flex: 1, minWidth: 0 }]} value={title} onChangeText={setTitle} onSubmitEditing={save} returnKeyType="done" onFocus={() => setTimeout(keep, 300)}
           placeholder={area === 'family' ? 'e.g. Call Mum' : area === 'work' ? 'e.g. Send the budget' : 'e.g. Read 10 pages'} placeholderTextColor={colors.muted} />
         <Button title={tr('Add')} onPress={save} disabled={!title.trim()} />
@@ -186,6 +212,31 @@ function AddTask({ area }: { area: Area }) {
         </View>
       ) : null}
       {title.trim() && rep === 'once' && cal ? <DatePicker value={picked ?? undefined} full={d => loadOn(tasks, area, d) >= PER_AREA_DAY} onPick={d => { setPicked(d); setDays(null); setCal(false); }} /> : null}
+      {attach.status}
+      {found ? (
+        <View style={{ gap: 6, padding: 10, borderRadius: 14, borderWidth: 1, borderColor: colors.insight + '50', backgroundColor: colors.surface }}>
+          <Text style={{ color: colors.insight, fontWeight: '700' }}>{tr('Myra found {n} to-dos. Untick any you don\'t want.', { n: found.length })}</Text>
+          {found.map((t, i) => (
+            <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 4 }}>
+              <Pressable onPress={() => setFound(f => f && f.map((x, k) => k === i ? { ...x, on: !x.on } : x))} hitSlop={8} accessibilityLabel={t.title}>
+                <Ionicons name={t.on ? 'checkbox' : 'square-outline'} size={22} color={t.on ? colors.accent : colors.muted} />
+              </Pressable>
+              <View style={{ flex: 1 }}>
+                <Text style={{ color: t.on ? colors.ink : colors.muted }}>{t.title}</Text>
+                <Text style={{ fontSize: 12, color: colors.muted }}>{t.repeat ? `${tr(repeatName(t.repeat))}${t.at ? ` · ${t.at}` : ''}` : t.due ? shortDate(t.due) : tr('Myra picks the day')}</Text>
+              </View>
+              <Pressable onPress={() => setFound(f => f && f.map((x, k) => k === i ? { ...x, area: cycle(x.area) } : x))}
+                style={{ paddingVertical: 4, paddingHorizontal: 10, borderRadius: 99, borderWidth: 1, borderColor: colors.line }}>
+                <Text style={{ fontSize: 12, color: colors.ink }}>{tr(areaName(t.area))}</Text>
+              </Pressable>
+            </View>
+          ))}
+          <View style={{ flexDirection: 'row', gap: 8 }}>
+            <Button title={tr('Add {n} to-dos', { n: found.filter(t => t.on).length })} onPress={addFound} disabled={!found.some(t => t.on)} />
+            <Button kind="plain" title={tr('Cancel')} onPress={() => setFound(null)} />
+          </View>
+        </View>
+      ) : null}
       {note && !title.trim() ? <Note>{note}</Note> : null}
     </View>
   );

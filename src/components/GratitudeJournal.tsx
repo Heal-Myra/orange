@@ -7,6 +7,8 @@ import { soulScore } from '../lib/scoring';
 import { useHeal } from '../lib/store';
 import { colors } from '../theme';
 import { Card, Heading, Note, Score, s, useKeepVisible } from './ui';
+import { readNoteJournal } from '../lib/ai';
+import { useAttach } from './AttachPlus';
 
 const HEAD = colors.soul, LOVE = colors.insight;
 
@@ -38,10 +40,31 @@ export function GratitudeJournal() {
       value={value} onChangeText={onChange} multiline placeholder={placeholder} placeholderTextColor={colors.muted}
       onFocus={() => setTimeout(keep, 300)} onContentSizeChange={() => keep()} />
   );
+  // "+": a photo of the paper journal page fills the empty panels; anything already typed stays (founder, 30 Oct 2026).
+  const attach = useAttach(async img => {
+    const r = await readNoteJournal(img.data, img.media_type);
+    // Work out what to fill from what is on screen now, then save it in one change.
+    const g = Array.from({ length: Math.max(3, thanks.length) }, (_, k) => thanks[k] ?? '');
+    const fresh = (r.thankful ?? []).map(x => x?.trim()).filter(Boolean);
+    let filled = 0;
+    for (let k = 0; k < 3 && fresh.length; k++) if (!g[k]?.trim()) { g[k] = fresh.shift()!; filled++; }
+    const pick = (old: string | undefined, nu: string | undefined) => (!old?.trim() && nu?.trim() ? (filled++, nu.trim()) : old);
+    const laugh = pick(so.laugh, r.laugh), best = pick(so.best, r.best), kindTo = pick(day.love?.kindTo, r.kindTo);
+    if (!filled) return r.note || tr('Nothing new to fill from that photo.');
+    update(d => {
+      d.soul = { ...d.soul, gratitude: g, laugh, best };
+      d.love = { ...(d.love ?? {}), kindTo };
+    });
+    return tr('Filled {n} lines from your photo. Check and change anything.', { n: filled });
+  });
   return (
     <Card style={{ gap: 10 }}>
       <Heading right={<Score value={(score?.gratitude ?? 0) + (score?.love ?? 0)} max={60} />}>{tr('Gratitude journal')}</Heading>
-      <Note>{tr('Fill it in through the day, or at night before sleep.')}</Note>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+        <View style={{ flex: 1 }}><Note>{tr('Fill it in through the day, or at night before sleep. Wrote it on paper? Tap + for a photo.')}</Note></View>
+        {attach.button}
+      </View>
+      {attach.status}
 
       <Panel title={tr('I\'m thankful for')} points={15}>
         {[0, 1, 2].map(i => (

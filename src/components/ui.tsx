@@ -1,5 +1,7 @@
 // Small building blocks shared by every screen.
 
+import { useAttach } from './AttachPlus';
+import { readNoteText } from '../lib/ai';
 import { Ionicons } from '@expo/vector-icons';
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useLocalSearchParams } from 'expo-router';
@@ -196,16 +198,29 @@ export function NumberField({ label, value, onChange, placeholder, decimal, live
   );
 }
 
-export function TextField({ label, value, onChangeText, placeholder, multiline }: {
+export function TextField({ label, value, onChangeText, placeholder, multiline, attach }: {
   label: string; value: string; onChangeText: (t: string) => void; placeholder?: string; multiline?: boolean;
+  attach?: boolean; // "+" to read a photo into the box (founder, 30 Oct 2026); on for every writing box (multiline) unless false
 }) {
   const { keepVisible } = useContext(AnchorCtx);
+  const plus = useAttach(async img => {
+    const r = await readNoteText(img.data, img.media_type, label);
+    const t = (r.text ?? '').trim();
+    if (!t) return tr('No words found in that photo. Try a clearer one.');
+    onChangeText(value.trim() ? `${value.trim()} ${t}` : t);
+    return null;
+  }, { size: 40 });
+  const withPlus = attach ?? !!multiline;
+  const box = (
+    <TextInput style={[s.input, multiline && { minHeight: 70, textAlignVertical: 'top' }, withPlus && { flex: 1, minWidth: 0 }]} value={value} onChangeText={onChangeText}
+      placeholder={placeholder} placeholderTextColor={colors.muted} multiline={multiline}
+      onFocus={() => setTimeout(keepVisible, 300)} onContentSizeChange={multiline ? () => keepVisible() : undefined} />
+  );
   return (
     <View style={s.field}>
       <Text style={s.fieldLabel}>{label}</Text>
-      <TextInput style={[s.input, multiline && { minHeight: 70, textAlignVertical: 'top' }]} value={value} onChangeText={onChangeText}
-        placeholder={placeholder} placeholderTextColor={colors.muted} multiline={multiline}
-        onFocus={() => setTimeout(keepVisible, 300)} onContentSizeChange={multiline ? () => keepVisible() : undefined} />
+      {withPlus && plus.button ? <View style={{ flexDirection: 'row', gap: 8, alignItems: 'flex-start' }}>{box}{plus.button}</View> : box}
+      {withPlus ? plus.status : null}
     </View>
   );
 }

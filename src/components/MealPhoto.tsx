@@ -2,7 +2,6 @@
 // Numbers come from IFCT 2017 where an ingredient matches.
 // The person checks and edits every number before it is added (understanding over tracking).
 
-import * as ImageManipulator from 'expo-image-manipulator';
 import * as ImagePicker from 'expo-image-picker';
 import { useRef, useState, type ReactNode } from 'react';
 import { Ionicons } from '@expo/vector-icons';
@@ -16,17 +15,8 @@ import { IfctPicker } from './IfctPicker';
 import { Button, Card, Heading, Note, TextField, s } from './ui';
 import { lang, tr } from '../lib/i18n';
 
-export async function shrink(uri: string, fallback: string | null | undefined, mime: string | null | undefined) {
-  try {
-    const ctx = ImageManipulator.ImageManipulator.manipulate(uri);
-    ctx.resize({ width: 1024, height: null });
-    const img = await ctx.renderAsync();
-    const out = await img.saveAsync({ format: ImageManipulator.SaveFormat.JPEG, base64: true, compress: 0.8 });
-    if (out.base64) return { data: out.base64, type: 'image/jpeg' };
-  } catch { /* fall back to the picker's own copy */ }
-  if (fallback) return { data: fallback, type: mime ?? 'image/jpeg' };
-  throw new Error(tr('Could not read that photo. Try another one.'));
-}
+import { shrink } from '../lib/photo';
+export { shrink };
 
 /**
  * Speech to text: Apple's recognition in the iPhone app; the browser's in Chrome and Android.
