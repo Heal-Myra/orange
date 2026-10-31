@@ -22,3 +22,9 @@ for, made me laugh, I was kind to, best part of my day. Daily Wisdom and Tao: st
 
 **Colours.** Shared soft pastels (`PASTEL` in `src/components/Rings.tsx`: peach, lavender, teal, sky, sand, rose, sage), no red;
 the coloured left edges on cards were removed. Scoring itself is unchanged.
+
+## Update, 31 Oct 2026 (12:14, founder): Today's card in the same design
+"My day" replaces the old three-part circle: rings for **your best** part of the day and the **three biggest concerns**
+(across Food, Sleep, Movement, To-dos, Breathing, Phone, Gratitude, Daily Wisdom, Tao; parts not logged count as 0), the
+total out of 300 in the middle, the band ("Finding your footing") at the top right in grey, and **Myra recommends** inside
+the bottom of the card (`GuidanceCard embedded`). Tapping a key row opens that card. The Body, Mind and Soul tiles stay below.

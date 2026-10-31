@@ -1,7 +1,7 @@
 // AI pieces used on the Today, Mind and Soul screens.
 
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { Pressable, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import { classifyMedia, dailyGuidance, explainPassage, explainVerse, oneLine, reflectOnAction } from '../lib/ai';
 import { traditionName, type Passage, type Tradition } from '../lib/wisdom';
 import { useAuth } from '../lib/auth';
@@ -57,7 +57,7 @@ export function pickForMoment(kind: RoutineKind | undefined, slot: Slot, myra?: 
 
 /** Today: "Myra recommends". Refreshes by itself when the part of the day changes (morning, afternoon, evening, night)
  *  or when what is logged today changes (a meal, steps from a fitness app, meditation...), so the person never has to ask. */
-export function GuidanceCard() {
+export function GuidanceCard({ embedded }: { embedded?: boolean } = {}) {
   const { session, tradition } = useAuth();
   const { day, days, date, profile, update } = useHeal();
   const { open, focus, setFocus, complete, habits, tickHabit } = useTasks();
@@ -117,11 +117,15 @@ export function GuidanceCard() {
   const mindLine = bedtime ? [tr('Lie down for Yoga Nidra, then drift into sleep.')] : g?.mind ?? [];
   const blocks = g ? ([[tr('Body'), colors.body, g.body], [tr('Mind'), colors.mind, mindLine], [tr('Soul'), colors.soul, g.soul]] as const) : [];
 
+  // Inside Today's "My day" card (decision 0037) the blocks sit on a soft tint instead of cards of their own.
+  const Box = ({ style, children }: { style?: StyleProp<ViewStyle>; children: ReactNode }) => embedded
+    ? <View style={[{ backgroundColor: colors.insight + '0F', borderRadius: 14, paddingHorizontal: 12 }, style, { borderLeftWidth: 0 }]}>{children}</View>
+    : <Card style={style}>{children}</Card>;
   // Three separate blocks, one each for Body, Mind and Soul, stacked one under another (founder, 20 Oct 2026).
   return (
-    <View style={{ gap: 10 }}>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 4 }}>
-        <Heading>{tr('Clear your mind')}</Heading>
+    <View style={{ gap: embedded ? 8 : 10 }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: embedded ? 0 : 4 }}>
+        {embedded ? <Text style={{ color: colors.insight, fontWeight: '700', fontSize: 11, letterSpacing: 0.4 }}>{tr('MYRA RECOMMENDS')}</Text> : <Heading>{tr('Clear your mind')}</Heading>}
         {session && g && !busy && isToday ? <Pressable onPress={run} hitSlop={8}><Text style={{ color: colors.insight, fontWeight: '600' }}>{tr('Refresh')}</Text></Pressable> : null}
       </View>
 
@@ -131,13 +135,13 @@ export function GuidanceCard() {
       {/* Since 26 Oct 2026 (founder): every habit due today stays on Myra recommends from its time until ticked,
           above Myra's own suggestion rather than instead of it. */}
       {due.map(h => (
-        <Card key={h.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 12, borderLeftWidth: 5, borderLeftColor: colors.mind }}>
+        <Box key={h.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 12, borderLeftWidth: 5, borderLeftColor: colors.mind }}>
           <Text style={{ color: colors.mind, fontWeight: '700', fontSize: 14, width: 44 }}>{h.at ?? tr('Today')}</Text>
           <Text style={{ color: colors.ink, flex: 1, fontSize: 14, lineHeight: 20 }}>{h.title} <Text style={{ color: colors.muted, fontSize: 12 }}>· {tr('Habit')}</Text></Text>
           <Pressable accessibilityRole="checkbox" accessibilityLabel={`Done: ${h.title}`} hitSlop={10} onPress={() => tickHabit(h.id)}>
             <Ionicons name="ellipse-outline" size={24} color={colors.accent} />
           </Pressable>
-        </Card>
+        </Box>
       ))}
       {g ? blocks.map(([name, color, list], i) => {
         if ((['body', 'mind', 'soul'] as const)[i] !== pick) return null; // one thing at a time (founder, 22 Oct 2026)
@@ -148,7 +152,7 @@ export function GuidanceCard() {
           <Pressable key={name} accessibilityRole="button" accessibilityHint={tr('Opens the card where you do this')}
             onPress={() => bedtime && pillar === 'mind' ? router.push('/yoga-nidra') : router.navigate({ pathname: `/${pillar}`, params: { card, at: String(Date.now()) } })}
             style={({ pressed }) => ({ opacity: pressed ? 0.8 : 1 })}>
-          <Card style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 12, borderLeftWidth: 5, borderLeftColor: color }}>
+          <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 12, borderLeftWidth: 5, borderLeftColor: color }}>
             <Text style={{ color, fontWeight: '700', fontSize: 14, width: 44 }}>{name}</Text>
             <Text style={{ color: colors.ink, flex: 1, fontSize: 14, lineHeight: 20 }}>{oneLine(list[0])}</Text>
             {task ? (
@@ -157,21 +161,21 @@ export function GuidanceCard() {
                 <Ionicons name="ellipse-outline" size={24} color={colors.accent} />
               </Pressable>
             ) : <Ionicons name="chevron-forward" size={18} color={colors.muted} />}
-          </Card>
+          </Box>
           </Pressable>
         ) : null;
       }) : null}
 
       {g ? null : (
-        <Card>
+        <Box style={{ paddingVertical: 12, gap: 8 }}>
           {!session ? <Note>{tr('Sign in to get Myra\'s recommendations.')}</Note>
             : <Note>{busy ? tr('Myra is looking at your day…') : tr('Myra will suggest your next steps here.')}</Note>}
           {session && !busy && isToday ? <Button kind="insight" title={tr('Get recommendations')} onPress={run} /> : null}
-        </Card>
+        </Box>
       )}
 
       {message ? <Text style={{ color: colors.bad, paddingHorizontal: 4 }}>{message}</Text> : null}
-      <View style={{ paddingHorizontal: 4 }}>
+      <View style={{ paddingHorizontal: embedded ? 0 : 4 }}>
         <Note>{g ? `${busy ? tr('Updating…') : tr('Updated {time}', { time })} · ${tr('changes with your day')} · ` : ''}{tr('Not medical advice.')}</Note>
       </View>
     </View>

@@ -1266,4 +1266,9 @@ export const HI: Record<string, string> = {
   'Lived and written. Beautiful.': 'जिया और लिखा। सुंदर।',
   'Write one line on how you lived it.': 'एक पंक्ति लिखें कि आपने इसे कैसे जिया।',
   "Read today's Tao practice slowly, once.": 'आज का ताओ अभ्यास एक बार धीरे से पढ़ें।',
+  'MYRA RECOMMENDS': 'मायरा की सलाह',
+  'My day': 'मेरा दिन',
+  'of {n}': '{n} में से',
+  'To-dos': 'काम',
+  'Phone': 'फ़ोन',
 };

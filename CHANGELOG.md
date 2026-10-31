@@ -1,5 +1,8 @@
 # Changelog
 
+## 31 Oct 2026 — Today: "My day" card in the ring design
+- Rings for the best part of the day and the three biggest concerns, total out of 300 in the middle, Myra recommends at the bottom of the card; tap a row to open that card. The old three-part circle is replaced; Body, Mind and Soul tiles stay.
+
 ## 31 Oct 2026 — One design for every scored card (decision 0037)
 - Concentric rings with the score in the middle on Food, Sleep, Movement, Face & beauty, Clear your mind, Breathing & meditation, Phone activity, Gratitude journal, Daily Wisdom and Tao.
 - Data cards: key at the side; writing cards: rings on top, boxes below with matching dots. Myra's one line at the bottom of every card.

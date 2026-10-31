@@ -2,14 +2,14 @@
 // The detail of each pillar lives on its own tab; tap a section of the circle to open it.
 
 import { Text, View } from 'react-native';
-import { GuidanceCard } from '../../components/AiBits';
+import { TodayRings } from '../../components/TodayRings';
 import { FeelingCard } from '../../components/FeelingCard';
 import { AirLine } from '../../components/AirLine';
 import { todayISO } from '../../lib/dates';
-import { PillarTiles, WellBeingRing } from '../../components/WellBeingRing';
+import { PillarTiles } from '../../components/WellBeingRing';
 import { useAuth } from '../../lib/auth';
-import { Card, Note, Screen } from '../../components/ui';
-import { band, wellBeing } from '../../lib/scoring';
+import { Note, Screen } from '../../components/ui';
+import { wellBeing } from '../../lib/scoring';
 import { useHeal } from '../../lib/store';
 import { colors } from '../../theme';
 import { tr } from '../../lib/i18n';
@@ -18,8 +18,6 @@ export default function Today() {
   const { day, date, profile } = useHeal();
   const { session } = useAuth();
   const w = wellBeing(day, profile);
-  const label = w.logged ? tr(band(w.total)) : tr('Nothing logged yet');
-  const bandColor = w.total >= 180 ? colors.good : w.total >= 120 ? colors.warn : colors.bad;
 
   return (
     <Screen feedback="Today" trends="today" top={
@@ -32,13 +30,11 @@ export default function Today() {
 
       {date === todayISO() ? <FeelingCard /> : null}
 
-      <Card style={{ alignItems: 'center' }}>
-        <WellBeingRing w={w} label={label} labelColor={w.logged ? bandColor : colors.muted} />
-      </Card>
+      {/* One design with the other cards (founder, 31 Oct 2026): rings for the best part and the three biggest concerns,
+          the total in the middle, Myra recommends at the bottom; the three tiles open Body, Mind and Soul. */}
+      <TodayRings w={w} />
 
       <PillarTiles w={w} />
-
-      <GuidanceCard />
 
       <View style={{ paddingHorizontal: 4 }}>
         <Note>{tr('Well-being = Body + Mind + Soul, each out of 100. A working model, not a medical measure.')}</Note>
