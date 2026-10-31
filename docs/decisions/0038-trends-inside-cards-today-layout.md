@@ -12,3 +12,8 @@ Change arrows are soft green when better and grey otherwise, never red.
 the AQI line only on bad-air days; My day (total, best, catch up on); Body · Mind · Soul ring circles; one Myra card in
 two parts: Myra recommends (starting with the name) and Ask Myra (box, microphone, send, two quick questions).
 **How I feel today** moved to the Mind tab, above the habits and Clear your mind.
+
+## Update, 31 Oct 2026 (14:16, founder): no day row on the tabs
+The "‹ Good afternoon, Santosh ›" row is gone from Today, Body, Mind and Soul; the tabs always show today (a person had landed
+on an old day without noticing). Past days open from a card's Trends page: D has ‹ › and "Open this day to see or change it";
+the tabs then show a slim "Showing Fri, 30 Oct · Back to today" banner. The Profile button shows the person's first name.

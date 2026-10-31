@@ -1,5 +1,9 @@
 # Changelog
 
+## 31 Oct 2026 — No day row on the tabs; name on the Profile button
+- Tabs always show today. Earlier days: a card's Trends page › D › ‹ › › "Open this day"; a banner then says which day and leads back to today.
+- The Profile button shows the first name. Fixed: the Trends page D switch jumped back to W.
+
 ## 31 Oct 2026 — Trends inside each card; Today's final layout (decision 0038)
 - No D·W·M·Q·Y bar on the tabs. Tap a card's rings ("Trends ›") for its own page with the switch and only its measures. No red arrows.
 - Today: greeting in the day row, AQI only on bad-air days, My day, Body · Mind · Soul circles, one Myra card (recommends + ask). How I feel today moved to Mind.

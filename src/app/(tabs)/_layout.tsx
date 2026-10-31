@@ -8,6 +8,8 @@ import type { ColorValue } from 'react-native';
 import { colors } from '../../theme';
 import { tr } from '../../lib/i18n';
 import { usePendingRequests } from '../../lib/adminAlerts';
+import { useHeal } from '../../lib/store';
+import { useAuth } from '../../lib/auth';
 
 type IconName = ComponentProps<typeof Ionicons>['name'];
 
@@ -20,6 +22,11 @@ const tab = (title: string, icon: IconName, tint: string) => ({
 /** Profile, with a small dot when AI access requests are waiting for an admin (admins only). */
 function ProfileButton() {
   const pending = usePendingRequests();
+  // The person's first name in place of the word "Profile" (founder, 31 Oct 2026).
+  const { profile } = useHeal();
+  const { session } = useAuth();
+  const mail = (session?.user.email ?? '').split('@')[0].match(/^[a-zA-Z]+/)?.[0] ?? '';
+  const name = profile.me?.name?.trim().split(/\s+/)[0] || (mail.length > 1 ? mail[0].toUpperCase() + mail.slice(1).toLowerCase() : '') || tr('Profile');
   return (
     <Link href="/account" asChild>
       <Pressable accessibilityLabel={pending ? tr('Profile, {n} requests waiting', { n: pending }) : tr('Profile')} hitSlop={10} style={{ paddingHorizontal: 16, alignItems: 'center' }}>
@@ -27,7 +34,7 @@ function ProfileButton() {
           <Ionicons name="person-circle-outline" size={30} color={colors.ink} />
           {pending > 0 && <View style={{ position: 'absolute', top: 1, right: 0, width: 11, height: 11, borderRadius: 6, backgroundColor: colors.brand, borderWidth: 2, borderColor: colors.bg }} />}
         </View>
-        <Text style={{ fontSize: 12, fontWeight: '600', color: colors.ink }}>{tr('Profile')}</Text>
+        <Text style={{ fontSize: 12, fontWeight: '600', color: colors.ink, maxWidth: 80 }} numberOfLines={1}>{name}</Text>
       </Pressable>
     </Link>
   );

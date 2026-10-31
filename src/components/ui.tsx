@@ -18,7 +18,7 @@ import { tr } from '../lib/i18n';
 // outlines it for a moment (founder, 21 Oct 2026). Cards opt in by being wrapped in <Anchor id="…">.
 const AnchorCtx = createContext<{ register: (id: string, y: number) => void; lit: string | null; keepVisible: () => void }>({ register: () => {}, lit: null, keepVisible: () => {} });
 
-export function Screen({ children, showDay = true, feedback, top, dayLabel }: { children: ReactNode; showDay?: boolean; feedback?: string; top?: ReactNode; trends?: Pillar; dayLabel?: ReactNode }) {
+export function Screen({ children, showDay = false, feedback, top, dayLabel, noBanner }: { children: ReactNode; showDay?: boolean; noBanner?: boolean; feedback?: string; top?: ReactNode; trends?: Pillar; dayLabel?: ReactNode }) {
   const { card, at } = useLocalSearchParams<{ card?: string; at?: string }>();
   const scroll = useRef<ScrollViewInstance>(null);
   const spots = useRef<Record<string, number>>({});
@@ -65,12 +65,28 @@ export function Screen({ children, showDay = true, feedback, top, dayLabel }: { 
           {/* Trends moved off the tabs (founder, 31 Oct 2026): D · W · M · Q · Y lives on each card's detail page
               (tap the rings; src/app/trend.tsx), so people not interested in trends never see the switch. */}
           {top}
-          {showDay && <DayBar label={dayLabel} />}
+          {/* No day row on the tabs (founder, 31 Oct 2026): they show today. A past day is opened from a card's
+              Trends page (D); then a slim banner says which day it is and leads back to today. */}
+          {showDay ? <DayBar label={dayLabel} /> : noBanner ? null : <PastDayBanner />}
           {feedback ? <FeedbackBox area={feedback} /> : null}
           {children}
         </ScrollView>
       </AnchorCtx.Provider>
     </SafeAreaView>
+  );
+}
+
+/** Shown only when a past day is open on the tabs. */
+function PastDayBanner() {
+  const { date, setDate } = useHeal();
+  if (date === todayISO()) return null;
+  return (
+    <Pressable onPress={() => setDate(todayISO())} accessibilityRole="button"
+      style={{ flexDirection: 'row', alignItems: 'center', gap: 8, padding: 10, borderRadius: 14, backgroundColor: colors.tint }}>
+      <Ionicons name="calendar-outline" size={18} color={colors.accent} />
+      <Text style={{ flex: 1, color: colors.ink }}>{tr('Showing {day}', { day: formatDay(date) })}</Text>
+      <Text style={{ color: colors.accent, fontWeight: '700' }}>{tr('Back to today')}</Text>
+    </Pressable>
   );
 }
 

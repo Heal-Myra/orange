@@ -1281,4 +1281,8 @@ export const HI: Record<string, string> = {
   'Choose W, M, Q or Y above to see how this has changed over time.': 'समय के साथ बदलाव देखने के लिए ऊपर W, M, Q या Y चुनें।',
   'ASK MYRA': 'मायरा से पूछें',
   'Details and trends': 'विवरण और रुझान',
+  'Open this day to see or change it': 'इस दिन को देखने या बदलने के लिए खोलें',
+  'Use ‹ › to look at an earlier day. Choose W, M, Q or Y above to see how this has changed over time.': 'पहले का दिन देखने के लिए ‹ › दबाएँ। समय के साथ बदलाव देखने के लिए ऊपर W, M, Q या Y चुनें।',
+  'Showing {day}': '{day} दिखा रहा है',
+  'Back to today': 'आज पर लौटें',
 };

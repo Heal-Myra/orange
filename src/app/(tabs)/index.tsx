@@ -19,15 +19,10 @@ export default function Today() {
   const w = wellBeing(day, profile);
 
   return (
-    // The greeting sits in the day row, in place of "Today" (founder, 31 Oct 2026); other days show their date.
-    <Screen feedback="Today" dayLabel={
-      <View style={{ alignItems: 'center' }}>
-        <Text style={{ fontSize: 14, color: colors.muted }}>{greeting()},</Text>
-        <Text style={{ fontSize: 22, fontWeight: '800', color: colors.ink }}>{profile.me?.name?.split(' ')[0] || firstName(session?.user.email) || tr('friend')}</Text>
-      </View>
-    }>
+    // No day row or greeting (founder, 31 Oct 2026): the page starts with the score; Myra speaks to the person by name.
+    <Screen feedback="Today">
       {/* AQI only on bad-air days; How I feel today moved to the Mind tab (founder, 31 Oct 2026). */}
-      {date === todayISO() ? <View style={{ alignItems: 'center', marginTop: -6 }}><AirLine /></View> : null}
+      {date === todayISO() ? <View style={{ alignItems: 'center' }}><AirLine /></View> : null}
 
       {/* One design with the other cards (founder, 31 Oct 2026): rings for the best part and the three biggest concerns,
           the total in the middle, Myra recommends at the bottom; the three tiles open Body, Mind and Soul. */}
