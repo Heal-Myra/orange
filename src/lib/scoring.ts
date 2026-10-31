@@ -108,7 +108,7 @@ export const GRATITUDE_EACH = POINTS.gratitude / 4;  // each of up to four grati
 export const LEARN_SHARE = 0.25;
 /** The Gratitude journal replaces the Gratitude and Love cards from this day. */
 export const JOURNAL_FROM = '2026-10-27';
-const filledText = (t?: string) => !!t && t.trim().length >= 2;
+export const filledText = (t?: string) => !!t && t.trim().length >= 2;
 /** A line on how the learning was lived: at least three words. */
 export const lived = (text?: string) => (text ?? '').trim().split(/\s+/).filter(Boolean).length >= 3;
 

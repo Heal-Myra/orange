@@ -3,6 +3,8 @@
 // never use up the limit), everyday tools (shown, not scored). Minutes go to the day the screenshot shows.
 // Websites cannot read Screen Time directly, so a screenshot is the practical way. Every number can be checked and changed.
 
+import { MyraLine } from './MyraLine';
+import { PASTEL, RingPanel } from './Rings';
 import * as ImagePicker from 'expo-image-picker';
 import { useEffect, useState, type ReactNode } from 'react';
 import { ActivityIndicator, Image, Platform, Pressable, Text, TextInput, View } from 'react-native';
@@ -70,6 +72,7 @@ export function ScreenTimeCard({ children }: { children?: ReactNode }) {
   const [rows, setRows] = useState<MediaSession[] | null>(null);
   const [open, setOpen] = useState<number | null>(null);
   const score = phoneContent(day.media, day.noMedia, profile); // this card's own day (yesterday)
+  const socialMin = day.media.filter(x => !x.notMe && x.group !== 'tool' && x.group !== 'learning').reduce((a, x) => a + (x.minutes || 0), 0);
   const updatePhoneOn = usePhoneUpdate();
   // Today's Mind score counts yesterday's phone activity: if yesterday has sessions but today has no copy yet, copy them.
   const { updateOn } = useHeal();
@@ -128,6 +131,12 @@ export function ScreenTimeCard({ children }: { children?: ReactNode }) {
   return (
     <Card>
       <Heading right={<Score value={score?.content ?? undefined} max={30} />}>{phoneDate === date ? tr('Phone activity') : tr('Phone activity · yesterday')}</Heading>
+      {score.content != null ? (
+        <RingPanel score={score.content} max={30} items={[
+          { id: 'quality', color: PASTEL.sky, label: tr('Content quality'), value: score.quality ?? 0, text: `${Math.round(18 * (score.quality ?? 0))} / 18` },
+          { id: 'limit', color: PASTEL.sage, label: tr('Within limit'), value: (score.content - 18 * (score.quality ?? 0)) / 12, text: `${socialMin} / ${profile.mediaLimit} min` },
+        ]} />
+      ) : null}
       <Note>{tr('Each morning, add yesterday: in Settings → Screen Time → See All App & Website Activity, go back one day, take a screenshot, then paste it here. The app reads every app for you.')}</Note>
       {/* "I used no social media today" removed (founder, 23 Oct 2026). Older days that have it still count. */}
       {session ? (
@@ -184,6 +193,7 @@ export function ScreenTimeCard({ children }: { children?: ReactNode }) {
       ) : null}
       {day.media.length > 0 && !rows ? <Note>{tr('Social and video: {total} of your {limit}-minute limit.', { total, limit: profile.mediaLimit })}{learning ? ` ${tr('Learning and AI tools: {n} min (never counts against the limit).', { n: learning })}` : ''}</Note> : null}
       {children}
+      <MyraLine card="phone" phone={{ minutes: score.minutes, social: socialMin }} />
     </Card>
   );
 }

@@ -12,7 +12,8 @@ import { useHeal } from '../lib/store';
 import { colors } from '../theme';
 import { useAttach } from './AttachPlus';
 import { selfieReading } from './FeelingCard';
-import { Card, Heading, Note } from './ui';
+import { Card, Heading, Note, Score } from './ui';
+import { MyraLine } from './MyraLine';
 
 /** Numbers stay calm (founder, 31 Oct 2026: no red for concerns; light and minimalist): soft green when good, grey otherwise. */
 const tone = (v: number) => (v >= 80 ? colors.good : colors.muted);
@@ -78,7 +79,7 @@ export function FaceCard() {
   return (
     // A full card like Food (founder, 31 Oct 2026: "It should be visible like other cards"), not folded away.
     <Card>
-      <Heading>{tr('Face & beauty')}</Heading>
+      <Heading right={score != null ? <Score value={score} max={100} /> : undefined}>{tr('Face & beauty')}</Heading>
         <View style={{ gap: 12 }}>
           {f && score != null ? (
             <>
@@ -111,7 +112,7 @@ export function FaceCard() {
                   <Text style={{ color: colors.accent, fontWeight: '600' }}>{more ? tr('Show less') : tr('See all {n}', { n: points.length })}</Text>
                 </Pressable>
               ) : null}
-              <Note>{tr('Myra adds remedies to your food and movement suggestions. Everyday skin care, not medical advice.')}</Note>
+              <Note>{tr('Everyday skin care, not medical advice.')}</Note>
             </>
           ) : (
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
@@ -121,6 +122,7 @@ export function FaceCard() {
           )}
           {plus.status}
         </View>
+      <MyraLine card="face" />
     </Card>
   );
 }

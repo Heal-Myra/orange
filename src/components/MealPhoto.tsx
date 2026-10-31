@@ -33,7 +33,7 @@ export function speechRecognition(): (new () => any) | null {
 }
 
 /** One Food card: log a meal (photo, speak, type) on top, today's meals and totals underneath. */
-export function MealPhoto({ right, children }: { right?: ReactNode; children?: ReactNode }) {
+export function MealPhoto({ right, top, children }: { right?: ReactNode; top?: ReactNode; children?: ReactNode }) {
   const { session } = useAuth();
   const { update } = useHeal();
   const [mode, setMode] = useState<'photo' | 'speak' | 'type' | null>(null);
@@ -147,6 +147,7 @@ export function MealPhoto({ right, children }: { right?: ReactNode; children?: R
   return (
     <Card>
       <Heading right={right}>{tr('Food')}</Heading>
+      {top}
       {(
         <>
           <View style={{ flexDirection: 'row', gap: 10 }}>

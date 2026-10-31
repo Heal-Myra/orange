@@ -3,26 +3,15 @@
 // Gratitude and Love cards. Points: thank-yous 5 each, laugh 7.5, best part 7.5 (Gratitude 30); kind to someone 30 (Love).
 import { TextInput, Text, View } from 'react-native';
 import { tr } from '../lib/i18n';
-import { soulScore } from '../lib/scoring';
+import { filledText, soulScore } from '../lib/scoring';
+import { EntryHead, PASTEL, RingTop, pts } from './Rings';
+import { MyraLine } from './MyraLine';
 import { useHeal } from '../lib/store';
 import { colors } from '../theme';
 import { Card, Heading, Note, Score, s, useKeepVisible } from './ui';
 import { readNoteJournal } from '../lib/ai';
 import { useAttach } from './AttachPlus';
 
-const HEAD = colors.soul, LOVE = colors.insight;
-
-function Panel({ title, points, tone = HEAD, children }: { title: string; points: number; tone?: string; children: React.ReactNode }) {
-  return (
-    <View style={{ flex: 1, borderRadius: 16, borderWidth: 1.5, borderColor: tone + '40', overflow: 'hidden', backgroundColor: colors.surface }}>
-      <View style={{ backgroundColor: tone, paddingHorizontal: 10, paddingVertical: 7, flexDirection: 'row', justifyContent: 'space-between', gap: 6 }}>
-        <Text style={{ color: '#fff', fontWeight: '800', fontSize: 12, letterSpacing: 0.6, flexShrink: 1 }}>{title.toUpperCase()}</Text>
-        <Text style={{ color: '#fff', fontWeight: '800', fontSize: 12 }}>{points}</Text>
-      </View>
-      <View style={{ padding: 8 }}>{children}</View>
-    </View>
-  );
-}
 
 export function GratitudeJournal() {
   const { day, date, update, profile } = useHeal();
@@ -57,38 +46,48 @@ export function GratitudeJournal() {
     });
     return tr('Filled {n} lines from your photo. Check and change anything.', { n: filled });
   });
+  // Rings on top, one per prompt; the writing boxes below, each with its ring's dot (founder, 31 Oct 2026; decision 0037).
+  const nThanks = Math.min(3, thanks.filter(x => filledText(x ?? '')).length);
+  const laughOk = filledText(so.laugh ?? ''), kindOk = filledText(day.love?.kindTo ?? ''), bestOk = filledText(so.best ?? '');
+  const RING = { thanks: PASTEL.peach, laugh: PASTEL.sand, kind: PASTEL.rose, best: PASTEL.teal };
+  const soft = { borderWidth: 1, borderColor: colors.line, backgroundColor: '#F8FAFB', borderRadius: 12, paddingHorizontal: 10 } as const;
   return (
     <Card style={{ gap: 10 }}>
       <Heading right={<Score value={(score?.gratitude ?? 0) + (score?.love ?? 0)} max={60} />}>{tr('Gratitude journal')}</Heading>
+      <RingTop score={(score?.gratitude ?? 0) + (score?.love ?? 0)} max={60} items={[
+        { id: 'thanks', color: RING.thanks, label: tr('I\'m thankful for'), value: nThanks / 3 },
+        { id: 'laugh', color: RING.laugh, label: tr('Made me laugh'), value: laughOk ? 1 : 0 },
+        { id: 'kind', color: RING.kind, label: tr('I was kind to'), value: kindOk ? 1 : 0 },
+        { id: 'best', color: RING.best, label: tr('Best part of my day'), value: bestOk ? 1 : 0 },
+      ]} />
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
         <View style={{ flex: 1 }}><Note>{tr('Fill it in through the day, or at night before sleep. Wrote it on paper? Tap + for a photo.')}</Note></View>
         {attach.button}
       </View>
       {attach.status}
 
-      <Panel title={tr('I\'m thankful for')} points={15}>
+      <EntryHead color={RING.thanks} title={tr('I\'m thankful for')} points={pts(nThanks * 5, 15)} />
+      <View style={soft}>
         {[0, 1, 2].map(i => (
-          <View key={date + 't' + i} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, borderBottomWidth: i < 2 ? 1 : 0, borderBottomColor: HEAD + '30', borderStyle: 'dashed' }}>
-            <Text style={{ color: HEAD, fontWeight: '800', width: 12 }}>{i + 1}</Text>
-            <TextInput style={[s.input, { flex: 1, borderWidth: 0, backgroundColor: 'transparent', paddingHorizontal: 0, paddingVertical: 8 }]}
+          <View key={date + 't' + i} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, borderBottomWidth: i < 2 ? 1 : 0, borderBottomColor: colors.line, borderStyle: 'dashed' }}>
+            <Text style={{ color: colors.muted, fontWeight: '700', width: 14 }}>{i + 1}.</Text>
+            <TextInput style={[s.input, { flex: 1, borderWidth: 0, backgroundColor: 'transparent', paddingHorizontal: 0, paddingVertical: 9 }]}
               value={thanks[i] ?? ''} onChangeText={t => setThanks(i, t)} placeholder={tr('Write here')} placeholderTextColor={colors.muted}
               onFocus={() => setTimeout(keep, 300)} />
           </View>
         ))}
-      </Panel>
-
-      <View style={{ flexDirection: 'row', gap: 10 }}>
-        <Panel title={tr('Made me laugh')} points={7.5}>
-          {box(so.laugh ?? '', t => update(d => { d.soul = { ...d.soul, laugh: t }; }), tr('Write here'), 'laugh')}
-        </Panel>
-        <Panel title={tr('I was kind to')} points={30} tone={LOVE}>
-          {box(day.love?.kindTo ?? '', t => update(d => { d.love = { ...(d.love ?? {}), kindTo: t }; }), tr('Someone, and how'), 'kind')}
-        </Panel>
       </View>
 
-      <Panel title={tr('Best part of my day')} points={7.5}>
-        {box(so.best ?? '', t => update(d => { d.soul = { ...d.soul, best: t }; }), tr('Write here'), 'best', 2)}
-      </Panel>
+      <EntryHead color={RING.laugh} title={tr('Made me laugh')} points={pts(laughOk ? 7.5 : 0, 7.5)} />
+      <View style={soft}>{box(so.laugh ?? '', t => update(d => { d.soul = { ...d.soul, laugh: t }; }), tr('Write here'), 'laugh', 2)}</View>
+
+      <EntryHead color={RING.kind} title={tr('I was kind to')} points={pts(kindOk ? 30 : 0, 30)} />
+      <View style={soft}>{box(day.love?.kindTo ?? '', t => update(d => { d.love = { ...(d.love ?? {}), kindTo: t }; }), tr('Someone, and how'), 'kind', 2)}</View>
+
+      <EntryHead color={RING.best} title={tr('Best part of my day')} points={pts(bestOk ? 7.5 : 0, 7.5)} />
+      <View style={soft}>{box(so.best ?? '', t => update(d => { d.soul = { ...d.soul, best: t }; }), tr('Write here'), 'best', 2)}</View>
+
+      <MyraLine card="gratitude" />
     </Card>
   );
 }

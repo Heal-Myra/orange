@@ -153,12 +153,16 @@ export function Heading({ children, right }: { children: ReactNode; right?: Reac
 export const Note = ({ children }: { children: ReactNode }) => <Text style={s.note}>{children}</Text>;
 export const Label = ({ children }: { children: ReactNode }) => <Text style={s.label}>{children}</Text>;
 
+/** The card's score as a soft pill at the top right (decision 0037: one look for every scored card). */
 export function Score({ value, max }: { value: number | null | undefined; max: number }) {
+  const v = value == null ? '–' : Number.isInteger(value * 2) ? value : Math.round(value);
   return (
-    <Text style={s.score}>
-      {value == null ? '–' : Math.round(value)}
-      <Text style={s.scoreMax}> /{max}</Text>
-    </Text>
+    <View style={{ backgroundColor: '#F1F6F7', borderRadius: 99, paddingHorizontal: 10, paddingVertical: 4 }}>
+      <Text style={s.score}>
+        {v}
+        <Text style={s.scoreMax}>/{max}</Text>
+      </Text>
+    </View>
   );
 }
 
@@ -221,7 +225,7 @@ export function TextField({ label, value, onChangeText, placeholder, multiline, 
   );
   return (
     <View style={s.field}>
-      <Text style={s.fieldLabel}>{label}</Text>
+      {label ? <Text style={s.fieldLabel}>{label}</Text> : null}
       {withPlus && plus.button ? <View style={{ flexDirection: 'row', gap: 8, alignItems: 'flex-start' }}>{box}{plus.button}</View> : box}
       {withPlus ? plus.status : null}
     </View>
@@ -276,8 +280,8 @@ export const s = StyleSheet.create({
   heading: { fontSize: 20, fontWeight: '600', color: colors.ink, flexShrink: 1 },
   note: { fontSize: 13, color: colors.muted, lineHeight: 19 },
   label: { fontSize: 11, letterSpacing: 1, textTransform: 'uppercase', color: colors.muted, fontWeight: '700' },
-  score: { fontSize: 20, fontVariant: ['tabular-nums'], color: colors.insight }, // scores are Happy Orange output
-  scoreMax: { fontSize: 13, color: colors.muted },
+  score: { fontSize: 16, fontWeight: '800', fontVariant: ['tabular-nums'], color: colors.insight }, // scores are Happy Orange output
+  scoreMax: { fontSize: 12, fontWeight: '600', color: colors.muted },
   meterLabel: { fontSize: 14, color: colors.ink },
   meterRight: { fontSize: 13, color: colors.muted, fontVariant: ['tabular-nums'] },
   track: { height: 8, borderRadius: 99, backgroundColor: colors.sunk, overflow: 'hidden' },

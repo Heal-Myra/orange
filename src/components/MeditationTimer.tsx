@@ -1,5 +1,7 @@
 // Guided meditation inside the app: the app suggests a length, guides the breath, and records the minutes actually sat.
 
+import { MyraLine } from './MyraLine';
+import { PASTEL, RingPanel } from './Rings';
 import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
@@ -69,8 +71,11 @@ export function MeditationTimer() {
   const sitting = running || pausedMs > 0;
 
   return (
-    <Card style={{ borderLeftWidth: 4, borderLeftColor: colors.soul }}>
+    <Card>
       <Heading right={<Score value={Math.min(30, (30 * done) / target)} max={30} />}>{tr('Breathing & meditation')}</Heading>
+      <RingPanel score={Math.min(30, (30 * done) / target)} max={30} items={[
+        { id: 'min', color: PASTEL.lavender, label: tr('Minutes today'), value: done / target, text: `${done} / ${target} min` },
+      ]} />
       {!sitting ? (
         <>
           <Note>{plan ? tr('Today\'s plan: {m} minutes, on the way to {goal} minutes a day.', { m: plan.minutes, goal: goal!.minutes })
@@ -150,6 +155,7 @@ export function MeditationTimer() {
       )}
       <Meter label={tr('Today')} value={done} max={target} color={colors.soul} right={`${done} / ${target} ${tr('min')}`} />
       {profile.me ? <GoalRow /> : null}
+      <MyraLine card="meditation" />
     </Card>
   );
 }

@@ -5,12 +5,14 @@ import { Pressable, Text, TextInput, View } from 'react-native';
 import { useAuth } from '../lib/auth';
 import { verseOfDay } from '../lib/gita';
 import { passageOfDay, sourceOf, traditionName } from '../lib/wisdom';
-import { LEARN_SHARE, POINTS, PRACTICES } from '../lib/scoring';
+import { LEARN_SHARE, POINTS, PRACTICES, lived } from '../lib/scoring';
+import { EntryHead, PASTEL, RingTop, pts } from './Rings';
+import { MyraLine } from './MyraLine';
 import { useHeal } from '../lib/store';
 import { thoughtOfDay } from '../lib/thoughts';
 import { colors } from '../theme';
 import { ExplainPassage, ExplainVerse } from './AiBits';
-import { Button, Card, Check, Heading, Label, Note, TextField, s, useKeepVisible } from './ui';
+import { Button, Card, Check, Heading, Label, Note, Score, TextField, s, useKeepVisible } from './ui';
 import { tr } from '../lib/i18n';
 
 /** Daily Wisdom: the passage of the day from the person's chosen tradition (Gita when Hindu or not chosen). */
@@ -21,9 +23,15 @@ export function VerseStudyCard() {
   const p = passageOfDay(t, date);
   const v = verseOfDay(date);
   const so = day.soul ?? {};
+  // Rings on top (studied, lived), the writing below with each ring's dot; Myra's line at the bottom (decision 0037).
+  const W = POINTS.wisdom, studyPts = so.verseStudied ? LEARN_SHARE * W : 0, livedPts = lived(so.verseLived) ? (1 - LEARN_SHARE) * W : 0;
   return (
-    <Card style={{ borderLeftWidth: 4, borderLeftColor: colors.soul }}>
-      <Heading>{tr('Daily Wisdom')}</Heading>
+    <Card>
+      <Heading right={<Score value={studyPts + livedPts} max={W} />}>{tr('Daily Wisdom')}</Heading>
+      <RingTop score={studyPts + livedPts} max={W} items={[
+        { id: 'study', color: PASTEL.sand, label: tr('Studied'), value: studyPts ? 1 : 0 },
+        { id: 'lived', color: PASTEL.peach, label: tr('Lived'), value: livedPts ? 1 : 0 },
+      ]} />
       {p ? (
         <>
           <Label>{p.ref} · {t === 'jain' ? tr('Universal wisdom (Jain texts coming soon)') : tr(traditionName(t))}</Label>
@@ -47,11 +55,14 @@ export function VerseStudyCard() {
       )}
       <TextField key={date + 'verse'} label={tr('What it means to me today')} value={so.verseNote ?? ''} multiline
         onChangeText={t => update(d => { d.soul = { ...d.soul, verseNote: t }; })} placeholder={tr('One line is enough')} />
+      <EntryHead color={PASTEL.sand} title={tr('Studied')} points={pts(studyPts, LEARN_SHARE * W)} />
       <Check checked={!!so.verseStudied} onToggle={() => update(d => { d.soul = { ...d.soul, verseStudied: !d.soul?.verseStudied }; })}
-        title={tr('I studied today\'s wisdom')} points={LEARN_SHARE * POINTS.wisdom} />
+        title={tr('I studied today\'s wisdom')} points={LEARN_SHARE * W} />
       {/* Living it earns the other 75 % (founder, 26 Oct 2026). Usually written later in the day. */}
-      <TextField key={date + 'lived'} label={tr('How I lived it today · {n} points', { n: (1 - LEARN_SHARE) * POINTS.wisdom })} value={so.verseLived ?? ''} multiline
+      <EntryHead color={PASTEL.peach} title={tr('How I lived it today')} points={pts(livedPts, (1 - LEARN_SHARE) * W)} />
+      <TextField key={date + 'lived'} label="" value={so.verseLived ?? ''} multiline
         onChangeText={t => update(d => { d.soul = { ...d.soul, verseLived: t }; })} placeholder={tr('e.g. I paused and took three breaths before replying in anger.')} />
+      <MyraLine card="wisdom" />
     </Card>
   );
 }

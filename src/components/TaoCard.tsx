@@ -6,10 +6,12 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { useHeal } from '../lib/store';
-import { LEARN_SHARE } from '../lib/scoring';
+import { LEARN_SHARE, lived } from '../lib/scoring';
+import { EntryHead, PASTEL, RingTop, pts } from './Rings';
+import { MyraLine } from './MyraLine';
 import { TAO_CORE, TAO_POINTS, TAO_WEEK, WEEK_REVIEW, mondayOf, taoForDate } from '../lib/tao';
 import { colors } from '../theme';
-import { Card, Check, Expandable, Heading, Label, Note, TextField } from './ui';
+import { Card, Check, Expandable, Heading, Label, Note, Score, TextField } from './ui';
 import { tr } from '../lib/i18n';
 
 const NAME = { mind: 'Mind', soul: 'Soul' } as const;
@@ -34,14 +36,19 @@ export function TaoCard({ on }: { on: 'mind' | 'soul' }) {
   }
 
   const monday = mondayOf(date);
+  const taoStudy = day.tao?.done ? LEARN_SHARE * TAO_POINTS : 0, taoLived = lived(day.tao?.lived) ? (1 - LEARN_SHARE) * TAO_POINTS : 0;
   const mondayNote = monday !== date ? days[monday]?.tao?.note : undefined;
 
   // Compact (founder, 21 Oct 2026): about the size of "Clear your mind". One-sentence practice, the note and the tick;
   // the full text, the Sunday review and the week are one tap away.
   return (
-    <Card style={{ borderLeftWidth: 4, borderLeftColor: color }}>
+    <Card>
       <Label>{tr('Tao practice')} · {tr(t.day)}</Label>
-      <Heading>{tr(t.title)}</Heading>
+      <Heading right={<Score value={taoStudy + taoLived} max={TAO_POINTS} />}>{tr(t.title)}</Heading>
+      <RingTop score={taoStudy + taoLived} max={TAO_POINTS} items={[
+        { id: 'study', color: PASTEL.sand, label: tr('Studied'), value: taoStudy ? 1 : 0 },
+        { id: 'lived', color: PASTEL.sage, label: tr('Lived'), value: taoLived ? 1 : 0 },
+      ]} />
       <Text style={{ color: colors.ink, lineHeight: 22 }}>{tr(t.short)}</Text>
       {t.weekday === 3 && mondayNote ? <Note>{tr('Your Monday note: {note}', { note: mondayNote })}</Note> : null}
 
@@ -50,10 +57,12 @@ export function TaoCard({ on }: { on: 'mind' | 'soul' }) {
           onChangeText={v => update(d => { d.tao = { ...d.tao, note: v }; })} placeholder={tr(t.notePrompt)} />
       </Expandable>
 
+      <EntryHead color={PASTEL.sand} title={tr('Studied')} points={pts(taoStudy, LEARN_SHARE * TAO_POINTS)} />
       <Check color={color} checked={!!day.tao?.done} onToggle={() => update(d => { d.tao = { ...d.tao, done: !d.tao?.done }; })}
         title={tr('I read today\'s practice')} points={LEARN_SHARE * TAO_POINTS} />
       {/* Living it earns the other 75 % (founder, 26 Oct 2026). */}
-      <TextField key={date + 'taolived'} label={tr('How I lived it today · {n} points', { n: (1 - LEARN_SHARE) * TAO_POINTS })} value={day.tao?.lived ?? ''} multiline
+      <EntryHead color={PASTEL.sage} title={tr('How I lived it today')} points={pts(taoLived, (1 - LEARN_SHARE) * TAO_POINTS)} />
+      <TextField key={date + 'taolived'} label="" value={day.tao?.lived ?? ''} multiline
         onChangeText={v => update(d => { d.tao = { ...d.tao, lived: v }; })} placeholder={tr('e.g. I let go of being right in a family discussion.')} />
 
       <Pressable onPress={() => setMore(m => !m)} hitSlop={6}>
@@ -77,6 +86,7 @@ export function TaoCard({ on }: { on: 'mind' | 'soul' }) {
           {week && <TaoWeek compact />}
         </View>
       ) : null}
+      <MyraLine card="tao" />
     </Card>
   );
 }

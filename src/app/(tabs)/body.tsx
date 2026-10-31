@@ -14,8 +14,10 @@ import { MealRow } from '../../components/MealRow';
 import { CareNote } from '../../components/CareCard';
 import { FaceCard } from '../../components/FaceCard';
 import { AirRow } from '../../components/AirLine';
+import { PASTEL, RingPanel } from '../../components/Rings';
+import { MyraLine } from '../../components/MyraLine';
 import { todayISO } from '../../lib/dates';
-import { Anchor, Card, Heading, Note, Screen, Score, s } from '../../components/ui';
+import { Anchor, Card, Expandable, Heading, Note, Screen, Score, s } from '../../components/ui';
 import { FAST_KCAL, bodyScore, mealTotals } from '../../lib/scoring';
 import { useHeal } from '../../lib/store';
 import { colors } from '../../theme';
@@ -33,7 +35,12 @@ export default function Body() {
 
   return (
     <Screen feedback="Body" trends="body">
-      <Anchor id="food"><MealPhoto right={<Score value={score?.nutrition} max={40} />}>
+      <Anchor id="food"><MealPhoto right={<Score value={score?.nutrition} max={40} />} top={
+        <RingPanel score={score?.nutrition} max={40} items={[
+          { id: 'kcal', color: PASTEL.peach, label: tr('Calories'), value: totals.kcal / profile.kcal, text: `${Math.round(totals.kcal)} / ${profile.kcal}` },
+          { id: 'protein', color: PASTEL.lavender, label: tr('Protein'), value: totals.p / profile.protein, text: `${Math.round(totals.p)} / ${profile.protein} g` },
+          { id: 'fibre', color: PASTEL.teal, label: tr('Fibre'), value: (totals.fib ?? 0) / fibreTarget(profile.kcal), text: `${Math.round(totals.fib ?? 0)} / ${fibreTarget(profile.kcal)} g` },
+        ]} />}>
         <CareNote part="food" />
         {/* "I'm fasting today" (founder, 22 Oct 2026): a declared fast scores Food in full while only water, black tea
             or black coffee go in, and Myra changes her advice. */}
@@ -49,26 +56,40 @@ export default function Body() {
         </Pressable>
         {/* Tomorrow's food (founder, 23 Oct 2026): one clock row that opens the planner when asked. Only on today's page. */}
         {date === todayISO() ? <FoodPlanRow /> : null}
-        <View style={{ borderTopWidth: 1, borderTopColor: colors.line }}>
-          <NutritionTable totals={totals} kcal={profile.kcal} protein={profile.protein} fibre={fibreTarget(profile.kcal)} />
-          {/* Food items only when asked (founder, 22 Oct 2026): "See details" next to the pies' title opens them below. */}
-          <MacroMix totals={totals} kcal={profile.kcal} protein={profile.protein} fibre={fibreTarget(profile.kcal)}
-            right={day.meals.length ? (
+        {/* The rings show calories, protein and fibre; the full table, where calories come from and each meal open on
+            "See details" (decision 0037). */}
+        <View style={{ borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 10, gap: 10 }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Note>{day.meals.length ? tr('{n} meals today', { n: day.meals.length }) : tr('No meals yet today.')}</Note>
+            {day.meals.length ? (
               <Pressable onPress={() => setDetails(x => !x)} hitSlop={8} accessibilityRole="button">
                 <Text style={{ color: colors.accent, fontWeight: '600' }}>{details ? tr('Hide') : tr('See details')}</Text>
               </Pressable>
-            ) : undefined} />
-          {day.meals.length ? (details ? day.meals.map((m, i) => (
-            <MealRow key={`${i}-${m.name}`} m={m} i={i} />
-          )) : null) : <View style={{ borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 10 }}><Note>{tr('No meals yet today.')}</Note></View>}
+            ) : null}
+          </View>
+          {details && day.meals.length ? (
+            <>
+              <NutritionTable totals={totals} kcal={profile.kcal} protein={profile.protein} fibre={fibreTarget(profile.kcal)} />
+              <MacroMix totals={totals} kcal={profile.kcal} protein={profile.protein} fibre={fibreTarget(profile.kcal)} />
+              {day.meals.map((m, i) => <MealRow key={`${i}-${m.name}`} m={m} i={i} />)}
+            </>
+          ) : null}
         </View>
+        <MyraLine card="food" />
       </MealPhoto></Anchor>
 
       <HealthLine />
 
       <Anchor id="sleep"><Card>
         <Heading right={<Score value={score?.sleep} max={30} />}>{tr('Sleep')}</Heading>
+        <RingPanel score={score?.sleep} max={30} items={[
+          { id: 'hours', color: PASTEL.lavender, label: tr('Hours slept'), value: (day.sleep.hours ?? 0) / 8, text: day.sleep.hours != null ? `${Math.round(day.sleep.hours * 10) / 10} / 8 h` : '–' },
+          ...(st?.deep != null ? [{ id: 'deep', color: PASTEL.sky, label: tr('Deep sleep'), value: st.deep / 1.5, text: `${Math.round(st.deep * 10) / 10} / 1.5 h` }] : []),
+          { id: 'quality', color: PASTEL.sand, label: tr('Sleep quality'), value: (day.sleep.quality ?? 0) / 5, text: day.sleep.quality ? `${day.sleep.quality} / 5` : '–' },
+        ]} />
         <CareNote part="rest" />
+        {/* Details and typing fold away once there is data (decision 0037); open while something is missing. */}
+        <Expandable key={date + 'sleepd'} icon="list-outline" title={tr('Details')} status={tr('Sleep stages, hours and quality')} defaultOpen={day.sleep.hours == null || !day.sleep.quality}>
         <Rows>
           <StatRow first label={tr('Hours slept')} value={day.sleep.hours} unit="h" decimal key={date + 'sleep'}
             onEdit={v => update(d => { d.sleep.hours = v; d.sleep.source = v == null ? undefined : 'Typed in'; })} />
@@ -79,11 +100,19 @@ export default function Body() {
           <StatRow label={tr('Sleep quality')} value={undefined}
             right={<Dots value={day.sleep.quality} onChange={q => update(d => { d.sleep.quality = q; })} />} />
         </Rows>
+        </Expandable>
+        <MyraLine card="sleep" />
       </Card></Anchor>
 
       <Anchor id="movement"><Card>
         <Heading right={<Score value={score?.movement} max={30} />}>{tr('Movement')}</Heading>
+        <RingPanel score={score?.movement} max={30} items={[
+          { id: 'steps', color: PASTEL.sage, label: tr('Steps'), value: (day.activity.steps ?? 0) / profile.steps, text: `${(day.activity.steps ?? 0).toLocaleString('en-IN')} / ${profile.steps.toLocaleString('en-IN')}` },
+          { id: 'active', color: PASTEL.teal, label: tr('Active minutes'), value: (day.activity.activeMin ?? 0) / profile.active, text: `${day.activity.activeMin ?? 0} / ${profile.active}` },
+          ...(h?.activeKcal != null ? [{ id: 'energy', color: PASTEL.peach, label: tr('Active energy'), value: h.activeKcal / 400, text: `${Math.round(h.activeKcal)} kcal` }] : []),
+        ]} />
         <CareNote part="move" />
+        <Expandable key={date + 'moved'} icon="list-outline" title={tr('Details')} status={tr('Steps, minutes and workouts')} defaultOpen={day.activity.steps == null && day.activity.activeMin == null}>
         <Rows>
           <StatRow first label={tr('Steps')} value={day.activity.steps} target={profile.steps} key={date + 'steps'}
             onEdit={v => update(d => { d.activity.steps = v; d.activity.stepsTyped = v != null; })} />
@@ -94,7 +123,9 @@ export default function Body() {
             <StatRow key={'w' + i} label={tr(w.type)} value={w.kcal ? `${w.min} min · ${w.kcal} kcal` : `${w.min} min`} />
           ))}
         </Rows>
+        </Expandable>
         <AirRow />
+        <MyraLine card="movement" />
       </Card></Anchor>
 
       {h || profile.me ? (

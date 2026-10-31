@@ -1,5 +1,10 @@
 # Changelog
 
+## 31 Oct 2026 — One design for every scored card (decision 0037)
+- Concentric rings with the score in the middle on Food, Sleep, Movement, Face & beauty, Clear your mind, Breathing & meditation, Phone activity, Gratitude journal, Daily Wisdom and Tao.
+- Data cards: key at the side; writing cards: rings on top, boxes below with matching dots. Myra's one line at the bottom of every card.
+- Score shown as a soft pill; whole numbers (journal halves kept). Sleep and Movement details fold into "Details" once there is data; Food's table and meals under "See details". No red, no coloured card edges.
+
 ## 31 Oct 2026 — Air quality (decision 0036); Face & beauty always open
 - AQI near you, by itself from the phone's location (build 13+): a line under the greeting on Today, a folded row in Body › Movement, and Myra moves exercise indoors on poor-air days. Indian AQI (CPCB) worked out from Open-Meteo PM2.5 and PM10.
 - Face & beauty is now a full card like Food, no longer folded away.

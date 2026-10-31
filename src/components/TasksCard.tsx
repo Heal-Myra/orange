@@ -2,6 +2,8 @@
 // Writing a task down with a "when" quiets the mind even before it is done. Myra puts one at a time in front of the
 // person (the Mind line of Myra recommends on Today, 21 Oct 2026); the rest get dates automatically. Done tasks leave the list.
 
+import { MyraLine } from './MyraLine';
+import { PASTEL, RingPanel } from './Rings';
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { Pressable, Text, TextInput, View } from 'react-native';
@@ -50,6 +52,10 @@ export function TasksCard() {
   return (
     <Card>
       <Heading right={<Score value={Math.min(2, day.mind.focusDone ?? 0) * FOCUS_EACH} max={40} />}>{tr('Clear your mind')}</Heading>
+      <RingPanel score={Math.min(2, day.mind.focusDone ?? 0) * FOCUS_EACH} max={40} items={[
+        { id: 'first', color: PASTEL.teal, label: tr('First to-do done'), value: (day.mind.focusDone ?? 0) >= 1 ? 1 : 0, text: `${(day.mind.focusDone ?? 0) >= 1 ? FOCUS_EACH : 0} / ${FOCUS_EACH}` },
+        { id: 'second', color: PASTEL.sky, label: tr('Second to-do done'), value: (day.mind.focusDone ?? 0) >= 2 ? 1 : 0, text: `${(day.mind.focusDone ?? 0) >= 2 ? FOCUS_EACH : 0} / ${FOCUS_EACH}` },
+      ]} />
       <Note>{tr('Write it down. Myra puts one in front of you at a time, on Today. Finishing two of them earns the full 40.')}</Note>
 
       {/* Three groups */}
@@ -83,6 +89,7 @@ export function TasksCard() {
       <MakingAHabit />
 
       {doneToday ? <Note>{tr('Done today: {n} ✓', { n: doneToday })}</Note> : null}
+      <MyraLine card="tasks" />
     </Card>
   );
 }
