@@ -1,5 +1,9 @@
 # Changelog
 
+## 31 Oct 2026 — Trends inside each card; Today's final layout (decision 0038)
+- No D·W·M·Q·Y bar on the tabs. Tap a card's rings ("Trends ›") for its own page with the switch and only its measures. No red arrows.
+- Today: greeting in the day row, AQI only on bad-air days, My day, Body · Mind · Soul circles, one Myra card (recommends + ask). How I feel today moved to Mind.
+
 ## 31 Oct 2026 — Today: Myra card; AQI only on bad-air days
 - One Myra card under the Body · Mind · Soul circles: her recommendation starting with your name, "Ask Myra anything…" with microphone and send (opens her chat, question already sent), two quick questions. Floating Myra button hidden on Today.
 - The AQI line under your name shows only when the air is worse than Satisfactory (above 100).

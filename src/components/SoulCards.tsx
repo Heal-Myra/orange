@@ -28,7 +28,7 @@ export function VerseStudyCard() {
   return (
     <Card>
       <Heading right={<Score value={studyPts + livedPts} max={W} />}>{tr('Daily Wisdom')}</Heading>
-      <RingTop score={studyPts + livedPts} max={W} items={[
+      <RingTop trend="wisdom" score={studyPts + livedPts} max={W} items={[
         { id: 'study', color: PASTEL.sand, label: tr('What it means to me'), value: studyPts ? 1 : 0 },
         { id: 'lived', color: PASTEL.peach, label: tr('Lived'), value: livedPts ? 1 : 0 },
       ]} />

@@ -132,7 +132,7 @@ export function ScreenTimeCard({ children }: { children?: ReactNode }) {
     <Card>
       <Heading right={<Score value={score?.content ?? undefined} max={30} />}>{phoneDate === date ? tr('Phone activity') : tr('Phone activity · yesterday')}</Heading>
       {score.content != null ? (
-        <RingPanel score={score.content} max={30} items={[
+        <RingPanel trend="phone" score={score.content} max={30} items={[
           { id: 'quality', color: PASTEL.sky, label: tr('Content quality'), value: score.quality ?? 0, text: `${Math.round(18 * (score.quality ?? 0))} / 18` },
           { id: 'limit', color: PASTEL.sage, label: tr('Within limit'), value: (score.content - 18 * (score.quality ?? 0)) / 12, text: `${socialMin} / ${profile.mediaLimit} min` },
         ]} />

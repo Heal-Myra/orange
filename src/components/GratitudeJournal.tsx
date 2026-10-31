@@ -54,7 +54,7 @@ export function GratitudeJournal() {
   return (
     <Card style={{ gap: 10 }}>
       <Heading right={<Score value={(score?.gratitude ?? 0) + (score?.love ?? 0)} max={60} />}>{tr('Gratitude journal')}</Heading>
-      <RingTop score={(score?.gratitude ?? 0) + (score?.love ?? 0)} max={60} items={[
+      <RingTop trend="gratitude" score={(score?.gratitude ?? 0) + (score?.love ?? 0)} max={60} items={[
         { id: 'thanks', color: RING.thanks, label: tr('I\'m thankful for'), value: nThanks / 3 },
         { id: 'laugh', color: RING.laugh, label: tr('Made me laugh'), value: laughOk ? 1 : 0 },
         { id: 'kind', color: RING.kind, label: tr('I was kind to'), value: kindOk ? 1 : 0 },

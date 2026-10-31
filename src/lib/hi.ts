@@ -1276,4 +1276,9 @@ export const HI: Record<string, string> = {
   'Write one line on what it means to you.': 'एक पंक्ति लिखें कि इसका आपके लिए क्या अर्थ है।',
   'Your guide': 'आपकी मार्गदर्शक',
   'What should I eat tonight?': 'आज रात मैं क्या खाऊँ?',
+  'Trends': 'रुझान',
+  'Back': 'वापस',
+  'Choose W, M, Q or Y above to see how this has changed over time.': 'समय के साथ बदलाव देखने के लिए ऊपर W, M, Q या Y चुनें।',
+  'ASK MYRA': 'मायरा से पूछें',
+  'Details and trends': 'विवरण और रुझान',
 };

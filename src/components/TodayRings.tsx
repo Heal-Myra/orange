@@ -7,7 +7,7 @@ import { Pressable, Text, View } from 'react-native';
 import { tr } from '../lib/i18n';
 import { band, POINTS, type WellBeing } from '../lib/scoring';
 import { colors } from '../theme';
-import { Dot, PASTEL, RingStack, fmt, type RingItem } from './Rings';
+import { Dot, PASTEL, RingStack, RingTap, fmt, type RingItem } from './Rings';
 import { Card } from './ui';
 
 interface Part { id: string; label: string; got: number; of: number; color: string; tab: 'body' | 'mind' | 'soul'; card: string }
@@ -59,7 +59,7 @@ export function TodayRings({ w }: { w: WellBeing }) {
         <Text style={{ fontSize: 13, fontWeight: '600', color: colors.muted }}>{w.logged ? tr(band(w.total)) : tr('Nothing logged yet')}</Text>
       </View>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
-        <RingStack items={items} center={fmt(w.total)} sub={tr('of {n}', { n: 300 })} size={140} />
+        <RingTap trend="today"><RingStack items={items} center={fmt(w.total)} sub={tr('of {n}', { n: 300 })} size={140} /></RingTap>
         <View style={{ flex: 1, gap: 7 }}>
           {best ? <Text style={{ color: colors.good, fontWeight: '700', fontSize: 11, letterSpacing: 0.4 }}>{tr('YOUR BEST')}</Text> : null}
           {best ? row(best) : null}

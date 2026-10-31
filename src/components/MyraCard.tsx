@@ -27,6 +27,7 @@ export function MyraCard() {
       <GuidanceCard embedded />
       {session ? (
         <>
+          <Text style={{ color: colors.muted, fontWeight: '700', fontSize: 11, letterSpacing: 0.4, marginTop: 4 }}>{tr('ASK MYRA')}</Text>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, borderWidth: 1, borderColor: colors.line, backgroundColor: '#F8FAFB', borderRadius: 99, paddingLeft: 14, paddingRight: 5, paddingVertical: 4 }}>
             <Ionicons name="chatbubble-ellipses-outline" size={20} color={colors.muted} />
             <TextInput style={[s.input, { flex: 1, minWidth: 0, borderWidth: 0, backgroundColor: 'transparent', paddingHorizontal: 0 }]} value={q} onChangeText={setQ}

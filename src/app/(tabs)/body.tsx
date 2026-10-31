@@ -34,9 +34,9 @@ export default function Body() {
   const st = h?.sleepStages;
 
   return (
-    <Screen feedback="Body" trends="body">
+    <Screen feedback="Body">
       <Anchor id="food"><MealPhoto right={<Score value={score?.nutrition} max={40} />} top={
-        <RingPanel score={score?.nutrition} max={40} items={[
+        <RingPanel trend="food" score={score?.nutrition} max={40} items={[
           { id: 'kcal', color: PASTEL.peach, label: tr('Calories'), value: totals.kcal / profile.kcal, text: `${Math.round(totals.kcal)} / ${profile.kcal}` },
           { id: 'protein', color: PASTEL.lavender, label: tr('Protein'), value: totals.p / profile.protein, text: `${Math.round(totals.p)} / ${profile.protein} g` },
           { id: 'fibre', color: PASTEL.teal, label: tr('Fibre'), value: (totals.fib ?? 0) / fibreTarget(profile.kcal), text: `${Math.round(totals.fib ?? 0)} / ${fibreTarget(profile.kcal)} g` },
@@ -82,7 +82,7 @@ export default function Body() {
 
       <Anchor id="sleep"><Card>
         <Heading right={<Score value={score?.sleep} max={30} />}>{tr('Sleep')}</Heading>
-        <RingPanel score={score?.sleep} max={30} items={[
+        <RingPanel trend="sleep" score={score?.sleep} max={30} items={[
           { id: 'hours', color: PASTEL.lavender, label: tr('Hours slept'), value: (day.sleep.hours ?? 0) / 8, text: day.sleep.hours != null ? `${Math.round(day.sleep.hours * 10) / 10} / 8 h` : '–' },
           ...(st?.deep != null ? [{ id: 'deep', color: PASTEL.sky, label: tr('Deep sleep'), value: st.deep / 1.5, text: `${Math.round(st.deep * 10) / 10} / 1.5 h` }] : []),
           { id: 'quality', color: PASTEL.sand, label: tr('Sleep quality'), value: (day.sleep.quality ?? 0) / 5, text: day.sleep.quality ? `${day.sleep.quality} / 5` : '–' },
@@ -106,7 +106,7 @@ export default function Body() {
 
       <Anchor id="movement"><Card>
         <Heading right={<Score value={score?.movement} max={30} />}>{tr('Movement')}</Heading>
-        <RingPanel score={score?.movement} max={30} items={[
+        <RingPanel trend="movement" score={score?.movement} max={30} items={[
           { id: 'steps', color: PASTEL.sage, label: tr('Steps'), value: (day.activity.steps ?? 0) / profile.steps, text: `${(day.activity.steps ?? 0).toLocaleString('en-IN')} / ${profile.steps.toLocaleString('en-IN')}` },
           { id: 'active', color: PASTEL.teal, label: tr('Active minutes'), value: (day.activity.activeMin ?? 0) / profile.active, text: `${day.activity.activeMin ?? 0} / ${profile.active}` },
           ...(h?.activeKcal != null ? [{ id: 'energy', color: PASTEL.peach, label: tr('Active energy'), value: h.activeKcal / 400, text: `${Math.round(h.activeKcal)} kcal` }] : []),

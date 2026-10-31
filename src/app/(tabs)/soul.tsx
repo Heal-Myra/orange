@@ -15,7 +15,7 @@ export default function Soul() {
   const journal = date >= JOURNAL_FROM;
   const score = soulScore(day, profile);
   return (
-    <Screen feedback="Soul" trends="soul">
+    <Screen feedback="Soul">
       <Card style={{ paddingVertical: 12 }}>
         <Heading right={<Score value={score?.total} max={100} />}>{tr('Soul today')}</Heading>
       </Card>

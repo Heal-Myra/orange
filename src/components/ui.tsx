@@ -10,8 +10,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { formatDay, todayISO } from '../lib/dates';
 import { useHeal } from '../lib/store';
 import { FeedbackBox } from './FeedbackBox';
-import { RangeBar, Trends } from './Trends';
-import { useRange } from '../lib/range';
 import type { Pillar } from '../lib/trends';
 import { colors, radius, shadow, space } from '../theme';
 import { tr } from '../lib/i18n';
@@ -20,9 +18,7 @@ import { tr } from '../lib/i18n';
 // outlines it for a moment (founder, 21 Oct 2026). Cards opt in by being wrapped in <Anchor id="…">.
 const AnchorCtx = createContext<{ register: (id: string, y: number) => void; lit: string | null; keepVisible: () => void }>({ register: () => {}, lit: null, keepVisible: () => {} });
 
-export function Screen({ children, showDay = true, feedback, top, trends }: { children: ReactNode; showDay?: boolean; feedback?: string; top?: ReactNode; trends?: Pillar }) {
-  const { range } = useRange();
-  const trending = !!trends && range !== 'D';
+export function Screen({ children, showDay = true, feedback, top, dayLabel }: { children: ReactNode; showDay?: boolean; feedback?: string; top?: ReactNode; trends?: Pillar; dayLabel?: ReactNode }) {
   const { card, at } = useLocalSearchParams<{ card?: string; at?: string }>();
   const scroll = useRef<ScrollViewInstance>(null);
   const spots = useRef<Record<string, number>>({});
@@ -66,14 +62,12 @@ export function Screen({ children, showDay = true, feedback, top, trends }: { ch
         <ScrollView ref={scroll} contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled"
           automaticallyAdjustKeyboardInsets keyboardDismissMode="interactive" scrollEventThrottle={32}
           onScroll={e => { offset.current = e.nativeEvent.contentOffset.y; }}>
-          {/* Day · Week · Month · Quarter · Year (founder, 22 Oct 2026): any other choice than Day shows the tab's trends. */}
-          {trends ? <RangeBar /> : null}
-          {trending ? <Trends pillar={trends} /> : <>
-            {top}
-            {showDay && <DayBar />}
-            {feedback ? <FeedbackBox area={feedback} /> : null}
-            {children}
-          </>}
+          {/* Trends moved off the tabs (founder, 31 Oct 2026): D · W · M · Q · Y lives on each card's detail page
+              (tap the rings; src/app/trend.tsx), so people not interested in trends never see the switch. */}
+          {top}
+          {showDay && <DayBar label={dayLabel} />}
+          {feedback ? <FeedbackBox area={feedback} /> : null}
+          {children}
         </ScrollView>
       </AnchorCtx.Provider>
     </SafeAreaView>
@@ -94,7 +88,7 @@ export function Anchor({ id, children }: { id: string; children: ReactNode }) {
   );
 }
 
-export function DayBar() {
+export function DayBar({ label }: { label?: ReactNode } = {}) {
   const { date, goDay } = useHeal();
   const isToday = date === todayISO();
   return (
@@ -102,7 +96,7 @@ export function DayBar() {
       <Pressable accessibilityLabel={tr('Previous day')} onPress={() => goDay(-1)} style={s.dayBtn} hitSlop={8}>
         <Ionicons name="chevron-back" size={20} color={colors.muted} />
       </Pressable>
-      <Text style={s.dayText}>{formatDay(date)}</Text>
+      {isToday && label ? <View style={{ flex: 1, alignItems: 'center' }}>{label}</View> : <Text style={s.dayText}>{formatDay(date)}</Text>}
       <Pressable accessibilityLabel={tr('Next day')} onPress={() => goDay(1)} style={[s.dayBtn, isToday && { opacity: 0.3 }]} disabled={isToday} hitSlop={8}>
         <Ionicons name="chevron-forward" size={20} color={colors.muted} />
       </Pressable>

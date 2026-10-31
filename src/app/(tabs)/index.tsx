@@ -4,7 +4,6 @@
 import { Text, View } from 'react-native';
 import { PillarRings, TodayRings } from '../../components/TodayRings';
 import { MyraCard } from '../../components/MyraCard';
-import { FeelingCard } from '../../components/FeelingCard';
 import { AirLine } from '../../components/AirLine';
 import { todayISO } from '../../lib/dates';
 import { useAuth } from '../../lib/auth';
@@ -20,15 +19,15 @@ export default function Today() {
   const w = wellBeing(day, profile);
 
   return (
-    <Screen feedback="Today" trends="today" top={
-      <View style={{ paddingHorizontal: 4 }}>
-        <Text style={{ fontSize: 15, color: colors.muted }}>{greeting()},</Text>
-        <Text style={{ fontSize: 24, fontWeight: '700', color: colors.ink }}>{profile.me?.name?.split(' ')[0] || firstName(session?.user.email) || tr('friend')}</Text>
-        {date === todayISO() ? <AirLine /> : null}
+    // The greeting sits in the day row, in place of "Today" (founder, 31 Oct 2026); other days show their date.
+    <Screen feedback="Today" dayLabel={
+      <View style={{ alignItems: 'center' }}>
+        <Text style={{ fontSize: 14, color: colors.muted }}>{greeting()},</Text>
+        <Text style={{ fontSize: 22, fontWeight: '800', color: colors.ink }}>{profile.me?.name?.split(' ')[0] || firstName(session?.user.email) || tr('friend')}</Text>
       </View>
     }>
-
-      {date === todayISO() ? <FeelingCard /> : null}
+      {/* AQI only on bad-air days; How I feel today moved to the Mind tab (founder, 31 Oct 2026). */}
+      {date === todayISO() ? <View style={{ alignItems: 'center', marginTop: -6 }}><AirLine /></View> : null}
 
       {/* One design with the other cards (founder, 31 Oct 2026): rings for the best part and the three biggest concerns,
           the total in the middle, Myra recommends at the bottom; the three tiles open Body, Mind and Soul. */}

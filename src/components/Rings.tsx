@@ -3,7 +3,10 @@
 // the rings on top and the writing boxes below, each box with the dot of its ring (founder chose "text boxes at the bottom").
 // Soft pastel colours, never red; the numbers stay calm (ink and grey).
 
-import { Text, View } from 'react-native';
+import { router } from 'expo-router';
+import type { ReactNode } from 'react';
+import { Pressable, Text, View } from 'react-native';
+import { tr } from '../lib/i18n';
 import Svg, { Circle, G } from 'react-native-svg';
 import { colors } from '../theme';
 
@@ -61,21 +64,33 @@ export function RingKey({ items }: { items: RingItem[] }) {
   );
 }
 
+/** Tapping the rings opens the card's details and trends (founder, 31 Oct 2026); a small "Trends ›" under them says so. */
+export function RingTap({ trend, children }: { trend?: string; children: ReactNode }) {
+  if (!trend) return <>{children}</>;
+  return (
+    <Pressable onPress={() => router.push({ pathname: '/trend', params: { card: trend } })} accessibilityRole="button"
+      accessibilityLabel={tr('Details and trends')} hitSlop={6} style={({ pressed }) => ({ alignItems: 'center', gap: 2, opacity: pressed ? 0.7 : 1 })}>
+      {children}
+      <Text style={{ fontSize: 11, fontWeight: '600', color: colors.accent }}>{tr('Trends')} ›</Text>
+    </Pressable>
+  );
+}
+
 /** Data cards: rings on the left, key on the right. */
-export function RingPanel({ items, score, max }: { items: RingItem[]; score: number | null | undefined; max: number }) {
+export function RingPanel({ items, score, max, trend }: { items: RingItem[]; score: number | null | undefined; max: number; trend?: string }) {
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 4 }}>
-      <RingStack items={items} center={score == null ? '–' : fmt(score)} sub={`of ${max}`} />
+      <RingTap trend={trend}><RingStack items={items} center={score == null ? '–' : fmt(score)} sub={`of ${max}`} /></RingTap>
       <RingKey items={items} />
     </View>
   );
 }
 
 /** Writing cards: the rings alone, centred on top; the boxes below carry each ring's dot and points. */
-export function RingTop({ items, score, max }: { items: RingItem[]; score: number | null | undefined; max: number }) {
+export function RingTop({ items, score, max, trend }: { items: RingItem[]; score: number | null | undefined; max: number; trend?: string }) {
   return (
     <View style={{ alignItems: 'center', paddingVertical: 4 }}>
-      <RingStack items={items} center={score == null ? '–' : fmt(score)} sub={`of ${max}`} size={140} />
+      <RingTap trend={trend}><RingStack items={items} center={score == null ? '–' : fmt(score)} sub={`of ${max}`} size={140} /></RingTap>
     </View>
   );
 }

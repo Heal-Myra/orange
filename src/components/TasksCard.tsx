@@ -52,7 +52,7 @@ export function TasksCard() {
   return (
     <Card>
       <Heading right={<Score value={Math.min(2, day.mind.focusDone ?? 0) * FOCUS_EACH} max={40} />}>{tr('Clear your mind')}</Heading>
-      <RingPanel score={Math.min(2, day.mind.focusDone ?? 0) * FOCUS_EACH} max={40} items={[
+      <RingPanel trend="tasks" score={Math.min(2, day.mind.focusDone ?? 0) * FOCUS_EACH} max={40} items={[
         { id: 'first', color: PASTEL.teal, label: tr('First to-do done'), value: (day.mind.focusDone ?? 0) >= 1 ? 1 : 0, text: `${(day.mind.focusDone ?? 0) >= 1 ? FOCUS_EACH : 0} / ${FOCUS_EACH}` },
         { id: 'second', color: PASTEL.sky, label: tr('Second to-do done'), value: (day.mind.focusDone ?? 0) >= 2 ? 1 : 0, text: `${(day.mind.focusDone ?? 0) >= 2 ? FOCUS_EACH : 0} / ${FOCUS_EACH}` },
       ]} />

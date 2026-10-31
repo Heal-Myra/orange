@@ -66,13 +66,14 @@ function labelOf(range: Exclude<Range, 'D'>, iso: string, before?: string) {
 const fmt = (v: number, m: Metric) =>
   m.decimals ? v.toFixed(m.decimals) : Math.round(v).toLocaleString(locale());
 
-export function Trends({ pillar }: { pillar: Pillar }) {
+export function Trends({ pillar, ids }: { pillar: Pillar; ids?: string[] }) {
   const { range, back, setBack } = useRange();
   const { days, profile } = useHeal();
   if (range === 'D') return null;
   const today = todayISO();
   const p = periodOf(range, today, back);
-  const metrics = METRICS.filter(m => m.pillar === pillar);
+  // A card's detail page shows only that card's measures (founder, 31 Oct 2026).
+  const metrics = ids ? ids.map(id => METRICS.find(m => m.id === id)).filter((m): m is Metric => !!m) : METRICS.filter(m => m.pillar === pillar);
   const goal = profile.me?.goal;
   return (
     <View style={{ gap: 16 }}>
@@ -101,7 +102,7 @@ function TrendCard({ m, t, better, range, labels, color, target }: {
   const ch = t.change;
   const tiny = ch == null || (t.previous ? Math.abs(ch) / Math.abs(t.previous) < 0.02 : Math.abs(ch) < 0.05);
   const good = ch == null || tiny || !better ? null : (ch > 0) === (better === 'up');
-  const changeColor = good == null ? colors.muted : good ? colors.good : colors.bad;
+  const changeColor = good ? colors.good : colors.muted; // never red (founder, 31 Oct 2026)
   const pct = ch != null && t.previous ? Math.round((ch / Math.abs(t.previous)) * 100) : null;
   return (
     <Card style={{ gap: 10 }}>

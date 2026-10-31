@@ -73,7 +73,7 @@ export function MeditationTimer() {
   return (
     <Card>
       <Heading right={<Score value={Math.min(30, (30 * done) / target)} max={30} />}>{tr('Breathing & meditation')}</Heading>
-      <RingPanel score={Math.min(30, (30 * done) / target)} max={30} items={[
+      <RingPanel trend="meditation" score={Math.min(30, (30 * done) / target)} max={30} items={[
         { id: 'min', color: PASTEL.lavender, label: tr('Minutes today'), value: done / target, text: `${done} / ${target} min` },
       ]} />
       {!sitting ? (

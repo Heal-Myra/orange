@@ -151,6 +151,7 @@ export function GuidanceCard({ embedded }: { embedded?: boolean } = {}) {
         </View>
       )}
 
+      {embedded ? <Text style={{ color: colors.muted, fontWeight: '700', fontSize: 11, letterSpacing: 0.4 }}>{tr('MYRA RECOMMENDS')}</Text> : null}
       {/* Three very simple tasks, one each (founder, 21 Oct 2026). When the Mind task is a to-do, it can be ticked here;
           Myra then rotates to the next thing. */}
       {/* A habit at its time comes first (founder, 23 Oct 2026: "Call Dad daily at 9 AM" pops up at 9). */}

@@ -45,7 +45,7 @@ export function TaoCard({ on }: { on: 'mind' | 'soul' }) {
     <Card>
       <Label>{tr('Tao practice')} · {tr(t.day)}</Label>
       <Heading right={<Score value={taoStudy + taoLived} max={TAO_POINTS} />}>{tr(t.title)}</Heading>
-      <RingTop score={taoStudy + taoLived} max={TAO_POINTS} items={[
+      <RingTop trend="tao" score={taoStudy + taoLived} max={TAO_POINTS} items={[
         { id: 'study', color: PASTEL.sand, label: tr('What it means to me'), value: taoStudy ? 1 : 0 },
         { id: 'lived', color: PASTEL.sage, label: tr('Lived'), value: taoLived ? 1 : 0 },
       ]} />
