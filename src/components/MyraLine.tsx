@@ -5,7 +5,7 @@
 import { Text, View } from 'react-native';
 import { oneLine } from '../lib/ai';
 import { tr } from '../lib/i18n';
-import { lived, mealTotals } from '../lib/scoring';
+import { lived, mealTotals, taoStudied, wisdomStudied } from '../lib/scoring';
 import { useHeal } from '../lib/store';
 import { fibreTarget } from '../lib/targets';
 import { colors } from '../theme';
@@ -60,11 +60,11 @@ export function localTip(card: CardId, d: DayLog, P: Profile, phone?: { minutes:
     }
     case 'wisdom': {
       const so = d.soul ?? {};
-      if (!so.verseStudied) return ['Read today\'s wisdom slowly, once.'];
+      if (!wisdomStudied(so)) return ['Write one line on what it means to you.'];
       return lived(so.verseLived) ? ['Lived and written. Beautiful.'] : ['Write one line on how you lived it.'];
     }
     case 'tao':
-      if (!d.tao?.done) return ['Read today\'s Tao practice slowly, once.'];
+      if (!taoStudied(d.tao)) return ['Write one line on what it means to you.'];
       return lived(d.tao?.lived) ? ['Lived and written. Beautiful.'] : ['Write one line on how you lived it.'];
   }
 }

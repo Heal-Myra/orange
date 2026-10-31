@@ -1,6 +1,7 @@
 // A plain-text summary of the person's targets, today and the last 7 days, sent to the AI
 // (daily guidance and Myra) so its answers are about this person. Built on the device; only what is needed is sent.
 
+import { taoStudied } from './scoring';
 import { aboutLine, fibreTarget } from './targets';
 import { momentLine } from './routine';
 import { shiftISO, todayISO } from './dates';
@@ -40,10 +41,10 @@ export function buildContext(day: DayLog, days: Record<string, DayLog>, date: st
     `Food: ${day.meals.map(m => m.name).join(', ') || 'nothing logged'}; totals ${Math.round(t.kcal)} kcal, protein ${Math.round(t.p)} g, carbs ${Math.round(t.c)} g, fat ${Math.round(t.f)} g, fibre ${Math.round(t.fib)} g (target ${fibreTarget(profile.kcal)} g).`,
     `Mind: focus tasks done today ${day.mind.focusDone ?? 0} of up to 2; breathing and meditation ${day.mind.meditationMin ?? 'not done yet'} min; phone yesterday (counted today) ${(day.phoneFrom ?? day).noMedia ? 'no social media' : (day.phoneFrom ?? day).media.filter(m => !m.notMe && m.group !== 'tool').map(m => `${m.minutes} min ${m.app || m.platform} (${m.group === 'learning' ? 'learning/AI tool' : m.category})`).join('; ') || 'not logged'}.`,
     `Love: whom they will love today ${day.love?.whom?.trim() ? `"${day.love.whom.trim()}"` : 'not chosen'}; how they will love themselves ${(day.love?.self ?? day.love?.happy)?.trim() ? `"${(day.love?.self ?? day.love?.happy)!.trim()}"` : 'not chosen'}; done: ${day.love?.done ? 'yes' : 'not yet'}.`,
-    `Soul: Tao practice read ${day.tao?.done ? 'yes' : 'not yet'}, lived today ${day.tao?.lived?.trim() ? `"${day.tao.lived.trim().slice(0, 120)}"` : 'not written yet'}; Daily Wisdom studied ${day.soul?.verseStudied ? 'yes' : 'not yet'}, lived today ${day.soul?.verseLived?.trim() ? `"${day.soul.verseLived.trim().slice(0, 120)}"` : 'not written yet'}; gratitude journal: thankful for ${countGratitude(day.soul?.gratitude)} of 3, made me laugh ${day.soul?.laugh?.trim() ? 'written' : 'not yet'}, best part of the day ${day.soul?.best?.trim() ? 'written' : 'not yet'}, I was kind to ${day.love?.kindTo?.trim() ? `"${day.love.kindTo.trim().slice(0, 100)}"` : 'not yet'}.`,
+    `Soul: Tao practice studied (a line written on it) ${taoStudied(day.tao) ? 'yes' : 'not yet'}, lived today ${day.tao?.lived?.trim() ? `"${day.tao.lived.trim().slice(0, 120)}"` : 'not written yet'}; Daily Wisdom studied ${day.soul?.verseStudied ? 'yes' : 'not yet'}, lived today ${day.soul?.verseLived?.trim() ? `"${day.soul.verseLived.trim().slice(0, 120)}"` : 'not written yet'}; gratitude journal: thankful for ${countGratitude(day.soul?.gratitude)} of 3, made me laugh ${day.soul?.laugh?.trim() ? 'written' : 'not yet'}, best part of the day ${day.soul?.best?.trim() ? 'written' : 'not yet'}, I was kind to ${day.love?.kindTo?.trim() ? `"${day.love.kindTo.trim().slice(0, 100)}"` : 'not yet'}.`,
     `Scores out of 100: body ${w.body ? Math.round(w.body.total) : 'not logged'}, mind ${w.mind ? Math.round(w.mind.total) : 'not logged'}, soul ${w.soul ? Math.round(w.soul.total) : 'not logged'}; well-being ${Math.round(w.total)} of 300.`,
     dailyWisdomLine(tradition, date, `Bhagavad Gita ${v.chapter}.${v.verse} (${v.transliteration.replace(/\n/g, ' ')})`),
-    `Today's Tao practice (${tao.pillar}): ${tao.title}: ${tao.practice[0]} Done: ${day.tao?.done ? 'yes' : 'not yet'}.`,
+    `Today's Tao practice (${tao.pillar}): ${tao.title}: ${tao.practice[0]} Studied: ${taoStudied(day.tao) ? 'yes' : 'not yet'}.`,
     TAO_FOR_AI,
     profile.me?.meditationGoal ? `Meditation goal: ${profile.me.meditationGoal.minutes} min a day by ${profile.me.meditationGoal.by}; today's planned guided session ${todaysLength(profile.me.meditationGoal, days, date).minutes} min (suggest this length, not more).` : 'Meditation goal: none.',
     profile.me?.saved?.length ? `Saved to their journey (what inspires them): ${profile.me.saved.slice(0, 5).map(x => `"${x.title}"`).join('; ')}.` : 'Saved to their journey: nothing yet.',

@@ -6,7 +6,7 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { useHeal } from '../lib/store';
-import { LEARN_SHARE, lived } from '../lib/scoring';
+import { LEARN_SHARE, lived, taoStudied } from '../lib/scoring';
 import { EntryHead, PASTEL, RingTop, pts } from './Rings';
 import { MyraLine } from './MyraLine';
 import { TAO_CORE, TAO_POINTS, TAO_WEEK, WEEK_REVIEW, mondayOf, taoForDate } from '../lib/tao';
@@ -28,7 +28,7 @@ export function TaoCard({ on }: { on: 'mind' | 'soul' }) {
       <Pressable onPress={() => router.navigate(t.pillar === 'mind' ? '/mind' : '/soul')}>
         <Card>
           <Label>{tr('Tao practice')} · {tr(t.day)}</Label>
-          <Text style={{ color: colors.ink }}>{tr(t.title)}{day.tao?.done ? ` ✓ ${tr('done')}` : ''}</Text>
+          <Text style={{ color: colors.ink }}>{tr(t.title)}{taoStudied(day.tao) ? ` ✓ ${tr('done')}` : ''}</Text>
           <Note>{tr("Today's practice is on the {tab} tab ›", { tab: tr(NAME[t.pillar]) })}</Note>
         </Card>
       </Pressable>
@@ -36,7 +36,7 @@ export function TaoCard({ on }: { on: 'mind' | 'soul' }) {
   }
 
   const monday = mondayOf(date);
-  const taoStudy = day.tao?.done ? LEARN_SHARE * TAO_POINTS : 0, taoLived = lived(day.tao?.lived) ? (1 - LEARN_SHARE) * TAO_POINTS : 0;
+  const taoStudy = taoStudied(day.tao) ? LEARN_SHARE * TAO_POINTS : 0, taoLived = lived(day.tao?.lived) ? (1 - LEARN_SHARE) * TAO_POINTS : 0;
   const mondayNote = monday !== date ? days[monday]?.tao?.note : undefined;
 
   // Compact (founder, 21 Oct 2026): about the size of "Clear your mind". One-sentence practice, the note and the tick;
@@ -46,20 +46,16 @@ export function TaoCard({ on }: { on: 'mind' | 'soul' }) {
       <Label>{tr('Tao practice')} · {tr(t.day)}</Label>
       <Heading right={<Score value={taoStudy + taoLived} max={TAO_POINTS} />}>{tr(t.title)}</Heading>
       <RingTop score={taoStudy + taoLived} max={TAO_POINTS} items={[
-        { id: 'study', color: PASTEL.sand, label: tr('Studied'), value: taoStudy ? 1 : 0 },
+        { id: 'study', color: PASTEL.sand, label: tr('What it means to me'), value: taoStudy ? 1 : 0 },
         { id: 'lived', color: PASTEL.sage, label: tr('Lived'), value: taoLived ? 1 : 0 },
       ]} />
       <Text style={{ color: colors.ink, lineHeight: 22 }}>{tr(t.short)}</Text>
       {t.weekday === 3 && mondayNote ? <Note>{tr('Your Monday note: {note}', { note: mondayNote })}</Note> : null}
 
-      <Expandable icon="create-outline" title={tr('My note (private)')} status={day.tao?.note?.trim() ? day.tao.note.trim() : tr('Optional')}>
-        <TextField key={date + 'tao'} label={tr('My note (private)')} value={day.tao?.note ?? ''} multiline
-          onChangeText={v => update(d => { d.tao = { ...d.tao, note: v }; })} placeholder={tr(t.notePrompt)} />
-      </Expandable>
-
-      <EntryHead color={PASTEL.sand} title={tr('Studied')} points={pts(taoStudy, LEARN_SHARE * TAO_POINTS)} />
-      <Check color={color} checked={!!day.tao?.done} onToggle={() => update(d => { d.tao = { ...d.tao, done: !d.tao?.done }; })}
-        title={tr('I read today\'s practice')} points={LEARN_SHARE * TAO_POINTS} />
+      {/* A line on the practice counts as studied (founder, 31 Oct 2026: the tick box was removed). */}
+      <EntryHead color={PASTEL.sand} title={tr('What it means to me today')} points={pts(taoStudy, LEARN_SHARE * TAO_POINTS)} />
+      <TextField key={date + 'tao'} label="" value={day.tao?.note ?? ''} multiline
+        onChangeText={v => update(d => { d.tao = { ...d.tao, note: v }; })} placeholder={tr(t.notePrompt)} />
       {/* Living it earns the other 75 % (founder, 26 Oct 2026). */}
       <EntryHead color={PASTEL.sage} title={tr('How I lived it today')} points={pts(taoLived, (1 - LEARN_SHARE) * TAO_POINTS)} />
       <TextField key={date + 'taolived'} label="" value={day.tao?.lived ?? ''} multiline

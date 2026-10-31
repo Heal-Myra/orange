@@ -1272,4 +1272,6 @@ export const HI: Record<string, string> = {
   'To-dos': 'काम',
   'Phone': 'फ़ोन',
   'CATCH UP ON': 'इन पर ध्यान दें',
+  'What it means to me': 'मेरे लिए इसका अर्थ',
+  'Write one line on what it means to you.': 'एक पंक्ति लिखें कि इसका आपके लिए क्या अर्थ है।',
 };

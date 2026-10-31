@@ -1,5 +1,8 @@
 # Changelog
 
+## 31 Oct 2026 — No "I studied" tick box
+- Daily Wisdom and Tao: writing a line in "What it means to me today" earns the studied 5 points; the tick boxes are gone (founder). Older days with a tick keep their points. Trends and Myra follow the same rule (`wisdomStudied`, `taoStudied`).
+
 ## 31 Oct 2026 — Today: "My day" card in the ring design
 - Rings for the best part of the day and the three biggest concerns, total out of 300 in the middle, Myra recommends at the bottom of the card; tap a row to open that card. The old three-part circle is replaced; Body, Mind and Soul tiles stay.
 

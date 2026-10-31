@@ -5,7 +5,7 @@ import { Pressable, Text, TextInput, View } from 'react-native';
 import { useAuth } from '../lib/auth';
 import { verseOfDay } from '../lib/gita';
 import { passageOfDay, sourceOf, traditionName } from '../lib/wisdom';
-import { LEARN_SHARE, POINTS, PRACTICES, lived } from '../lib/scoring';
+import { LEARN_SHARE, POINTS, PRACTICES, lived, wisdomStudied } from '../lib/scoring';
 import { EntryHead, PASTEL, RingTop, pts } from './Rings';
 import { MyraLine } from './MyraLine';
 import { useHeal } from '../lib/store';
@@ -24,12 +24,12 @@ export function VerseStudyCard() {
   const v = verseOfDay(date);
   const so = day.soul ?? {};
   // Rings on top (studied, lived), the writing below with each ring's dot; Myra's line at the bottom (decision 0037).
-  const W = POINTS.wisdom, studyPts = so.verseStudied ? LEARN_SHARE * W : 0, livedPts = lived(so.verseLived) ? (1 - LEARN_SHARE) * W : 0;
+  const W = POINTS.wisdom, studyPts = wisdomStudied(so) ? LEARN_SHARE * W : 0, livedPts = lived(so.verseLived) ? (1 - LEARN_SHARE) * W : 0;
   return (
     <Card>
       <Heading right={<Score value={studyPts + livedPts} max={W} />}>{tr('Daily Wisdom')}</Heading>
       <RingTop score={studyPts + livedPts} max={W} items={[
-        { id: 'study', color: PASTEL.sand, label: tr('Studied'), value: studyPts ? 1 : 0 },
+        { id: 'study', color: PASTEL.sand, label: tr('What it means to me'), value: studyPts ? 1 : 0 },
         { id: 'lived', color: PASTEL.peach, label: tr('Lived'), value: livedPts ? 1 : 0 },
       ]} />
       {p ? (
@@ -53,11 +53,10 @@ export function VerseStudyCard() {
           <ExplainVerse verse={v} />
         </>
       )}
-      <TextField key={date + 'verse'} label={tr('What it means to me today')} value={so.verseNote ?? ''} multiline
+      {/* One line on what it means counts as studied (founder, 31 Oct 2026: the tick box was removed). */}
+      <EntryHead color={PASTEL.sand} title={tr('What it means to me today')} points={pts(studyPts, LEARN_SHARE * W)} />
+      <TextField key={date + 'verse'} label="" value={so.verseNote ?? ''} multiline
         onChangeText={t => update(d => { d.soul = { ...d.soul, verseNote: t }; })} placeholder={tr('One line is enough')} />
-      <EntryHead color={PASTEL.sand} title={tr('Studied')} points={pts(studyPts, LEARN_SHARE * W)} />
-      <Check checked={!!so.verseStudied} onToggle={() => update(d => { d.soul = { ...d.soul, verseStudied: !d.soul?.verseStudied }; })}
-        title={tr('I studied today\'s wisdom')} points={LEARN_SHARE * W} />
       {/* Living it earns the other 75 % (founder, 26 Oct 2026). Usually written later in the day. */}
       <EntryHead color={PASTEL.peach} title={tr('How I lived it today')} points={pts(livedPts, (1 - LEARN_SHARE) * W)} />
       <TextField key={date + 'lived'} label="" value={so.verseLived ?? ''} multiline

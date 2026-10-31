@@ -185,3 +185,17 @@ describe('Gratitude journal (27 Oct 2026)', () => {
     expect([s.gratitude, s.love]).toEqual([30, 30]);
   });
 });
+
+import { soulScore as soulScore2, taoStudied as taoStudied2, wisdomStudied as wisdomStudied2 } from './scoring';
+import { emptyDay as emptyDay2 } from './types';
+describe('studied = a line written (31 Oct 2026)', () => {
+  it('counts a written line as studied, and the old tick still counts', () => {
+    expect(wisdomStudied2({ verseNote: 'Be steady' })).toBe(true);
+    expect(wisdomStudied2({ verseNote: ' ' })).toBe(false);
+    expect(wisdomStudied2({ verseStudied: true })).toBe(true);
+    expect(taoStudied2({ note: 'Let go' })).toBe(true);
+    const d = emptyDay2('2026-10-31');
+    d.soul = { verseNote: 'Act without worry' };
+    expect(soulScore2(d)?.verse).toBe(5);
+  });
+});

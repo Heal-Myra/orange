@@ -3,6 +3,7 @@
 // Week and Month show one bar per day, Quarter one bar per week, Year one bar per month. Each bar is the average
 // of the days that have data; days without data are left out (never counted as zero).
 
+import { taoStudied, wisdomStudied } from './scoring';
 import { isoDate } from './dates';
 import { bodyScore, countGratitude, mealTotals, mindScore, soulScore, wellBeing } from './scoring';
 import type { DayLog, Profile } from './types';
@@ -101,9 +102,9 @@ export const METRICS: Metric[] = [
   { id: 'soul', name: 'Soul score', unit: 'of 100', pillar: 'soul', better: 'up', value: (d, P) => num(soulScore(d, P)?.total) },
   { id: 'meditation', name: 'Meditation', unit: 'min', pillar: 'mind', better: 'up', target: P => P.meditation, value: d => num(d.mind.meditationMin) },
   { id: 'gratitude', name: 'Gratitudes', unit: 'per day', pillar: 'soul', better: 'up', target: () => 4, value: d => { const n = countGratitude(d.soul?.gratitude); return n || null; } },
-  { id: 'tao', name: 'Days with Tao practice', unit: 'days', pillar: 'soul', better: 'up', days: true, value: d => (d.tao?.done ? 1 : null) },
+  { id: 'tao', name: 'Days with Tao practice', unit: 'days', pillar: 'soul', better: 'up', days: true, value: d => (taoStudied(d.tao) ? 1 : null) },
   { id: 'love', name: 'Days with love', unit: 'days', pillar: 'soul', better: 'up', days: true, value: d => (d.love?.done ? 1 : null) },
-  { id: 'wisdom', name: 'Days with Daily Wisdom', unit: 'days', pillar: 'soul', better: 'up', days: true, value: d => (d.soul?.verseStudied ? 1 : null) },
+  { id: 'wisdom', name: 'Days with Daily Wisdom', unit: 'days', pillar: 'soul', better: 'up', days: true, value: d => (wisdomStudied(d.soul) ? 1 : null) },
 ];
 
 export interface Trend {

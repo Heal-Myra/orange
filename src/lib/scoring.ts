@@ -175,6 +175,11 @@ export function lovePoints(d: DayLog): number {
   return (whom ? 12 : 0) + (self ? 12 : 0) + (d.love?.done && (whom || self) ? 6 : 0);
 }
 
+/** Studied today's wisdom / Tao: a line or two written about it counts (founder, 31 Oct 2026: the tick box was removed);
+ *  older days kept the tick. */
+export const wisdomStudied = (so?: { verseStudied?: boolean; verseNote?: string }) => !!so?.verseStudied || filledText(so?.verseNote);
+export const taoStudied = (t?: { done?: boolean; note?: string }) => !!t?.done || filledText(t?.note);
+
 export function soulScore(d: DayLog, _P: Profile = DEFAULT_PROFILE): SoulScore | null {
   const so = d.soul ?? {};
   // Boxes can be left empty in between (saved as null), so check each one is text (crash, 23 Oct 2026).
@@ -185,8 +190,8 @@ export function soulScore(d: DayLog, _P: Profile = DEFAULT_PROFILE): SoulScore |
     ? Math.min(3, countGratitude(so.gratitude)) * 5 + (filledText(so.laugh) ? 7.5 : 0) + (filledText(so.best) ? 7.5 : 0)
     : Math.min(4, countGratitude(so.gratitude)) * GRATITUDE_EACH;
   // Learning earns 25 %, living it during the day earns 75 % (founder, 26 Oct 2026).
-  const verse = (so.verseStudied ? LEARN_SHARE * POINTS.wisdom : 0) + (lived(so.verseLived) ? (1 - LEARN_SHARE) * POINTS.wisdom : 0);
-  const tao = (d.tao?.done ? LEARN_SHARE * POINTS.tao : 0) + (lived(d.tao?.lived) ? (1 - LEARN_SHARE) * POINTS.tao : 0);
+  const verse = (wisdomStudied(so) ? LEARN_SHARE * POINTS.wisdom : 0) + (lived(so.verseLived) ? (1 - LEARN_SHARE) * POINTS.wisdom : 0);
+  const tao = (taoStudied(d.tao) ? LEARN_SHARE * POINTS.tao : 0) + (lived(d.tao?.lived) ? (1 - LEARN_SHARE) * POINTS.tao : 0);
   const love = journal ? (filledText(d.love?.kindTo) ? POINTS.love : 0) : lovePoints(d);
   if (!gratitude && !verse && !tao && !love) return null;
   return { total: Math.min(100, gratitude + verse + tao + love), gratitude, verse, tao, love };
