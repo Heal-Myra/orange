@@ -1,5 +1,5 @@
 # 0039 — What you fed your mind, and the information fast
-Date: 31 October 2026 · Status: built, waiting for the founder's go on the picture
+Date: 31 October 2026 · Status: shipped (founder's go, 31 Oct 2026, 19:28)
 
 Founder: like a meal photo shows fat and calories, Myra should show the feelings in what a person watched (love, hate,
 fear, hope…; Harari's "information diet"), automatically; and an information-fasting button that blocks everything for a time.
