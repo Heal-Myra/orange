@@ -19,3 +19,12 @@ breaks the Orange Book's rules on truthfulness and no medical claims. So:
 
 **How:** `src/lib/face.ts` (tested), `src/components/FaceCard.tsx`, `FeelingCard.tsx` (`selfieReading`), `TextField` `onPhoto`,
 `useAttach` front camera option. Quick update; no new native module.
+
+## Update, 31 Oct 2026 (09:02, founder): a score, and remedies in Myra recommends
+- The card shows a **skin score out of 100** as a ring (average of the points read: clear 100, mild 60, noticeable 20) with
+  the change since the last selfie, and **one bar per point** (green good, amber some, coral needs care) instead of words.
+  The skin score is not part of the Body score.
+- **Remedies moved out of the card into Myra's suggestions.** The latest selfie within 7 days goes into Myra's context with
+  natural remedies per point (`faceLine`, `REMEDY` in `src/lib/face.ts`). Myra recommends makes the Body task a remedy when it
+  fits the moment (e.g. "Add spinach to lunch for your dark circles."), and Tomorrow's food includes one or two helpful foods
+  and names it in its note.

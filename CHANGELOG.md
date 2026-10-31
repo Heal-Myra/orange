@@ -1,5 +1,9 @@
 # Changelog
 
+## 31 Oct 2026 — Skin score ring and bars; remedies in Myra recommends
+- Face & beauty shows a skin score out of 100 (ring, change since the last selfie) and a bar per point instead of words.
+- Remedies now come through Myra: her Body suggestion and Tomorrow's food use the latest selfie (within 7 days) and say what it helps.
+
 ## 31 Oct 2026 — Face & beauty from a selfie (decision 0035)
 - How do you feel today: + takes a selfie; Myra suggests how you look ("a little tired. Is that right?") with two or three kind words; you confirm with Yes.
 - Body › Face & beauty (folded): seven skin-care points (Clear, Mild, Noticeable) with arrows against the last reading, 2–3 care tips, the day's witty words. The photo is not kept.

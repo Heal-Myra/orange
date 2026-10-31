@@ -66,9 +66,39 @@ export function earlierReading(days: Record<string, { face?: FaceReading }>, dat
   return gap <= 30 ? { date: last, face: days[last].face! } : null;
 }
 
+// ---------- Skin score (founder, 31 Oct 2026: "a score displayed as a visual" instead of words) ----------
+const POINT: Record<SkinLevel, number> = { none: 100, mild: 60, noticeable: 20 };
+/** One skin point out of 100 (clear 100, mild 60, noticeable 20). */
+export const pointScore = (l?: SkinLevel) => (l ? POINT[l] : null);
+/** The skin score out of 100: the average of the points read. Not part of the Body score. */
+export function skinScore(f?: FaceReading): number | null {
+  const v = Object.values(f?.skin ?? {}).map(l => POINT[l as SkinLevel]);
+  return v.length ? Math.round(v.reduce((a, b) => a + b, 0) / v.length) : null;
+}
+
+/** Natural remedies Myra can weave into food and movement suggestions (founder: remedies belong in Myra recommends). */
+const REMEDY: Record<SkinKey, string> = {
+  dryness: 'dryness: more water, a spoon of ghee or soaked almonds, seeds (flax, sesame), cucumber, coconut water',
+  darkCircles: 'dark circles: sleep 7–8 hours, iron-rich food (spinach, dates, jaggery, beetroot), less late-night screen, Yoga Nidra',
+  puffiness: 'puffy eyes: less salt and pickle, more water, a brisk 10-minute walk in the morning, cold spoon on the eyes',
+  redness: 'redness: cooling food (cucumber, curd, coconut water), less very spicy or fried food, sunscreen',
+  breakouts: 'pimples: less sugar, fried food and dairy sweets; more fruit, vegetables and water; exercise to sweat, then wash the face',
+  tan: 'sun tan: sunscreen and shade at midday, tomatoes, carrots and citrus fruit, walk early morning or evening',
+  lips: 'dry lips: water through the day, a little ghee on the lips at night',
+};
+
+/** The latest reading on or before `date`, within 7 days (a selfie is not needed every day). */
+export function latestReading(days: Record<string, { face?: FaceReading }>, date: string): { date: string; face: FaceReading } | null {
+  if (days[date]?.face) return { date, face: days[date].face! };
+  const r = earlierReading(days, date);
+  return r && (Date.parse(date) - Date.parse(r.date)) / 86400000 <= 7 ? r : null;
+}
+
 /** One line for Myra. */
-export function faceLine(f?: FaceReading): string {
+export function faceLine(f?: FaceReading, when?: string): string {
   if (!f) return '';
-  const pts = Object.entries(f.skin).filter(([, v]) => v !== 'none').map(([k, v]) => `${k} ${v}`).join(', ');
-  return `Today's selfie (skin care only, not a diagnosis): ${pts || 'skin looks clear'}${f.looksNote ? `; looks ${f.looksNote}` : ''}.`;
+  const pts = (Object.entries(f.skin) as [SkinKey, SkinLevel][]).filter(([, v]) => v !== 'none');
+  const remedies = pts.map(([k]) => REMEDY[k]).join('; ');
+  return `Face & skin from a selfie${when ? ` (${when})` : ''}, skin care only, not a diagnosis: skin score ${skinScore(f) ?? '-'}/100; ${pts.map(([k, v]) => `${k} ${v}`).join(', ') || 'skin looks clear'}${f.looksNote ? `; looks ${f.looksNote}` : ''}.` +
+    (remedies ? ` Remedies to weave into food and movement suggestions: ${remedies}.` : '');
 }

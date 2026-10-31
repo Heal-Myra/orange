@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { cleanReading, earlierReading, faceLine, skinChange } from './face';
+import { cleanReading, earlierReading, faceLine, latestReading, skinChange, skinScore } from './face';
 
 describe('Face & beauty', () => {
   it('keeps only known skin points, levels and safe hints', () => {
@@ -28,5 +28,13 @@ describe('Face & beauty', () => {
     expect(line).toContain('darkCircles mild');
     expect(line).not.toContain('dryness');
     expect(line).toContain('not a diagnosis');
+    expect(line).toContain('iron-rich food');
+  });
+  it('scores the skin out of 100 and uses a recent selfie', () => {
+    expect(skinScore(cleanReading({ skin: { dryness: 'none', darkCircles: 'mild', breakouts: 'noticeable' } }, 'x'))).toBe(60);
+    expect(skinScore(cleanReading({}, 'x'))).toBeNull();
+    const f = cleanReading({ witty: 'Fresh' }, 'x');
+    expect(latestReading({ '2026-10-28': { face: f } }, '2026-10-31')?.date).toBe('2026-10-28');
+    expect(latestReading({ '2026-10-20': { face: f } }, '2026-10-31')).toBeNull();
   });
 });
