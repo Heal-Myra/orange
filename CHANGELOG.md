@@ -1,5 +1,8 @@
 # Changelog
 
+## 31 Oct 2026 — Myra's pick: impact, one nudge, start arrow
+- Beside the score, after a thin divider line: big "+N" points, "Body/Mind/Soul points", one short instructing line ("Lie down for Yoga Nidra.", no minutes) and a round coral start arrow.
+
 ## 31 Oct 2026 — Myra's pick, impact first (founder's option 5 + 10)
 - Beside the score: the points in large ("+30", in the pillar's own deeper colour), "Mind points", two or three words of what to do ("Yoga Nidra · 20 min") and a coral Start now button. No label, no long sentence.
 

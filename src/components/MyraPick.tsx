@@ -23,18 +23,18 @@ const PILLAR = {
   soul: { points: 'Soul points', ink: '#A9744F' },
 } as const;
 
-/** What to do, in two or three words (founder, 31 Oct 2026: minimal text, like option 10). */
-const what = (id: StepId, n?: number): string => ({
-  sleep: tr("Last night's sleep"),
-  meditation: `${tr('Guided breathing')} · ${n ?? 10} ${tr('min')}`,
-  nidra: `${tr('Yoga Nidra')} · ${n ?? 20} ${tr('min')}`,
-  movement: `${tr('Brisk walk')} · 20 ${tr('min')}`,
-  food: tr('Snap your next meal'),
-  tasks: tr('One focus to-do'),
-  gratitude: tr('Gratitude journal'),
-  kind: tr('One kind act'),
-  wisdom: tr('Daily Wisdom'),
-  tao: tr('Tao practice'),
+/** One line in an instructing tone (founder, 31 Oct 2026, like option 3): a nudge, no minutes. */
+const what = (id: StepId): string => ({
+  sleep: tr("Log last night's sleep."),
+  meditation: tr('Sit and breathe.'),
+  nidra: tr('Lie down for Yoga Nidra.'),
+  movement: tr('Go for a brisk walk.'),
+  food: tr('Snap your next meal.'),
+  tasks: tr('Finish one to-do.'),
+  gratitude: tr('Write your gratitude.'),
+  kind: tr('Note one kind act.'),
+  wisdom: tr("Read today's wisdom."),
+  tao: tr("Try today's Tao."),
 }[id]);
 
 
@@ -92,17 +92,19 @@ export function MyraPick({ w }: { w: WellBeing }) {
 
   const s = nextStep(day, profile, w, hour);
   if (!s) return <View style={{ flex: 1, gap: 8 }}>{label}{line(tr('a full day. Rest well.'))}</View>;
-  // Impact first (founder, 31 Oct 2026, option 5) with option 10's few words and a Start now button.
+  // Impact first (founder, 31 Oct 2026): the points in large, then one instructing line and a round Start now arrow (option 3).
   const p = PILLAR[s.pillar];
   return (
-    <View style={{ flex: 1, gap: 2 }} accessible accessibilityLabel={`+${s.gain} ${tr(p.points)}: ${what(s.id, s.minutes)}`}>
+    <View style={{ flex: 1, gap: 2 }}>
       <Text style={{ color: p.ink, fontSize: 40, fontWeight: '800', lineHeight: 44 }}>+{s.gain}</Text>
       <Text style={{ color: colors.muted, fontSize: 13, fontWeight: '600' }}>{tr(p.points)}</Text>
-      <Text style={{ color: colors.ink, fontSize: 15, fontWeight: '700', marginTop: 6 }}>{what(s.id, s.minutes)}</Text>
-      <Pressable onPress={() => start(s)} accessibilityRole="button" accessibilityHint={tr('Opens the card where you do this')}
-        style={({ pressed }) => ({ alignSelf: 'flex-start', marginTop: 8, paddingVertical: 8, paddingHorizontal: 16, borderRadius: 99, backgroundColor: colors.insight, opacity: pressed ? 0.85 : 1 })}>
-        <Text style={{ color: colors.onInsight, fontWeight: '700', fontSize: 14 }}>{tr('Start now')}</Text>
-      </Pressable>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 8 }}>
+        <Text style={{ flex: 1, color: colors.ink, fontSize: 15, lineHeight: 20 }} numberOfLines={2}>{what(s.id)}</Text>
+        <Pressable onPress={() => start(s)} accessibilityRole="button" accessibilityLabel={`${tr('Start now')}: ${what(s.id)}`} hitSlop={8}
+          style={({ pressed }) => ({ width: 36, height: 36, borderRadius: 18, backgroundColor: colors.insight, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.85 : 1 })}>
+          <Ionicons name="arrow-forward" size={20} color={colors.onInsight} />
+        </Pressable>
+      </View>
     </View>
   );
 }

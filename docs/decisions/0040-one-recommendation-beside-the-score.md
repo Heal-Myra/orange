@@ -14,3 +14,6 @@ Date: 31 Oct 2026 · Founder's request ("Myra recommends to the right of the tot
 
 ## Update, 31 Oct 2026 (22:40)
 Shown impact first (option 5 of 10, with option 10's few words): big "+N", "Body/Mind/Soul points", what to do in 2–3 words, and a Start now button.
+
+## Update, 31 Oct 2026 (22:50)
+Founder: impact first, then one small instructing line (a nudge, like option 3, no minutes) and a round start button; a thin divider between the rings and Myra (option 2).

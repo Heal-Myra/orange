@@ -54,6 +54,8 @@ export function TodayRings({ w }: { w: WellBeing }) {
       </View>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
         <RingTap trend="today"><RingStack items={items} center={fmt(w.total)} sub={tr('of {n}', { n: 300 })} size={140} /></RingTap>
+        {/* A thin line between the score and Myra (founder, 31 Oct 2026, like option 2). */}
+        <View style={{ width: 1, alignSelf: 'stretch', marginVertical: 12, backgroundColor: colors.line }} />
         <MyraPick w={w} />
       </View>
     </Card>
