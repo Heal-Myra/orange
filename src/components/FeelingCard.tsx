@@ -11,6 +11,16 @@ import { tr } from '../lib/i18n';
 import { useHeal } from '../lib/store';
 import { colors } from '../theme';
 import { Button, Card, Expandable, Note, TextField } from './ui';
+import { readSelfie } from '../lib/ai';
+import { cleanReading, type FaceReading } from '../lib/face';
+import type { Picked } from './AttachPlus';
+
+/** Read a selfie: saves the Face & beauty results for the day and returns them, or a message if it is not a face. */
+export async function selfieReading(img: Picked): Promise<FaceReading | string> {
+  const r = await readSelfie(img.data, img.media_type);
+  if (r.isFace === false) return r.note || tr('Please take a selfie with your face clearly in the light.');
+  return cleanReading(r);
+}
 
 export function FeelingCard() {
   const { day, days, date, update } = useHeal();
@@ -18,6 +28,15 @@ export function FeelingCard() {
   const before = days[shiftISO(date, -1)]?.feeling;
   const [note, setNote] = useState(f?.note ?? '');
   const [editing, setEditing] = useState(false);
+  // A selfie: Myra suggests how the person looks; they confirm it (founder, 31 Oct 2026; decision 0035).
+  const [guess, setGuess] = useState<FaceReading | null>(null);
+  const fromSelfie = async (img: Picked) => {
+    const r = await selfieReading(img);
+    if (typeof r === 'string') return r;
+    update(d => { d.face = r; });
+    setGuess(r);
+    return null;
+  };
 
   const save = (m: Mood | null, s: Symptom[], n: string) => {
     // Words count too (founder, 24 Oct 2026): "I have a cold" ticks Cold by itself.
@@ -35,8 +54,20 @@ export function FeelingCard() {
   // Just the words (founder, 24 Oct 2026: no buttons). Symptoms and mood are read from what is written.
   const picker = (
     <View style={{ gap: 10 }}>
-      <TextField label={tr('In your own words')} value={note} onChangeText={setNote} multiline placeholder={tr('e.g. I have a cold since last night, a little tired')} />
-      {note.trim() ? <Button kind="insight" title={tr('Done')} onPress={() => save(null, [], note)} /> : null}
+      <TextField label={tr('In your own words')} value={note} onChangeText={setNote} multiline placeholder={tr('e.g. I have a cold since last night, a little tired')}
+        onPhoto={fromSelfie} front photoHint={tr('Take a selfie: Myra suggests how you look today, and you confirm it.')} />
+      {guess ? (
+        <View style={{ gap: 8, padding: 12, borderRadius: 14, backgroundColor: colors.insight + '10' }}>
+          {guess.witty ? <Text style={{ color: colors.insight, fontWeight: '800', fontSize: 17 }}>{guess.witty}</Text> : null}
+          <Text style={{ color: colors.ink }}>{guess.looksNote ? tr('From your selfie, you look {how}. Is that right?', { how: guess.looksNote }) : tr('Is this how you feel?')}</Text>
+          <View style={{ flexDirection: 'row', gap: 8 }}>
+            <Button kind="insight" title={tr('Yes')} onPress={() => { const n = note.trim() || guess.looksNote; setGuess(null); save(guess.looks, guess.hints, n); }} />
+            <Button kind="plain" title={tr('No, I\'ll write it')} onPress={() => setGuess(null)} />
+          </View>
+          <Note>{tr('Your skin check is in Body › Face & beauty.')}</Note>
+        </View>
+      ) : null}
+      {note.trim() && !guess ? <Button kind="insight" title={tr('Done')} onPress={() => save(null, [], note)} /> : null}
     </View>
   );
 

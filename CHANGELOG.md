@@ -1,5 +1,10 @@
 # Changelog
 
+## 31 Oct 2026 — Face & beauty from a selfie (decision 0035)
+- How do you feel today: + takes a selfie; Myra suggests how you look ("a little tired. Is that right?") with two or three kind words; you confirm with Yes.
+- Body › Face & beauty (folded): seven skin-care points (Clear, Mild, Noticeable) with arrows against the last reading, 2–3 care tips, the day's witty words. The photo is not kept.
+- Never mental-health labels or medical names. Server action `read_selfie`; tests in `src/lib/face.test.ts`.
+
 ## 30 Oct 2026 — "+" to read a photo into text boxes (decision 0034)
 - Clear your mind: + → Camera, Photos or Files; Myra reads a notebook page into to-dos (group, date, repeat) to tick and add.
 - Gratitude journal: + fills the empty panels from a photo of the paper journal.

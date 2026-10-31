@@ -45,6 +45,10 @@ export const readNoteJournal = (image_base64: string, media_type: string) =>
 export const readNoteText = (image_base64: string, media_type: string, field?: string) =>
   call<{ text: string }>('read_note', { mode: 'text', image_base64, media_type, field });
 
+/** A selfie for Face & beauty and "How do you feel today?" (decision 0035). */
+export const readSelfie = (image_base64: string, media_type: string) =>
+  call<Partial<import('./face').FaceReading> & { isFace?: boolean; note?: string }>('read_selfie', { image_base64, media_type });
+
 export interface GoalReading { goal: 'lose' | 'keep' | 'gain'; kg: number | null; weeks: number | null; aims: string; verdict: string; message: string }
 /** Myra reads a goal written in plain words (About you). */
 export const understandGoal = (goal: string, me: { age: number; sex: string; heightCm: number; weightKg: number }, today: string) =>

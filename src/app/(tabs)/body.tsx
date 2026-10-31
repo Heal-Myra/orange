@@ -12,6 +12,7 @@ import { MealPhoto } from '../../components/MealPhoto';
 import { FoodPlanRow } from '../../components/FoodPlan';
 import { MealRow } from '../../components/MealRow';
 import { CareNote } from '../../components/CareCard';
+import { FaceCard } from '../../components/FaceCard';
 import { todayISO } from '../../lib/dates';
 import { Anchor, Card, Heading, Note, Screen, Score, s } from '../../components/ui';
 import { FAST_KCAL, bodyScore, mealTotals } from '../../lib/scoring';
@@ -108,6 +109,8 @@ export default function Body() {
           </Rows>
         </Card></Anchor>
       ) : null}
+
+      <FaceCard />
 
       {h && (h.restingHr != null || h.hrv != null || h.vo2max != null) ? (
         <Card>

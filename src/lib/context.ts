@@ -8,6 +8,7 @@ import { verseOfDay } from './gita';
 import { countGratitude, mealTotals, wellBeing } from './scoring';
 import { habitsToday } from './habits';
 import { feelingLine } from './feeling';
+import { faceLine } from './face';
 import { todaysLength } from './meditationPlan';
 import { TAO_FOR_AI, taoForDate } from './tao';
 import { passageOfDay, traditionName, type Tradition } from './wisdom';
@@ -32,6 +33,7 @@ export function buildContext(day: DayLog, days: Record<string, DayLog>, date: st
     momentLine(profile.me?.routine),
     healthLine(day),
     feelingLine(day.feeling),
+    faceLine(day.face),
     `Fasting today: ${day.fasting ? 'yes (declared fast: water, black tea, black coffee)' : 'no'}.`,
     `Food: ${day.meals.map(m => m.name).join(', ') || 'nothing logged'}; totals ${Math.round(t.kcal)} kcal, protein ${Math.round(t.p)} g, carbs ${Math.round(t.c)} g, fat ${Math.round(t.f)} g, fibre ${Math.round(t.fib)} g (target ${fibreTarget(profile.kcal)} g).`,
     `Mind: focus tasks done today ${day.mind.focusDone ?? 0} of up to 2; breathing and meditation ${day.mind.meditationMin ?? 'not done yet'} min; phone yesterday (counted today) ${(day.phoneFrom ?? day).noMedia ? 'no social media' : (day.phoneFrom ?? day).media.filter(m => !m.notMe && m.group !== 'tool').map(m => `${m.minutes} min ${m.app || m.platform} (${m.group === 'learning' ? 'learning/AI tool' : m.category})`).join('; ') || 'not logged'}.`,
@@ -46,7 +48,7 @@ export function buildContext(day: DayLog, days: Record<string, DayLog>, date: st
     `Habits today (repeating; shown to them at their time by the app, do not repeat them as tasks): ${hab || 'none'}.`,
     tasks ?? '',
     `Last 7 days:\n${week}`,
-  ].join('\n');
+  ].filter(Boolean).join('\n');
 }
 
 /** The moment of the day Myra plans for (founder, 21 Oct 2026): first thing in the morning (gratitude), office hours

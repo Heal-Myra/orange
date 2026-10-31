@@ -1,6 +1,6 @@
 // Small building blocks shared by every screen.
 
-import { useAttach } from './AttachPlus';
+import { useAttach, type Picked } from './AttachPlus';
 import { readNoteText } from '../lib/ai';
 import { Ionicons } from '@expo/vector-icons';
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
@@ -198,18 +198,21 @@ export function NumberField({ label, value, onChange, placeholder, decimal, live
   );
 }
 
-export function TextField({ label, value, onChangeText, placeholder, multiline, attach }: {
+export function TextField({ label, value, onChangeText, placeholder, multiline, attach, onPhoto, photoHint, front }: {
   label: string; value: string; onChangeText: (t: string) => void; placeholder?: string; multiline?: boolean;
   attach?: boolean; // "+" to read a photo into the box (founder, 30 Oct 2026); on for every writing box (multiline) unless false
+  onPhoto?: (img: Picked) => Promise<string | null | void>; // a box's own way of reading the photo (e.g. a selfie)
+  photoHint?: string; front?: boolean;
 }) {
   const { keepVisible } = useContext(AnchorCtx);
   const plus = useAttach(async img => {
+    if (onPhoto) return onPhoto(img);
     const r = await readNoteText(img.data, img.media_type, label);
     const t = (r.text ?? '').trim();
     if (!t) return tr('No words found in that photo. Try a clearer one.');
     onChangeText(value.trim() ? `${value.trim()} ${t}` : t);
     return null;
-  }, { size: 40 });
+  }, { size: 40, hint: photoHint, front });
   const withPlus = attach ?? !!multiline;
   const box = (
     <TextInput style={[s.input, multiline && { minHeight: 70, textAlignVertical: 'top' }, withPlus && { flex: 1, minWidth: 0 }]} value={value} onChangeText={onChangeText}

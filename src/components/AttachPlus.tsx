@@ -23,7 +23,7 @@ export interface Picked { data: string; media_type: string; uri: string }
 /** Handwriting needs more detail than a meal photo. */
 const NOTE_WIDTH = 1600;
 
-export function useAttach(read: (img: Picked) => Promise<string | null | void>, opts?: { size?: number }): { button: ReactNode; status: ReactNode; busy: boolean } {
+export function useAttach(read: (img: Picked) => Promise<string | null | void>, opts?: { size?: number; front?: boolean; hint?: string }): { button: ReactNode; status: ReactNode; busy: boolean } {
   const { session } = useAuth();
   const [menu, setMenu] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -56,7 +56,7 @@ export function useAttach(read: (img: Picked) => Promise<string | null | void>, 
       const perm = await ImagePicker.requestCameraPermissionsAsync();
       if (!perm.granted) { setMsg({ text: tr('Camera permission is needed. You can choose a photo instead.'), bad: true }); return; }
     }
-    const o: ImagePicker.ImagePickerOptions = { mediaTypes: ['images'], quality: 0.8, base64: true };
+    const o: ImagePicker.ImagePickerOptions = { mediaTypes: ['images'], quality: 0.8, base64: true, ...(opts?.front ? { cameraType: ImagePicker.CameraType.front } : {}) };
     const res = from === 'camera' ? await ImagePicker.launchCameraAsync(o) : await ImagePicker.launchImageLibraryAsync(o);
     if (res.canceled) return;
     const a = res.assets[0];
@@ -81,7 +81,7 @@ export function useAttach(read: (img: Picked) => Promise<string | null | void>, 
         <Pressable onPress={() => setMenu(false)} style={{ flex: 1, backgroundColor: '#0006', justifyContent: 'flex-end' }}>
           <Pressable onPress={() => {}} style={{ backgroundColor: colors.surface, borderTopLeftRadius: 22, borderTopRightRadius: 22, paddingTop: 8, paddingBottom: 34 }}>
             <View style={{ alignSelf: 'center', width: 40, height: 4, borderRadius: 2, backgroundColor: colors.line, marginBottom: 6 }} />
-            <Text style={{ paddingHorizontal: 18, paddingVertical: 8, color: colors.muted, fontSize: 13 }}>{tr('Myra reads the photo and fills it in for you.')}</Text>
+            <Text style={{ paddingHorizontal: 18, paddingVertical: 8, color: colors.muted, fontSize: 13 }}>{opts?.hint ?? tr('Myra reads the photo and fills it in for you.')}</Text>
             {Platform.OS !== 'web' ? row('camera-outline', tr('Camera'), () => pick('camera')) : null}
             {row('images-outline', tr('Photos'), () => pick('photos'))}
             {Platform.OS !== 'web' ? row('folder-outline', tr('Files'), () => pick('files')) : null}
