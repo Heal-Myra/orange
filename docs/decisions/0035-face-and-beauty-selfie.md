@@ -29,3 +29,8 @@ breaks the Orange Book's rules on truthfulness and no medical claims. So:
   fits the moment (e.g. "Add spinach to lunch for your dark circles."), and Tomorrow's food includes one or two helpful foods
   and names it in its note.
 - Feel-good first: **Your best** (the highest bar), then the **three biggest concerns** (lowest bars, only those not clear); "See all 7" opens the rest (founder, 09:05 and 09:07).
+- **Concentric rings chosen** (founder, 09:21, over a score ring with sliding bars: "align with concise and minimalist
+  space"): one ring per point shown (your best outermost, then the top three concerns; all seven after "See all"), the
+  weighted skin score in the middle. Weights: pimples 20; dark circles, dryness, redness, sun tan 15 each; puffy eyes, dry lips 10.
+- **Soft colours, no red** (founder, 09:19): pastel ring per point (peach, lavender, soft teal, sky blue, sand, rose, sage);
+  the score in ink; numbers grey, only good ones soft green; coral only for Myra's witty words.

@@ -1,7 +1,7 @@
 # Changelog
 
 ## 31 Oct 2026 — Skin score ring and bars; remedies in Myra recommends
-- Face & beauty shows a skin score out of 100 (ring, change since the last selfie) and a bar per point instead of words; "Your best" point first, then the three biggest concerns; "See all 7" opens the rest.
+- Face & beauty shows a skin score out of 100 (ring, change since the last selfie) and a bar per point instead of words; concentric rings (one soft pastel ring per point, weighted skin score in the middle), "Your best" first, then the three biggest concerns; "See all 7" opens the rest. No red.
 - Remedies now come through Myra: her Body suggestion and Tomorrow's food use the latest selfie (within 7 days) and say what it helps.
 
 ## 31 Oct 2026 — Face & beauty from a selfie (decision 0035)

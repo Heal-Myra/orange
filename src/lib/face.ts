@@ -70,10 +70,13 @@ export function earlierReading(days: Record<string, { face?: FaceReading }>, dat
 const POINT: Record<SkinLevel, number> = { none: 100, mild: 60, noticeable: 20 };
 /** One skin point out of 100 (clear 100, mild 60, noticeable 20). */
 export const pointScore = (l?: SkinLevel) => (l ? POINT[l] : null);
-/** The skin score out of 100: the average of the points read. Not part of the Body score. */
+/** How much each point counts in the skin score (adds up to 100; founder, 31 Oct 2026: "a weightage"). */
+export const WEIGHT: Record<SkinKey, number> = { breakouts: 20, darkCircles: 15, dryness: 15, redness: 15, tan: 15, puffiness: 10, lips: 10 };
+/** The skin score out of 100: the weighted average of the points read. Not part of the Body score. */
 export function skinScore(f?: FaceReading): number | null {
-  const v = Object.values(f?.skin ?? {}).map(l => POINT[l as SkinLevel]);
-  return v.length ? Math.round(v.reduce((a, b) => a + b, 0) / v.length) : null;
+  const e = (Object.entries(f?.skin ?? {}) as [SkinKey, SkinLevel][]);
+  const w = e.reduce((a, [k]) => a + WEIGHT[k], 0);
+  return w ? Math.round(e.reduce((a, [k, l]) => a + WEIGHT[k] * POINT[l], 0) / w) : null;
 }
 
 /** Natural remedies Myra can weave into food and movement suggestions (founder: remedies belong in Myra recommends). */

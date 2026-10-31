@@ -5,7 +5,7 @@
 
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
-import Svg, { Circle } from 'react-native-svg';
+import Svg, { Circle, G } from 'react-native-svg';
 import { earlierReading, pointScore, SKIN, skinScore } from '../lib/face';
 import { tr } from '../lib/i18n';
 import { useHeal } from '../lib/store';
@@ -14,34 +14,43 @@ import { useAttach } from './AttachPlus';
 import { selfieReading } from './FeelingCard';
 import { Card, Expandable, Note } from './ui';
 
-/** Colour for a score out of 100: green when good, warm when it needs care. */
-const tone = (v: number) => (v >= 80 ? colors.body : v >= 50 ? '#D99A3D' : colors.insight);
+/** Numbers stay calm (founder, 31 Oct 2026: no red for concerns; light and minimalist): soft green when good, grey otherwise. */
+const tone = (v: number) => (v >= 80 ? colors.good : colors.muted);
 
-function Ring({ value, size = 104 }: { value: number; size?: number }) {
-  const w = 10, r = (size - w) / 2, c = 2 * Math.PI * r;
+/** Each skin point has its own ring colour, like activity rings. */
+const RING: Record<string, string> = {
+  breakouts: '#EBA987', darkCircles: '#9C95D0', dryness: '#6FB7BD', puffiness: '#86B4DE', tan: '#E3B873', redness: '#D9A7BD', lips: '#9CC08E',
+};
+
+/** One ring per point, outermost first, filled by its score; the overall (weighted) skin score in the middle. */
+function Rings({ rings, value, size = 150 }: { rings: { id: string; v: number }[]; value: number; size?: number }) {
+  const w = 9, gap = 3;
   return (
     <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
       <Svg width={size} height={size} style={{ position: 'absolute' }}>
-        <Circle cx={size / 2} cy={size / 2} r={r} stroke={colors.line} strokeWidth={w} fill="none" />
-        <Circle cx={size / 2} cy={size / 2} r={r} stroke={tone(value)} strokeWidth={w} fill="none" strokeLinecap="round"
-          strokeDasharray={`${(c * value) / 100} ${c}`} transform={`rotate(-90 ${size / 2} ${size / 2})`} />
+        {rings.map((k, i) => {
+          const r = size / 2 - w / 2 - i * (w + gap), c = 2 * Math.PI * r;
+          return (
+            <G key={k.id}>
+              <Circle cx={size / 2} cy={size / 2} r={r} stroke={RING[k.id] + '33'} strokeWidth={w} fill="none" />
+              <Circle cx={size / 2} cy={size / 2} r={r} stroke={RING[k.id]} strokeWidth={w} fill="none" strokeLinecap="round"
+                strokeDasharray={`${Math.max(0.01, (c * k.v) / 100)} ${c}`} transform={`rotate(-90 ${size / 2} ${size / 2})`} />
+            </G>
+          );
+        })}
       </Svg>
-      <Text style={{ fontSize: 28, fontWeight: '800', color: colors.ink }}>{value}</Text>
-      <Text style={{ fontSize: 11, color: colors.muted, marginTop: -2 }}>{tr('skin score')}</Text>
+      <Text style={{ fontSize: 26, fontWeight: '800', color: colors.ink }}>{value}</Text>
+      <Text style={{ fontSize: 10, color: colors.muted, marginTop: -2 }}>{tr('skin score')}</Text>
     </View>
   );
 }
 
-function Bar({ label, value }: { label: string; value: number }) {
+function Legend({ id, label, value }: { id: string; label: string; value: number }) {
   return (
-    <View style={{ gap: 4 }}>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-        <Text style={{ color: colors.ink, fontSize: 13 }}>{label}</Text>
-        <Text style={{ color: colors.muted, fontSize: 12, fontWeight: '600' }}>{value}</Text>
-      </View>
-      <View style={{ height: 8, borderRadius: 4, backgroundColor: colors.line, overflow: 'hidden' }}>
-        <View style={{ width: `${value}%`, height: 8, borderRadius: 4, backgroundColor: tone(value) }} />
-      </View>
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+      <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: RING[id] }} />
+      <Text style={{ flex: 1, color: colors.ink, fontSize: 13 }} numberOfLines={1}>{label}</Text>
+      <Text style={{ color: tone(value), fontWeight: '700', fontSize: 13 }}>{value}</Text>
     </View>
   );
 }
@@ -73,29 +82,29 @@ export function FaceCard() {
         <View style={{ gap: 12, paddingBottom: 12 }}>
           {f && score != null ? (
             <>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16 }}>
-                <Ring value={score} />
-                <View style={{ flex: 1, gap: 4 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                <View style={{ flex: 1, gap: 2 }}>
                   {f.witty ? <Text style={{ color: colors.insight, fontWeight: '800', fontSize: 18 }}>{f.witty}</Text> : null}
                   {was != null ? (
-                    <Text style={{ color: score > was ? colors.good : score < was ? colors.bad : colors.muted, fontWeight: '600', fontSize: 13 }}>
+                    <Text style={{ color: score > was ? colors.good : colors.muted, fontWeight: '600', fontSize: 13 }}>
                       {score === was ? tr('Same as {day}', { day: shortDay(before!.date) }) : tr('{d} since {day}', { d: `${score > was ? '+' : ''}${score - was}`, day: shortDay(before!.date) })}
                     </Text>
                   ) : null}
                 </View>
                 {plus.button}
               </View>
-              {/* Feel-good first: the best point, then the three biggest concerns; the rest fold away (founder, 31 Oct 2026). */}
-              <View style={{ gap: 10 }}>
-                {best ? (
-                  <View style={{ gap: 6 }}>
-                    <Text style={{ color: colors.good, fontWeight: '700', fontSize: 12, letterSpacing: 0.4 }}>{tr('YOUR BEST')}</Text>
-                    <Bar label={tr(best.label)} value={best.v} />
-                  </View>
-                ) : null}
-                {concerns.length ? <Text style={{ color: colors.insight, fontWeight: '700', fontSize: 12, letterSpacing: 0.4, marginTop: 4 }}>{tr('TOP CONCERNS')}</Text> : null}
-                {concerns.map(k => <Bar key={k.id} label={tr(k.label)} value={k.v} />)}
-                {more ? rest.map(k => <Bar key={k.id} label={tr(k.label)} value={k.v} />) : null}
+              {/* One score in the middle (weighted), a ring for each point shown: the best first, then the three biggest
+                  concerns (founder, 31 Oct 2026); the rest fold away. */}
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+                <Rings rings={[...(best ? [best] : []), ...concerns, ...(more ? rest : [])]} value={score} size={more ? 170 : 150} />
+                <View style={{ flex: 1, gap: 7 }}>
+                  {best ? <Text style={{ color: colors.good, fontWeight: '700', fontSize: 11, letterSpacing: 0.4 }}>{tr('YOUR BEST')}</Text> : null}
+                  {best ? <Legend id={best.id} label={tr(best.label)} value={best.v} /> : null}
+                  {concerns.length ? <Text style={{ color: colors.muted, fontWeight: '700', fontSize: 11, letterSpacing: 0.4, marginTop: 4 }}>{tr('TOP CONCERNS')}</Text> : null}
+                  {concerns.map(k => <Legend key={k.id} id={k.id} label={tr(k.label)} value={k.v} />)}
+                  {more && rest.length ? <View style={{ height: 4 }} /> : null}
+                  {more ? rest.map(k => <Legend key={k.id} id={k.id} label={tr(k.label)} value={k.v} />) : null}
+                </View>
               </View>
               {rest.length ? (
                 <Pressable onPress={() => setMore(m => !m)} hitSlop={8} accessibilityRole="button">
