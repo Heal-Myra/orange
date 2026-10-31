@@ -1285,4 +1285,7 @@ export const HI: Record<string, string> = {
   'Use ‹ › to look at an earlier day. Choose W, M, Q or Y above to see how this has changed over time.': 'पहले का दिन देखने के लिए ‹ › दबाएँ। समय के साथ बदलाव देखने के लिए ऊपर W, M, Q या Y चुनें।',
   'Showing {day}': '{day} दिखा रहा है',
   'Back to today': 'आज पर लौटें',
+  'Could not look up "{name}" just now. You can type its numbers.': '"{name}" अभी नहीं मिल सका। आप इसकी संख्याएँ लिख सकते हैं।',
+  'Remove {name}': '{name} हटाएँ',
+  'Myra is looking up {name}…': 'मायरा {name} देख रही है…',
 };

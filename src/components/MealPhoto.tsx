@@ -65,7 +65,7 @@ export function MealPhoto({ right, top, children }: { right?: ReactNode; top?: R
     try {
       const img = await shrink(a.uri, a.base64, a.mimeType);
       const r = await analyseMeal(img.data, img.type, hint);
-      setItems(r.items);
+      setItems(r.items); setNamed({});
       setInsight(r.insight);
       setNote([r.confidence && `Confidence: ${r.confidence}.`, r.note].filter(Boolean).join(' '));
       setMessage(r.items.length ? tr('Check the numbers, change anything that looks off, then add.') : (r.note || tr('No food found in the photo.')));
@@ -81,7 +81,7 @@ export function MealPhoto({ right, top, children }: { right?: ReactNode; top?: R
     try {
       // One quiet second try: the AI occasionally sends a reply that cannot be read (founder, 20 Oct 2026).
       const r = await analyseMealText(text).catch(e => { if (aiUnavailable(e)) throw e; return analyseMealText(text); });
-      setItems(r.items);
+      setItems(r.items); setNamed({});
       setInsight(r.insight);
       setNote([r.confidence && `Confidence: ${r.confidence}.`, r.note].filter(Boolean).join(' '));
       setMessage(r.items.length ? tr('Check the numbers, change anything that looks off, then add.') : (r.note || tr('No food found in that description.')));
@@ -131,6 +131,35 @@ export function MealPhoto({ right, top, children }: { right?: ReactNode; top?: R
   const edit = (i: number, key: keyof MealItem, value: string) => setItems(list => list && list.map((it, n) => n !== i ? it : {
     ...it, [key]: key === 'name' ? value : (parseFloat(value) || 0),
   }));
+
+  // Founder, 31 Oct 2026: remove any item, and a corrected name gets its own nutrition (e.g. "Amli", not what the photo
+  // seemed to show). The new numbers come from Myra (IFCT first) for the same grams.
+  const [named, setNamed] = useState<Record<number, string>>({}); // the name each row's numbers belong to
+  const [fixing, setFixing] = useState<number | null>(null);
+  const remove = (i: number) => {
+    setItems(list => list && list.filter((_, n) => n !== i));
+    setNamed(m => Object.fromEntries(Object.entries(m).filter(([k]) => +k !== i).map(([k, v]) => [+k > i ? +k - 1 : +k, v])));
+  };
+  const renamed = async (i: number) => {
+    const it = items?.[i];
+    if (!it) return;
+    const was = named[i] ?? '';
+    const now = it.name.trim();
+    if (!now || now.toLowerCase() === was.toLowerCase()) return;
+    setFixing(i);
+    try {
+      const r = await analyseMealText(`${Math.round(it.grams || 100)} g ${now}`);
+      const sum = (k: keyof MealItem) => (r.items ?? []).reduce((a, x) => a + (Number(x[k]) || 0), 0);
+      if (!r.items?.length) throw new Error();
+      setItems(list => list && list.map((x, n) => n !== i ? x : {
+        ...x, name: now, kcal: Math.round(sum('kcal')), protein_g: +sum('protein_g').toFixed(1), carbs_g: +sum('carbs_g').toFixed(1),
+        fat_g: +sum('fat_g').toFixed(1), fibre_g: +sum('fibre_g').toFixed(1), basis: r.items.every(x2 => x2.basis === 'IFCT') ? 'IFCT' : 'estimate',
+      }));
+      setNamed(m => ({ ...m, [i]: now }));
+    } catch {
+      setMessage(tr('Could not look up "{name}" just now. You can type its numbers.', { name: now }));
+    } finally { setFixing(null); }
+  };
 
   const add = () => {
     if (!items?.length) return;
@@ -197,14 +226,20 @@ export function MealPhoto({ right, top, children }: { right?: ReactNode; top?: R
       {message ? <Text style={{ color: colors.muted }}>{message}</Text> : null}
       {insight ? <Text style={{ color: colors.insight, fontWeight: '600' }}>{oneLine(insight)}</Text> : null}
       {items?.map((it, i) => (
-        <View key={i} style={{ gap: 6, borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 8 }}>
+        <View key={`${i}-${items.length}`} style={{ gap: 6, borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 8 }}>
           <View style={[s.headingRow]}>
-            <TextInput style={[s.input, { flex: 1 }]} value={it.name} onChangeText={v => edit(i, 'name', v)} />
+            <TextInput style={[s.input, { flex: 1 }]} value={it.name} onChangeText={v => { if (named[i] == null) setNamed(m => ({ ...m, [i]: it.name })); edit(i, 'name', v); }}
+              onEndEditing={() => renamed(i)} onSubmitEditing={() => renamed(i)} returnKeyType="done" />
             <Text style={{ color: it.basis === 'IFCT' ? colors.body : colors.muted, fontSize: 12, fontWeight: '700' }}>{it.basis === 'IFCT' ? 'IFCT' : 'ESTIMATE'}</Text>
+            <Pressable onPress={() => remove(i)} hitSlop={10} accessibilityRole="button" accessibilityLabel={tr('Remove {name}', { name: it.name })}
+              style={{ width: 32, height: 32, borderRadius: 16, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' }}>
+              <Ionicons name="close" size={18} color={colors.muted} />
+            </Pressable>
           </View>
+          {fixing === i ? <Text style={{ color: colors.insight, fontSize: 13 }}>{tr('Myra is looking up {name}…', { name: it.name })}</Text> : null}
           <View style={s.row}>
             {([['grams', 'g'], ['kcal', 'kcal'], ['protein_g', tr('Protein g')], ['carbs_g', tr('Carbs g')], ['fat_g', tr('Fat g')], ['fibre_g', tr('Fibre g')]] as const).map(([k, label]) => (
-              <View key={k} style={{ width: 84, gap: 2 }}>
+              <View key={`${k}-${it[k]}`} style={{ width: 84, gap: 2 }}>
                 <Text style={s.fieldLabel}>{label}</Text>
                 <TextInput style={s.input} keyboardType="decimal-pad" defaultValue={String(it[k] ?? 0)} onEndEditing={e => edit(i, k, e.nativeEvent.text)} />
               </View>
@@ -215,7 +250,7 @@ export function MealPhoto({ right, top, children }: { right?: ReactNode; top?: R
       {note && items?.length ? <Note>{note}</Note> : null}
       {items?.length ? (
         <View style={s.row}>
-          <Button title={tr('Add to my day')} onPress={add} />
+          <Button title={tr('Add to my day')} onPress={add} disabled={fixing != null} />
           <Button kind="plain" title={tr('Discard')} onPress={() => { setItems(null); setUri(null); setMessage(null); setInsight(''); }} />
         </View>
       ) : null}

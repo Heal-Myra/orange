@@ -1,5 +1,9 @@
 # Changelog
 
+## 31 Oct 2026 — Fix a meal reading before adding it
+- Each item Myra reads from a meal photo or words has an ✕ to remove it.
+- Correcting an item's name (e.g. "Amli") looks it up again for the same grams (IFCT first) and replaces its calories, protein, carbs, fat and fibre; "Add to my day" waits for the lookup.
+
 ## 31 Oct 2026 — Food rings: calories, carbs, protein, fibre, fat
 - Five rings in the founder's order; carb and fat aims from the same mix as the nutrition table. Thinner rings when a card has five. Food's Trends page shows all five.
 
