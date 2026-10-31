@@ -17,3 +17,6 @@ Shown impact first (option 5 of 10, with option 10's few words): big "+N", "Body
 
 ## Update, 31 Oct 2026 (22:50)
 Founder: impact first, then one small instructing line (a nudge, like option 3, no minutes) and a round start button; a thin divider between the rings and Myra (option 2).
+
+## Update, 31 Oct 2026 (23:05)
+The nudge is written by a quill in Kalam Light (founder picked option 1 of 10 pens, then 1 of 10 simple fonts): `src/components/HandLine.tsx`. Once per session per line; respects Reduce motion.

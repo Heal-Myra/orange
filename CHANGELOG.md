@@ -1,5 +1,9 @@
 # Changelog
 
+## 31 Oct 2026 — Myra's nudge written by a quill
+- On Today, Myra's one line is written in Kalam Light handwriting by a small cream quill, line by line (about 10 letters a second); the start arrow appears when it finishes. Written once per app session and whenever Myra picks something new; otherwise it simply shows. Off with "Reduce motion". On the website the words just appear.
+- New font package @expo-google-fonts/kalam (OFL; has Hindi letters). Works with a normal update, no new build.
+
 ## 31 Oct 2026 — Myra's pick: impact, one nudge, start arrow
 - Beside the score, after a thin divider line: big "+N" points, "Body/Mind/Soul points", one short instructing line ("Lie down for Yoga Nidra.", no minutes) and a round coral start arrow.
 

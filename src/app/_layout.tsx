@@ -1,6 +1,7 @@
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { AmiriQuran_400Regular, useFonts } from '@expo-google-fonts/amiri-quran';
+import { Kalam_300Light } from '@expo-google-fonts/kalam';
 import { useEffect, useState } from 'react';
 import { Platform, Pressable, Text, View } from 'react-native';
 import { AuthProvider, useAuth } from '../lib/auth';
@@ -143,7 +144,8 @@ export function ErrorBoundary({ error, retry }: { error: Error; retry: () => Pro
 
 export default function RootLayout() {
   // Amiri Quran (OFL) draws the Qur'anic marks that phones' built-in Arabic fonts cannot. Loads in the background.
-  useFonts({ AmiriQuran_400Regular });
+  // Kalam Light (OFL): the quill's handwriting for Myra's nudge on Today, in English and Hindi.
+  useFonts({ AmiriQuran_400Regular, Kalam_300Light });
   const iconGeneration = useIconFontGuard();
   return (
     <ShareProvider>

@@ -15,6 +15,7 @@ import type { WellBeing } from '../lib/scoring';
 import { useHeal } from '../lib/store';
 import { useTasks } from '../lib/tasks';
 import { colors } from '../theme';
+import { HandLine } from './HandLine';
 
 // The big number takes a deeper shade of its pillar's ring colour so it reads well (never red).
 const PILLAR = {
@@ -54,6 +55,7 @@ export function MyraPick({ w }: { w: WellBeing }) {
   const { day, date, profile } = useHeal();
   const { habits, tickHabit } = useTasks();
   const [, tick] = useState(0);
+  const [readyFor, setReadyFor] = useState(''); // the start arrow shows once the quill has finished this line
   useEffect(() => { const t = setInterval(() => tick(x => x + 1), 60_000); return () => clearInterval(t); }, []); // the hour moves on
   const who = profile.me?.name?.trim().split(/\s+/)[0] || emailName(session?.user.email);
   const isToday = date === todayISO();
@@ -99,9 +101,10 @@ export function MyraPick({ w }: { w: WellBeing }) {
       <Text style={{ color: p.ink, fontSize: 40, fontWeight: '800', lineHeight: 44 }}>+{s.gain}</Text>
       <Text style={{ color: colors.muted, fontSize: 13, fontWeight: '600' }}>{tr(p.points)}</Text>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 8 }}>
-        <Text style={{ flex: 1, color: colors.ink, fontSize: 15, lineHeight: 20 }} numberOfLines={2}>{what(s.id)}</Text>
+        {/* Written by a quill, then the start arrow appears (founder, 31 Oct 2026). */}
+        <View style={{ flex: 1 }}><HandLine text={what(s.id)} style={{ color: colors.ink, fontSize: 19, lineHeight: 24 }} onDone={() => setReadyFor(what(s.id))} /></View>
         <Pressable onPress={() => start(s)} accessibilityRole="button" accessibilityLabel={`${tr('Start now')}: ${what(s.id)}`} hitSlop={8}
-          style={({ pressed }) => ({ width: 36, height: 36, borderRadius: 18, backgroundColor: colors.insight, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.85 : 1 })}>
+          style={({ pressed }) => ({ width: 36, height: 36, borderRadius: 18, backgroundColor: colors.insight, alignItems: 'center', justifyContent: 'center', opacity: readyFor !== what(s.id) ? 0 : pressed ? 0.85 : 1 })}>
           <Ionicons name="arrow-forward" size={20} color={colors.onInsight} />
         </Pressable>
       </View>
