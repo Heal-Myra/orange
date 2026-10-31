@@ -101,7 +101,7 @@ export function FaceCard() {
                 <View style={{ flex: 1, gap: 7 }}>
                   {best ? <Text style={{ color: colors.good, fontWeight: '700', fontSize: 11, letterSpacing: 0.4 }}>{tr('YOUR BEST')}</Text> : null}
                   {best ? <Legend id={best.id} label={tr(best.label)} value={best.v} /> : null}
-                  {concerns.length ? <Text style={{ color: colors.muted, fontWeight: '700', fontSize: 11, letterSpacing: 0.4, marginTop: 4 }}>{tr('TOP CONCERNS')}</Text> : null}
+                  {concerns.length ? <Text style={{ color: colors.muted, fontWeight: '700', fontSize: 11, letterSpacing: 0.4, marginTop: 4 }}>{tr('CATCH UP ON')}</Text> : null}
                   {concerns.map(k => <Legend key={k.id} id={k.id} label={tr(k.label)} value={k.v} />)}
                   {more && rest.length ? <View style={{ height: 4 }} /> : null}
                   {more ? rest.map(k => <Legend key={k.id} id={k.id} label={tr(k.label)} value={k.v} />) : null}

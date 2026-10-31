@@ -1271,4 +1271,5 @@ export const HI: Record<string, string> = {
   'of {n}': '{n} में से',
   'To-dos': 'काम',
   'Phone': 'फ़ोन',
+  'CATCH UP ON': 'इन पर ध्यान दें',
 };
