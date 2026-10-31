@@ -1208,4 +1208,5 @@ export const HI: Record<string, string> = {
   'Same as {day}': '{day} जैसा ही',
   '{d} since {day}': '{day} से {d}',
   'Myra adds remedies to your food and movement suggestions. Everyday skin care, not medical advice.': 'मायरा उपाय आपके खाने और व्यायाम के सुझावों में जोड़ती है। रोज़ की त्वचा देखभाल, डॉक्टरी सलाह नहीं।',
+  'See all {n}': 'सभी {n} देखें',
 };

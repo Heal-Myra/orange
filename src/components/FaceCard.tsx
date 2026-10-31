@@ -3,7 +3,8 @@
 // Remedies are not listed here: Myra weaves them into her food and movement suggestions (Myra recommends, food plan).
 // The photo is read once and not kept; only the results are saved with the day.
 
-import { Text, View } from 'react-native';
+import { useState } from 'react';
+import { Pressable, Text, View } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 import { earlierReading, pointScore, SKIN, skinScore } from '../lib/face';
 import { tr } from '../lib/i18n';
@@ -51,6 +52,9 @@ export function FaceCard() {
   const score = skinScore(f);
   const before = earlierReading(days, date);
   const was = skinScore(before?.face);
+  const [more, setMore] = useState(false);
+  // Lowest scores first (stable, so ties keep the usual order).
+  const points = SKIN.filter(k => f?.skin[k.id]).map(k => ({ ...k, v: pointScore(f!.skin[k.id])! })).sort((a, b) => a.v - b.v);
   const plus = useAttach(async img => {
     const r = await selfieReading(img);
     if (typeof r === 'string') return r;
@@ -77,9 +81,16 @@ export function FaceCard() {
                 </View>
                 {plus.button}
               </View>
+              {/* The three biggest concerns first; the rest fold away (founder, 31 Oct 2026). */}
               <View style={{ gap: 10 }}>
-                {SKIN.filter(k => f.skin[k.id]).map(k => <Bar key={k.id} label={tr(k.label)} value={pointScore(f.skin[k.id])!} />)}
+                {points.slice(0, 3).map(k => <Bar key={k.id} label={tr(k.label)} value={k.v} />)}
+                {more ? points.slice(3).map(k => <Bar key={k.id} label={tr(k.label)} value={k.v} />) : null}
               </View>
+              {points.length > 3 ? (
+                <Pressable onPress={() => setMore(m => !m)} hitSlop={8} accessibilityRole="button">
+                  <Text style={{ color: colors.accent, fontWeight: '600' }}>{more ? tr('Show less') : tr('See all {n}', { n: points.length })}</Text>
+                </Pressable>
+              ) : null}
               <Note>{tr('Myra adds remedies to your food and movement suggestions. Everyday skin care, not medical advice.')}</Note>
             </>
           ) : (
