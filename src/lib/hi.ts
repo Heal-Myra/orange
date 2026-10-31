@@ -1312,4 +1312,18 @@ export const HI: Record<string, string> = {
   'Choose calm or learning content today.': 'आज शांत या सीखने वाली सामग्री चुनें।',
   'GOING WELL': 'अच्छा चल रहा है',
   'WORK ON': 'इस पर काम करें',
+  // ---------- Myra beside the score (decision 0040) ----------
+  'Start': 'शुरू करें',
+  'add how you slept last night.': 'बताइए कल रात नींद कैसी रही।',
+  'sit for {n} minutes of guided breathing.': '{n} मिनट गाइडेड साँस के अभ्यास में बैठिए।',
+  'lie down for Yoga Nidra, then drift into sleep.': 'योग निद्रा के लिए लेटिए, फिर आराम से सो जाइए।',
+  'take a brisk 20-minute walk.': '20 मिनट तेज़ चाल से टहलिए।',
+  'snap your next meal before you eat.': 'अगला खाना खाने से पहले उसकी फ़ोटो लीजिए।',
+  "finish one of today's focus to-dos.": 'आज के फ़ोकस कामों में से एक पूरा कीजिए।',
+  'write what you are thankful for today.': 'लिखिए कि आज आप किसके लिए आभारी हैं।',
+  'note one kind thing you did today.': 'आज की एक भलाई लिखिए।',
+  "read today's Daily Wisdom and write one line.": 'आज का दैनिक ज्ञान पढ़िए और एक पंक्ति लिखिए।',
+  "try today's Tao practice and write one line.": 'आज का ताओ अभ्यास कीजिए और एक पंक्ति लिखिए।',
+  'a full day. Rest well.': 'आज का दिन पूरा हुआ। अच्छे से आराम कीजिए।',
+  'A look back at this day. Tap the circles below to see each part.': 'इस दिन पर एक नज़र। हर हिस्सा देखने के लिए नीचे के घेरे छुएँ।',
 };

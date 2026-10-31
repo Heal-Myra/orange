@@ -64,7 +64,7 @@ const emailName = (email?: string | null): string | null => {
   return m && m[0].length > 1 ? m[0][0].toUpperCase() + m[0].slice(1).toLowerCase() : null;
 };
 
-export function GuidanceCard({ embedded }: { embedded?: boolean } = {}) {
+export function GuidanceCard({ embedded, headless }: { embedded?: boolean; headless?: boolean } = {}) {
   const { session, tradition } = useAuth();
   const { day, days, date, profile, update } = useHeal();
   const { open, focus, setFocus, complete, habits, tickHabit } = useTasks();
@@ -125,6 +125,8 @@ export function GuidanceCard({ embedded }: { embedded?: boolean } = {}) {
   const mindLine = bedtime ? [tr('Lie down for Yoga Nidra, then drift into sleep.')] : g?.mind ?? [];
   const blocks = g ? ([[tr('Body'), colors.body, g.body], [tr('Mind'), colors.mind, mindLine], [tr('Soul'), colors.soul, g.soul]] as const) : [];
 
+  // On Today only the refreshing runs (decision 0040): the one recommendation is drawn by MyraPick.
+  if (headless) return null;
   // Inside Today's "My day" card (decision 0037) the blocks sit on a soft tint instead of cards of their own.
   const Box = ({ style, children }: { style?: StyleProp<ViewStyle>; children: ReactNode }) => embedded
     ? <View style={[{ backgroundColor: colors.insight + '0F', borderRadius: 14, paddingHorizontal: 12 }, style, { borderLeftWidth: 0 }]}>{children}</View>

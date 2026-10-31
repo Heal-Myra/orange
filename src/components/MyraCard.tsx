@@ -1,6 +1,6 @@
-// Today's Myra card (founder, 31 Oct 2026): under the scores, one card for Myra: her one recommendation as a horizontal
-// row (speaking to the person by name), then "Ask Myra anything" with the chat sign, a microphone and send. Asking opens
-// her chat with the question already sent. On Today this card replaces the floating Myra button.
+// Today's Ask Myra box (founder, 31 Oct 2026): only the chat box at the bottom of Today; her one recommendation sits beside
+// the total score (MyraPick, decision 0040). Asking opens her chat with the question already sent. On Today this box
+// replaces the floating Myra button. GuidanceCard runs headless here so Myra's advice for each card keeps refreshing.
 
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -10,7 +10,6 @@ import { useAuth } from '../lib/auth';
 import { tr } from '../lib/i18n';
 import { colors } from '../theme';
 import { GuidanceCard } from './AiBits';
-import { Card, s } from './ui';
 
 export function MyraCard() {
   const { session } = useAuth();
@@ -21,11 +20,10 @@ export function MyraCard() {
     setQ('');
   };
   return (
-    <Card style={{ gap: 10, borderWidth: 1.5, borderColor: colors.insight + '30' }}>
-      <GuidanceCard embedded />
+    <>
+      <GuidanceCard headless />
       {session ? (
         <>
-          <Text style={{ color: colors.muted, fontWeight: '700', fontSize: 11, letterSpacing: 0.4, marginTop: 4 }}>{tr('ASK MYRA')}</Text>
           {/* Like Claude's message box (founder, 31 Oct 2026): the words on top; + on the left; microphone and a round
               dark button on the right (send when there are words, otherwise talk to Myra). */}
           <View style={{ borderWidth: 1, borderColor: colors.line, backgroundColor: '#FFFFFF', borderRadius: 26, padding: 12, gap: 10,
@@ -50,6 +48,6 @@ export function MyraCard() {
           </View>
         </>
       ) : null}
-    </Card>
+    </>
   );
 }

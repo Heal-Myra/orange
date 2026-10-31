@@ -1,5 +1,9 @@
 # Changelog
 
+## 31 Oct 2026 — Myra beside the score; only the chat box below (decision 0040)
+- My day: Myra's one recommendation sits to the right of the total rings, replacing Going well / Work on. One item only, picked for the time of day and the most points still to win, with a chip such as "+15 Mind" and Start (opens the place where it is done). A habit due now comes first; after 9:30 pm only Yoga Nidra or the journal.
+- The separate Myra card is gone: below the three circles there is only the Ask Myra box. Myra's AI advice keeps refreshing in the background for the cards on each tab.
+
 ## 31 Oct 2026 — My day: Body, Mind, Soul only
 - Rings for Body, Mind and Soul inside the total; at the side Going well / Work on among the three (tap to open the tab). The three circles with their parts stay below.
 
