@@ -15,7 +15,7 @@ import { useAttach } from './AttachPlus';
 export const SHOW_FEEDBACK = false; // removed from the top of every page (founder, 31 Oct 2026); testers use TestFlight's Send Feedback
 const FACES = ['😞', '😕', '😐', '🙂', '😍'];
 
-export function FeedbackBox({ area }: { area: string }) {
+export function FeedbackBox({ area, always }: { area: string; always?: boolean }) { // always: Profile › Send feedback (31 Oct 2026)
   const keep = useKeepVisible();
   const { session } = useAuth();
   const [text, setText] = useState('');
@@ -31,7 +31,7 @@ export function FeedbackBox({ area }: { area: string }) {
     setText(x => (x.trim() ? `${x.trim()} ${t}` : t));
     return null;
   }, { size: 36 });
-  if (!SHOW_FEEDBACK || !session || !supabase) return null;
+  if ((!SHOW_FEEDBACK && !always) || !session || !supabase) return null;
 
   const send = async () => {
     if (!text.trim() || !supabase) return;

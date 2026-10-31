@@ -1,7 +1,7 @@
 # Changelog
 
 ## 31 Oct 2026 — Feedback box removed from the top of every page
-- Founder's request. Switched off with `SHOW_FEEDBACK = false` (the code stays). Testers give feedback through TestFlight's Send Feedback; Admin › Feedback still shows anything sent earlier.
+- Founder's request. Switched off with `SHOW_FEEDBACK = false`. Feedback now lives in Profile › Send feedback (folded row, same box with faces and +), and TestFlight's Send Feedback still works; both land in Admin › Feedback (Profile ones with area "Profile").
 
 ## 31 Oct 2026 — Skin score ring and bars; remedies in Myra recommends
 - Face & beauty shows a skin score out of 100 (ring, change since the last selfie) and a bar per point instead of words; concentric rings (one soft pastel ring per point, weighted skin score in the middle), "Your best" first, then the three biggest concerns; "See all 7" opens the rest. No red.

@@ -4,7 +4,8 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable, Share, Text, View } from 'react-native';
-import { Button, Card, Heading, Note, Screen } from '../components/ui';
+import { Button, Card, Expandable, Heading, Note, Screen } from '../components/ui';
+import { FeedbackBox } from '../components/FeedbackBox';
 import { useAuth } from '../lib/auth';
 import { usePendingRequests } from '../lib/adminAlerts';
 import { traditionName } from '../lib/wisdom';
@@ -122,6 +123,15 @@ export default function Account() {
           <Ionicons name="chevron-forward" size={20} color={colors.muted} />
         </Card>
       </Pressable>
+
+      {/* Send feedback (founder, 31 Oct 2026): moved here from the top of every page; folded until tapped. */}
+      {session ? (
+        <Card style={{ paddingVertical: 4 }}>
+          <Expandable icon="chatbubble-ellipses-outline" title={tr('Send feedback')} status={tr('Tell us what to keep or improve')}>
+            <View style={{ paddingBottom: 12 }}><FeedbackBox area="Profile" always /></View>
+          </Expandable>
+        </Card>
+      ) : null}
 
       {admin && (
         <Card>

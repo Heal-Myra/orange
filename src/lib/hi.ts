@@ -1211,4 +1211,5 @@ export const HI: Record<string, string> = {
   'See all {n}': 'सभी {n} देखें',
   'YOUR BEST': 'आपकी सबसे अच्छी',
   'TOP CONCERNS': 'मुख्य चिंताएँ',
+  'Tell us what to keep or improve': 'बताइए क्या रखें या क्या सुधारें',
 };
