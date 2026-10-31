@@ -1310,4 +1310,6 @@ export const HI: Record<string, string> = {
   'Anger': 'गुस्सा',
   'Enjoy the quiet. Step outside for a few minutes.': 'शांति का आनंद लें। कुछ मिनट बाहर टहलें।',
   'Choose calm or learning content today.': 'आज शांत या सीखने वाली सामग्री चुनें।',
+  'GOING WELL': 'अच्छा चल रहा है',
+  'WORK ON': 'इस पर काम करें',
 };

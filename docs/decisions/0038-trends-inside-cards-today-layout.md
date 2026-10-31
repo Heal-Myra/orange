@@ -17,3 +17,8 @@ two parts: Myra recommends (starting with the name) and Ask Myra (box, microphon
 The "‹ Good afternoon, Santosh ›" row is gone from Today, Body, Mind and Soul; the tabs always show today (a person had landed
 on an old day without noticing). Past days open from a card's Trends page: D has ‹ › and "Open this day to see or change it";
 the tabs then show a slim "Showing Fri, 30 Oct · Back to today" banner. The Profile button shows the person's first name.
+
+## Update, 31 Oct 2026 (19:50, founder chose option A): My day shows Body, Mind and Soul only
+My day's rings are now Body, Mind and Soul (total in the middle); at the side only "Going well" (60 or more) and "Work on"
+(under 60, always including the lowest), each opening its tab. The three Body · Mind · Soul circles below stay as they were,
+each with a ring per part. Details never appear in My day.

@@ -1,5 +1,8 @@
 # Changelog
 
+## 31 Oct 2026 — My day: Body, Mind, Soul only
+- Rings for Body, Mind and Soul inside the total; at the side Going well / Work on among the three (tap to open the tab). The three circles with their parts stay below.
+
 ## 31 Oct 2026 — What you fed your mind; information fast (decision 0039)
 - Phone activity: rings for the feelings in what you watched (estimate from app minutes by kind of content, plus posts shared to Happy Orange, read by Myra). Not scored.
 - Start an information fast (1 h, 2 h, 4 h, until tomorrow): Myra stops suggesting the phone; a reminder marks the end; points to iPhone Focus for blocking until Apple's Screen Time permission arrives.

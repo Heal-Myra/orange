@@ -37,21 +37,35 @@ export function bestAndConcerns(parts: Part[]): { best: Part | null; concerns: P
   return { best, concerns };
 }
 
+/** Going well (60 or more) and work on (under 60, and always the lowest), for Body, Mind and Soul only. */
+export function wellAndWork(scores: { id: 'body' | 'mind' | 'soul'; v: number }[]) {
+  const sorted = [...scores].sort((a, b) => b.v - a.v);
+  const lowest = sorted[sorted.length - 1];
+  const work = sorted.filter(x => x.v < 60 || x === lowest);
+  const well = sorted.filter(x => !work.includes(x));
+  return { well, work };
+}
+
+/** My day (founder, 31 Oct 2026, option A): the total in the middle of three rings, Body, Mind and Soul; at the side only
+ *  what is going well and what to work on among the three. The details live in each tab and in the circles below. */
 export function TodayRings({ w }: { w: WellBeing }) {
-  const { best, concerns } = bestAndConcerns(dayParts(w));
-  // The ring colours of the shown parts must differ from each other: give each shown ring its own pastel.
-  const shown = [...(best ? [best] : []), ...concerns];
-  const palette = [PASTEL.peach, PASTEL.lavender, PASTEL.teal, PASTEL.sky];
-  const colorOf = (p: Part) => palette[shown.indexOf(p)] ?? p.color;
-  const items: RingItem[] = shown.map(p => ({ id: p.id, color: colorOf(p), label: tr(p.label), value: p.got / p.of }));
-  const open = (p: Part) => router.navigate({ pathname: `/${p.tab}`, params: { card: p.card, at: String(Date.now()) } });
-  const row = (p: Part) => (
-    <Pressable key={p.id} onPress={() => open(p)} accessibilityRole="button" style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-      <Dot color={colorOf(p)} />
-      <Text style={{ flex: 1, color: colors.ink, fontSize: 13 }} numberOfLines={1}>{tr(p.label)}</Text>
-      <Text style={{ color: p === best ? colors.good : colors.muted, fontWeight: '700', fontSize: 12.5 }}>{`${fmt(p.got)}/${p.of}`}</Text>
-    </Pressable>
-  );
+  const P: { id: 'body' | 'mind' | 'soul'; label: string; color: string }[] = [
+    { id: 'body', label: 'Body', color: PASTEL.sage }, { id: 'mind', label: 'Mind', color: PASTEL.teal }, { id: 'soul', label: 'Soul', color: PASTEL.peach },
+  ];
+  const v = (id: 'body' | 'mind' | 'soul') => Math.round((id === 'body' ? w.body?.total : id === 'mind' ? w.mind?.total : w.soul?.total) ?? 0);
+  const items: RingItem[] = P.map(p => ({ id: p.id, color: p.color, label: tr(p.label), value: v(p.id) / 100 }));
+  const { well, work } = wellAndWork(P.map(p => ({ id: p.id, v: v(p.id) })));
+  const row = (x: { id: 'body' | 'mind' | 'soul'; v: number }, good: boolean) => {
+    const p = P.find(q => q.id === x.id)!;
+    return (
+      <Pressable key={x.id} onPress={() => router.navigate(`/${x.id}`)} accessibilityRole="button" style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 4 }}>
+        <Dot color={p.color} size={11} />
+        <Text style={{ flex: 1, color: colors.ink, fontSize: 15, fontWeight: '700' }}>{tr(p.label)}</Text>
+        <Text style={{ color: good ? colors.good : colors.muted, fontWeight: '800', fontSize: 16 }}>{x.v}<Text style={{ fontSize: 11, fontWeight: '600', color: colors.muted }}>/100</Text></Text>
+        <Text style={{ color: colors.muted, fontSize: 16 }}>›</Text>
+      </Pressable>
+    );
+  };
   return (
     <Card style={{ gap: 12 }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -60,11 +74,11 @@ export function TodayRings({ w }: { w: WellBeing }) {
       </View>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
         <RingTap trend="today"><RingStack items={items} center={fmt(w.total)} sub={tr('of {n}', { n: 300 })} size={140} /></RingTap>
-        <View style={{ flex: 1, gap: 7 }}>
-          {best ? <Text style={{ color: colors.good, fontWeight: '700', fontSize: 11, letterSpacing: 0.4 }}>{tr('YOUR BEST')}</Text> : null}
-          {best ? row(best) : null}
-          {concerns.length ? <Text style={{ color: colors.muted, fontWeight: '700', fontSize: 11, letterSpacing: 0.4, marginTop: 4 }}>{tr('CATCH UP ON')}</Text> : null}
-          {concerns.map(row)}
+        <View style={{ flex: 1, gap: 2 }}>
+          {well.length ? <Text style={{ color: colors.good, fontWeight: '700', fontSize: 11, letterSpacing: 0.4 }}>{tr('GOING WELL')}</Text> : null}
+          {well.map(x => row(x, true))}
+          <Text style={{ color: colors.muted, fontWeight: '700', fontSize: 11, letterSpacing: 0.4, marginTop: well.length ? 8 : 0 }}>{tr('WORK ON')}</Text>
+          {work.map(x => row(x, false))}
         </View>
       </View>
     </Card>
