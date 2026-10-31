@@ -1,5 +1,9 @@
 # Changelog
 
+## 31 Oct 2026 — Body, Mind, Soul scores in the tab bar (option B)
+- Each of the Body, Mind and Soul tab icons sits in one thin ring (sage, teal, peach) that fills with that pillar's score for the day on screen, visible from every page.
+- The three Body / Mind / Soul circles are removed from Today: Today is My day (score + Myra) and Ask Myra.
+
 ## 31 Oct 2026 — Myra's nudge written by a quill
 - On Today, Myra's one line is written in Kalam Light handwriting by a small cream quill, line by line (about 10 letters a second); the start arrow appears when it finishes. Written once per app session and whenever Myra picks something new; otherwise it simply shows. Off with "Reduce motion". On the website the words just appear.
 - New font package @expo-google-fonts/kalam (OFL; has Hindi letters). Works with a normal update, no new build.

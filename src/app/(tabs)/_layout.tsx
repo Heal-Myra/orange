@@ -3,6 +3,7 @@ import { Link, Tabs } from 'expo-router';
 import { Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MyraButton } from '../../components/MyraButton';
+import { TabRing } from '../../components/TabRing';
 import type { ComponentProps } from 'react';
 import type { ColorValue } from 'react-native';
 import { colors } from '../../theme';
@@ -17,6 +18,12 @@ const tab = (title: string, icon: IconName, tint: string) => ({
   title,
   tabBarActiveTintColor: tint,
   tabBarIcon: ({ color }: { color: ColorValue }) => <Ionicons name={icon} size={28} color={color as string} />,
+});
+
+const ringTab = (title: string, pillar: 'body' | 'mind' | 'soul', icon: IconName, tint: string) => ({
+  title,
+  tabBarActiveTintColor: tint,
+  tabBarIcon: ({ color }: { color: ColorValue }) => <TabRing pillar={pillar} icon={icon} color={color as string} />,
 });
 
 /** Profile, with a small dot when AI access requests are waiting for an admin (admins only). */
@@ -49,16 +56,17 @@ export default function TabLayout() {
         headerStyle: { backgroundColor: colors.bg },
         headerShadowVisible: false,
         headerTitleStyle: { color: colors.ink, fontWeight: '600' },
-        tabBarStyle: { backgroundColor: colors.surface, borderTopColor: colors.line, height: 68 + insets.bottom, paddingTop: 6 },
+        tabBarStyle: { backgroundColor: colors.surface, borderTopColor: colors.line, height: 72 + insets.bottom, paddingTop: 6 },
         tabBarLabelStyle: { fontSize: 13, fontWeight: '600', marginTop: 2 }, // bigger, easier to read (founder, 19 Oct 2026)
         tabBarInactiveTintColor: colors.muted,
       }}
     >
       <Tabs.Screen name="index" options={{ ...tab(tr('Today'), 'sunny-outline', colors.accent), headerTitle: 'Happy Orange', headerTitleStyle: { color: colors.brand, fontWeight: '700' },
         headerRight: () => <ProfileButton /> }} />
-      <Tabs.Screen name="body" options={tab(tr('Body'), 'leaf-outline', colors.body)} />
-      <Tabs.Screen name="mind" options={tab(tr('Mind'), 'bulb-outline', colors.mind)} />
-      <Tabs.Screen name="soul" options={tab(tr('Soul'), 'flame-outline', colors.soul)} />
+      {/* Each icon sits in a thin ring that fills with that pillar's score (founder, 31 Oct 2026, option B). */}
+      <Tabs.Screen name="body" options={ringTab(tr('Body'), 'body', 'leaf-outline', colors.body)} />
+      <Tabs.Screen name="mind" options={ringTab(tr('Mind'), 'mind', 'bulb-outline', colors.mind)} />
+      <Tabs.Screen name="soul" options={ringTab(tr('Soul'), 'soul', 'flame-outline', colors.soul)} />
     </Tabs>
     <MyraButton />
     </View>
