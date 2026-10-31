@@ -52,7 +52,11 @@ async function base64Of(uri: string): Promise<string> {
 }
 
 export default function Myra() {
-  const { from } = useLocalSearchParams<{ from?: string }>();
+  // q: a question typed in Today's Myra card, sent at once; listen: start speaking at once (31 Oct 2026).
+  const { from, q, listen } = useLocalSearchParams<{ from?: string; q?: string; listen?: string }>();
+  const [loaded, setLoaded] = useState(false);
+  const askedRef = useRef(false);
+  const speakRef = useRef<(() => void) | null>(null);
   const page = typeof from === 'string' && SUGGESTIONS[from] ? from : 'today';
   const { session, tradition } = useAuth();
   const { day, days, date, profile } = useHeal();
@@ -71,7 +75,7 @@ export default function Myra() {
   const Speech = speechRecognition();
 
   useEffect(() => {
-    AsyncStorage.getItem(KEY).then(v => { if (v) setMessages(JSON.parse(v)); }).catch(() => {});
+    AsyncStorage.getItem(KEY).then(v => { if (v) setMessages(JSON.parse(v)); }).catch(() => {}).finally(() => setLoaded(true));
   }, []);
 
   // Keep the typing box above the keyboard. iPhone: lift by the keyboard's height (this screen is a sheet that reaches
@@ -137,6 +141,12 @@ export default function Myra() {
     } catch { setNote(tr('Could not read that file. Try a PDF or a photo.')); }
   };
 
+  useEffect(() => {
+    if (!loaded || askedRef.current || !session) return;
+    if (typeof q === 'string' && q.trim()) { askedRef.current = true; send(q); }
+    else if (listen === '1') { askedRef.current = true; setTimeout(() => speakRef.current?.(), 300); }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loaded, q, listen, session]);
   const stopListening = () => { try { rec.current?.abort?.(); } catch { /* stopped */ } rec.current = null; setListening(false); };
   const speak = () => {
     if (!Speech) { setNote(tr('Tap the microphone on your keyboard to speak.')); return; }
@@ -156,6 +166,7 @@ export default function Myra() {
     try { r.start(); } catch { stopListening(); setNote(tr('Tap the microphone on your keyboard to speak.')); return; }
     setTimeout(() => { if (rec.current === r) { if (r.stop) { try { r.stop(); } catch { stopListening(); } } else stopListening(); } }, 20_000);
   };
+  speakRef.current = speak;
 
   const clear = () => { setMessages([HELLO]); AsyncStorage.removeItem(KEY).catch(() => {}); };
 

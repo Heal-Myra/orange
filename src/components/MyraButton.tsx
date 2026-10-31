@@ -11,6 +11,8 @@ export function MyraButton() {
   const path = usePathname();
   const insets = useSafeAreaInsets();
   const page = path === '/' ? 'today' : path.replace('/', '') || 'today';
+  // On Today, the Myra card does this job (founder, 31 Oct 2026).
+  if (page === 'today') return null;
   return (
     <Pressable accessibilityLabel={tr('Ask Myra, your assistant')} onPress={() => router.push({ pathname: '/myra', params: { from: page } })}
       style={({ pressed }) => ({

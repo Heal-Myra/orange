@@ -66,7 +66,8 @@ export function AirLine() {
   useAirRefresh();
   const { day } = useHeal();
   const a = day.air;
-  if (!a) return null;
+  // Only when the air is worse than Satisfactory (founder, 31 Oct 2026); good air needs no line.
+  if (!a || a.aqi <= 100) return null;
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 }}>
       <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: airTone(a) }} />

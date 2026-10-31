@@ -1,5 +1,9 @@
 # Changelog
 
+## 31 Oct 2026 — Today: Myra card; AQI only on bad-air days
+- One Myra card under the Body · Mind · Soul circles: her recommendation starting with your name, "Ask Myra anything…" with microphone and send (opens her chat, question already sent), two quick questions. Floating Myra button hidden on Today.
+- The AQI line under your name shows only when the air is worse than Satisfactory (above 100).
+
 ## 31 Oct 2026 — Body, Mind and Soul as ring circles
 - Today: the three coloured tiles became three white circles with a ring per part and the score out of 100 in the middle; tap opens the tab.
 

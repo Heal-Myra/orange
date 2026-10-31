@@ -7,7 +7,6 @@ import { Pressable, Text, View } from 'react-native';
 import { tr } from '../lib/i18n';
 import { band, POINTS, type WellBeing } from '../lib/scoring';
 import { colors } from '../theme';
-import { GuidanceCard } from './AiBits';
 import { Dot, PASTEL, RingStack, fmt, type RingItem } from './Rings';
 import { Card } from './ui';
 
@@ -68,8 +67,6 @@ export function TodayRings({ w }: { w: WellBeing }) {
           {concerns.map(row)}
         </View>
       </View>
-      {/* Myra recommends, at the bottom of the card (founder, 31 Oct 2026). */}
-      <GuidanceCard embedded />
     </Card>
   );
 }

@@ -57,6 +57,13 @@ export function pickForMoment(kind: RoutineKind | undefined, slot: Slot, myra?: 
 
 /** Today: "Myra recommends". Refreshes by itself when the part of the day changes (morning, afternoon, evening, night)
  *  or when what is logged today changes (a meal, steps from a fitness app, meditation...), so the person never has to ask. */
+/** "Snap your lunch" → "snap your lunch", but keep names and "I" as they are. */
+const lowerFirst = (t: string) => (/^(I\b|[A-Z]{2})/.test(t) ? t : t.charAt(0).toLowerCase() + t.slice(1));
+const emailName = (email?: string | null): string | null => {
+  const m = (email ?? '').split('@')[0].match(/^[a-zA-Z]+/);
+  return m && m[0].length > 1 ? m[0][0].toUpperCase() + m[0].slice(1).toLowerCase() : null;
+};
+
 export function GuidanceCard({ embedded }: { embedded?: boolean } = {}) {
   const { session, tradition } = useAuth();
   const { day, days, date, profile, update } = useHeal();
@@ -67,6 +74,7 @@ export function GuidanceCard({ embedded }: { embedded?: boolean } = {}) {
   const [kick, setKick] = useState(0); // a to-do was ticked: ask Myra for the next thing
   const tried = useRef<string>('');
   const g = day.guidance;
+  const who = profile.me?.name?.trim().split(/\s+/)[0] || emailName(session?.user.email);
   const isToday = date === todayISO();
   // The moment of the person's usual day if they described it (switches 5 minutes early), else the part of the day.
   const momentKey = () => momentOf(profile.me?.routine)?.key ?? partOfDay();
@@ -124,10 +132,24 @@ export function GuidanceCard({ embedded }: { embedded?: boolean } = {}) {
   // Three separate blocks, one each for Body, Mind and Soul, stacked one under another (founder, 20 Oct 2026).
   return (
     <View style={{ gap: embedded ? 8 : 10 }}>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: embedded ? 0 : 4 }}>
-        {embedded ? <Text style={{ color: colors.insight, fontWeight: '700', fontSize: 11, letterSpacing: 0.4 }}>{tr('MYRA RECOMMENDS')}</Text> : <Heading>{tr('Clear your mind')}</Heading>}
-        {session && g && !busy && isToday ? <Pressable onPress={run} hitSlop={8}><Text style={{ color: colors.insight, fontWeight: '600' }}>{tr('Refresh')}</Text></Pressable> : null}
-      </View>
+      {embedded ? (
+        // Today's Myra card (founder, 31 Oct 2026): her sign, name, when she last looked, and refresh.
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+          <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: colors.insight, alignItems: 'center', justifyContent: 'center' }}>
+            <Ionicons name="sparkles" size={18} color={colors.onInsight} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={{ fontSize: 17, fontWeight: '700', color: colors.ink }}>{tr('Myra')}</Text>
+            <Text style={{ fontSize: 12, color: colors.muted }}>{g ? `${tr('Your guide')} · ${busy ? tr('Updating…') : tr('Updated {time}', { time })}` : tr('Your guide')}</Text>
+          </View>
+          {session && g && !busy && isToday ? <Pressable onPress={run} hitSlop={10} accessibilityLabel={tr('Refresh')}><Ionicons name="refresh" size={22} color={colors.insight} /></Pressable> : null}
+        </View>
+      ) : (
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 4 }}>
+          <Heading>{tr('Clear your mind')}</Heading>
+          {session && g && !busy && isToday ? <Pressable onPress={run} hitSlop={8}><Text style={{ color: colors.insight, fontWeight: '600' }}>{tr('Refresh')}</Text></Pressable> : null}
+        </View>
+      )}
 
       {/* Three very simple tasks, one each (founder, 21 Oct 2026). When the Mind task is a to-do, it can be ticked here;
           Myra then rotates to the next thing. */}
@@ -153,8 +175,9 @@ export function GuidanceCard({ embedded }: { embedded?: boolean } = {}) {
             onPress={() => bedtime && pillar === 'mind' ? router.push('/yoga-nidra') : router.navigate({ pathname: `/${pillar}`, params: { card, at: String(Date.now()) } })}
             style={({ pressed }) => ({ opacity: pressed ? 0.8 : 1 })}>
           <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 12, borderLeftWidth: 5, borderLeftColor: color }}>
-            <Text style={{ color, fontWeight: '700', fontSize: 14, width: 44 }}>{name}</Text>
-            <Text style={{ color: colors.ink, flex: 1, fontSize: 14, lineHeight: 20 }}>{oneLine(list[0])}</Text>
+            {embedded ? null : <Text style={{ color, fontWeight: '700', fontSize: 14, width: 44 }}>{name}</Text>}
+            {/* On Today it speaks to the person by name (founder, 31 Oct 2026): "Santosh, snap your lunch…". */}
+            <Text style={{ color: colors.ink, flex: 1, fontSize: 14.5, lineHeight: 21 }}>{embedded && who ? <Text style={{ fontWeight: '700' }}>{who}, </Text> : null}{embedded && who ? lowerFirst(oneLine(list[0])) : oneLine(list[0])}</Text>
             {task ? (
               <Pressable accessibilityRole="checkbox" accessibilityLabel={`Done: ${task.title}`} hitSlop={10}
                 onPress={() => { complete(task.id); setKick(k => k + 1); }}>
@@ -175,9 +198,9 @@ export function GuidanceCard({ embedded }: { embedded?: boolean } = {}) {
       )}
 
       {message ? <Text style={{ color: colors.bad, paddingHorizontal: 4 }}>{message}</Text> : null}
-      <View style={{ paddingHorizontal: embedded ? 0 : 4 }}>
-        <Note>{g ? `${busy ? tr('Updating…') : tr('Updated {time}', { time })} · ${tr('changes with your day')} · ` : ''}{tr('Not medical advice.')}</Note>
-      </View>
+      {embedded ? null : <View style={{ paddingHorizontal: 4 }}>
+        <Note>{`${g ? `${busy ? tr('Updating…') : tr('Updated {time}', { time })} · ${tr('changes with your day')} · ` : ''}${tr('Not medical advice.')}`}</Note>
+      </View>}
     </View>
   );
 }

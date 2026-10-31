@@ -3,6 +3,7 @@
 
 import { Text, View } from 'react-native';
 import { PillarRings, TodayRings } from '../../components/TodayRings';
+import { MyraCard } from '../../components/MyraCard';
 import { FeelingCard } from '../../components/FeelingCard';
 import { AirLine } from '../../components/AirLine';
 import { todayISO } from '../../lib/dates';
@@ -34,6 +35,8 @@ export default function Today() {
       <TodayRings w={w} />
 
       <PillarRings w={w} />
+
+      <MyraCard />
 
       <View style={{ paddingHorizontal: 4 }}>
         <Note>{tr('Well-being = Body + Mind + Soul, each out of 100. A working model, not a medical measure.')}</Note>

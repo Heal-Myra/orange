@@ -32,3 +32,8 @@ the bottom of the card (`GuidanceCard embedded`). Tapping a key row opens that c
   the coloured tiles; each has a ring per part (Body: food, sleep, movement; Mind: to-dos, breathing, phone; Soul:
   gratitude, Daily Wisdom, Tao) and the pillar's score out of 100 in the middle. Tap opens the tab. Founder's rule from
   now on: show a picture before building a visual change.
+- **Today's order and the Myra card** (founder, 13:36 and 13:41, after a preview): My day (total, best, catch up on) →
+  Body · Mind · Soul ring circles → one **Myra card**: her sign, "Your guide · Updated hh:mm", refresh; one recommendation as a
+  horizontal row that starts with the person's name ("Santosh, snap your lunch…"); "Ask Myra anything…" with the chat sign,
+  microphone and send (opens her chat with the question sent, or listening); two quick questions. The floating Myra button
+  is hidden on Today only. The AQI line under the name shows only when AQI is above 100.
