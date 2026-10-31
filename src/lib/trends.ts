@@ -88,6 +88,8 @@ export const METRICS: Metric[] = [
   { id: 'kcal', name: 'Calories', unit: 'kcal', pillar: 'body', target: P => P.kcal, value: d => (ate(d) ? mealTotals(d.meals).kcal : d.fasting ? 0 : null) },
   { id: 'protein', name: 'Protein', unit: 'g', pillar: 'body', better: 'up', target: P => P.protein, value: d => (ate(d) ? mealTotals(d.meals).p : null) },
   { id: 'fibre', name: 'Fibre', unit: 'g', pillar: 'body', better: 'up', value: d => (ate(d) ? mealTotals(d.meals).fib : null) },
+  { id: 'carbs', name: 'Carbs', unit: 'g', pillar: 'body', value: d => (ate(d) ? mealTotals(d.meals).c : null) },
+  { id: 'fat', name: 'Fat', unit: 'g', pillar: 'body', better: 'down', value: d => (ate(d) ? mealTotals(d.meals).f : null) },
   { id: 'steps', name: 'Steps', unit: 'steps', pillar: 'body', better: 'up', target: P => P.steps, value: d => num(d.activity.steps) },
   { id: 'active', name: 'Active minutes', unit: 'min', pillar: 'body', better: 'up', target: P => P.active, value: d => num(d.activity.activeMin) },
   { id: 'sleep', name: 'Sleep', unit: 'hours', pillar: 'body', decimals: 1, target: () => 7.5, value: d => num(d.sleep.hours) },

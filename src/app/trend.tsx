@@ -17,7 +17,7 @@ import { METRICS, type Pillar } from '../lib/trends';
 /** Which measures belong to which card. */
 export const CARD_TRENDS: Record<string, { title: string; pillar: Pillar; ids: string[] }> = {
   today: { title: 'My day', pillar: 'today', ids: ['wellbeing', 'bodyScore', 'mindScore', 'soulScore'] },
-  food: { title: 'Food', pillar: 'body', ids: ['kcal', 'protein', 'fibre'] },
+  food: { title: 'Food', pillar: 'body', ids: ['kcal', 'carbs', 'protein', 'fibre', 'fat'] },
   sleep: { title: 'Sleep', pillar: 'body', ids: ['sleep'] },
   movement: { title: 'Movement', pillar: 'body', ids: ['steps', 'active'] },
   body: { title: 'Body', pillar: 'body', ids: ['weight', 'restingHr'] },

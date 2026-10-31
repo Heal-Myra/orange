@@ -24,7 +24,8 @@ export const fmt = (n: number) => (Number.isInteger(n * 2) ? n : Math.round(n)).
 /** Concentric rings, outermost first, each filled by its value; `center` (e.g. the score) in the middle. */
 export function RingStack({ items, center, sub, size = 132 }: { items: RingItem[]; center: string; sub?: string; size?: number }) {
   const small = size < 110;
-  const w = small ? 6 : items.length > 4 ? 7 : 9, gap = small ? 2 : 3;
+  const many = items.length > 4; // e.g. Food's five rings: thinner, so the score in the middle stays clear
+  const w = small || many ? 6 : 9, gap = small || many ? 2 : 3;
   return (
     <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
       <Svg width={size} height={size} style={{ position: 'absolute' }}>

@@ -1,5 +1,8 @@
 # Changelog
 
+## 31 Oct 2026 — Food rings: calories, carbs, protein, fibre, fat
+- Five rings in the founder's order; carb and fat aims from the same mix as the nutrition table. Thinner rings when a card has five. Food's Trends page shows all five.
+
 ## 31 Oct 2026 — No day row on the tabs; name on the Profile button
 - Tabs always show today. Earlier days: a card's Trends page › D › ‹ › › "Open this day"; a banner then says which day and leads back to today.
 - The Profile button shows the first name. Fixed: the Trends page D switch jumped back to W.

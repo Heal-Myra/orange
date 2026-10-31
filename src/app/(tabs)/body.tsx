@@ -6,7 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Pressable, Text, View } from 'react-native';
 import { HealthLine, useHealth } from '../../components/HealthSync';
 import { Dots, Rows, StatRow } from '../../components/StatRows';
-import { MacroMix, NutritionTable } from '../../components/MacroMix';
+import { MacroMix, NutritionTable, aimMix } from '../../components/MacroMix';
 import { bmiOf, fibreTarget, planFor } from '../../lib/targets';
 import { MealPhoto } from '../../components/MealPhoto';
 import { FoodPlanRow } from '../../components/FoodPlan';
@@ -36,11 +36,18 @@ export default function Body() {
   return (
     <Screen feedback="Body">
       <Anchor id="food"><MealPhoto right={<Score value={score?.nutrition} max={40} />} top={
-        <RingPanel trend="food" score={score?.nutrition} max={40} items={[
-          { id: 'kcal', color: PASTEL.peach, label: tr('Calories'), value: totals.kcal / profile.kcal, text: `${Math.round(totals.kcal)} / ${profile.kcal}` },
-          { id: 'protein', color: PASTEL.lavender, label: tr('Protein'), value: totals.p / profile.protein, text: `${Math.round(totals.p)} / ${profile.protein} g` },
-          { id: 'fibre', color: PASTEL.teal, label: tr('Fibre'), value: (totals.fib ?? 0) / fibreTarget(profile.kcal), text: `${Math.round(totals.fib ?? 0)} / ${fibreTarget(profile.kcal)} g` },
-        ]} />}>
+        <RingPanel trend="food" score={score?.nutrition} max={40} items={(() => {
+          // Calories, then carbs, protein, fibre and fat (founder, 31 Oct 2026); carb and fat aims from the same mix as the table.
+          const fib = fibreTarget(profile.kcal), aim = aimMix(profile.kcal, profile.protein, fib);
+          const carbAim = Math.round((aim.c * profile.kcal) / 4), fatAim = Math.round((aim.f * profile.kcal) / 9);
+          return [
+            { id: 'kcal', color: PASTEL.peach, label: tr('Calories'), value: totals.kcal / profile.kcal, text: `${Math.round(totals.kcal)} / ${profile.kcal}` },
+            { id: 'carbs', color: PASTEL.sand, label: tr('Carbs'), value: totals.c / carbAim, text: `${Math.round(totals.c)} / ${carbAim} g` },
+            { id: 'protein', color: PASTEL.lavender, label: tr('Protein'), value: totals.p / profile.protein, text: `${Math.round(totals.p)} / ${profile.protein} g` },
+            { id: 'fibre', color: PASTEL.teal, label: tr('Fibre'), value: (totals.fib ?? 0) / fib, text: `${Math.round(totals.fib ?? 0)} / ${fib} g` },
+            { id: 'fat', color: PASTEL.rose, label: tr('Fat'), value: totals.f / fatAim, text: `${Math.round(totals.f)} / ${fatAim} g` },
+          ];
+        })()} />}>
         <CareNote part="food" />
         {/* "I'm fasting today" (founder, 22 Oct 2026): a declared fast scores Food in full while only water, black tea
             or black coffee go in, and Myra changes her advice. */}
