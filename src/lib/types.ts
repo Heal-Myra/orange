@@ -66,6 +66,8 @@ export interface DayLog {
   // Love (founder, 24 Oct 2026): whom I love today and how, what makes me happy today, the friend I meet this week.
   love?: { whom?: string; self?: string; done?: boolean; act?: string; happy?: string; friend?: string; kindTo?: string }; // self: how I love myself (happy: older days); kindTo: Gratitude journal, I was kind to (27 Oct 2026)
   feeling?: import('./feeling').Feeling; // "How do you feel today?" (24 Oct 2026)
+  watched?: import('./feelings').Watched[]; // posts and videos shared to Happy Orange, read for their feelings (31 Oct 2026)
+  infoFast?: { start: string; until: string; ended?: string }; // information fast chosen by the person (31 Oct 2026)
   air?: import('./air').AirReading; // air quality near the person, picked up by itself (31 Oct 2026)
   face?: import('./face').FaceReading; // Face & beauty: results of today's selfie, the photo itself is not kept (31 Oct 2026)
   habitsDone?: string[]; // habits ticked off this day (23 Oct 2026)

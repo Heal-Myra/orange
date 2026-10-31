@@ -58,7 +58,7 @@ export const understandGoal = (goal: string, me: { age: number; sex: string; hei
 export const readRoutine = (text: string) => call<{ routine: import('./routine').RoutineItem[] }>('routine_plan', { text });
 
 /** Learning: what a link teaches, in up to 10 words (from the page's own title and description). */
-export const learnFromLink = (url: string, title?: string) => call<{ text: string; found: boolean; site?: string }>('learn_link', { url, title: title ?? '' });
+export const learnFromLink = (url: string, title?: string) => call<{ text: string; found: boolean; site?: string; feelings?: Record<string, number> }>('learn_link', { url, title: title ?? '' });
 
 export const dailyGuidance = (context: string) => call<Guidance>('guidance', { context });
 

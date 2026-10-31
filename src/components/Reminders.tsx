@@ -51,9 +51,10 @@ export function ReminderScheduler() {
   const doneToday = days[todayISO()]?.habitsDone ?? [];
   const doneKey = doneToday.join(',');
   const routine = profile.me?.routine;
+  const fastUntil = days[todayISO()]?.infoFast?.ended ? undefined : days[todayISO()]?.infoFast?.until; // information fast end (31 Oct 2026)
 
   useEffect(() => {
-    if (!N || (!routine?.length && !habits.length && !scale)) return;
+    if (!N || (!routine?.length && !habits.length && !scale && !fastUntil)) return;
     const Notif = N;
     let cancelled = false;
     const plan = async () => {
@@ -67,6 +68,12 @@ export function ReminderScheduler() {
       for (const t of open) queues[t.area]?.push(t);
       const take = (area: Task['area']) => queues[area]?.shift();
       const now = Date.now(), horizon = now + 26 * 3600 * 1000;
+      if (fastUntil && Date.parse(fastUntil) > now + 30_000) {
+        await Notif.scheduleNotificationAsync({
+          content: { title: tr('Information fast complete'), body: tr('Well done. Come back to the world gently, one app at a time.'), data: { kind: 'fast', lang: lang() } },
+          trigger: { type: Notif.SchedulableTriggerInputTypes.DATE, date: new Date(fastUntil) },
+        });
+      }
       for (const offset of [0, 1]) {
         const day = new Date(); day.setDate(day.getDate() + offset);
         // No weight by 3 pm (founder, 25 Oct 2026): the Withings app sends weighings to Apple Health only when it runs.
@@ -116,7 +123,7 @@ export function ReminderScheduler() {
     } catch { tap = null; }
     const sub = AppState.addEventListener('change', s => { if (s === 'active') plan().catch(() => {}); });
     return () => { cancelled = true; sub.remove(); tap?.remove(); };
-  }, [routine, open, fastingToday, habits, doneKey, weighed, scale]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [routine, open, fastingToday, habits, doneKey, weighed, scale, fastUntil]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return null;
 }

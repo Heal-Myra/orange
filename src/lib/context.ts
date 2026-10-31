@@ -1,6 +1,7 @@
 // A plain-text summary of the person's targets, today and the last 7 days, sent to the AI
 // (daily guidance and Myra) so its answers are about this person. Built on the device; only what is needed is sent.
 
+import { feelingMix, feelingsLine } from './feelings';
 import { taoStudied } from './scoring';
 import { aboutLine, fibreTarget } from './targets';
 import { momentLine } from './routine';
@@ -36,6 +37,7 @@ export function buildContext(day: DayLog, days: Record<string, DayLog>, date: st
     healthLine(day),
     feelingLine(day.feeling),
     airLine(day.air),
+    (() => { const y = days[shiftISO(date, -1)]; const f = day.infoFast && !day.infoFast.ended && Date.parse(day.infoFast.until) > Date.now() ? { until: new Date(day.infoFast.until).toTimeString().slice(0, 5) } : null; return feelingsLine(y ? feelingMix(y.media ?? [], y.watched ?? []) : null, f); })(),
     (() => { const r = latestReading(days, date); return r ? faceLine(r.face, r.date === date ? 'today' : r.date) : ''; })(),
     `Fasting today: ${day.fasting ? 'yes (declared fast: water, black tea, black coffee)' : 'no'}.`,
     `Food: ${day.meals.map(m => m.name).join(', ') || 'nothing logged'}; totals ${Math.round(t.kcal)} kcal, protein ${Math.round(t.p)} g, carbs ${Math.round(t.c)} g, fat ${Math.round(t.f)} g, fibre ${Math.round(t.fib)} g (target ${fibreTarget(profile.kcal)} g).`,

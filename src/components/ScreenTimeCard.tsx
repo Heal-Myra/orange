@@ -3,6 +3,8 @@
 // never use up the limit), everyday tools (shown, not scored). Minutes go to the day the screenshot shows.
 // Websites cannot read Screen Time directly, so a screenshot is the practical way. Every number can be checked and changed.
 
+import { InfoFast, MindFood } from './MindFood';
+import { feelingMix, heavyShare } from '../lib/feelings';
 import { MyraLine } from './MyraLine';
 import { PASTEL, RingPanel } from './Rings';
 import * as ImagePicker from 'expo-image-picker';
@@ -137,6 +139,8 @@ export function ScreenTimeCard({ children }: { children?: ReactNode }) {
           { id: 'limit', color: PASTEL.sage, label: tr('Within limit'), value: (score.content - 18 * (score.quality ?? 0)) / 12, text: `${socialMin} / ${profile.mediaLimit} min` },
         ]} />
       ) : null}
+      <MindFood day={day} />
+      {phoneDate !== date ? <InfoFast /> : null}
       <Note>{tr('Each morning, add yesterday: in Settings → Screen Time → See All App & Website Activity, go back one day, take a screenshot, then paste it here. The app reads every app for you.')}</Note>
       {/* "I used no social media today" removed (founder, 23 Oct 2026). Older days that have it still count. */}
       {session ? (
@@ -193,7 +197,7 @@ export function ScreenTimeCard({ children }: { children?: ReactNode }) {
       ) : null}
       {day.media.length > 0 && !rows ? <Note>{tr('Social and video: {total} of your {limit}-minute limit.', { total, limit: profile.mediaLimit })}{learning ? ` ${tr('Learning and AI tools: {n} min (never counts against the limit).', { n: learning })}` : ''}</Note> : null}
       {children}
-      <MyraLine card="phone" phone={{ minutes: score.minutes, social: socialMin }} />
+      <MyraLine card="phone" phone={{ minutes: score.minutes, social: socialMin, heavy: (() => { const r = feelingMix(day.media ?? [], day.watched ?? []); return r ? heavyShare(r.mix) : undefined; })() }} />
     </Card>
   );
 }

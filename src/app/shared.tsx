@@ -8,6 +8,8 @@ import { useEffect, useState } from 'react';
 import { Linking, Pressable, Text } from 'react-native';
 import { Button, Card, Heading, Note, Screen, TextField } from '../components/ui';
 import { learnFromLink } from '../lib/ai';
+import { cleanFeelings } from '../lib/feelings';
+import { todayISO } from '../lib/dates';
 import { useAuth } from '../lib/auth';
 import { tr } from '../lib/i18n';
 import { useHeal } from '../lib/store';
@@ -17,7 +19,7 @@ import { colors } from '../theme';
 export default function Shared() {
   const { url = '', title = '' } = useLocalSearchParams<{ url?: string; title?: string }>();
   const { session } = useAuth();
-  const { profile, setProfile } = useHeal();
+  const { profile, setProfile, updateOn } = useHeal();
   const [about, setAbout] = useState(title);
   const [note, setNote] = useState('');
   const [saved, setSaved] = useState(false);
@@ -27,8 +29,16 @@ export default function Shared() {
   // Myra says in a few words what it is about (from the page's own title and description).
   useEffect(() => {
     if (!url || !session) return;
-    learnFromLink(url, title).then(r => { if (r.text) setAbout(r.text); }).catch(() => {});
-  }, [url, title, session]);
+    learnFromLink(url, title).then(r => {
+      if (r.text) setAbout(r.text);
+      // Its feelings go into today's "What you fed your mind" by themselves (founder, 31 Oct 2026: no extra effort).
+      const f = cleanFeelings(r.feelings);
+      if (f) updateOn(todayISO(), d => {
+        if ((d.watched ?? []).some(w => w.url === url)) return;
+        d.watched = [...(d.watched ?? []), { title: r.text || title || url, url, feelings: f, at: new Date().toISOString() }].slice(-50);
+      });
+    }).catch(() => {});
+  }, [url, title, session]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const save = () => {
     if (!profile.me) { setMsg(tr('Fill in About you first, so your saved list can go with your account.')); return; }

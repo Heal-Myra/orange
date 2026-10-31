@@ -18,7 +18,7 @@ const PILLAR: Record<CardId, 'body' | 'mind' | 'soul' | null> = {
 };
 
 /** A ready-made next step from the card's own numbers, as [English text, values]. */
-export function localTip(card: CardId, d: DayLog, P: Profile, phone?: { minutes: number; social?: number } | null): [string, Record<string, string | number>?] {
+export function localTip(card: CardId, d: DayLog, P: Profile, phone?: { minutes: number; social?: number; heavy?: number } | null): [string, Record<string, string | number>?] {
   switch (card) {
     case 'food': {
       if (d.fasting) return ['Sip water through the day; break the fast gently.'];
@@ -48,7 +48,9 @@ export function localTip(card: CardId, d: DayLog, P: Profile, phone?: { minutes:
       return left > 0 ? ['Sit for {n} minutes of guided breathing.', { n: Math.min(15, left) }] : ['Done for today. Lovely.'];
     }
     case 'phone':
+      if (d.infoFast && !d.infoFast.ended && Date.parse(d.infoFast.until) > Date.now()) return ['Enjoy the quiet. Step outside for a few minutes.'];
       if (!phone || !phone.minutes) return ['Add yesterday\'s Screen Time screenshot.'];
+      if (phone.heavy != null && phone.heavy > 0.3) return ['Choose calm or learning content today.'];
       return (phone.social ?? phone.minutes) > P.mediaLimit ? ['Keep social media under {n} minutes today.', { n: P.mediaLimit }] : ['Good balance yesterday. Keep it up.'];
     case 'gratitude': {
       const so = d.soul ?? {};
@@ -70,7 +72,7 @@ export function localTip(card: CardId, d: DayLog, P: Profile, phone?: { minutes:
 }
 
 /** Myra's line for a card: her latest recommendation when it is about this card, else a ready-made next step. */
-export function MyraLine({ card, phone }: { card: CardId; phone?: { minutes: number; social?: number } | null }) {
+export function MyraLine({ card, phone }: { card: CardId; phone?: { minutes: number; social?: number; heavy?: number } | null }) {
   const { day, profile } = useHeal();
   const g = day.guidance, p = PILLAR[card];
   const hers = g && p && g.cards?.[p] === card ? g[p]?.[0] : undefined;
