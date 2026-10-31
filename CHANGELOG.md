@@ -1,5 +1,8 @@
 # Changelog
 
+## 31 Oct 2026 — Myra's pick, impact first (founder's option 5 + 10)
+- Beside the score: the points in large ("+30", in the pillar's own deeper colour), "Mind points", two or three words of what to do ("Yoga Nidra · 20 min") and a coral Start now button. No label, no long sentence.
+
 ## 31 Oct 2026 — Phone activity, minimalist
 - One circle only: what you fed your mind ("nourishing" in the middle). The quality / limit circle is gone; its numbers sit under Show details.
 - Start an information fast is a soft pastel blue button. Choose / Paste screenshot stay on the card; the notes, the app list and the how-to fold under Show details.

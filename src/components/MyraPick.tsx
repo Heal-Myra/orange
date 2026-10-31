@@ -1,6 +1,6 @@
 // Myra's one recommendation, beside the total score on Today (founder, 31 Oct 2026; decision 0040).
-// One thing only: a habit due now comes first; otherwise the step with the most points to win at this hour, with a chip
-// showing how many points it can add ("+15 Mind") and Start, which opens the place where it is done.
+// One thing only: a habit due now comes first; otherwise the step with the most points to win at this hour, shown impact
+// first (founder's option 5): "+30 / Mind points / from 20 min Yoga Nidra ›". Tapping opens the place where it is done.
 
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -15,22 +15,28 @@ import type { WellBeing } from '../lib/scoring';
 import { useHeal } from '../lib/store';
 import { useTasks } from '../lib/tasks';
 import { colors } from '../theme';
-import { PASTEL } from './Rings';
 
-const PILLAR = { body: { label: 'Body', color: PASTEL.sage }, mind: { label: 'Mind', color: PASTEL.teal }, soul: { label: 'Soul', color: PASTEL.peach } } as const;
+// The big number takes a deeper shade of its pillar's ring colour so it reads well (never red).
+const PILLAR = {
+  body: { points: 'Body points', ink: '#5E8A4E' },
+  mind: { points: 'Mind points', ink: '#2A7C83' },
+  soul: { points: 'Soul points', ink: '#A9744F' },
+} as const;
 
-const say = (id: StepId, n?: number): string => ({
-  sleep: tr('add how you slept last night.'),
-  meditation: tr('sit for {n} minutes of guided breathing.', { n: n ?? 10 }),
-  nidra: tr('lie down for Yoga Nidra, then drift into sleep.'),
-  movement: tr('take a brisk 20-minute walk.'),
-  food: tr('snap your next meal before you eat.'),
-  tasks: tr("finish one of today's focus to-dos."),
-  gratitude: tr('write what you are thankful for today.'),
-  kind: tr('note one kind thing you did today.'),
-  wisdom: tr("read today's Daily Wisdom and write one line."),
-  tao: tr("try today's Tao practice and write one line."),
+/** What to do, in two or three words (founder, 31 Oct 2026: minimal text, like option 10). */
+const what = (id: StepId, n?: number): string => ({
+  sleep: tr("Last night's sleep"),
+  meditation: `${tr('Guided breathing')} · ${n ?? 10} ${tr('min')}`,
+  nidra: `${tr('Yoga Nidra')} · ${n ?? 20} ${tr('min')}`,
+  movement: `${tr('Brisk walk')} · 20 ${tr('min')}`,
+  food: tr('Snap your next meal'),
+  tasks: tr('One focus to-do'),
+  gratitude: tr('Gratitude journal'),
+  kind: tr('One kind act'),
+  wisdom: tr('Daily Wisdom'),
+  tao: tr('Tao practice'),
 }[id]);
+
 
 const start = (s: Step) => {
   if (s.id === 'meditation') router.push({ pathname: '/breathe', params: { practice: 'mix', minutes: String(s.minutes ?? 10) } });
@@ -86,18 +92,17 @@ export function MyraPick({ w }: { w: WellBeing }) {
 
   const s = nextStep(day, profile, w, hour);
   if (!s) return <View style={{ flex: 1, gap: 8 }}>{label}{line(tr('a full day. Rest well.'))}</View>;
+  // Impact first (founder, 31 Oct 2026, option 5) with option 10's few words and a Start now button.
   const p = PILLAR[s.pillar];
   return (
-    <Pressable onPress={() => start(s)} accessibilityRole="button" accessibilityHint={tr('Opens the card where you do this')}
-      style={({ pressed }) => ({ flex: 1, gap: 8, opacity: pressed ? 0.8 : 1 })}>
-      {label}
-      {line(say(s.id, s.minutes))}
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-        <View style={{ backgroundColor: p.color + '33', borderRadius: 99, paddingVertical: 4, paddingHorizontal: 9 }}>
-          <Text style={{ color: colors.ink, fontWeight: '700', fontSize: 12 }}>+{s.gain} {tr(p.label)}</Text>
-        </View>
-        <Text style={{ color: colors.insight, fontWeight: '700', fontSize: 13 }}>{tr('Start')} ›</Text>
-      </View>
-    </Pressable>
+    <View style={{ flex: 1, gap: 2 }} accessible accessibilityLabel={`+${s.gain} ${tr(p.points)}: ${what(s.id, s.minutes)}`}>
+      <Text style={{ color: p.ink, fontSize: 40, fontWeight: '800', lineHeight: 44 }}>+{s.gain}</Text>
+      <Text style={{ color: colors.muted, fontSize: 13, fontWeight: '600' }}>{tr(p.points)}</Text>
+      <Text style={{ color: colors.ink, fontSize: 15, fontWeight: '700', marginTop: 6 }}>{what(s.id, s.minutes)}</Text>
+      <Pressable onPress={() => start(s)} accessibilityRole="button" accessibilityHint={tr('Opens the card where you do this')}
+        style={({ pressed }) => ({ alignSelf: 'flex-start', marginTop: 8, paddingVertical: 8, paddingHorizontal: 16, borderRadius: 99, backgroundColor: colors.insight, opacity: pressed ? 0.85 : 1 })}>
+        <Text style={{ color: colors.onInsight, fontWeight: '700', fontSize: 14 }}>{tr('Start now')}</Text>
+      </Pressable>
+    </View>
   );
 }

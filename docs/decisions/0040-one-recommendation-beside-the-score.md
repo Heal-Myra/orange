@@ -11,3 +11,6 @@ Date: 31 Oct 2026 · Founder's request ("Myra recommends to the right of the tot
   - after 9:30 pm only Yoga Nidra and the journal (founder, 22 Oct 2026); a habit due now comes first, with a tick.
 - Phone activity is never suggested: its points are yesterday's.
 - The AI daily guidance still runs (GuidanceCard headless) for Myra's line at the bottom of each card on the tabs.
+
+## Update, 31 Oct 2026 (22:40)
+Shown impact first (option 5 of 10, with option 10's few words): big "+N", "Body/Mind/Soul points", what to do in 2–3 words, and a Start now button.
