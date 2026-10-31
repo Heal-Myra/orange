@@ -13,6 +13,7 @@ import { FoodPlanRow } from '../../components/FoodPlan';
 import { MealRow } from '../../components/MealRow';
 import { CareNote } from '../../components/CareCard';
 import { FaceCard } from '../../components/FaceCard';
+import { AirRow } from '../../components/AirLine';
 import { todayISO } from '../../lib/dates';
 import { Anchor, Card, Heading, Note, Screen, Score, s } from '../../components/ui';
 import { FAST_KCAL, bodyScore, mealTotals } from '../../lib/scoring';
@@ -93,6 +94,7 @@ export default function Body() {
             <StatRow key={'w' + i} label={tr(w.type)} value={w.kcal ? `${w.min} min · ${w.kcal} kcal` : `${w.min} min`} />
           ))}
         </Rows>
+        <AirRow />
       </Card></Anchor>
 
       {h || profile.me ? (

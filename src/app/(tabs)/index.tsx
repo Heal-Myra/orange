@@ -4,6 +4,7 @@
 import { Text, View } from 'react-native';
 import { GuidanceCard } from '../../components/AiBits';
 import { FeelingCard } from '../../components/FeelingCard';
+import { AirLine } from '../../components/AirLine';
 import { todayISO } from '../../lib/dates';
 import { PillarTiles, WellBeingRing } from '../../components/WellBeingRing';
 import { useAuth } from '../../lib/auth';
@@ -25,6 +26,7 @@ export default function Today() {
       <View style={{ paddingHorizontal: 4 }}>
         <Text style={{ fontSize: 15, color: colors.muted }}>{greeting()},</Text>
         <Text style={{ fontSize: 24, fontWeight: '700', color: colors.ink }}>{profile.me?.name?.split(' ')[0] || firstName(session?.user.email) || tr('friend')}</Text>
+        {date === todayISO() ? <AirLine /> : null}
       </View>
     }>
 

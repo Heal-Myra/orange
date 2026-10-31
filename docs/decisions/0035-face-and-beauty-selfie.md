@@ -34,3 +34,4 @@ breaks the Orange Book's rules on truthfulness and no medical claims. So:
   weighted skin score in the middle. Weights: pimples 20; dark circles, dryness, redness, sun tan 15 each; puffy eyes, dry lips 10.
 - **Soft colours, no red** (founder, 09:19): pastel ring per point (peach, lavender, soft teal, sky blue, sand, rose, sage);
   the score in ink; numbers grey, only good ones soft green; coral only for Myra's witty words.
+- **A full card, always open** (founder, 10:53: "It should be visible like other cards such as food"): Face & beauty no longer folds away.

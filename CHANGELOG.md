@@ -1,5 +1,9 @@
 # Changelog
 
+## 31 Oct 2026 — Air quality (decision 0036); Face & beauty always open
+- AQI near you, by itself from the phone's location (build 13+): a line under the greeting on Today, a folded row in Body › Movement, and Myra moves exercise indoors on poor-air days. Indian AQI (CPCB) worked out from Open-Meteo PM2.5 and PM10.
+- Face & beauty is now a full card like Food, no longer folded away.
+
 ## 31 Oct 2026 — Feedback through Myra
 - Tell Myra anything about the app in her chat (a suggestion, a bug, praise): she thanks you, says it went to the team, and it is saved to Admin › Feedback with area "Myra chat". Server: Myra's reply ends with a FEEDBACK: line only for app feedback; the app removes it from the reply and saves it.
 

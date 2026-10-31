@@ -12,7 +12,7 @@ import { useHeal } from '../lib/store';
 import { colors } from '../theme';
 import { useAttach } from './AttachPlus';
 import { selfieReading } from './FeelingCard';
-import { Card, Expandable, Note } from './ui';
+import { Card, Heading, Note } from './ui';
 
 /** Numbers stay calm (founder, 31 Oct 2026: no red for concerns; light and minimalist): soft green when good, grey otherwise. */
 const tone = (v: number) => (v >= 80 ? colors.good : colors.muted);
@@ -76,10 +76,10 @@ export function FaceCard() {
   }, { front: true, hint: tr('Take a selfie in daylight, without filters, for a fair skin check.') });
 
   return (
-    <Card style={{ paddingVertical: 4 }}>
-      <Expandable icon="sparkles-outline" color={colors.insight} title={tr('Face & beauty')}
-        status={score != null ? `${tr('Skin {n}/100', { n: score })}${f?.witty ? ` · ${f.witty}` : ''}` : tr('Take a selfie for a skin check')} statusColor={score != null ? colors.insight : undefined}>
-        <View style={{ gap: 12, paddingBottom: 12 }}>
+    // A full card like Food (founder, 31 Oct 2026: "It should be visible like other cards"), not folded away.
+    <Card>
+      <Heading>{tr('Face & beauty')}</Heading>
+        <View style={{ gap: 12 }}>
           {f && score != null ? (
             <>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
@@ -121,7 +121,6 @@ export function FaceCard() {
           )}
           {plus.status}
         </View>
-      </Expandable>
     </Card>
   );
 }

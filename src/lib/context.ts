@@ -9,6 +9,7 @@ import { countGratitude, mealTotals, wellBeing } from './scoring';
 import { habitsToday } from './habits';
 import { feelingLine } from './feeling';
 import { faceLine, latestReading } from './face';
+import { airLine } from './air';
 import { todaysLength } from './meditationPlan';
 import { TAO_FOR_AI, taoForDate } from './tao';
 import { passageOfDay, traditionName, type Tradition } from './wisdom';
@@ -33,6 +34,7 @@ export function buildContext(day: DayLog, days: Record<string, DayLog>, date: st
     momentLine(profile.me?.routine),
     healthLine(day),
     feelingLine(day.feeling),
+    airLine(day.air),
     (() => { const r = latestReading(days, date); return r ? faceLine(r.face, r.date === date ? 'today' : r.date) : ''; })(),
     `Fasting today: ${day.fasting ? 'yes (declared fast: water, black tea, black coffee)' : 'no'}.`,
     `Food: ${day.meals.map(m => m.name).join(', ') || 'nothing logged'}; totals ${Math.round(t.kcal)} kcal, protein ${Math.round(t.p)} g, carbs ${Math.round(t.c)} g, fat ${Math.round(t.f)} g, fibre ${Math.round(t.fib)} g (target ${fibreTarget(profile.kcal)} g).`,

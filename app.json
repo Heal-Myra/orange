@@ -74,6 +74,12 @@
           ],
           "iosShareExtensionName": "Happy Orange Share"
         }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Happy Orange uses your rough location to show the air quality (AQI) near you, so Myra can suggest indoor or outdoor activity. Your location is not saved."
+        }
       ]
     ],
     "scheme": "projectheal",
