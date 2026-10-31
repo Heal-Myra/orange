@@ -12,7 +12,7 @@ import { tr } from '../lib/i18n';
 import { readNoteText } from '../lib/ai';
 import { useAttach } from './AttachPlus';
 
-export const SHOW_FEEDBACK = true; // testing phase
+export const SHOW_FEEDBACK = false; // removed from the top of every page (founder, 31 Oct 2026); testers use TestFlight's Send Feedback
 const FACES = ['😞', '😕', '😐', '🙂', '😍'];
 
 export function FeedbackBox({ area }: { area: string }) {
