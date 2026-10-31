@@ -1288,4 +1288,5 @@ export const HI: Record<string, string> = {
   'Could not look up "{name}" just now. You can type its numbers.': '"{name}" अभी नहीं मिल सका। आप इसकी संख्याएँ लिख सकते हैं।',
   'Remove {name}': '{name} हटाएँ',
   'Myra is looking up {name}…': 'मायरा {name} देख रही है…',
+  'Talk to Myra': 'मायरा से बात करें',
 };

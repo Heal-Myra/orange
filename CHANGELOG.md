@@ -1,5 +1,8 @@
 # Changelog
 
+## 31 Oct 2026 — Ask Myra box like Claude's message box
+- Large rounded box with "Ask Myra anything…" on top; + (opens Myra with attach choices), microphone, and a round coral button (send when there are words, otherwise opens Myra to talk). Happy Orange colours.
+
 ## 31 Oct 2026 — Cleaner Today bottom
 - Myra card: quick-question chips and "Not medical advice" removed; the well-being footnote under it removed (founder). The medical note stays on the consent screen everyone accepts at sign-up.
 

@@ -53,7 +53,7 @@ async function base64Of(uri: string): Promise<string> {
 
 export default function Myra() {
   // q: a question typed in Today's Myra card, sent at once; listen: start speaking at once (31 Oct 2026).
-  const { from, q, listen } = useLocalSearchParams<{ from?: string; q?: string; listen?: string }>();
+  const { from, q, listen, attach } = useLocalSearchParams<{ from?: string; q?: string; listen?: string; attach?: string }>();
   const [loaded, setLoaded] = useState(false);
   const askedRef = useRef(false);
   const speakRef = useRef<(() => void) | null>(null);
@@ -66,7 +66,7 @@ export default function Myra() {
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
   const [file, setFile] = useState<(AttachmentData & { uri?: string }) | null>(null);
-  const [menu, setMenu] = useState(false);
+  const [menu, setMenu] = useState(attach === '1'); // + on Today's Myra card opens the attach choices
   const [note, setNote] = useState<string | null>(null);
   const [listening, setListening] = useState(false);
   const [kb, setKb] = useState(0);
