@@ -28,3 +28,7 @@ the coloured left edges on cards were removed. Scoring itself is unchanged.
 (across Food, Sleep, Movement, To-dos, Breathing, Phone, Gratitude, Daily Wisdom, Tao; parts not logged count as 0), the
 total out of 300 in the middle, the band ("Finding your footing") at the top right in grey, and **Myra recommends** inside
 the bottom of the card (`GuidanceCard embedded`). Tapping a key row opens that card. The Body, Mind and Soul tiles stay below.
+- **Body, Mind and Soul as ring circles** (founder, 13:21, after seeing a preview): three white circles under My day replace
+  the coloured tiles; each has a ring per part (Body: food, sleep, movement; Mind: to-dos, breathing, phone; Soul:
+  gratitude, Daily Wisdom, Tao) and the pillar's score out of 100 in the middle. Tap opens the tab. Founder's rule from
+  now on: show a picture before building a visual change.

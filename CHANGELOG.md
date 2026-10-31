@@ -1,5 +1,8 @@
 # Changelog
 
+## 31 Oct 2026 — Body, Mind and Soul as ring circles
+- Today: the three coloured tiles became three white circles with a ring per part and the score out of 100 in the middle; tap opens the tab.
+
 ## 31 Oct 2026 — No "I studied" tick box
 - Daily Wisdom and Tao: writing a line in "What it means to me today" earns the studied 5 points; the tick boxes are gone (founder). Older days with a tick keep their points. Trends and Myra follow the same rule (`wisdomStudied`, `taoStudied`).
 

@@ -20,7 +20,8 @@ export const fmt = (n: number) => (Number.isInteger(n * 2) ? n : Math.round(n)).
 
 /** Concentric rings, outermost first, each filled by its value; `center` (e.g. the score) in the middle. */
 export function RingStack({ items, center, sub, size = 132 }: { items: RingItem[]; center: string; sub?: string; size?: number }) {
-  const w = items.length > 4 ? 7 : 9, gap = 3;
+  const small = size < 110;
+  const w = small ? 6 : items.length > 4 ? 7 : 9, gap = small ? 2 : 3;
   return (
     <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
       <Svg width={size} height={size} style={{ position: 'absolute' }}>
@@ -35,7 +36,7 @@ export function RingStack({ items, center, sub, size = 132 }: { items: RingItem[
           );
         })}
       </Svg>
-      <Text style={{ fontSize: size > 120 ? 24 : 20, fontWeight: '800', color: colors.ink }}>{center}</Text>
+      <Text style={{ fontSize: small ? 18 : size > 120 ? 24 : 20, fontWeight: '800', color: colors.ink }}>{center}</Text>
       {sub ? <Text style={{ fontSize: 10, color: colors.muted, marginTop: -2 }}>{sub}</Text> : null}
     </View>
   );

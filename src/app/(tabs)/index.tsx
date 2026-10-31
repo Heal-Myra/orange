@@ -2,11 +2,10 @@
 // The detail of each pillar lives on its own tab; tap a section of the circle to open it.
 
 import { Text, View } from 'react-native';
-import { TodayRings } from '../../components/TodayRings';
+import { PillarRings, TodayRings } from '../../components/TodayRings';
 import { FeelingCard } from '../../components/FeelingCard';
 import { AirLine } from '../../components/AirLine';
 import { todayISO } from '../../lib/dates';
-import { PillarTiles } from '../../components/WellBeingRing';
 import { useAuth } from '../../lib/auth';
 import { Note, Screen } from '../../components/ui';
 import { wellBeing } from '../../lib/scoring';
@@ -34,7 +33,7 @@ export default function Today() {
           the total in the middle, Myra recommends at the bottom; the three tiles open Body, Mind and Soul. */}
       <TodayRings w={w} />
 
-      <PillarTiles w={w} />
+      <PillarRings w={w} />
 
       <View style={{ paddingHorizontal: 4 }}>
         <Note>{tr('Well-being = Body + Mind + Soul, each out of 100. A working model, not a medical measure.')}</Note>

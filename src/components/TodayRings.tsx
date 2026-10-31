@@ -73,3 +73,30 @@ export function TodayRings({ w }: { w: WellBeing }) {
     </Card>
   );
 }
+
+/** Body, Mind and Soul as three small ring circles (founder, 31 Oct 2026: circles with concentric rings instead of
+ *  rectangular tiles). Each ring is one part of that pillar; the pillar's score sits in the middle. Tap to open the tab. */
+export function PillarRings({ w }: { w: WellBeing }) {
+  const parts = dayParts(w);
+  const pillars: { tab: 'body' | 'mind' | 'soul'; name: string; score: number | null }[] = [
+    { tab: 'body', name: 'Body', score: w.body ? w.body.total : null },
+    { tab: 'mind', name: 'Mind', score: w.mind ? w.mind.total : null },
+    { tab: 'soul', name: 'Soul', score: w.soul ? w.soul.total : null },
+  ];
+  return (
+    <View style={{ flexDirection: 'row', gap: 8 }}>
+      {pillars.map(p => {
+        const mine = parts.filter(x => x.tab === p.tab);
+        const items: RingItem[] = mine.map(x => ({ id: x.id, color: x.color, label: tr(x.label), value: x.got / x.of }));
+        return (
+          <Pressable key={p.tab} accessibilityRole="button" accessibilityLabel={`${tr(p.name)}: ${p.score == null ? '–' : Math.round(p.score)}/100`}
+            onPress={() => router.navigate(`/${p.tab}`)}
+            style={({ pressed }) => ({ flex: 1, alignItems: 'center', gap: 6, paddingVertical: 12, borderRadius: 18, backgroundColor: colors.surface, opacity: pressed ? 0.85 : 1 })}>
+            <RingStack items={items} center={p.score == null ? '–' : fmt(Math.round(p.score))} sub={tr('of {n}', { n: 100 })} size={92} />
+            <Text style={{ fontSize: 15, fontWeight: '700', color: colors.ink }}>{tr(p.name)}</Text>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
