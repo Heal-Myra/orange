@@ -3,10 +3,9 @@
 // never use up the limit), everyday tools (shown, not scored). Minutes go to the day the screenshot shows.
 // Websites cannot read Screen Time directly, so a screenshot is the practical way. Every number can be checked and changed.
 
-import { InfoFast, MindFood } from './MindFood';
+import { InfoFast, MindFood, MindFoodNote } from './MindFood';
 import { feelingMix, heavyShare } from '../lib/feelings';
 import { MyraLine } from './MyraLine';
-import { PASTEL, RingPanel } from './Rings';
 import * as ImagePicker from 'expo-image-picker';
 import { useEffect, useState, type ReactNode } from 'react';
 import { ActivityIndicator, Image, Platform, Pressable, Text, TextInput, View } from 'react-native';
@@ -73,6 +72,7 @@ export function ScreenTimeCard({ children }: { children?: ReactNode }) {
   const [message, setMessage] = useState<string | null>(null);
   const [rows, setRows] = useState<MediaSession[] | null>(null);
   const [open, setOpen] = useState<number | null>(null);
+  const [details, setDetails] = useState(false); // founder, 31 Oct 2026: the numbers and the app list fold away
   const score = phoneContent(day.media, day.noMedia, profile); // this card's own day (yesterday)
   const socialMin = day.media.filter(x => !x.notMe && x.group !== 'tool' && x.group !== 'learning').reduce((a, x) => a + (x.minutes || 0), 0);
   const updatePhoneOn = usePhoneUpdate();
@@ -133,15 +133,10 @@ export function ScreenTimeCard({ children }: { children?: ReactNode }) {
   return (
     <Card>
       <Heading right={<Score value={score?.content ?? undefined} max={30} />}>{phoneDate === date ? tr('Phone activity') : tr('Phone activity · yesterday')}</Heading>
-      {score.content != null ? (
-        <RingPanel trend="phone" score={score.content} max={30} items={[
-          { id: 'quality', color: PASTEL.sky, label: tr('Content quality'), value: score.quality ?? 0, text: `${Math.round(18 * (score.quality ?? 0))} / 18` },
-          { id: 'limit', color: PASTEL.sage, label: tr('Within limit'), value: (score.content - 18 * (score.quality ?? 0)) / 12, text: `${socialMin} / ${profile.mediaLimit} min` },
-        ]} />
-      ) : null}
+      {/* Minimalist (founder, 31 Oct 2026): one circle (what you fed your mind), the fast, the screenshot buttons; the rest
+          under Show details. */}
       <MindFood day={day} />
       {phoneDate !== date ? <InfoFast /> : null}
-      <Note>{tr('Each morning, add yesterday: in Settings → Screen Time → See All App & Website Activity, go back one day, take a screenshot, then paste it here. The app reads every app for you.')}</Note>
       {/* "I used no social media today" removed (founder, 23 Oct 2026). Older days that have it still count. */}
       {session ? (
         <View style={s.row}>
@@ -195,9 +190,31 @@ export function ScreenTimeCard({ children }: { children?: ReactNode }) {
           <Button kind="plain" title={tr('Discard')} onPress={() => { setRows(null); setMessage(null); }} />
         </View>
       ) : null}
-      {day.media.length > 0 && !rows ? <Note>{tr('Social and video: {total} of your {limit}-minute limit.', { total, limit: profile.mediaLimit })}{learning ? ` ${tr('Learning and AI tools: {n} min (never counts against the limit).', { n: learning })}` : ''}</Note> : null}
-      {children}
+      <Pressable onPress={() => setDetails(x => !x)} hitSlop={8} accessibilityRole="button" style={{ alignSelf: 'center', paddingVertical: 2 }}>
+        <Text style={{ color: colors.muted, fontWeight: '600', fontSize: 13.5 }}>{details ? tr('Hide details') : tr('Show details')} {details ? '˄' : '˅'}</Text>
+      </Pressable>
+      {details ? (
+        <View style={{ gap: 8, borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 10 }}>
+          {score.content != null ? (
+            <>
+              <DetailRow label={tr('Content quality')} value={`${Math.round(18 * (score.quality ?? 0))} / 18`} />
+              <DetailRow label={tr('Social and video')} value={`${socialMin} / ${profile.mediaLimit} ${tr('min')}`} />
+            </>
+          ) : null}
+          <MindFoodNote day={day} />
+          {learning && !rows ? <Note>{tr('Learning and AI tools: {n} min (never counts against the limit).', { n: learning })}</Note> : null}
+          <Note>{tr('Each morning, add yesterday: in Settings → Screen Time → See All App & Website Activity, go back one day, take a screenshot, then paste it here. The app reads every app for you.')}</Note>
+          {children}
+        </View>
+      ) : null}
       <MyraLine card="phone" phone={{ minutes: score.minutes, social: socialMin, heavy: (() => { const r = feelingMix(day.media ?? [], day.watched ?? []); return r ? heavyShare(r.mix) : undefined; })() }} />
     </Card>
   );
 }
+
+const DetailRow = ({ label, value }: { label: string; value: string }) => (
+  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+    <Text style={{ flex: 1, color: colors.ink, fontSize: 15 }}>{label}</Text>
+    <Text style={{ color: colors.ink, fontWeight: '600', fontSize: 15 }}>{value}</Text>
+  </View>
+);

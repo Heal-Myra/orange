@@ -1326,4 +1326,7 @@ export const HI: Record<string, string> = {
   "try today's Tao practice and write one line.": 'आज का ताओ अभ्यास कीजिए और एक पंक्ति लिखिए।',
   'a full day. Rest well.': 'आज का दिन पूरा हुआ। अच्छे से आराम कीजिए।',
   'A look back at this day. Tap the circles below to see each part.': 'इस दिन पर एक नज़र। हर हिस्सा देखने के लिए नीचे के घेरे छुएँ।',
+  'nourishing': 'पोषक',
+  'Show details': 'विवरण देखें',
+  'Social and video': 'सोशल और वीडियो',
 };

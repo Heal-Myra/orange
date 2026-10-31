@@ -12,7 +12,10 @@ import { useHeal } from '../lib/store';
 import { todayISO } from '../lib/dates';
 import { colors } from '../theme';
 import { PASTEL, RingPanel, type RingItem } from './Rings';
-import { Button, Note } from './ui';
+import { Note } from './ui';
+import { Ionicons } from '@expo/vector-icons';
+
+const SKY_INK = '#3F6E99'; // readable blue on the pastel sky
 import type { DayLog } from '../lib/types';
 
 const COLOR: Record<FeelingId, string> = {
@@ -26,13 +29,20 @@ export function MindFood({ day }: { day: DayLog }) {
   const top = [...FEELINGS].sort((a, b) => r.mix[b.id] - r.mix[a.id]).filter(f => r.mix[f.id] > 0.005).slice(0, 5);
   const items: RingItem[] = top.map(f => ({ id: f.id, color: COLOR[f.id], label: tr(f.label), value: r.mix[f.id], text: `${Math.round(r.mix[f.id] * 100)}%` }));
   const heavy = Math.round(heavyShare(r.mix) * 100);
+  // The only circle on Phone activity (founder, 31 Oct 2026): the explanation lives under Show details (MindFoodNote).
   return (
-    <View style={{ gap: 6, borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 12 }}>
-      <Text style={{ fontSize: 16, fontWeight: '700', color: colors.ink }}>{tr('What you fed your mind')}</Text>
-      <RingPanel items={items} score={100 - heavy} max={100} />
-      <Note>{tr('{n}% nourishing, {h}% heavy (fear and anger). An estimate from your apps and anything you shared to Happy Orange.', { n: 100 - heavy, h: heavy })}</Note>
+    <View style={{ gap: 4 }}>
+      <Text style={{ fontSize: 13, fontWeight: '600', color: colors.muted }}>{tr('What you fed your mind')}</Text>
+      <RingPanel items={items} score={100 - heavy} max={100} sub={tr('nourishing')} trend="phone" />
     </View>
   );
+}
+
+export function MindFoodNote({ day }: { day: DayLog }) {
+  const r = feelingMix(day.media ?? [], day.watched ?? []);
+  if (!r) return null;
+  const heavy = Math.round(heavyShare(r.mix) * 100);
+  return <Note>{tr('{n}% nourishing, {h}% heavy (fear and anger). An estimate from your apps and anything you shared to Happy Orange.', { n: 100 - heavy, h: heavy })}</Note>;
 }
 
 const CHOICES = [{ label: '1 hour', h: 1 }, { label: '2 hours', h: 2 }, { label: '4 hours', h: 4 }, { label: 'Until tomorrow', h: 0 }];
@@ -67,11 +77,18 @@ export function InfoFast() {
   }
   return (
     <View style={{ gap: 8 }}>
-      {!choosing ? <Button kind="plain" title={tr('Start an information fast')} onPress={() => setChoosing(true)} /> : (
+      {/* A soft pastel button (founder, 31 Oct 2026). */}
+      {!choosing ? (
+        <Pressable onPress={() => setChoosing(true)} accessibilityRole="button"
+          style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 13, borderRadius: 99, backgroundColor: PASTEL.sky + '2E', opacity: pressed ? 0.8 : 1 })}>
+          <Ionicons name="moon-outline" size={18} color={SKY_INK} />
+          <Text style={{ color: SKY_INK, fontWeight: '700', fontSize: 16 }}>{tr('Start an information fast')}</Text>
+        </Pressable>
+      ) : (
         <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap' }}>
           {CHOICES.map(c => (
-            <Pressable key={c.label} onPress={() => start(c.h)} style={{ paddingVertical: 8, paddingHorizontal: 12, borderRadius: 99, borderWidth: 1, borderColor: colors.accent }}>
-              <Text style={{ color: colors.accent, fontWeight: '600' }}>{tr(c.label)}</Text>
+            <Pressable key={c.label} onPress={() => start(c.h)} style={{ paddingVertical: 8, paddingHorizontal: 12, borderRadius: 99, backgroundColor: PASTEL.sky + '2E' }}>
+              <Text style={{ color: SKY_INK, fontWeight: '600' }}>{tr(c.label)}</Text>
             </Pressable>
           ))}
         </View>

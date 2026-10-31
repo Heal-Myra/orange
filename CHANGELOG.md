@@ -1,5 +1,9 @@
 # Changelog
 
+## 31 Oct 2026 — Phone activity, minimalist
+- One circle only: what you fed your mind ("nourishing" in the middle). The quality / limit circle is gone; its numbers sit under Show details.
+- Start an information fast is a soft pastel blue button. Choose / Paste screenshot stay on the card; the notes, the app list and the how-to fold under Show details.
+
 ## 31 Oct 2026 — Myra beside the score; only the chat box below (decision 0040)
 - My day: Myra's one recommendation sits to the right of the total rings, replacing Going well / Work on. One item only, picked for the time of day and the most points still to win, with a chip such as "+15 Mind" and Start (opens the place where it is done). A habit due now comes first; after 9:30 pm only Yoga Nidra or the journal.
 - The separate Myra card is gone: below the three circles there is only the Ask Myra box. Myra's AI advice keeps refreshing in the background for the cards on each tab.

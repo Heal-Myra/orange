@@ -78,10 +78,10 @@ export function RingTap({ trend, children }: { trend?: string; children: ReactNo
 }
 
 /** Data cards: rings on the left, key on the right. */
-export function RingPanel({ items, score, max, trend }: { items: RingItem[]; score: number | null | undefined; max: number; trend?: string }) {
+export function RingPanel({ items, score, max, trend, sub }: { items: RingItem[]; score: number | null | undefined; max: number; trend?: string; sub?: string }) {
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 4 }}>
-      <RingTap trend={trend}><RingStack items={items} center={score == null ? '–' : fmt(score)} sub={`of ${max}`} /></RingTap>
+      <RingTap trend={trend}><RingStack items={items} center={score == null ? '–' : fmt(score)} sub={sub ?? `of ${max}`} /></RingTap>
       <RingKey items={items} />
     </View>
   );
