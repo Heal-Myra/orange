@@ -10,9 +10,7 @@ import { useAuth } from '../lib/auth';
 import { tr } from '../lib/i18n';
 import { colors } from '../theme';
 import { GuidanceCard } from './AiBits';
-import { Card, Note, s } from './ui';
-
-const QUICK = ['How is my week going?', 'What should I eat tonight?'];
+import { Card, s } from './ui';
 
 export function MyraCard() {
   const { session } = useAuth();
@@ -42,16 +40,8 @@ export function MyraCard() {
               <Ionicons name="arrow-up" size={20} color={colors.onInsight} />
             </Pressable>
           </View>
-          <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
-            {QUICK.map(x => (
-              <Pressable key={x} onPress={() => ask(tr(x))} style={{ paddingVertical: 6, paddingHorizontal: 10, borderRadius: 99, borderWidth: 1, borderColor: colors.insight + '66' }}>
-                <Text style={{ color: colors.insight, fontWeight: '600', fontSize: 12.5 }}>{tr(x)}</Text>
-              </Pressable>
-            ))}
-          </View>
         </>
       ) : null}
-      <Note>{tr('Not medical advice.')}</Note>
     </Card>
   );
 }

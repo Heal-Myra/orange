@@ -7,7 +7,7 @@ import { MyraCard } from '../../components/MyraCard';
 import { AirLine } from '../../components/AirLine';
 import { todayISO } from '../../lib/dates';
 import { useAuth } from '../../lib/auth';
-import { Note, Screen } from '../../components/ui';
+import { Screen } from '../../components/ui';
 import { wellBeing } from '../../lib/scoring';
 import { useHeal } from '../../lib/store';
 import { colors } from '../../theme';
@@ -32,9 +32,6 @@ export default function Today() {
 
       <MyraCard />
 
-      <View style={{ paddingHorizontal: 4 }}>
-        <Note>{tr('Well-being = Body + Mind + Soul, each out of 100. A working model, not a medical measure.')}</Note>
-      </View>
 
       {/* The Care plan card was removed (founder, 26 Oct 2026): care shows only inside Food, Sleep and Movement, and as
           the care breathing session; the see-a-doctor line sits under How I feel today. */}

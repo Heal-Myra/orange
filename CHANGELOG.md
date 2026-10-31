@@ -1,5 +1,8 @@
 # Changelog
 
+## 31 Oct 2026 — Cleaner Today bottom
+- Myra card: quick-question chips and "Not medical advice" removed; the well-being footnote under it removed (founder). The medical note stays in the consent screen and Profile.
+
 ## 31 Oct 2026 — Fix a meal reading before adding it
 - Each item Myra reads from a meal photo or words has an ✕ to remove it.
 - Correcting an item's name (e.g. "Amli") looks it up again for the same grams (IFCT first) and replaces its calories, protein, carbs, fat and fibre; "Add to my day" waits for the lookup.
