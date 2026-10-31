@@ -28,4 +28,4 @@ breaks the Orange Book's rules on truthfulness and no medical claims. So:
   natural remedies per point (`faceLine`, `REMEDY` in `src/lib/face.ts`). Myra recommends makes the Body task a remedy when it
   fits the moment (e.g. "Add spinach to lunch for your dark circles."), and Tomorrow's food includes one or two helpful foods
   and names it in its note.
-- Only the **three biggest concerns** (lowest bars) show; "See all 7" opens the rest (founder, 09:05).
+- Feel-good first: **Your best** (the highest bar), then the **three biggest concerns** (lowest bars, only those not clear); "See all 7" opens the rest (founder, 09:05 and 09:07).

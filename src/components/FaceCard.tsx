@@ -55,6 +55,10 @@ export function FaceCard() {
   const [more, setMore] = useState(false);
   // Lowest scores first (stable, so ties keep the usual order).
   const points = SKIN.filter(k => f?.skin[k.id]).map(k => ({ ...k, v: pointScore(f!.skin[k.id])! })).sort((a, b) => a.v - b.v);
+  const best = points.length ? [...points].sort((a, b) => b.v - a.v)[0] : null;
+  const others = points.filter(k => k !== best);
+  const concerns = others.filter(k => k.v < 100).slice(0, 3); // only real concerns; all clear means none
+  const rest = others.filter(k => !concerns.includes(k));
   const plus = useAttach(async img => {
     const r = await selfieReading(img);
     if (typeof r === 'string') return r;
@@ -81,12 +85,19 @@ export function FaceCard() {
                 </View>
                 {plus.button}
               </View>
-              {/* The three biggest concerns first; the rest fold away (founder, 31 Oct 2026). */}
+              {/* Feel-good first: the best point, then the three biggest concerns; the rest fold away (founder, 31 Oct 2026). */}
               <View style={{ gap: 10 }}>
-                {points.slice(0, 3).map(k => <Bar key={k.id} label={tr(k.label)} value={k.v} />)}
-                {more ? points.slice(3).map(k => <Bar key={k.id} label={tr(k.label)} value={k.v} />) : null}
+                {best ? (
+                  <View style={{ gap: 6 }}>
+                    <Text style={{ color: colors.good, fontWeight: '700', fontSize: 12, letterSpacing: 0.4 }}>{tr('YOUR BEST')}</Text>
+                    <Bar label={tr(best.label)} value={best.v} />
+                  </View>
+                ) : null}
+                {concerns.length ? <Text style={{ color: colors.insight, fontWeight: '700', fontSize: 12, letterSpacing: 0.4, marginTop: 4 }}>{tr('TOP CONCERNS')}</Text> : null}
+                {concerns.map(k => <Bar key={k.id} label={tr(k.label)} value={k.v} />)}
+                {more ? rest.map(k => <Bar key={k.id} label={tr(k.label)} value={k.v} />) : null}
               </View>
-              {points.length > 3 ? (
+              {rest.length ? (
                 <Pressable onPress={() => setMore(m => !m)} hitSlop={8} accessibilityRole="button">
                   <Text style={{ color: colors.accent, fontWeight: '600' }}>{more ? tr('Show less') : tr('See all {n}', { n: points.length })}</Text>
                 </Pressable>
