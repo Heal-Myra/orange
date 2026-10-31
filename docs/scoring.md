@@ -31,7 +31,7 @@ Phone activity is added each morning for **yesterday** (a full day is only known
 | Gratitude journal: gratitude | 30 | I'm thankful for: 5 each, up to three; made me laugh 7.5; best part of my day 7.5 |
 | Gratitude journal: love | 30 | I was kind to (someone, and how) |
 | Daily Wisdom | 20 | "What it means to me today", a line written, 5 (the tick box was removed 31 Oct 2026; older ticks still count) + "How I lived it today", at least three words, 15 |
-| Tao practice | 20 | read the day's practice (tick) 5 + "How I lived it today", at least three words, 15 |
+| Tao practice | 20 | "What it means to me today", a line written, 5 (the tick box was removed 31 Oct 2026; older ticks still count) + "How I lived it today", at least three words, 15 |
 
 Learning earns 25 %, living it during the day earns 75 % (founder, 26 Oct 2026).
 
