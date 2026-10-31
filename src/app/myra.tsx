@@ -21,6 +21,8 @@ import { tasksForAI, useTasks } from '../lib/tasks';
 import { colors } from '../theme';
 import { lang, tr } from '../lib/i18n';
 import { optional } from '../lib/native';
+import { supabase } from '../lib/supabase';
+import Constants from 'expo-constants';
 
 // The document picker arrived with a later app build; older installed builds simply don't offer documents.
 let DocumentPicker: typeof import('expo-document-picker') | null = null;
@@ -95,6 +97,11 @@ export default function Myra() {
         sending ? { kind: sending.kind, name: sending.name, media_type: sending.media_type, data: sending.data, text: sending.text } : undefined);
       const done: ChatMessage[] = [...next, { role: 'myra', text: r.text }];
       setMessages(done); save(done);
+      // Feedback told to Myra goes to the team (founder, 31 Oct 2026): Admin › Feedback, area "Myra chat".
+      if (r.feedback && supabase && session) {
+        supabase.from('feedback').insert({ email: session.user.email, area: 'Myra chat', rating: null, message: r.feedback,
+          app_version: Constants.expoConfig?.version ?? 'web' }).then(() => {}, () => {});
+      }
     } catch (e) {
       setMessages([...next, { role: 'myra', text: e instanceof Error ? e.message : tr('Something went wrong. Please try again.') }]);
     } finally { setBusy(false); }

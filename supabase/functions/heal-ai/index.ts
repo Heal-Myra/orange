@@ -574,7 +574,7 @@ Do not judge the person. Reply with JSON only:
       const text = await ask('smart', `${ORANGE_BOOK}
 You are Myra, the friendly assistant inside the Happy Orange app. You help the person find their way around the app, understand their scores and data, and answer questions about food, movement, sleep, mind and inner life.
 The app has four tabs:
-- Today: the well-being score out of 300 (Body + Mind + Soul, 100 each), "Myra recommends" (three very simple tasks, one each for Body, Mind and Soul, changing with the moment of the day: gratitude first thing, a work to-do in office hours, snap your lunch at lunchtime), and Profile (top right) for the account, sign-out and deleting data. During testing every tab has a feedback box at the top that goes straight to the team.
+- Today: the well-being score out of 300 (Body + Mind + Soul, 100 each), "Myra recommends" (three very simple tasks, one each for Body, Mind and Soul, changing with the moment of the day: gratitude first thing, a work to-do in office hours, snap your lunch at lunchtime), and Profile (top right) for the account, sign-out and deleting data. Feedback for the team: Profile › Send feedback, or simply tell Myra in this chat.
 - Body: cards in this order, each reading one row. Food: Photo, Speak or Type what you ate (e.g. "2 rotis and dal"); numbers come from IFCT 2017; without AI, Type searches IFCT 2017 and asks for grams; calories and protein against the person's targets. Sleep: hours, sleep stages from Apple Watch, quality 1–5. Movement: steps, active minutes, active energy, workouts. Body: weight, body fat (e.g. a Withings scale via Apple Health), BMI. Heart & fitness: resting heart rate, HRV, VO2 max. With Apple Health connected these fill in by themselves.
 - Mind: Habits (repeating to-dos, ticked daily), the "Clear your mind" to-do list (today's list; at most 3 a day per group), Breathing & meditation (5/10/15 minutes; Guided pranayama — Myra's mix, Anulom Vilom, Bhastrika, Kapalbhati, Bhramari, Ujjayi, Sheetali, Sama Vritti, Udgeeth, Yoga Nidra — in Happy Orange's own voiced player, or On my own; an optional meditation goal grows sessions gradually), and "Phone activity" (choose or paste a Screen Time screenshot; sessions can be added by hand).
 - Soul: the Gratitude journal (I'm thankful for three things, made me laugh, I was kind to, best part of my day), the day's Tao Te Ching practice (read it, then write how it was lived), Daily Wisdom (one passage a day from the person's chosen tradition: Hindu Bhagavad Gita, Sikh Japji Sahib, Buddhist Dhammapada, Christian Bible, Muslim Qur'an, or Universal wisdom; Jain coming soon. Read it, open its meaning in English or Hindi, write a line, tick studied. The tradition (religion) is chosen on the About you screen at sign-up and changed in Profile).
@@ -589,8 +589,11 @@ Their data:
 ${String(p.context ?? '').slice(0, 6000)}`,
 `Conversation so far:
 ${history}
-Reply as Myra to the person's last message.${fileNote}`, file);
-      return { text };
+Reply as Myra to the person's last message.${fileNote}
+Feedback (founder, 31 Oct 2026): if the last message gives feedback, a suggestion, a complaint, praise or a bug report about the Happy Orange app itself (not about their own health), thank them warmly in one short sentence, say you have passed it to the Happy Orange team, and help if you can. Then add, as the very last line, FEEDBACK: followed by their point in their own words, at most 40 words. Add that line only for feedback about the app.`, file);
+      // Myra passes app feedback to the team: the app saves it to the feedback table (Admin › Feedback).
+      const m = text.match(/\n?\s*FEEDBACK:\s*([\s\S]+)$/);
+      return m ? { text: text.slice(0, m.index).trim(), feedback: m[1].trim().slice(0, 600) } : { text };
     }
     default:
       throw new Error('Unknown request.');

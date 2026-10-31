@@ -1,5 +1,8 @@
 # Changelog
 
+## 31 Oct 2026 — Feedback through Myra
+- Tell Myra anything about the app in her chat (a suggestion, a bug, praise): she thanks you, says it went to the team, and it is saved to Admin › Feedback with area "Myra chat". Server: Myra's reply ends with a FEEDBACK: line only for app feedback; the app removes it from the reply and saves it.
+
 ## 31 Oct 2026 — Feedback box removed from the top of every page
 - Founder's request. Switched off with `SHOW_FEEDBACK = false`. Feedback now lives in Profile › Send feedback (folded row, same box with faces and +), and TestFlight's Send Feedback still works; both land in Admin › Feedback (Profile ones with area "Profile").
 

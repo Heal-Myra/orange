@@ -80,7 +80,7 @@ export interface AttachmentData { kind: 'image' | 'pdf' | 'text'; name: string; 
 
 /** Myra, the in-app assistant: answers using the person's own summary and the screen they are on. */
 export const askMyra = (messages: ChatMessage[], context: string, page: string, attachment?: AttachmentData) =>
-  call<{ text: string }>('myra', { messages: messages.slice(-12).map(({ role, text, attach }) => ({ role, text, attach: attach ? { name: attach.name } : undefined })), context, page, attachment });
+  call<{ text: string; feedback?: string }>('myra', { messages: messages.slice(-12).map(({ role, text, attach }) => ({ role, text, attach: attach ? { name: attach.name } : undefined })), context, page, attachment });
 
 /** Founder's rule (19 Oct 2026): every suggestion shown to the person is one line of at most 10 words. */
 export const oneLine = (text: string, max = 10): string => {
