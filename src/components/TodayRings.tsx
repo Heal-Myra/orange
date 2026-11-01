@@ -47,14 +47,13 @@ export function TodayRings({ w }: { w: WellBeing }) {
   const v = (id: 'body' | 'mind' | 'soul') => Math.round((id === 'body' ? w.body?.total : id === 'mind' ? w.mind?.total : w.soul?.total) ?? 0);
   const items: RingItem[] = P.map(p => ({ id: p.id, color: p.color, label: tr(p.label), value: v(p.id) / 100 }));
   return (
-    // Compact so all of Today fits on one screen (founder, 1 Nov 2026).
-    <Card style={{ gap: 6, paddingVertical: 12 }}>
+    <Card style={{ gap: 12 }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
         <Text style={{ fontSize: 18, fontWeight: '700', color: colors.ink }}>{tr('My day')}</Text>
         <Text style={{ fontSize: 13, fontWeight: '600', color: colors.muted }}>{w.logged ? tr(band(w.total)) : tr('Nothing logged yet')}</Text>
       </View>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
-        <RingTap trend="today"><RingStack items={items} center={fmt(w.total)} sub={tr('of {n}', { n: 100 })} size={124} /></RingTap>
+        <RingTap trend="today"><RingStack items={items} center={fmt(w.total)} sub={tr('of {n}', { n: 100 })} size={140} /></RingTap>
         {/* A thin line between the score and Myra (founder, 31 Oct 2026, like option 2). */}
         <View style={{ width: 1, alignSelf: 'stretch', marginVertical: 12, backgroundColor: colors.line }} />
         <MyraPick w={w} />
@@ -74,7 +73,7 @@ export function PillarRings({ w }: { w: WellBeing }) {
   ];
   return (
     // One white card with a fine line between the three (founder, 1 Nov 2026), like the line between the score and Myra.
-    <View style={{ flexDirection: 'row', backgroundColor: colors.surface, borderRadius: 22, paddingVertical: 2 }}>
+    <View style={{ flexDirection: 'row', backgroundColor: colors.surface, borderRadius: 22, paddingVertical: 4 }}>
       {pillars.map((p, i) => {
         const mine = parts.filter(x => x.tab === p.tab);
         const items: RingItem[] = mine.map(x => ({ id: x.id, color: x.color, label: tr(x.label), value: x.got / x.of }));
@@ -83,9 +82,9 @@ export function PillarRings({ w }: { w: WellBeing }) {
           {i > 0 ? <View style={{ width: 1, marginVertical: 18, backgroundColor: colors.line }} /> : null}
           <Pressable accessibilityRole="button" accessibilityLabel={`${tr(p.name)}: ${p.score == null ? '–' : Math.round(p.score)}/100`}
             onPress={() => router.navigate(`/${p.tab}`)}
-            style={({ pressed }) => ({ flex: 1, alignItems: 'center', gap: 4, paddingVertical: 8, opacity: pressed ? 0.85 : 1 })}>
-            <RingStack items={items} center={p.score == null ? '–' : fmt(Math.round(p.score))} sub={tr('of {n}', { n: 100 })} size={76} />
-            <Text style={{ fontSize: 14, fontWeight: '700', color: colors.ink }}>{tr(p.name)}</Text>
+            style={({ pressed }) => ({ flex: 1, alignItems: 'center', gap: 6, paddingVertical: 12, opacity: pressed ? 0.85 : 1 })}>
+            <RingStack items={items} center={p.score == null ? '–' : fmt(Math.round(p.score))} sub={tr('of {n}', { n: 100 })} size={92} />
+            <Text style={{ fontSize: 15, fontWeight: '700', color: colors.ink }}>{tr(p.name)}</Text>
           </Pressable>
           </View>
         );

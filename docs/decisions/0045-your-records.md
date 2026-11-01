@@ -7,3 +7,6 @@ Date: 1 Nov 2026 · Founder: a section under Body, Mind and Soul with achievemen
 - NEW for 7 days after the period ends; new records first, then the most recent. "Close to a record" when today is within 25 % of the best day (steps, breathing).
 - The card fills the free height above Ask Myra and shows as many rows as fit (founder: together with Ask Myra it completes the screen).
 - Runs on the phone, offline. Only on today's Today.
+
+## Update, 1 Nov 2026 (10:05)
+On Today the card is one line only: the newest record, or the "close to a record" nudge when there is none. The full list can come later on a page of its own.

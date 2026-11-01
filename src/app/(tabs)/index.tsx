@@ -21,7 +21,6 @@ export default function Today() {
 
   return (
     // No day row or greeting (founder, 31 Oct 2026): the page starts with the score; Myra speaks to the person by name.
-    // fill: Today ends at the bottom of the screen; Your records takes the space left above Ask Myra (1 Nov 2026).
     <Screen feedback="Today" fill>
       {/* AQI only on bad-air days; How I feel today moved to the Mind tab (founder, 31 Oct 2026). */}
       {date === todayISO() ? <View style={{ alignItems: 'center' }}><AirLine /></View> : null}

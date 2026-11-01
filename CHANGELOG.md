@@ -1,7 +1,7 @@
 # Changelog
 
 ## 1 Nov 2026 — Today fits on one screen
-- Smaller gaps, a slightly smaller My day ring (124) and Body / Mind / Soul circles (76), a shorter Ask Myra box and a tighter Your records card, so My day, the circles, records and Ask Myra all fit above the tab bar. Your records shows as many rows as there is room for.
+- The My day ring and the Body / Mind / Soul circles keep their original sizes; Your records is one line only (the newest best, else the "close to a record" nudge), with slightly smaller gaps and a shorter Ask Myra box, so everything fits above the tab bar.
 
 ## 1 Nov 2026 — Fasting by choice scores; Your records on Today (decisions 0044, 0045)
 - Fasting: for someone who fasts on purpose, Food = Fasting 16 + Meals 24. Fasting points grow every hour from last night's last meal to today's first meal, up to their target (e.g. 18 h). Read from About you (their usual day or goal), asked once after three late-first-meal days, or set in About you ("Fasting by choice": I don't fast / 14 / 16 / 18 h, and the usual last meal). Food card: a Fasting ring and a soft blue line ("Fasting since 9:00 pm · 5½ h to your 18"); Myra never nudges a meal mid-fast. Meals now keep the time they were logged; the day's last meal starts the next day's fast. From 1 Nov 2026; earlier days unchanged.
