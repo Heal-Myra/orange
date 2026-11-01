@@ -35,3 +35,6 @@ breaks the Orange Book's rules on truthfulness and no medical claims. So:
 - **Soft colours, no red** (founder, 09:19): pastel ring per point (peach, lavender, soft teal, sky blue, sand, rose, sage);
   the score in ink; numbers grey, only good ones soft green; coral only for Myra's witty words.
 - **A full card, always open** (founder, 10:53: "It should be visible like other cards such as food"): Face & beauty no longer folds away.
+
+## Update, 1 Nov 2026
+Four grouped rings (Eyes, Clear skin, Moisture, Sun) instead of seven; the group needing most care in a box with one tip; all seven points under Show details (founder chose option B).
