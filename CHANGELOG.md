@@ -1,5 +1,8 @@
 # Changelog
 
+## 1 Nov 2026 — Every finished to-do counts
+- Clear your mind: finishing any to-do now adds its points at once (20 each, the first two of the day = 40). Before, only the two Myra had picked for the day counted, so finishing another one did not move the score.
+
 ## 1 Nov 2026 — Myra takes anything you drop in (decision 0046)
 - A picture added in Myra's chat (+ on Today's Ask box or in the chat) is recognised first: meal, Screen Time, to-do list, gratitude journal page or selfie. Myra reads it with the card's own reader and replies with a short summary and where it goes ("→ Food"), with Add to my day / No. Nothing is added without a yes. Anything else she simply talks about, as before.
 - The Ask Myra box hint changes every few seconds: Ask Myra anything… · Add a photo of your meal… · Add your handwritten to-do list… · Add yesterday's Screen Time… · Add a selfie for Face & beauty…

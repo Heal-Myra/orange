@@ -52,7 +52,7 @@ const fromRow = (r: Record<string, unknown>): Task => ({
 export function TasksProvider({ children }: { children: ReactNode }) {
   const { session, consented } = useAuth();
   const userId = session && consented ? session.user.id : null;
-  const { updateOn, profile, setProfile } = useHeal();
+  const { updateOn, profile, setProfile, days } = useHeal();
   const [habitsLocal, setHabitsLocal] = useState<Habit[] | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [focusRec, setFocusRec] = useState<{ date: string; ids: string[] }>({ date: '', ids: [] });
@@ -134,6 +134,12 @@ export function TasksProvider({ children }: { children: ReactNode }) {
     setFocus(defaultFocus(tasks, today));
   }, [ready, focusRec.date, today, tasks, setFocus]);
 
+  // Catch up: to-dos finished today that were not counted yet (e.g. before 1 Nov 2026 only Myra's picks counted).
+  useEffect(() => {
+    const doneToday = tasks.filter(t => t.doneAt && new Date(t.doneAt).toDateString() === new Date().toDateString()).length;
+    if (doneToday > (days[today]?.mind?.focusDone ?? 0)) updateOn(today, d => { d.mind.focusDone = Math.max(d.mind.focusDone ?? 0, doneToday); });
+  }, [tasks, today]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const value = useMemo<TasksState>(() => {
     const open = tasks.filter(t => !t.doneAt).sort(sortOpen);
     const focus = focusRec.date === today ? focusRec.ids.map(id => open.find(t => t.id === id)).filter((t): t is Task => !!t) : [];
@@ -162,8 +168,9 @@ export function TasksProvider({ children }: { children: ReactNode }) {
         d.habitsDone = done.includes(id) ? done.filter(x => x !== id) : [...done, id];
       }),
       complete: id => {
-        // A focus task done today earns Mind points (15 each, up to 30).
-        if (focusRec.date === today && focusRec.ids.includes(id)) updateOn(today, d => { d.mind.focusDone = (d.mind.focusDone ?? 0) + 1; });
+        // Any to-do finished earns Mind points, 20 each for the first two of the day (founder, 1 Nov 2026: finishing
+        // "shoes shopping" did not move the score because only Myra's two picks counted). Not twice for the same one.
+        if (!tasks.find(t => t.id === id)?.doneAt) updateOn(today, d => { d.mind.focusDone = (d.mind.focusDone ?? 0) + 1; });
         change(ts => ts.map(t => t.id === id ? { ...t, doneAt: new Date().toISOString() } : t));
       },
       moveTo: (id, due) => change(ts => ts.map(t => t.id === id ? { ...t, due, moved: t.moved + 1 } : t),
