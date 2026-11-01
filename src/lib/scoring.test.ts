@@ -88,12 +88,14 @@ describe('mind (focus to-dos 40, meditation 30, phone activity 30)', () => {
     d.mind = { learned: { text: 'How compound interest works' } };
     expect(mindScore(d, P)).toBeNull();
   });
-  it('scores phone activity out of 30: quality 18 and within the limit 12', () => {
+  it('scores phone activity out of 30 by quality, minus 1 point per 10 minutes over the limit (1 Nov 2026)', () => {
     const d = day();
     d.media = [{ platform: 'YouTube', minutes: 30, category: 'learning' }, { platform: 'Instagram', minutes: 30, category: 'scrolling' }];
-    expect(mindScore(d, P)!.content).toBeCloseTo(18 * 0.6 + 12);
+    expect(mindScore(d, P)!.content).toBeCloseTo(30 * 0.6); // 60 minutes: at the limit, no penalty
     d.media = [{ platform: 'Instagram', minutes: 180, category: 'learning' }];
-    expect(mindScore(d, P)!.content).toBeCloseTo(18);
+    expect(mindScore(d, P)!.content).toBeCloseTo(30 - 12); // 120 minutes over: −12
+    d.media = [{ platform: 'Instagram', minutes: 600, category: 'scrolling' }];
+    expect(mindScore(d, P)!.content).toBe(0); // never below zero
   });
   it('reaches 100 with all three parts', () => {
     const d = day();
@@ -161,8 +163,8 @@ describe('phone activity groups (26 Oct 2026)', () => {
     ];
     const m = mindScore(d, P)!;
     expect(m.minutes).toBe(95);
-    // 40 social minutes is within the 60-minute limit: full 12 for quantity.
-    expect(m.content).toBeCloseTo(18 * ((55 * 1 + 40 * 0.8) / 95) + 12, 5);
+    // 40 social minutes is within the 60-minute limit (learning never counts): no penalty.
+    expect(m.content).toBeCloseTo(30 * ((55 * 1 + 40 * 0.8) / 95), 5);
   });
 });
 
@@ -172,7 +174,7 @@ describe('phone points count the next day (27 Oct 2026)', () => {
     d.media = [{ platform: 'YouTube', minutes: 500, category: 'fun', group: 'social' }]; // ignored: belongs to the 29th's score
     expect(mindScore(d, P)?.content ?? null).toBeNull();
     d.phoneFrom = { date: '2026-10-27', media: [{ platform: 'WhatsApp', minutes: 40, category: 'connect', group: 'social' }] };
-    expect(mindScore(d, P)!.content).toBeCloseTo(18 * 0.8 + 12, 5);
+    expect(mindScore(d, P)!.content).toBeCloseTo(30 * 0.8, 5);
   });
 });
 

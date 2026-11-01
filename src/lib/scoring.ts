@@ -98,7 +98,7 @@ export function bodyScore(d: DayLog, P: Profile): BodyScore | null {
 /**
  * Points per part (founder, 24 Oct 2026): no bonuses.
  * Body = Food 40 + Sleep 30 + Movement 30.
- * Mind = Focus to-dos 40 + Breathing & meditation 30 + Phone activity 30 (Learning removed).
+ * Mind = Focus to-dos 40 + Breathing & meditation 30 + Phone activity 30 (Learning removed; phone = 30 × quality − 1 per 10 min over the limit).
  * Soul = Gratitude 30 + Love 30 + Daily Wisdom 20 + Tao practice 20 = 100 (founder, 25 Oct 2026, ending the 130 overrun).
  */
 export const POINTS = { food: 40, sleep: 30, movement: 30, focus: 40, meditation: 30, phone: 30, gratitude: 30, wisdom: 20, tao: 20, love: 30 } as const;
@@ -124,19 +124,25 @@ export interface MindScore {
 /** From this day on, a day's phone points come from the day before (the screenshot is added the next morning). */
 export const PHONE_LAG_FROM = '2026-10-27';
 
-/** Phone activity points for a set of sessions: quality 18 + within the limit 12 (null when nothing logged). */
-export function phoneContent(media: MediaSession[], noMedia: boolean | undefined, P: Profile): { content: number | null; minutes: number; quality: number | null } {
-  if (noMedia) return { content: POINTS.phone, minutes: 0, quality: 1 };
+/** Social and video minutes over the limit cost 1 point for every 10 minutes (founder, 1 Nov 2026). */
+export const OVER_LIMIT_MIN_PER_POINT = 10;
+
+/**
+ * Phone activity points (founder, 1 Nov 2026: quality matters most): 30 × quality (minutes weighted by the kind of
+ * content), then minus 1 point per 10 social and video minutes over the daily limit. Never below 0. Null when nothing logged.
+ */
+export function phoneContent(media: MediaSession[], noMedia: boolean | undefined, P: Profile): { content: number | null; minutes: number; quality: number | null; social: number; over: number; penalty: number } {
+  if (noMedia) return { content: POINTS.phone, minutes: 0, quality: 1, social: 0, over: 0, penalty: 0 };
   // Scored: social and learning sessions that were the person's own; tools and "Not me" are left out (26 Oct 2026).
   const scored = media.filter(x => !x.notMe && x.group !== 'tool');
   const social = scored.filter(x => x.group !== 'learning').reduce((s, x) => s + (x.minutes || 0), 0);
   const minutes = scored.reduce((s, x) => s + (x.minutes || 0), 0);
-  if (minutes <= 0) return { content: null, minutes: 0, quality: null };
+  if (minutes <= 0) return { content: null, minutes: 0, quality: null, social: 0, over: 0, penalty: 0 };
   const quality = scored.reduce((s, x) => s + (x.minutes || 0) * weightOf(x.category), 0) / minutes;
-  const L = P.mediaLimit;
   // Only social and video time counts toward the limit; learning and AI tools never use it up.
-  const quantity = social <= L ? 1 : c01(1 - (social - L) / (2 * L));
-  return { content: 18 * quality + 12 * quantity, minutes, quality };
+  const over = Math.max(0, social - P.mediaLimit);
+  const penalty = over / OVER_LIMIT_MIN_PER_POINT;
+  return { content: Math.max(0, POINTS.phone * quality - penalty), minutes, quality, social, over, penalty };
 }
 
 export function mindScore(d: DayLog, P: Profile): MindScore | null {

@@ -22,18 +22,18 @@ const COLOR: Record<FeelingId, string> = {
   love: PASTEL.rose, hope: PASTEL.sand, joy: PASTEL.peach, calm: PASTEL.sky, learning: PASTEL.teal, fear: PASTEL.lavender, anger: '#B8A9A0',
 };
 
-export function MindFood({ day }: { day: DayLog }) {
+/** The feelings in what was watched as rings; the card's score (out of 30) in the middle (founder, 1 Nov 2026). */
+export function MindFood({ day, score }: { day: DayLog; score: number | null }) {
   const r = feelingMix(day.media ?? [], day.watched ?? []);
   if (!r) return null;
   // The five biggest feelings, so the rings stay readable.
   const top = [...FEELINGS].sort((a, b) => r.mix[b.id] - r.mix[a.id]).filter(f => r.mix[f.id] > 0.005).slice(0, 5);
   const items: RingItem[] = top.map(f => ({ id: f.id, color: COLOR[f.id], label: tr(f.label), value: r.mix[f.id], text: `${Math.round(r.mix[f.id] * 100)}%` }));
-  const heavy = Math.round(heavyShare(r.mix) * 100);
   // The only circle on Phone activity (founder, 31 Oct 2026): the explanation lives under Show details (MindFoodNote).
   return (
     <View style={{ gap: 4 }}>
       <Text style={{ fontSize: 13, fontWeight: '600', color: colors.muted }}>{tr('What you fed your mind')}</Text>
-      <RingPanel items={items} score={100 - heavy} max={100} sub={tr('nourishing')} trend="phone" />
+      <RingPanel items={items} score={score == null ? null : Math.round(score)} max={30} trend="phone" />
     </View>
   );
 }

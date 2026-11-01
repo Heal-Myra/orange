@@ -1,5 +1,9 @@
 # Changelog
 
+## 1 Nov 2026 — Phone activity: quality first, time only as a penalty (decision 0042)
+- Score: 30 × content quality, minus 1 point for every 10 social and video minutes over the daily limit (never below 0). Before: quality 18 + within the limit 12. Older days are re-scored the same way.
+- Card: the feeling rings with the score (of 30) in the middle; a quiet "Social time 96 / 60 min · −4" line only when over the limit; the pastel fast button; a box like Ask Myra's with + (choose a screenshot) and Apple's own Paste button, so iPhone no longer asks "Allow Paste" each time; Show details (closed by default) holds only the how-to and the app list. Content quality, minutes lines and the "Added" message are gone.
+
 ## 31 Oct 2026 — Body, Mind, Soul scores in the tab bar (option B)
 - Each of the Body, Mind and Soul tab icons sits in one thin ring (sage, teal, peach) that fills with that pillar's score for the day on screen, visible from every page.
 - The three Body / Mind / Soul circles are removed from Today: Today is My day (score + Myra) and Ask Myra.

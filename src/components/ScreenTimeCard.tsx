@@ -1,9 +1,11 @@
+import { Ionicons } from '@expo/vector-icons';
 // Phone activity: read every app's minutes from a Screen Time (iPhone) or Digital Wellbeing (Android) screenshot, in
 // three groups (founder, 26 Oct 2026): social and video (count toward the limit), learning and AI tools (raise quality,
 // never use up the limit), everyday tools (shown, not scored). Minutes go to the day the screenshot shows.
 // Websites cannot read Screen Time directly, so a screenshot is the practical way. Every number can be checked and changed.
 
-import { InfoFast, MindFood, MindFoodNote } from './MindFood';
+import { InfoFast, MindFood } from './MindFood';
+import { PASTEL } from './Rings';
 import { feelingMix, heavyShare } from '../lib/feelings';
 import { MyraLine } from './MyraLine';
 import * as ImagePicker from 'expo-image-picker';
@@ -104,6 +106,15 @@ export function ScreenTimeCard({ children }: { children?: ReactNode }) {
     await read(async () => img.uri.startsWith('data:') && Platform.OS !== 'web' ? shrink(img.uri, img.data, img.type) : { data: img.data, type: img.type });
   };
 
+  // Apple's Paste button hands over the picture itself, so iPhone does not ask "Allow Paste?" (founder, 1 Nov 2026).
+  const pastedFromButton = async (e: { type: string; data?: string }) => {
+    if (e.type !== 'image' || !e.data) { setMessage(tr('No picture to paste. Take the screenshot, tap Copy, then Paste here.')); return; }
+    setMessage(null); setRows(null);
+    const uri = e.data.startsWith('data:') ? e.data : `data:image/jpeg;base64,${e.data}`;
+    setPreview(uri);
+    await read(() => shrink(uri, uri.split(',')[1] ?? '', 'image/jpeg'));
+  };
+
   const read = async (get: () => Promise<{ data: string; type: string }>) => {
     setBusy(true); setMessage(tr('Reading your Screen Time…'));
     try {
@@ -125,7 +136,7 @@ export function ScreenTimeCard({ children }: { children?: ReactNode }) {
       d.media = [...d.media.filter(m => m.source !== 'screen'), ...rows.filter(r => r.minutes > 0)];
     });
     setRows(null);
-    setMessage(target === phoneDate ? tr('Added. Your content diet score is updated.') : tr('Added to {day}, the day the screenshot shows.', { day: new Date(target + 'T12:00:00').toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'short' }) }));
+    setMessage(target === phoneDate ? null : tr('Added to {day}, the day the screenshot shows.', { day: new Date(target + 'T12:00:00').toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'short' }) }));
   };
   const setRow = (i: number, change: Partial<MediaSession>) => setRows(list => list && list.map((x, n) => (n === i ? { ...x, ...change } : x)));
   const toolRows = rows?.filter(r => r.group === 'tool') ?? [];
@@ -135,13 +146,40 @@ export function ScreenTimeCard({ children }: { children?: ReactNode }) {
       <Heading right={<Score value={score?.content ?? undefined} max={30} />}>{phoneDate === date ? tr('Phone activity') : tr('Phone activity · yesterday')}</Heading>
       {/* Minimalist (founder, 31 Oct 2026): one circle (what you fed your mind), the fast, the screenshot buttons; the rest
           under Show details. */}
-      <MindFood day={day} />
+      <MindFood day={day} score={score.content} />
+      {/* Time shows only when it costs points (founder, 1 Nov 2026): −1 for every 10 minutes over the limit. */}
+      {score.over > 0 ? (
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10, paddingHorizontal: 12, borderRadius: 14, backgroundColor: PASTEL.lavender + '1F' }}>
+          <Ionicons name="time-outline" size={18} color={colors.ink} />
+          <Text style={{ flex: 1, color: colors.ink, fontSize: 15 }}>{tr('Social time')} <Text style={{ fontWeight: '700' }}>{score.social} / {profile.mediaLimit} {tr('min')}</Text></Text>
+          <Text style={{ color: '#6A62A8', fontWeight: '800', fontSize: 15 }}>−{Math.round(score.penalty)}</Text>
+        </View>
+      ) : null}
       {phoneDate !== date ? <InfoFast /> : null}
       {/* "I used no social media today" removed (founder, 23 Oct 2026). Older days that have it still count. */}
+      {/* A box like Ask Myra's (founder, 1 Nov 2026): + chooses a screenshot; Apple's own Paste button pastes one without
+          the "Allow Paste" question every time. */}
       {session ? (
-        <View style={s.row}>
-          <View style={{ flex: 1 }}><Button kind="insight" title={busy ? tr('Reading…') : tr('Choose screenshot')} onPress={pick} disabled={busy} /></View>
-          <View style={{ flex: 1 }}><Button kind="plain" title={tr('Paste screenshot')} onPress={paste} disabled={busy} /></View>
+        <View style={{ borderWidth: 1, borderColor: colors.line, backgroundColor: '#FFFFFF', borderRadius: 24, padding: 11, gap: 10, boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
+          <Text style={{ fontSize: 16, color: colors.muted, paddingHorizontal: 4, paddingTop: 2 }}>{busy ? tr('Reading your Screen Time…') : tr("Add yesterday's Screen Time…")}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+            <Pressable onPress={pick} disabled={busy} accessibilityLabel={tr('Choose screenshot')}
+              style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: colors.insight + '14', alignItems: 'center', justifyContent: 'center' }}>
+              <Ionicons name="add" size={24} color={colors.insight} />
+            </Pressable>
+            <View style={{ flex: 1 }} />
+            {Platform.OS === 'ios' && Clip?.isPasteButtonAvailable ? (
+              <Clip.ClipboardPasteButton acceptedContentTypes={['image']} imageOptions={{ format: 'jpeg', jpegQuality: 0.8 }}
+                backgroundColor={colors.insight} foregroundColor="#FFFFFF" cornerStyle="capsule" displayMode="iconAndLabel"
+                style={{ width: 104, height: 40 }} onPress={pastedFromButton} />
+            ) : (
+              <Pressable onPress={paste} disabled={busy} accessibilityRole="button"
+                style={{ flexDirection: 'row', alignItems: 'center', gap: 6, height: 40, paddingHorizontal: 16, borderRadius: 20, backgroundColor: colors.insight }}>
+                <Ionicons name="clipboard-outline" size={17} color={colors.onInsight} />
+                <Text style={{ color: colors.onInsight, fontWeight: '700', fontSize: 15 }}>{tr('Paste')}</Text>
+              </Pressable>
+            )}
+          </View>
         </View>
       ) : <Note>{tr('Sign in to read a screenshot. You can still add sessions by hand below.')}</Note>}
       {/* The screenshot appears at once with a reading spinner, so it is clear the app is working (founder, 27 Oct 2026). */}
@@ -195,15 +233,7 @@ export function ScreenTimeCard({ children }: { children?: ReactNode }) {
       </Pressable>
       {details ? (
         <View style={{ gap: 8, borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 10 }}>
-          {score.content != null ? (
-            <>
-              <DetailRow label={tr('Content quality')} value={`${Math.round(18 * (score.quality ?? 0))} / 18`} />
-              <DetailRow label={tr('Social and video')} value={`${socialMin} / ${profile.mediaLimit} ${tr('min')}`} />
-            </>
-          ) : null}
-          <MindFoodNote day={day} />
-          {learning && !rows ? <Note>{tr('Learning and AI tools: {n} min (never counts against the limit).', { n: learning })}</Note> : null}
-          <Note>{tr('Each morning, add yesterday: in Settings → Screen Time → See All App & Website Activity, go back one day, take a screenshot, then paste it here. The app reads every app for you.')}</Note>
+          <Note>{tr('Each morning: Settings › Screen Time › See All Activity › go back one day › screenshot › paste here.')}</Note>
           {children}
         </View>
       ) : null}
@@ -212,9 +242,3 @@ export function ScreenTimeCard({ children }: { children?: ReactNode }) {
   );
 }
 
-const DetailRow = ({ label, value }: { label: string; value: string }) => (
-  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-    <Text style={{ flex: 1, color: colors.ink, fontSize: 15 }}>{label}</Text>
-    <Text style={{ color: colors.ink, fontWeight: '600', fontSize: 15 }}>{value}</Text>
-  </View>
-);

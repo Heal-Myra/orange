@@ -1344,4 +1344,8 @@ export const HI: Record<string, string> = {
   'Note one kind act.': 'एक भलाई लिखिए।',
   "Read today's wisdom.": 'आज का ज्ञान पढ़िए।',
   "Try today's Tao.": 'आज का ताओ कीजिए।',
+  'Social time': 'सोशल समय',
+  "Add yesterday's Screen Time…": 'कल का स्क्रीन टाइम जोड़ें…',
+  'Paste': 'पेस्ट करें',
+  'Each morning: Settings › Screen Time › See All Activity › go back one day › screenshot › paste here.': 'हर सुबह: सेटिंग्स › स्क्रीन टाइम › सारी गतिविधि › एक दिन पीछे › स्क्रीनशॉट › यहाँ पेस्ट करें।',
 };
