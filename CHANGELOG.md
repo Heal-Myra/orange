@@ -1,5 +1,9 @@
 # Changelog
 
+## 1 Nov 2026 — My day out of 100 (decision 0043)
+- The day's well-being is the average of Body, Mind and Soul, out of 100 (was their sum, out of 300). Bands: 80+ Flourishing, 60+ Balanced, 40+ Finding your footing. Trends re-scaled the same way.
+- Myra's "+N" on Today is now what the nudge adds to the day's 100 (e.g. "+5 · Mind · for your day"). Each tab and card keeps its own scale.
+
 ## 1 Nov 2026 — Phone activity: quality first, time only as a penalty (decision 0042)
 - Score: 30 × content quality, minus 1 point for every 10 social and video minutes over the daily limit (never below 0). Before: quality 18 + within the limit 12. Older days are re-scored the same way.
 - Card: the feeling rings with the score (of 30) in the middle; a quiet "Social time 96 / 60 min · −4" line only when over the limit; the pastel fast button; a box like Ask Myra's with + (choose a screenshot) and Apple's own Paste button, so iPhone no longer asks "Allow Paste" each time; Show details (closed by default) holds only the how-to and the app list. Content quality, minutes lines and the "Added" message are gone.

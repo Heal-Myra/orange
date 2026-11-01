@@ -1,4 +1,4 @@
-// Today: the well-being circle (Body + Mind + Soul, out of 300) and today's guidance.
+// Today: the well-being circle (the average of Body, Mind and Soul, out of 100) and today's guidance.
 // The detail of each pillar lives on its own tab; tap a section of the circle to open it.
 
 import { Text, View } from 'react-native';

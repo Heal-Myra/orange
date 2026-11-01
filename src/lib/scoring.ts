@@ -1,5 +1,5 @@
 // Project Heal scoring engine.
-// Well-being = Body (100) + Mind (100) + Soul (100) = 300.
+// Well-being (out of 100, founder 1 Nov 2026) = the average of Body (100), Mind (100) and Soul (100). Before: their sum, out of 300.
 // A working model to help people understand themselves, not a medical measure
 // (The Orange Book, Chapter 2). Weights are documented in docs/scoring.md.
 
@@ -209,14 +209,14 @@ export function wellBeing(d: DayLog, P: Profile): WellBeing {
   const body = bodyScore(d, P), mind = mindScore(d, P), soul = soulScore(d, P);
   return {
     body, mind, soul,
-    total: (body?.total ?? 0) + (mind?.total ?? 0) + (soul?.total ?? 0),
+    total: ((body?.total ?? 0) + (mind?.total ?? 0) + (soul?.total ?? 0)) / 3,
     logged: [body, mind, soul].filter(Boolean).length,
   };
 }
 
 export function band(total: number): 'Flourishing' | 'Balanced' | 'Finding your footing' | 'Needs care' {
-  if (total >= 240) return 'Flourishing';
-  if (total >= 180) return 'Balanced';
-  if (total >= 120) return 'Finding your footing';
+  if (total >= 80) return 'Flourishing';
+  if (total >= 60) return 'Balanced';
+  if (total >= 40) return 'Finding your footing';
   return 'Needs care';
 }

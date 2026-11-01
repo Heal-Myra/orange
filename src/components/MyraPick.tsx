@@ -19,9 +19,9 @@ import { HandLine } from './HandLine';
 
 // The big number takes a deeper shade of its pillar's ring colour so it reads well (never red).
 const PILLAR = {
-  body: { points: 'Body points', ink: '#5E8A4E' },
-  mind: { points: 'Mind points', ink: '#2A7C83' },
-  soul: { points: 'Soul points', ink: '#A9744F' },
+  body: { points: 'Body · for your day', ink: '#5E8A4E' },
+  mind: { points: 'Mind · for your day', ink: '#2A7C83' },
+  soul: { points: 'Soul · for your day', ink: '#A9744F' },
 } as const;
 
 /** One line in an instructing tone (founder, 31 Oct 2026, like option 3): a nudge, no minutes. */
@@ -98,7 +98,7 @@ export function MyraPick({ w }: { w: WellBeing }) {
   const p = PILLAR[s.pillar];
   return (
     <View style={{ flex: 1, gap: 2 }}>
-      <Text style={{ color: p.ink, fontSize: 40, fontWeight: '800', lineHeight: 44 }}>+{s.gain}</Text>
+      <Text style={{ color: p.ink, fontSize: 40, fontWeight: '800', lineHeight: 44 }}>+{Math.max(1, Math.round(s.gain / 3))}</Text>
       <Text style={{ color: colors.muted, fontSize: 13, fontWeight: '600' }}>{tr(p.points)}</Text>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 8 }}>
         {/* Written by a quill, then the start arrow appears (founder, 31 Oct 2026). */}

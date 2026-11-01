@@ -1348,4 +1348,7 @@ export const HI: Record<string, string> = {
   "Add yesterday's Screen Time…": 'कल का स्क्रीन टाइम जोड़ें…',
   'Paste': 'पेस्ट करें',
   'Each morning: Settings › Screen Time › See All Activity › go back one day › screenshot › paste here.': 'हर सुबह: सेटिंग्स › स्क्रीन टाइम › सारी गतिविधि › एक दिन पीछे › स्क्रीनशॉट › यहाँ पेस्ट करें।',
+  'Body · for your day': 'शरीर · आपके दिन में',
+  'Mind · for your day': 'मन · आपके दिन में',
+  'Soul · for your day': 'आत्मा · आपके दिन में',
 };

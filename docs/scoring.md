@@ -1,6 +1,6 @@
 # How the well-being score works
 
-Well-being = **Body + Mind + Soul**, each out of 100, so the total is out of 300.
+Well-being = the **average of Body, Mind and Soul**, each out of 100, so the total is out of 100 (founder, 1 Nov 2026; before that the sum, out of 300). Each pillar and card keeps its own scale.
 It is a working model to help a person understand themselves, not a medical measure (The Orange Book, Chapter 2).
 The code is in `src/lib/scoring.ts`; tests are in `src/lib/scoring.test.ts`.
 
@@ -38,7 +38,7 @@ Learning earns 25 %, living it during the day earns 75 % (founder, 26 Oct 2026).
 Founder's split, 25 Oct 2026; Gratitude journal from 27 Oct 2026 (days before keep four gratitudes 7.5 each and the old Love card: whom 12, myself 12, done 6).
 
 ## Bands
-240+ Flourishing · 180+ Balanced · 120+ Finding your footing · below 120 Needs care.
+80+ Flourishing · 60+ Balanced · 40+ Finding your footing · below 40 Needs care (out of 100).
 
 ## Trends: Week, Month, Quarter, Year (22 Oct 2026)
 

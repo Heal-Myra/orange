@@ -1,6 +1,6 @@
 // The Today circle, in the founder's chosen look "A. Calm Teal" (19 Oct 2026):
 // a soft tinted disc holding a thin ring of three rounded arcs (Body, Mind, Soul). Each arc fills in
-// proportion to its score out of 100; the total out of 300 sits in the middle in Happy Orange coral.
+// proportion to its score out of 100; the total out of 100 (the average of the three) sits in the middle in Happy Orange coral.
 // Below the circle, three coloured tiles open the Body, Mind and Soul tabs.
 
 import { router } from 'expo-router';
@@ -47,7 +47,7 @@ export function WellBeingRing({ w, label, labelColor }: { w: WellBeing; label: s
             </Svg>
             <View pointerEvents="none" style={{ position: 'absolute', left: 0, top: 0, width: SIZE, height: SIZE, alignItems: 'center', justifyContent: 'center' }}>
               <Text style={{ fontSize: 44 * k, color: colors.insight, fontVariant: ['tabular-nums'], lineHeight: 50 * k }}>{Math.round(w.total)}</Text>
-              <Text style={{ color: colors.muted, fontSize: 12 }}>{tr('of 300')}</Text>
+              <Text style={{ color: colors.muted, fontSize: 12 }}>{tr('of 100')}</Text>
             </View>
           </View>
         </View>

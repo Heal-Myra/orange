@@ -144,10 +144,10 @@ describe('soul (gratitude 30, love 30, Daily Wisdom 20, Tao 20)', () => {
 
 describe('band', () => {
   it('maps totals to labels', () => {
-    expect(band(250)).toBe('Flourishing');
-    expect(band(200)).toBe('Balanced');
-    expect(band(130)).toBe('Finding your footing');
-    expect(band(50)).toBe('Needs care');
+    expect(band(84)).toBe('Flourishing');
+    expect(band(67)).toBe('Balanced');
+    expect(band(44)).toBe('Finding your footing');
+    expect(band(17)).toBe('Needs care');
   });
 });
 

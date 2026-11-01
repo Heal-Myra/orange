@@ -79,7 +79,7 @@ const num = (v: number | undefined | null) => (v == null || Number.isNaN(v) ? nu
 const ate = (d: DayLog) => d.meals.length > 0;
 
 export const METRICS: Metric[] = [
-  { id: 'wellbeing', name: 'Well-being', unit: 'of 300', pillar: 'today', better: 'up', value: (d, P) => { const w = wellBeing(d, P); return w.logged ? w.total : null; } },
+  { id: 'wellbeing', name: 'Well-being', unit: 'of 100', pillar: 'today', better: 'up', value: (d, P) => { const w = wellBeing(d, P); return w.logged ? w.total : null; } },
   { id: 'bodyScore', name: 'Body', unit: 'of 100', pillar: 'today', better: 'up', value: (d, P) => num(bodyScore(d, P)?.total) },
   { id: 'mindScore', name: 'Mind', unit: 'of 100', pillar: 'today', better: 'up', value: (d, P) => num(mindScore(d, P)?.total) },
   { id: 'soulScore', name: 'Soul', unit: 'of 100', pillar: 'today', better: 'up', value: (d, P) => num(soulScore(d, P)?.total) },

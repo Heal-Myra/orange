@@ -1,5 +1,5 @@
 // Today's well-being card in the same design as every other card (founder, 31 Oct 2026; decision 0037):
-// concentric rings for the best part of the day and the three biggest concerns, the total out of 300 in the middle,
+// concentric rings for the best part of the day and the three biggest concerns, the total out of 100 in the middle,
 // the key at the side, and Myra's recommendation at the bottom of the card.
 
 import { router } from 'expo-router';
@@ -53,7 +53,7 @@ export function TodayRings({ w }: { w: WellBeing }) {
         <Text style={{ fontSize: 13, fontWeight: '600', color: colors.muted }}>{w.logged ? tr(band(w.total)) : tr('Nothing logged yet')}</Text>
       </View>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
-        <RingTap trend="today"><RingStack items={items} center={fmt(w.total)} sub={tr('of {n}', { n: 300 })} size={140} /></RingTap>
+        <RingTap trend="today"><RingStack items={items} center={fmt(w.total)} sub={tr('of {n}', { n: 100 })} size={140} /></RingTap>
         {/* A thin line between the score and Myra (founder, 31 Oct 2026, like option 2). */}
         <View style={{ width: 1, alignSelf: 'stretch', marginVertical: 12, backgroundColor: colors.line }} />
         <MyraPick w={w} />
