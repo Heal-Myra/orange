@@ -1,5 +1,8 @@
 # Changelog
 
+## 1 Nov 2026 — Body, Mind, Soul circles back on Today
+- The three circles with each pillar's parts return under My day (Today looked too blank). The tab icons keep their score rings.
+
 ## 1 Nov 2026 — My day out of 100 (decision 0043)
 - The day's well-being is the average of Body, Mind and Soul, out of 100 (was their sum, out of 300). Bands: 80+ Flourishing, 60+ Balanced, 40+ Finding your footing. Trends re-scaled the same way.
 - Myra's "+N" on Today is now what the nudge adds to the day's 100 (e.g. "+5 · Mind · for your day"). Each tab and card keeps its own scale.

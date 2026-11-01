@@ -2,7 +2,7 @@
 // The detail of each pillar lives on its own tab; tap a section of the circle to open it.
 
 import { Text, View } from 'react-native';
-import { TodayRings } from '../../components/TodayRings';
+import { PillarRings, TodayRings } from '../../components/TodayRings';
 import { MyraCard } from '../../components/MyraCard';
 import { AirLine } from '../../components/AirLine';
 import { todayISO } from '../../lib/dates';
@@ -28,7 +28,9 @@ export default function Today() {
           the total in the middle, Myra recommends at the bottom; the three tiles open Body, Mind and Soul. */}
       <TodayRings w={w} />
 
-      {/* The three Body / Mind / Soul circles moved into the tab bar as rings around the icons (founder, 31 Oct 2026). */}
+      {/* Back under the total (founder, 1 Nov 2026: the page looked too blank): Body, Mind and Soul with their parts. The tab
+          icons keep their single score rings. */}
+      <PillarRings w={w} />
 
       <MyraCard />
 
