@@ -72,17 +72,21 @@ export function PillarRings({ w }: { w: WellBeing }) {
     { tab: 'soul', name: 'Soul', score: w.soul ? w.soul.total : null },
   ];
   return (
-    <View style={{ flexDirection: 'row', gap: 8 }}>
-      {pillars.map(p => {
+    // One white card with a fine line between the three (founder, 1 Nov 2026), like the line between the score and Myra.
+    <View style={{ flexDirection: 'row', backgroundColor: colors.surface, borderRadius: 22, paddingVertical: 4 }}>
+      {pillars.map((p, i) => {
         const mine = parts.filter(x => x.tab === p.tab);
         const items: RingItem[] = mine.map(x => ({ id: x.id, color: x.color, label: tr(x.label), value: x.got / x.of }));
         return (
-          <Pressable key={p.tab} accessibilityRole="button" accessibilityLabel={`${tr(p.name)}: ${p.score == null ? '–' : Math.round(p.score)}/100`}
+          <View key={p.tab} style={{ flex: 1, flexDirection: 'row' }}>
+          {i > 0 ? <View style={{ width: 1, marginVertical: 18, backgroundColor: colors.line }} /> : null}
+          <Pressable accessibilityRole="button" accessibilityLabel={`${tr(p.name)}: ${p.score == null ? '–' : Math.round(p.score)}/100`}
             onPress={() => router.navigate(`/${p.tab}`)}
-            style={({ pressed }) => ({ flex: 1, alignItems: 'center', gap: 6, paddingVertical: 12, borderRadius: 18, backgroundColor: colors.surface, opacity: pressed ? 0.85 : 1 })}>
+            style={({ pressed }) => ({ flex: 1, alignItems: 'center', gap: 6, paddingVertical: 12, opacity: pressed ? 0.85 : 1 })}>
             <RingStack items={items} center={p.score == null ? '–' : fmt(Math.round(p.score))} sub={tr('of {n}', { n: 100 })} size={92} />
             <Text style={{ fontSize: 15, fontWeight: '700', color: colors.ink }}>{tr(p.name)}</Text>
           </Pressable>
+          </View>
         );
       })}
     </View>
