@@ -39,3 +39,12 @@ describe('Face & beauty', () => {
     expect(latestReading({ '2026-10-20': { face: f } }, '2026-10-31')).toBeNull();
   });
 });
+
+describe('four skin groups (1 Nov 2026)', () => {
+  it('averages each group by weight and finds the one needing most care', async () => {
+    const { groupScores, needsCare } = await import('./face');
+    const g = groupScores({ at: '', witty: '', looks: null, looksNote: '', hints: [], tips: [], skin: { darkCircles: 'mild', puffiness: 'mild', dryness: 'none', lips: 'none', redness: 'none', breakouts: 'none', tan: 'none' } });
+    expect(g.map(x => [x.id, x.v])).toEqual([['eyes', 60], ['clear', 100], ['moisture', 100], ['sun', 100]]);
+    expect(needsCare(g)?.id).toBe('eyes');
+  });
+});

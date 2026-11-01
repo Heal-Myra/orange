@@ -1,5 +1,8 @@
 # Changelog
 
+## 1 Nov 2026 — Face & beauty in four rings
+- The seven skin points are grouped into four rings: Eyes (dark circles, puffiness), Clear skin (redness, pimples), Moisture (dryness, lips) and Sun (tan), each the weighted average of its points; the skin score is unchanged. The four sit beside the rings with their scores; the group needing most care sits in a soft box below with one tip; Show details lists all seven points.
+
 ## 1 Nov 2026 — Every finished to-do counts
 - Clear your mind: finishing any to-do now adds its points at once (20 each, the first two of the day = 40). Before, only the two Myra had picked for the day counted, so finishing another one did not move the score.
 

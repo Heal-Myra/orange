@@ -6,7 +6,7 @@
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import Svg, { Circle, G } from 'react-native-svg';
-import { earlierReading, pointScore, SKIN, skinScore } from '../lib/face';
+import { earlierReading, GROUPS, groupScores, needsCare, pointScore, SKIN, skinScore, type SkinKey } from '../lib/face';
 import { tr } from '../lib/i18n';
 import { useHeal } from '../lib/store';
 import { colors } from '../theme';
@@ -18,14 +18,9 @@ import { MyraLine } from './MyraLine';
 /** Numbers stay calm (founder, 31 Oct 2026: no red for concerns; light and minimalist): soft green when good, grey otherwise. */
 const tone = (v: number) => (v >= 80 ? colors.good : colors.muted);
 
-/** Each skin point has its own ring colour, like activity rings. */
-const RING: Record<string, string> = {
-  breakouts: '#EBA987', darkCircles: '#9C95D0', dryness: '#6FB7BD', puffiness: '#86B4DE', tan: '#E3B873', redness: '#D9A7BD', lips: '#9CC08E',
-};
-
-/** One ring per point, outermost first, filled by its score; the overall (weighted) skin score in the middle. */
-function Rings({ rings, value, size = 150 }: { rings: { id: string; v: number }[]; value: number; size?: number }) {
-  const w = 9, gap = 3;
+/** One ring per group, outermost first, filled by its score; the overall (weighted) skin score in the middle. */
+function Rings({ rings, value, size = 150 }: { rings: { id: string; v: number; color: string }[]; value: number; size?: number }) {
+  const w = 11, gap = 5;
   return (
     <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
       <Svg width={size} height={size} style={{ position: 'absolute' }}>
@@ -33,8 +28,8 @@ function Rings({ rings, value, size = 150 }: { rings: { id: string; v: number }[
           const r = size / 2 - w / 2 - i * (w + gap), c = 2 * Math.PI * r;
           return (
             <G key={k.id}>
-              <Circle cx={size / 2} cy={size / 2} r={r} stroke={RING[k.id] + '33'} strokeWidth={w} fill="none" />
-              <Circle cx={size / 2} cy={size / 2} r={r} stroke={RING[k.id]} strokeWidth={w} fill="none" strokeLinecap="round"
+              <Circle cx={size / 2} cy={size / 2} r={r} stroke={k.color + '33'} strokeWidth={w} fill="none" />
+              <Circle cx={size / 2} cy={size / 2} r={r} stroke={k.color} strokeWidth={w} fill="none" strokeLinecap="round"
                 strokeDasharray={`${Math.max(0.01, (c * k.v) / 100)} ${c}`} transform={`rotate(-90 ${size / 2} ${size / 2})`} />
             </G>
           );
@@ -46,12 +41,12 @@ function Rings({ rings, value, size = 150 }: { rings: { id: string; v: number }[
   );
 }
 
-function Legend({ id, label, value }: { id: string; label: string; value: number }) {
+function Legend({ color, label, value, small }: { color: string; label: string; value: number; small?: boolean }) {
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-      <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: RING[id] }} />
-      <Text style={{ flex: 1, color: colors.ink, fontSize: 13 }} numberOfLines={1}>{label}</Text>
-      <Text style={{ color: tone(value), fontWeight: '700', fontSize: 13 }}>{value}</Text>
+      <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: color }} />
+      <Text style={{ flex: 1, color: colors.ink, fontSize: small ? 13.5 : 15 }} numberOfLines={1}>{label}</Text>
+      <Text style={{ color: tone(value), fontWeight: '700', fontSize: small ? 13.5 : 15 }}>{value}</Text>
     </View>
   );
 }
@@ -63,12 +58,11 @@ export function FaceCard() {
   const before = earlierReading(days, date);
   const was = skinScore(before?.face);
   const [more, setMore] = useState(false);
-  // Lowest scores first (stable, so ties keep the usual order).
-  const points = SKIN.filter(k => f?.skin[k.id]).map(k => ({ ...k, v: pointScore(f!.skin[k.id])! })).sort((a, b) => a.v - b.v);
-  const best = points.length ? [...points].sort((a, b) => b.v - a.v)[0] : null;
-  const others = points.filter(k => k !== best);
-  const concerns = others.filter(k => k.v < 100).slice(0, 3); // only real concerns; all clear means none
-  const rest = others.filter(k => !concerns.includes(k));
+  // Four groups (founder, 1 Nov 2026, option B): Eyes, Clear skin, Moisture, Sun; the one needing most care below;
+  // every point under Show details.
+  const groups = groupScores(f);
+  const care = needsCare(groups);
+  const colorOf = (k: SkinKey) => GROUPS.find(g => g.parts.includes(k))?.color ?? colors.muted;
   const plus = useAttach(async img => {
     const r = await selfieReading(img);
     if (typeof r === 'string') return r;
@@ -94,23 +88,28 @@ export function FaceCard() {
                 </View>
                 {plus.button}
               </View>
-              {/* One score in the middle (weighted), a ring for each point shown: the best first, then the three biggest
-                  concerns (founder, 31 Oct 2026); the rest fold away. */}
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
-                <Rings rings={[...(best ? [best] : []), ...concerns, ...(more ? rest : [])]} value={score} size={more ? 170 : 150} />
-                <View style={{ flex: 1, gap: 7 }}>
-                  {best ? <Text style={{ color: colors.good, fontWeight: '700', fontSize: 11, letterSpacing: 0.4 }}>{tr('YOUR BEST')}</Text> : null}
-                  {best ? <Legend id={best.id} label={tr(best.label)} value={best.v} /> : null}
-                  {concerns.length ? <Text style={{ color: colors.muted, fontWeight: '700', fontSize: 11, letterSpacing: 0.4, marginTop: 4 }}>{tr('CATCH UP ON')}</Text> : null}
-                  {concerns.map(k => <Legend key={k.id} id={k.id} label={tr(k.label)} value={k.v} />)}
-                  {more && rest.length ? <View style={{ height: 4 }} /> : null}
-                  {more ? rest.map(k => <Legend key={k.id} id={k.id} label={tr(k.label)} value={k.v} />) : null}
+                <Rings rings={groups.map(g => ({ id: g.id, v: g.v, color: g.color }))} value={score} />
+                <View style={{ flex: 1, gap: 9 }}>
+                  {groups.map(g => <Legend key={g.id} color={g.color} label={tr(g.label)} value={g.v} />)}
                 </View>
               </View>
-              {rest.length ? (
-                <Pressable onPress={() => setMore(m => !m)} hitSlop={8} accessibilityRole="button">
-                  <Text style={{ color: colors.accent, fontWeight: '600' }}>{more ? tr('Show less') : tr('See all {n}', { n: points.length })}</Text>
-                </Pressable>
+              {care ? (
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, padding: 12, borderRadius: 14, backgroundColor: care.color + '1A' }}>
+                  <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: care.color }} />
+                  <View style={{ flex: 1, gap: 2 }}>
+                    <Text style={{ color: colors.ink, fontWeight: '700', fontSize: 15 }}>{tr('Needs most care: {g} · {v}', { g: tr(care.label), v: care.v })}</Text>
+                    <Text style={{ color: colors.muted, fontSize: 13.5, lineHeight: 19 }}>{tr(care.tip)}</Text>
+                  </View>
+                </View>
+              ) : null}
+              <Pressable onPress={() => setMore(m => !m)} hitSlop={8} accessibilityRole="button" style={{ alignSelf: 'center' }}>
+                <Text style={{ color: colors.muted, fontWeight: '600', fontSize: 13.5 }}>{more ? tr('Hide details') : tr('Show details')} {more ? '˄' : '˅'}</Text>
+              </Pressable>
+              {more ? (
+                <View style={{ gap: 8, borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 10 }}>
+                  {SKIN.filter(k => f.skin[k.id]).map(k => <Legend key={k.id} small color={colorOf(k.id)} label={tr(k.label)} value={pointScore(f.skin[k.id])!} />)}
+                </View>
               ) : null}
               <Note>{tr('Everyday skin care, not medical advice.')}</Note>
             </>

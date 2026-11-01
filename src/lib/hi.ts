@@ -1418,4 +1418,13 @@ export const HI: Record<string, string> = {
   'Add a photo of your meal…': 'अपने खाने की फ़ोटो जोड़ें…',
   'Add your handwritten to-do list…': 'अपनी हाथ से लिखी कामों की सूची जोड़ें…',
   'Add a selfie for Face & beauty…': 'चेहरा और सुंदरता के लिए सेल्फ़ी जोड़ें…',
+  'Eyes': 'आँखें',
+  'Clear skin': 'साफ़ त्वचा',
+  'Moisture': 'नमी',
+  'Sun': 'धूप',
+  'Needs most care: {g} · {v}': 'सबसे ज़्यादा ध्यान: {g} · {v}',
+  'Rest a cold spoon under each eye for a minute.': 'हर आँख के नीचे एक मिनट ठंडा चम्मच रखें।',
+  'Wash gently twice a day and leave spots alone.': 'दिन में दो बार हल्के से धोएँ और दानों को न छेड़ें।',
+  'Sip water through the day; a little ghee on the lips.': 'दिन भर पानी पिएँ; होंठों पर थोड़ा घी लगाएँ।',
+  'Sunscreen before you step out, even on cloudy days.': 'बाहर जाने से पहले सनस्क्रीन लगाएँ, बादल हों तब भी।',
 };

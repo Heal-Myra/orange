@@ -105,3 +105,24 @@ export function faceLine(f?: FaceReading, when?: string): string {
   return `Face & skin from a selfie${when ? ` (${when})` : ''}, skin care only, not a diagnosis: skin score ${skinScore(f) ?? '-'}/100; ${pts.map(([k, v]) => `${k} ${v}`).join(', ') || 'skin looks clear'}${f.looksNote ? `; looks ${f.looksNote}` : ''}.` +
     (remedies ? ` Remedies to weave into food and movement suggestions: ${remedies}.` : '');
 }
+
+// ---------- Four groups (founder, 1 Nov 2026: seven rings looked crowded) ----------
+export interface SkinGroup { id: 'eyes' | 'clear' | 'moisture' | 'sun'; label: string; color: string; parts: SkinKey[]; tip: string }
+export const GROUPS: SkinGroup[] = [
+  { id: 'eyes', label: 'Eyes', color: '#9C95D0', parts: ['darkCircles', 'puffiness'], tip: 'Rest a cold spoon under each eye for a minute.' },
+  { id: 'clear', label: 'Clear skin', color: '#D9A7BD', parts: ['redness', 'breakouts'], tip: 'Wash gently twice a day and leave spots alone.' },
+  { id: 'moisture', label: 'Moisture', color: '#6FB7BD', parts: ['dryness', 'lips'], tip: 'Sip water through the day; a little ghee on the lips.' },
+  { id: 'sun', label: 'Sun', color: '#E3B873', parts: ['tan'], tip: 'Sunscreen before you step out, even on cloudy days.' },
+];
+
+/** Each group's score: the weighted average of its points that were read (null when none were). */
+export function groupScores(f?: FaceReading): (SkinGroup & { v: number })[] {
+  return GROUPS.map(g => {
+    const read = g.parts.filter(k => f?.skin[k]);
+    const w = read.reduce((a, k) => a + WEIGHT[k], 0);
+    return w ? { ...g, v: Math.round(read.reduce((a, k) => a + WEIGHT[k] * POINT[f!.skin[k]!], 0) / w) } : null;
+  }).filter((x): x is SkinGroup & { v: number } => x != null);
+}
+
+/** The group that needs most care: the lowest under 100, else none. */
+export const needsCare = (groups: (SkinGroup & { v: number })[]) => groups.filter(g => g.v < 100).sort((a, b) => a.v - b.v)[0] ?? null;
