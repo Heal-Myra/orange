@@ -13,6 +13,8 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { shrink, speechRecognition } from '../components/MealPhoto';
 import { Button, Note, s } from '../components/ui';
 import { askMyra, type AttachmentData, type ChatAttachment, type ChatMessage } from '../lib/ai';
+import { useSmartUpload } from '../lib/smartUpload';
+import { useRotatingHint } from '../lib/rotatingHint';
 import { useAuth } from '../lib/auth';
 import { buildContext } from '../lib/context';
 import { useHeal } from '../lib/store';
@@ -73,6 +75,8 @@ export default function Myra() {
   const scroll = useRef<ScrollViewInstance>(null);
   const rec = useRef<any>(null);
   const Speech = speechRecognition();
+  const upload = useSmartUpload();
+  const hint = useRotatingHint(!!text || !!file);
 
   useEffect(() => {
     AsyncStorage.getItem(KEY).then(v => { if (v) setMessages(JSON.parse(v)); }).catch(() => {}).finally(() => setLoaded(true));
@@ -96,6 +100,18 @@ export default function Myra() {
     const next: ChatMessage[] = [...messages, { role: 'user', text: question, attach }];
     const sending = file;
     setMessages(next); setText(''); setFile(null); setMenu(false); setNote(null); setBusy(true);
+    // A picture: Myra first sees whether a card takes it (meal, Screen Time, to-dos, journal, selfie) and offers to add
+    // it (founder, 1 Nov 2026; decision 0046). Otherwise she talks about it as before.
+    if (sending?.kind === 'image' && sending.data && sending.media_type) {
+      try {
+        const offer = await upload.read({ data: sending.data, media_type: sending.media_type }, q.trim());
+        if (offer) {
+          const done: ChatMessage[] = [...next, { role: 'myra', text: tr('Here is what I found. Shall I add it?'), offer }];
+          setMessages(done); save(done); setBusy(false);
+          return;
+        }
+      } catch { /* fall back to talking about it */ }
+    }
     try {
       const r = await askMyra(next.filter(m => m !== HELLO), buildContext(day, days, date, profile, tasksForAI(open, todayISO()), tradition), page,
         sending ? { kind: sending.kind, name: sending.name, media_type: sending.media_type, data: sending.data, text: sending.text } : undefined);
@@ -109,6 +125,15 @@ export default function Myra() {
     } catch (e) {
       setMessages([...next, { role: 'myra', text: e instanceof Error ? e.message : tr('Something went wrong. Please try again.') }]);
     } finally { setBusy(false); }
+  };
+
+  // "Add to my day" or "No" on an offer.
+  const decide = (i: number, yes: boolean) => {
+    const m = messages[i];
+    if (!m?.offer || m.offer.state) return;
+    const said = yes ? upload.apply(m.offer) : tr('Okay, I left it out.');
+    const done: ChatMessage[] = [...messages.slice(0, i), { ...m, offer: { ...m.offer, state: yes ? 'added' : 'no' } }, ...messages.slice(i + 1), { role: 'myra', text: said }];
+    setMessages(done); save(done);
   };
 
   const pickPhoto = async (camera: boolean) => {
@@ -193,6 +218,23 @@ export default function Myra() {
                 <Text style={{ color: m.role === 'user' ? colors.onAccent : colors.ink, fontSize: 13 }}>📎 {m.attach.name}</Text>
               ) : null}
               <Text selectable style={{ color: m.role === 'user' ? colors.onAccent : colors.ink, fontSize: 15, lineHeight: 22 }}>{m.text}</Text>
+              {m.offer ? (
+                <View style={{ gap: 4 }}>
+                  <Text style={{ color: colors.ink, fontSize: 16, fontWeight: '700' }}>{m.offer.title}</Text>
+                  {m.offer.lines.map((l, k) => <Text key={k} style={{ color: colors.ink, fontSize: 14, lineHeight: 20, paddingVertical: 2, borderBottomWidth: 1, borderBottomColor: colors.line }}>{l}</Text>)}
+                  <Text style={{ color: colors.accent, fontSize: 13, fontWeight: '600', marginTop: 4 }}>→ {m.offer.where}</Text>
+                  {!m.offer.state ? (
+                    <View style={{ flexDirection: 'row', gap: 8, marginTop: 6 }}>
+                      <Pressable onPress={() => decide(i, true)} accessibilityRole="button" style={{ paddingVertical: 8, paddingHorizontal: 14, borderRadius: 99, backgroundColor: colors.insight }}>
+                        <Text style={{ color: colors.onInsight, fontWeight: '700' }}>{tr('Add to my day')}</Text>
+                      </Pressable>
+                      <Pressable onPress={() => decide(i, false)} accessibilityRole="button" style={{ paddingVertical: 8, paddingHorizontal: 14, borderRadius: 99, borderWidth: 1, borderColor: colors.line }}>
+                        <Text style={{ color: colors.ink, fontWeight: '600' }}>{tr('No')}</Text>
+                      </Pressable>
+                    </View>
+                  ) : <Text style={{ color: colors.muted, fontSize: 13 }}>{m.offer.state === 'added' ? tr('Added') : tr('Not added')}</Text>}
+                </View>
+              ) : null}
             </View>
           ))}
           {busy ? <Note>{tr('Myra is thinking…')}</Note> : null}
@@ -228,7 +270,7 @@ export default function Myra() {
               {note ? <Text style={{ color: colors.muted }}>{note}</Text> : null}
               <View style={{ flexDirection: 'row', gap: 8, alignItems: 'flex-end' }}>
                 {iconBtn('add', tr('Attach a photo or document'), () => setMenu(x => !x), menu)}
-                <TextInput style={[s.input, { flex: 1, maxHeight: 120 }]} value={text} onChangeText={setText} placeholder={tr('Ask Myra anything…')}
+                <TextInput style={[s.input, { flex: 1, maxHeight: 120 }]} value={text} onChangeText={setText} placeholder={hint}
                   placeholderTextColor={colors.muted} multiline onFocus={() => setTimeout(() => scroll.current?.scrollToEnd({ animated: true }), 300)} />
                 {iconBtn(listening ? 'stop' : 'mic-outline', tr('Speak'), speak, listening)}
                 <Button kind="insight" title={tr('Send')} onPress={() => send(text)} disabled={(!text.trim() && !file) || busy} />

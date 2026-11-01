@@ -8,12 +8,14 @@ import { useState } from 'react';
 import { Pressable, Text, TextInput, View } from 'react-native';
 import { useAuth } from '../lib/auth';
 import { tr } from '../lib/i18n';
+import { useRotatingHint } from '../lib/rotatingHint';
 import { colors } from '../theme';
 import { GuidanceCard } from './AiBits';
 
 export function MyraCard() {
   const { session } = useAuth();
   const [q, setQ] = useState('');
+  const hint = useRotatingHint(!!q);
   const ask = (question: string) => {
     const t = question.trim();
     router.push({ pathname: '/myra', params: t ? { from: 'today', q: t } : { from: 'today' } });
@@ -30,7 +32,7 @@ export function MyraCard() {
           <View style={{ borderWidth: 1, borderColor: colors.line, backgroundColor: '#FFFFFF', borderRadius: 24, paddingHorizontal: 12, paddingVertical: 10, gap: 6,
             boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
             <TextInput style={{ fontSize: 16, color: colors.ink, minHeight: 24, paddingHorizontal: 4, paddingVertical: 2 }} value={q} onChangeText={setQ}
-              placeholder={tr('Ask Myra anything…')} placeholderTextColor={colors.muted} multiline returnKeyType="send" blurOnSubmit onSubmitEditing={() => ask(q)} />
+              placeholder={hint} placeholderTextColor={colors.muted} multiline returnKeyType="send" blurOnSubmit onSubmitEditing={() => ask(q)} />
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
               <Pressable onPress={() => router.push({ pathname: '/myra', params: { from: 'today', attach: '1' } })} accessibilityLabel={tr('Attach a photo or document')}
                 style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: colors.insight + '14', alignItems: 'center', justifyContent: 'center' }}>

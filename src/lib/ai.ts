@@ -45,6 +45,10 @@ export const readNoteJournal = (image_base64: string, media_type: string) =>
 export const readNoteText = (image_base64: string, media_type: string, field?: string) =>
   call<{ text: string }>('read_note', { mode: 'text', image_base64, media_type, field });
 
+/** Myra's first look at a picture dropped into her chat (decision 0046). */
+export type UploadKind = 'meal' | 'screen_time' | 'todo' | 'journal' | 'selfie' | 'other';
+export const whatIsThis = (image_base64: string, media_type: string) => call<{ kind: UploadKind; sure: number; note: string }>('what_is_this', { image_base64, media_type });
+
 /** A selfie for Face & beauty and "How do you feel today?" (decision 0035). */
 export const readSelfie = (image_base64: string, media_type: string) =>
   call<Partial<import('./face').FaceReading> & { isFace?: boolean; note?: string }>('read_selfie', { image_base64, media_type });
@@ -74,7 +78,9 @@ export const classifyMedia = (text: string) => call<{ category: ContentCategoryI
 export const reflectOnAction = (text: string) => call<Reflection>('reflect_action', { text });
 
 export interface ChatAttachment { kind: 'image' | 'pdf' | 'text'; name: string; uri?: string }
-export interface ChatMessage { role: 'user' | 'myra'; text: string; attach?: ChatAttachment }
+/** What Myra found in a picture and offers to add to the day (decision 0046). */
+export interface Offer { kind: Exclude<UploadKind, 'other'>; title: string; lines: string[]; where: string; data: unknown; state?: 'added' | 'no' }
+export interface ChatMessage { role: 'user' | 'myra'; text: string; attach?: ChatAttachment; offer?: Offer }
 /** The file itself, sent once with the question it belongs to (never stored in the chat history). */
 export interface AttachmentData { kind: 'image' | 'pdf' | 'text'; name: string; media_type?: string; data?: string; text?: string }
 

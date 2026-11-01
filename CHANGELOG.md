@@ -1,5 +1,10 @@
 # Changelog
 
+## 1 Nov 2026 — Myra takes anything you drop in (decision 0046)
+- A picture added in Myra's chat (+ on Today's Ask box or in the chat) is recognised first: meal, Screen Time, to-do list, gratitude journal page or selfie. Myra reads it with the card's own reader and replies with a short summary and where it goes ("→ Food"), with Add to my day / No. Nothing is added without a yes. Anything else she simply talks about, as before.
+- The Ask Myra box hint changes every few seconds: Ask Myra anything… · Add a photo of your meal… · Add your handwritten to-do list… · Add yesterday's Screen Time… · Add a selfie for Face & beauty…
+- Server: new action `what_is_this` (quick model).
+
 ## 1 Nov 2026 — Today's spare space goes to My day
 - The Ask Myra box is back to the height of the Top of My Game card. The My day card (score and Myra's suggestion) takes the spare height, with a bigger ring (156) centred in it; Body / Mind / Soul keeps its original size. Today ends at the tab bar with no gap.
 

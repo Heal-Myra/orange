@@ -337,6 +337,19 @@ Give:
 Reply with JSON only: {"isFace":true|false,"skin":{"dryness":"none"|"mild"|"noticeable","darkCircles":"…","puffiness":"…","redness":"…","breakouts":"…","tan":"…","lips":"…"},"looks":"…","looksNote":"…","hints":[],"tips":["…"],"witty":"…","note":"one short sentence"}`,
         { media_type: String(p.media_type ?? 'image/jpeg'), data: String(p.image_base64 ?? '') });
     }
+    case 'what_is_this': {
+      // Myra as the one place to drop anything (founder, 1 Nov 2026; decision 0046): first, what is this picture?
+      return await askJson(ask, 'quick', ORANGE_BOOK,
+`What is this picture? Choose one kind:
+- "meal": food or drink being eaten or about to be (a plate, thali, bowl, snack, restaurant dish). Not a recipe page or a menu.
+- "screen_time": a phone's Screen Time (iPhone) or Digital Wellbeing (Android) screen with app times.
+- "todo": a handwritten or printed to-do list, task list or reminders note.
+- "journal": a gratitude journal page (thankful for, what made me laugh, kind to, best part of the day).
+- "selfie": one person's face, close up, taken by themselves.
+- "other": anything else (a report, an article, a recipe, a place, a document).
+Reply with JSON only: {"kind":"meal"|"screen_time"|"todo"|"journal"|"selfie"|"other","sure":0.0-1.0,"note":"at most 6 words on what it shows"}`,
+        { media_type: String(p.media_type ?? 'image/jpeg'), data: String(p.image_base64 ?? '') });
+    }
     case 'read_note': {
       // A photo of a notebook page, a printed list or a screenshot, attached with "+" in a text box (founder, 30 Oct 2026:
       // "upload a picture from notebooks and it can auto populate the task list", and the same in every text box).
