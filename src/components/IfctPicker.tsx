@@ -4,13 +4,13 @@
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { foodByCode, per100g, searchFoods } from '../lib/ifct';
-import { useHeal } from '../lib/store';
+import { useLogMeals } from '../lib/logMeals';
 import { colors } from '../theme';
 import { Button, Note, TextField, s } from './ui';
 import { tr } from '../lib/i18n';
 
 export function IfctPicker({ start = '', why }: { start?: string; why?: string }) {
-  const { update } = useHeal();
+  const logMeals = useLogMeals();
   const [query, setQuery] = useState(start);
   const [code, setCode] = useState<string | null>(null);
   const [grams, setGrams] = useState('100');
@@ -20,7 +20,7 @@ export function IfctPicker({ start = '', why }: { start?: string; why?: string }
   const add = () => {
     if (!food) return;
     const g = parseFloat(grams) || 100, k = g / 100, p = per100g(food);
-    update(d => { d.meals.push({ name: `${food.name} (${Math.round(g)} g)`, grams: g, kcal: p.kcal * k, p: p.protein * k, c: p.carbs * k, f: p.fat * k, fib: p.fibre * k, source: 'ifct' }); });
+    logMeals([{ name: `${food.name} (${Math.round(g)} g)`, grams: g, kcal: p.kcal * k, p: p.protein * k, c: p.carbs * k, f: p.fat * k, fib: p.fibre * k, source: 'ifct' }]);
     setCode(null); setQuery('');
   };
 

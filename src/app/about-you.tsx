@@ -3,6 +3,7 @@
 // Myra reads the goal (AI action goal_plan; a simple reader when offline), sets the daily targets
 // (src/lib/targets.ts, with safe limits) and says plainly when a goal is too steep.
 
+import { fastHabit } from '../lib/fasting';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
@@ -28,6 +29,10 @@ export default function AboutYou() {
   const [faith, setFaith] = useState<Tradition | null>(tradition);
   const [goalText, setGoalText] = useState(me?.goalText ?? '');
   const [dayText, setDayText] = useState(me?.dayText ?? '');
+  // Fasting by choice (decision 0044): hours (0 = I don't), and when the last meal usually is.
+  const auto = fastHabit(me);
+  const [fastH, setFastH] = useState<number>(me?.fast ? (me.fast.off ? 0 : me.fast.hours) : auto?.hours ?? 0);
+  const [lastMeal, setLastMeal] = useState(me?.fast?.lastMeal ?? auto?.lastMeal ?? '21:00');
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<{ me: AboutMe; plan: Plan } | null>(null);
 
@@ -51,6 +56,7 @@ export default function AboutYou() {
     // The usual day → a timetable (Myra reads it; kept as it was if the words did not change).
     const day = dayText.trim();
     next.dayText = day || undefined;
+    next.fast = { hours: fastH, lastMeal: /^\d{1,2}:\d{2}$/.test(lastMeal.trim()) ? lastMeal.trim().padStart(5, '0') : '21:00', ...(fastH ? {} : { off: true }) };
     if (day && day === me?.dayText && me?.routine?.length) next.routine = me.routine;
     else if (day && session) { try { next.routine = (await readRoutine(day)).routine; } catch { next.routine = me?.routine; } }
     else if (!day) next.routine = undefined;
@@ -140,6 +146,20 @@ export default function AboutYou() {
         <TextField label={tr('In your own words (optional)')} value={dayText} onChangeText={setDayText} multiline
           placeholder={tr('e.g. Wake 5:30, tea and plan. Walk 6–8. Office Mon–Fri 9 to 6, tea at 11 and 3, lunch 1. Dinner 7. Sleep 9:30.')} />
         <Note>{tr('Five minutes before each change in your day, Myra puts one fitting thing in front of you: a work task on reaching office, a family task at family time.')}</Note>
+      </Card>
+
+      <Card style={{ gap: 10 }}>
+        <Heading>{tr('Fasting by choice')}</Heading>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+          {[0, 14, 16, 18].map(h => (
+            <Pressable key={h} onPress={() => setFastH(h)} accessibilityRole="radio" accessibilityState={{ selected: fastH === h }}
+              style={{ paddingVertical: 8, paddingHorizontal: 14, borderRadius: 99, borderWidth: 1, borderColor: fastH === h ? colors.accent : colors.line, backgroundColor: fastH === h ? colors.tint : colors.surface }}>
+              <Text style={{ color: colors.ink, fontWeight: '600' }}>{h ? `${h} h` : tr("I don't fast")}</Text>
+            </Pressable>
+          ))}
+        </View>
+        {fastH ? <TextField label={tr('My last meal is usually at (24-hour, e.g. 21:00)')} value={lastMeal} onChangeText={setLastMeal} /> : null}
+        <Note>{tr('The hours without food earn Food points, so a morning without breakfast counts as a good morning.')}</Note>
       </Card>
 
       <Button kind="insight" title={busy ? tr('Myra is reading your goal…') : tr('Save')} onPress={save} disabled={!complete || busy} />

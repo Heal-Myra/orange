@@ -2,6 +2,7 @@
 // and the part of the day with the most points still to win, with how many points it can add. The points come from the
 // same scoring as the cards (src/lib/scoring.ts), so the "+N" is worked out, never guessed.
 
+import { FAST_FROM, fastHabit, fastHoursOf } from './fasting';
 import { FOCUS_EACH, POINTS, type WellBeing } from './scoring';
 import type { DayLog, Profile } from './types';
 
@@ -43,7 +44,11 @@ export function candidates(d: DayLog, P: Profile, w: WellBeing, hour: number): S
     const gain = 15 * (c01((st + 2000) / P.steps) - c01(st / P.steps)) + 15 * (c01((am + 20) / P.active) - c01(am / P.active));
     add({ id: 'movement', pillar: 'body', card: 'movement', minutes: 20, gain });
   }
-  if (hour >= 7 && !d.fasting) {
+  // Mid-fast (fasting by choice, decision 0044): no meal nudges until the fast reaches its target.
+  const habit = (d.date ?? '') >= FAST_FROM ? fastHabit(P.me) : null;
+  const [y, mo, da] = (d.date ?? '2000-01-01').split('-').map(Number);
+  const fasting = habit && !d.meals.length && fastHoursOf(d, habit, new Date(y, mo - 1, da, Math.floor(hour), Math.round((hour % 1) * 60))).hours < habit.hours;
+  if (hour >= 7 && !d.fasting && !fasting) {
     // The food points still open, shared over the meals left in the day.
     const left = hour < 11 ? 3 : hour < 16 ? 2 : 1;
     add({ id: 'food', pillar: 'body', card: 'food', gain: (POINTS.food - (b?.nutrition ?? 0)) / left });

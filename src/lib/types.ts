@@ -13,6 +13,7 @@ export interface Meal {
   f: number; // fat, g
   fib?: number; // fibre, g (from 21 Oct 2026)
   source: MealSource;
+  at?: string; // when it was logged (ISO), for fasting hours (from 1 Nov 2026)
 }
 
 export type ContentCategoryId =
@@ -63,6 +64,7 @@ export interface DayLog {
   sleep: { hours?: number; quality?: 1 | 2 | 3 | 4 | 5; source?: string }; // source 'Typed in' = the person's own number wins over Apple Health
   meals: Meal[];
   fasting?: boolean;
+  fastFrom?: string; // ISO time of the last meal of the day before (fasting by choice; 1 Nov 2026)
   // Love (founder, 24 Oct 2026): whom I love today and how, what makes me happy today, the friend I meet this week.
   love?: { whom?: string; self?: string; done?: boolean; act?: string; happy?: string; friend?: string; kindTo?: string }; // self: how I love myself (happy: older days); kindTo: Gratitude journal, I was kind to (27 Oct 2026)
   feeling?: import('./feeling').Feeling; // "How do you feel today?" (24 Oct 2026)

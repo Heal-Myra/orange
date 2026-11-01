@@ -37,4 +37,11 @@ describe("Myra's one recommendation", () => {
     expect(ids).not.toContain('nidra');
     expect(nextStep(d, P, wellBeing(d, P), 4)).toBeNull();
   });
+
+  it('does not suggest a meal in the middle of a chosen fast', () => {
+    const d = emptyDay('2026-11-02'); d.sleep = { hours: 8, quality: 5 };
+    const p = { ...P, me: { weightKg: 70, heightCm: 170, sex: 'male' as const, age: 40, goal: 'keep' as const, setAt: '2026-10-01', fast: { hours: 18, lastMeal: '21:00' } } };
+    expect(candidates(d, p, wellBeing(d, p), 10).map(x => x.id)).not.toContain('food');
+    expect(candidates(d, p, wellBeing(d, p), 16).map(x => x.id)).toContain('food');
+  });
 });

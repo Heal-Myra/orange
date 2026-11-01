@@ -18,7 +18,7 @@ import { tr } from '../lib/i18n';
 // outlines it for a moment (founder, 21 Oct 2026). Cards opt in by being wrapped in <Anchor id="…">.
 const AnchorCtx = createContext<{ register: (id: string, y: number) => void; lit: string | null; keepVisible: () => void }>({ register: () => {}, lit: null, keepVisible: () => {} });
 
-export function Screen({ children, showDay = false, feedback, top, dayLabel, noBanner }: { children: ReactNode; showDay?: boolean; noBanner?: boolean; feedback?: string; top?: ReactNode; trends?: Pillar; dayLabel?: ReactNode }) {
+export function Screen({ children, showDay = false, feedback, top, dayLabel, noBanner, fill }: { children: ReactNode; showDay?: boolean; noBanner?: boolean; feedback?: string; top?: ReactNode; trends?: Pillar; dayLabel?: ReactNode; fill?: boolean }) {
   const { card, at } = useLocalSearchParams<{ card?: string; at?: string }>();
   const scroll = useRef<ScrollViewInstance>(null);
   const spots = useRef<Record<string, number>>({});
@@ -59,7 +59,7 @@ export function Screen({ children, showDay = false, feedback, top, dayLabel, noB
   return (
     <SafeAreaView style={s.safe} edges={['left', 'right']}>
       <AnchorCtx.Provider value={ctx}>
-        <ScrollView ref={scroll} contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled"
+        <ScrollView ref={scroll} contentContainerStyle={fill ? [s.scroll, { flexGrow: 1, paddingBottom: space.lg }] : s.scroll} keyboardShouldPersistTaps="handled"
           automaticallyAdjustKeyboardInsets keyboardDismissMode="interactive" scrollEventThrottle={32}
           onScroll={e => { offset.current = e.nativeEvent.contentOffset.y; }}>
           {/* Trends moved off the tabs (founder, 31 Oct 2026): D · W · M · Q · Y lives on each card's detail page

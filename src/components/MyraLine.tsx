@@ -2,6 +2,7 @@
 // at the bottom Myra recommends"). When Myra's latest recommendation is about this card, her line is shown; otherwise a
 // short, ready-made next step from the card's own numbers (no extra AI request). One line, at most 10 words.
 
+import { FAST_FROM, fastHabit, fastHoursOf, fmtHours } from '../lib/fasting';
 import { Text, View } from 'react-native';
 import { oneLine } from '../lib/ai';
 import { tr } from '../lib/i18n';
@@ -75,8 +76,12 @@ export function localTip(card: CardId, d: DayLog, P: Profile, phone?: { minutes:
 export function MyraLine({ card, phone }: { card: CardId; phone?: { minutes: number; social?: number; heavy?: number } | null }) {
   const { day, profile } = useHeal();
   const g = day.guidance, p = PILLAR[card];
-  const hers = g && p && g.cards?.[p] === card ? g[p]?.[0] : undefined;
-  const [text, vars] = hers ? [oneLine(hers)] : localTip(card, day, profile, phone);
+  // Mid-fast by choice (decision 0044): never a meal nudge, only how far along the fast is.
+  const habit = card === 'food' && day.date >= FAST_FROM ? fastHabit(profile.me) : null;
+  const f = habit && !day.meals.length ? fastHoursOf(day, habit) : null;
+  const midFast = f && f.ongoing && f.hours < habit!.hours;
+  const hers = !midFast && g && p && g.cards?.[p] === card ? g[p]?.[0] : undefined;
+  const [text, vars]: [string, Record<string, string | number>?] = midFast ? ["You're {h} hours in. Water and black tea are fine.", { h: fmtHours(f!.hours) }] : hers ? [oneLine(hers)] : localTip(card, day, profile, phone);
   return (
     <View style={{ flexDirection: 'row', gap: 6, marginTop: 6, paddingVertical: 10, paddingHorizontal: 12, borderRadius: 14, backgroundColor: colors.insight + '12' }}>
       <Text style={{ color: colors.insight, fontWeight: '700' }}>✦</Text>

@@ -12,6 +12,7 @@ export type Goal = 'lose' | 'keep' | 'gain';
 
 export interface AboutMe {
   name?: string;
+  fast?: { hours: number; lastMeal: string; off?: boolean }; // fasting by choice (1 Nov 2026); off = "No, I just forget"
   goalText?: string;  // the goal in the person's own words (founder, 21 Oct 2026); Myra reads it into the fields below
   aims?: string;      // the non-weight part of the goal, e.g. "run 5 km", "sleep better"
   goalNote?: string;  // Myra's one-line reply about the goal (e.g. that it is too steep and what she planned instead)

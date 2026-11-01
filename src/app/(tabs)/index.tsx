@@ -4,6 +4,7 @@
 import { Text, View } from 'react-native';
 import { PillarRings, TodayRings } from '../../components/TodayRings';
 import { MyraCard } from '../../components/MyraCard';
+import { RecordsCard } from '../../components/RecordsCard';
 import { AirLine } from '../../components/AirLine';
 import { todayISO } from '../../lib/dates';
 import { useAuth } from '../../lib/auth';
@@ -20,7 +21,8 @@ export default function Today() {
 
   return (
     // No day row or greeting (founder, 31 Oct 2026): the page starts with the score; Myra speaks to the person by name.
-    <Screen feedback="Today">
+    // fill: Today ends at the bottom of the screen; Your records takes the space left above Ask Myra (1 Nov 2026).
+    <Screen feedback="Today" fill>
       {/* AQI only on bad-air days; How I feel today moved to the Mind tab (founder, 31 Oct 2026). */}
       {date === todayISO() ? <View style={{ alignItems: 'center' }}><AirLine /></View> : null}
 
@@ -31,6 +33,8 @@ export default function Today() {
       {/* Back under the total (founder, 1 Nov 2026: the page looked too blank): Body, Mind and Soul with their parts. The tab
           icons keep their single score rings. */}
       <PillarRings w={w} />
+
+      {date === todayISO() ? <RecordsCard /> : null}
 
       <MyraCard />
 

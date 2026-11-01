@@ -3,6 +3,7 @@
 // A working model to help people understand themselves, not a medical measure
 // (The Orange Book, Chapter 2). Weights are documented in docs/scoring.md.
 
+import { FAST_FROM, MEAL_SHARE, fastHabit, fastHoursOf, fastPoints } from './fasting';
 import { DEFAULT_PROFILE, type ContentCategoryId, type DayLog, type Meal, type MediaSession, type PracticeId, type Profile } from './types';
 
 export const CONTENT_CATEGORIES: { id: ContentCategoryId; name: string; weight: number }[] = [
@@ -69,11 +70,13 @@ export function foodScore(t: MealTotals, targetKcal: number) {
 export const FAST_KCAL = 60; // black tea and coffee through a day stay under this
 
 /** Body: food 40, sleep 30, movement 30 (founder, 24 Oct 2026). Returns null when nothing is logged. */
-export function bodyScore(d: DayLog, P: Profile): BodyScore | null {
+export function bodyScore(d: DayLog, P: Profile, now: Date = new Date()): BodyScore | null {
   const a = d.activity, s = d.sleep;
   const hasAct = a.steps != null || a.activeMin != null;
   const hasSleep = s.hours != null;
-  const hasFood = d.meals.length > 0 || !!d.fasting;
+  // Fasting by choice (decision 0044): the hours without food count from 1 Nov 2026.
+  const habit = (d.date ?? '') >= FAST_FROM ? fastHabit(P.me) : null;
+  const hasFood = d.meals.length > 0 || !!d.fasting || !!habit;
   if (!hasAct && !hasSleep && !hasFood) return null;
 
   // Body = Food 40 + Sleep 30 + Movement 30 (founder, 24 Oct 2026).
@@ -91,6 +94,10 @@ export function bodyScore(d: DayLog, P: Profile): BodyScore | null {
   let nutrition = 0;
   // A declared fast scores full, as long as only water, black tea or black coffee (a few calories) went in.
   if (d.fasting && totals.kcal <= FAST_KCAL) nutrition = 40;
+  else if (habit) {
+    const f = fastHoursOf(d, habit, now);
+    nutrition = fastPoints(f.hours, habit) + (d.meals.length ? MEAL_SHARE * foodScore(totals, P.kcal).total : 0);
+  }
   else if (hasFood) nutrition = foodScore(totals, P.kcal).total;
   return { total: movement + sleep + nutrition, movement, sleep, nutrition, totals };
 }

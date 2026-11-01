@@ -9,6 +9,7 @@ import { Image, Platform, Pressable, Text, TextInput, View } from 'react-native'
 import { analyseMeal, analyseMealText, oneLine, type MealItem } from '../lib/ai';
 import { useAuth } from '../lib/auth';
 import { useHeal } from '../lib/store';
+import { useLogMeals } from '../lib/logMeals';
 import { colors } from '../theme';
 import { NativeSpeech } from '../lib/nativeSpeech';
 import { IfctPicker } from './IfctPicker';
@@ -36,6 +37,7 @@ export function speechRecognition(): (new () => any) | null {
 export function MealPhoto({ right, top, children }: { right?: ReactNode; top?: ReactNode; children?: ReactNode }) {
   const { session } = useAuth();
   const { update } = useHeal();
+  const logMeals = useLogMeals();
   const [mode, setMode] = useState<'photo' | 'speak' | 'type' | null>(null);
   const [words, setWords] = useState('');
   const [listening, setListening] = useState(false);
@@ -163,12 +165,10 @@ export function MealPhoto({ right, top, children }: { right?: ReactNode; top?: R
 
   const add = () => {
     if (!items?.length) return;
-    update(d => {
-      for (const it of items) d.meals.push({
-        name: it.name, grams: it.grams, kcal: it.kcal, p: it.protein_g, c: it.carbs_g, f: it.fat_g, fib: it.fibre_g ?? 0,
-        source: source === 'words' ? (it.basis === 'IFCT' ? 'words+ifct' : 'words') : (it.basis === 'IFCT' ? 'photo+ifct' : 'photo'),
-      });
-    });
+    logMeals(items.map(it => ({
+      name: it.name, grams: it.grams, kcal: it.kcal, p: it.protein_g, c: it.carbs_g, f: it.fat_g, fib: it.fibre_g ?? 0,
+      source: source === 'words' ? (it.basis === 'IFCT' ? 'words+ifct' : 'words') : (it.basis === 'IFCT' ? 'photo+ifct' : 'photo'),
+    })));
     setMessage(`Added ${items.length} item${items.length > 1 ? 's' : ''} to your day.`);
     setItems(null); setUri(null); setInsight(''); setWords(''); setMode(null);
   };

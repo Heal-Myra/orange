@@ -22,12 +22,14 @@ import { FAST_KCAL, bodyScore, mealTotals } from '../../lib/scoring';
 import { useHeal } from '../../lib/store';
 import { colors } from '../../theme';
 import { tr } from '../../lib/i18n';
+import { FastAsk, FastStatus, fastRing, useFast } from '../../components/FastBits';
 
 export default function Body() {
   const { day, date, profile, update, setProfile } = useHeal();
   const score = bodyScore(day, profile);
   const totals = mealTotals(day.meals);
   const { connected } = useHealth();
+  const fast = useFast(); // fasting by choice (decision 0044)
   const [details, setDetails] = useState(false);
   const auto = connected; // Apple Health fills sleep and movement; typing is only for phones without it
   const h = day.health;
@@ -41,6 +43,7 @@ export default function Body() {
           const fib = fibreTarget(profile.kcal), aim = aimMix(profile.kcal, profile.protein, fib);
           const carbAim = Math.round((aim.c * profile.kcal) / 4), fatAim = Math.round((aim.f * profile.kcal) / 9);
           return [
+            ...(fast ? [fastRing(fast)] : []),
             { id: 'kcal', color: PASTEL.peach, label: tr('Calories'), value: totals.kcal / profile.kcal, text: `${Math.round(totals.kcal)} / ${profile.kcal}` },
             { id: 'carbs', color: PASTEL.sand, label: tr('Carbs'), value: totals.c / carbAim, text: `${Math.round(totals.c)} / ${carbAim} g` },
             { id: 'protein', color: PASTEL.lavender, label: tr('Protein'), value: totals.p / profile.protein, text: `${Math.round(totals.p)} / ${profile.protein} g` },
@@ -48,6 +51,8 @@ export default function Body() {
             { id: 'fat', color: PASTEL.rose, label: tr('Fat'), value: totals.f / fatAim, text: `${Math.round(totals.f)} / ${fatAim} g` },
           ];
         })()} />}>
+        <FastStatus />
+        <FastAsk />
         <CareNote part="food" />
         {/* "I'm fasting today" (founder, 22 Oct 2026): a declared fast scores Food in full while only water, black tea
             or black coffee go in, and Myra changes her advice. */}
