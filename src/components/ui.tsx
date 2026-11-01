@@ -59,7 +59,7 @@ export function Screen({ children, showDay = false, feedback, top, dayLabel, noB
   return (
     <SafeAreaView style={s.safe} edges={['left', 'right']}>
       <AnchorCtx.Provider value={ctx}>
-        <ScrollView ref={scroll} contentContainerStyle={fill ? [s.scroll, { flexGrow: 1, paddingBottom: space.lg }] : s.scroll} keyboardShouldPersistTaps="handled"
+        <ScrollView ref={scroll} contentContainerStyle={fill ? [s.scroll, { flexGrow: 1, gap: space.md, paddingTop: space.md, paddingBottom: space.md }] : s.scroll} keyboardShouldPersistTaps="handled"
           automaticallyAdjustKeyboardInsets keyboardDismissMode="interactive" scrollEventThrottle={32}
           onScroll={e => { offset.current = e.nativeEvent.contentOffset.y; }}>
           {/* Trends moved off the tabs (founder, 31 Oct 2026): D · W · M · Q · Y lives on each card's detail page

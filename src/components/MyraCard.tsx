@@ -26,22 +26,22 @@ export function MyraCard() {
         <>
           {/* Like Claude's message box (founder, 31 Oct 2026): the words on top; + on the left; microphone and a round
               dark button on the right (send when there are words, otherwise talk to Myra). */}
-          <View style={{ borderWidth: 1, borderColor: colors.line, backgroundColor: '#FFFFFF', borderRadius: 26, padding: 12, gap: 10,
+          <View style={{ borderWidth: 1, borderColor: colors.line, backgroundColor: '#FFFFFF', borderRadius: 24, paddingHorizontal: 12, paddingVertical: 9, gap: 6,
             boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
-            <TextInput style={{ fontSize: 17, color: colors.ink, minHeight: 28, paddingHorizontal: 4, paddingVertical: 2 }} value={q} onChangeText={setQ}
+            <TextInput style={{ fontSize: 16, color: colors.ink, minHeight: 24, paddingHorizontal: 4, paddingVertical: 2 }} value={q} onChangeText={setQ}
               placeholder={tr('Ask Myra anything…')} placeholderTextColor={colors.muted} multiline returnKeyType="send" blurOnSubmit onSubmitEditing={() => ask(q)} />
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
               <Pressable onPress={() => router.push({ pathname: '/myra', params: { from: 'today', attach: '1' } })} accessibilityLabel={tr('Attach a photo or document')}
-                style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: colors.insight + '14', alignItems: 'center', justifyContent: 'center' }}>
+                style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: colors.insight + '14', alignItems: 'center', justifyContent: 'center' }}>
                 <Ionicons name="add" size={24} color={colors.insight} />
               </Pressable>
               <View style={{ flex: 1 }} />
               <Pressable onPress={() => router.push({ pathname: '/myra', params: { from: 'today', listen: '1' } })} accessibilityLabel={tr('Speak')}
-                style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: colors.insight + '14', alignItems: 'center', justifyContent: 'center' }}>
+                style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: colors.insight + '14', alignItems: 'center', justifyContent: 'center' }}>
                 <Ionicons name="mic-outline" size={21} color={colors.insight} />
               </Pressable>
               <Pressable onPress={() => ask(q)} accessibilityLabel={q.trim() ? tr('Send') : tr('Talk to Myra')}
-                style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: colors.insight, alignItems: 'center', justifyContent: 'center' }}>
+                style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: colors.insight, alignItems: 'center', justifyContent: 'center' }}>
                 <Ionicons name={q.trim() ? 'arrow-up' : 'pulse'} size={20} color={colors.onInsight} />
               </Pressable>
             </View>

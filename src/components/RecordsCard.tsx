@@ -12,7 +12,7 @@ import { useHeal } from '../lib/store';
 import { colors } from '../theme';
 import { PASTEL } from './Rings';
 
-const ROW = 58, HEAD = 44, CLOSE = 62, PAD = 28;
+const ROW = 50, HEAD = 30, CLOSE = 56, PAD = 22;
 const date = (iso: string, o: Intl.DateTimeFormatOptions) => { const [y, m, d] = iso.split('-').map(Number); return new Date(y, m - 1, d).toLocaleDateString(locale(), o); };
 
 function when(r: Rec, today: string): string {
@@ -34,17 +34,17 @@ export function RecordsCard() {
   return (
     // The outer box takes the free height; the card inside fills it.
     <View style={{ flex: 1, minHeight: HEAD + PAD + ROW }} onLayout={e => setH(e.nativeEvent.layout.height)}>
-      <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: colors.surface, borderRadius: 22, paddingHorizontal: 16, paddingVertical: 14, overflow: 'hidden' }}>
-        <Text style={{ fontSize: 18, fontWeight: '700', color: colors.ink, marginBottom: 4 }}>{tr('Your records')}</Text>
+      <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: colors.surface, borderRadius: 22, paddingHorizontal: 16, paddingVertical: 11, overflow: 'hidden' }}>
+        <Text style={{ fontSize: 16, fontWeight: '700', color: colors.ink }}>{tr('Your records')}</Text>
         {show.length ? show.map((r, i) => (
           <View key={r.key} style={{ flexDirection: 'row', alignItems: 'center', gap: 12, height: ROW, borderTopWidth: i ? 1 : 0, borderTopColor: colors.line }}>
-            <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: r.def.color + '2E', alignItems: 'center', justifyContent: 'center' }}>
+            <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: r.def.color + '2E', alignItems: 'center', justifyContent: 'center' }}>
               <Ionicons name={r.def.icon as never} size={18} color={colors.ink} />
             </View>
             <View style={{ flex: 1 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                 <Text style={{ flexShrink: 1, fontSize: 15, fontWeight: '600', color: colors.ink }} numberOfLines={1}>{tr(r.title)}</Text>
-                {r.isNew ? <Text style={{ fontSize: 9.5, fontWeight: '800', color: '#5E8A4E', backgroundColor: PASTEL.sage + '33', borderRadius: 99, paddingHorizontal: 6, paddingVertical: 1, overflow: 'hidden' }}>{tr('NEW')}</Text> : null}
+                {r.isNew ? <Text style={{ flexShrink: 0, fontSize: 9.5, fontWeight: '800', color: '#5E8A4E', backgroundColor: PASTEL.sage + '33', borderRadius: 99, paddingHorizontal: 6, paddingVertical: 1, overflow: 'hidden' }}>{tr('NEW')}</Text> : null}
               </View>
               <Text style={{ fontSize: 12.5, color: colors.muted }} numberOfLines={1}>
                 {when(r, today)}{r.beat != null ? ` · ${tr('beat {n}', { n: r.kind === 'streak' ? String(r.beat) : r.def.fmt(r.beat) })}` : ''}
