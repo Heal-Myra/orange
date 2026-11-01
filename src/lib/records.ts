@@ -19,7 +19,7 @@ const n0 = (v: number | null | undefined) => (v == null || Number.isNaN(v) ? nul
 const int = (n: number) => Math.round(n).toLocaleString('en-IN');
 
 export const REC_DEFS: RecDef[] = [
-  { id: 'wellbeing', icon: 'sunny-outline', color: '#E3B873', agg: 'avg', titles: { day: 'Best day overall', week: 'Best week overall', month: 'Best month overall' },
+  { id: 'wellbeing', icon: 'sunny-outline', color: '#E3B873', agg: 'avg', titles: { day: 'Best day ever', week: 'Best week ever', month: 'Best month ever' },
     value: (d, P) => { const w = wellBeing(d, P); return w.logged ? w.total : null; }, fmt: n => `${Math.round(n)} / 100` },
   { id: 'steps', icon: 'footsteps-outline', color: '#9CC08E', agg: 'sum', titles: { day: 'Best day of steps', week: 'Best week of steps' },
     value: d => n0(d.activity.steps), fmt: int, close: '{n} more steps today makes it your best day.' },

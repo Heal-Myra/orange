@@ -1,5 +1,8 @@
 # Changelog
 
+## 1 Nov 2026 — Your records: a trophy and one line
+- The record card is one line with a soft-gold trophy: "Best week of steps · last week   63,300" (founder chose the gold trophy of option 2 with the one-line words of option 8). Well-being records read "Best day / week / month ever".
+
 ## 1 Nov 2026 — Today fits on one screen
 - The My day ring and the Body / Mind / Soul circles keep their original sizes; Your records is one line only (the newest best, else the "close to a record" nudge), with slightly smaller gaps and a shorter Ask Myra box, so everything fits above the tab bar.
 

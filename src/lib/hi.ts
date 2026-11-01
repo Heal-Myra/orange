@@ -1390,4 +1390,7 @@ export const HI: Record<string, string> = {
   '{n} more steps today makes it your best day.': 'आज {n} कदम और, तो यह आपका सबसे अच्छा दिन होगा।',
   '{n} more minutes of breathing today makes it your best day.': 'आज {n} मिनट और साँस अभ्यास, तो यह आपका सबसे अच्छा दिन होगा।',
   "You're {h} hours in. Water and black tea are fine.": 'आपको {h} घंटे हो गए। पानी और बिना दूध की चाय ठीक है।',
+  'Best day ever': 'अब तक का सबसे अच्छा दिन',
+  'Best week ever': 'अब तक का सबसे अच्छा हफ़्ता',
+  'Best month ever': 'अब तक का सबसे अच्छा महीना',
 };
