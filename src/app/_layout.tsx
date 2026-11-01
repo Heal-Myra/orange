@@ -66,6 +66,7 @@ function Gate() {
       <Stack.Screen name="breathe" options={{ presentation: 'fullScreenModal', contentStyle: { backgroundColor: '#C4E4F8' } }} />
       <Stack.Screen name="shared" options={{ headerShown: true, title: tr('Shared'), presentation: 'modal', headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
       <Stack.Screen name="myra" options={{ headerShown: true, title: tr('Myra'), presentation: 'modal', headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
+      <Stack.Screen name="records" options={{ headerShown: true, title: tr('Top of My Game'), headerBackTitle: tr('Back'), headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
       <Stack.Screen name="trend" options={{ headerShown: true, title: tr('Trends'), headerBackTitle: tr('Back'), headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
     </Stack>
   );

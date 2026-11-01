@@ -1393,4 +1393,6 @@ export const HI: Record<string, string> = {
   'Best day ever': 'अब तक का सबसे अच्छा दिन',
   'Best week ever': 'अब तक का सबसे अच्छा हफ़्ता',
   'Best month ever': 'अब तक का सबसे अच्छा महीना',
+  'Top of My Game': 'मेरा सबसे अच्छा',
+  'All': 'सभी',
 };

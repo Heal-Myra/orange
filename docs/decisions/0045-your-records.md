@@ -10,3 +10,6 @@ Date: 1 Nov 2026 · Founder: a section under Body, Mind and Soul with achievemen
 
 ## Update, 1 Nov 2026 (10:05)
 On Today the card is one line only: the newest record, or the "close to a record" nudge when there is none. The full list can come later on a page of its own.
+
+## Update, 1 Nov 2026 (10:20)
+Named "Top of My Game". One card on Today (name, All ›, one trophy line); the full list on `src/app/records.tsx`.

@@ -1,5 +1,8 @@
 # Changelog
 
+## 1 Nov 2026 — Top of My Game
+- The record card is named "Top of My Game" (founder's choice of 10), about twice as tall: the name, "All ›", and the trophy line. "All ›" opens a page with every personal best, newest first, each with what it beat.
+
 ## 1 Nov 2026 — Your records: a trophy and one line
 - The record card is one line with a soft-gold trophy: "Best week of steps · last week   63,300" (founder chose the gold trophy of option 2 with the one-line words of option 8). Well-being records read "Best day / week / month ever".
 
