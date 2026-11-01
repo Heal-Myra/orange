@@ -1,5 +1,8 @@
 # Changelog
 
+## 1 Nov 2026 — Ask Myra box fills the bottom of Today
+- The Ask Myra box grows to fill the space left under Top of My Game, so Today ends at the tab bar with no gap.
+
 ## 1 Nov 2026 — Top of My Game
 - The record card is named "Top of My Game" (founder's choice of 10), about twice as tall: the name, "All ›", and the trophy line. "All ›" opens a page with every personal best, newest first, each with what it beat.
 
