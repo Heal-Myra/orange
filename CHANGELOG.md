@@ -1,5 +1,9 @@
 # Changelog
 
+## 4 Nov 2026 — Top of My Game shows only fresh records
+- Today's card shows only a best that yesterday completed: yesterday as a best day, the 7 or 30 days ending yesterday as the best such stretch, or a streak running through yesterday that is the longest ever. Never an older record; if there is none, the "close to a record" nudge or "No new best yesterday". All › still lists every best.
+- New records: highest Body, Mind and Soul score (day and 7 days), and the longest streak of healthy food (Food 28 of 40 or more).
+
 ## 3 Nov 2026 — Food: fasting, early dinner and meals, with a graded penalty (decision 0047)
 - Food (40) from 3 Nov = Fasting 8 (hours since the last meal, up to the person's fast, 14 h if they have none) + Early dinner 8 (last meal 3 h or more before falling asleep; half at 2 h; none at 1 h) + Meals 24 (the usual calories, protein, fibre and fat score) − up to 4 when carbs or fat give more of the calories than the aim (graded over 0–15 points of calories above it). A declared fasting day still scores 40.
 - Bedtime comes from Apple Health (when sleep began), else the usual day in About you, else 10:30 pm.

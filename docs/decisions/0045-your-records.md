@@ -13,3 +13,6 @@ On Today the card is one line only: the newest record, or the "close to a record
 
 ## Update, 1 Nov 2026 (10:20)
 Named "Top of My Game". One card on Today (name, All ›, one trophy line); the full list on `src/app/records.tsx`.
+
+## Update, 4 Nov 2026
+Today shows only fresh records (completed yesterday): yesterday's day, rolling 7 and 30 days ending yesterday (vs every earlier window, 7+ of them), or a running streak that is the longest ever (`freshRecords`). New: Body/Mind/Soul highs, healthy-food streak (Food ≥ 28/40). The All page keeps the all-time list.

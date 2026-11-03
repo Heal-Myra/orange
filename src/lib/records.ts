@@ -33,6 +33,15 @@ export const REC_DEFS: RecDef[] = [
     value: d => n0(d.mind.meditationMin), fmt: n => `${int(n)} min`, close: '{n} more minutes of breathing today makes it your best day.' },
   { id: 'focus', icon: 'checkmark-done-outline', color: '#6FB7BD', agg: 'sum', titles: { week: 'Most to-dos done in a week' },
     value: d => n0(d.mind.focusDone), fmt: int },
+  { id: 'mindScore', icon: 'bulb-outline', color: '#6FB7BD', agg: 'avg', titles: { day: 'Highest Mind score', week: 'Best week for Mind' },
+    value: (d, P) => n0(wellBeing(d, P).mind?.total), fmt: n => `${Math.round(n)} / 100` },
+  { id: 'bodyScore', icon: 'leaf-outline', color: '#9CC08E', agg: 'avg', titles: { day: 'Highest Body score', week: 'Best week for Body' },
+    value: (d, P) => n0(wellBeing(d, P).body?.total), fmt: n => `${Math.round(n)} / 100` },
+  { id: 'soulScore', icon: 'flame-outline', color: '#EBA987', agg: 'avg', titles: { day: 'Highest Soul score', week: 'Best week for Soul' },
+    value: (d, P) => n0(wellBeing(d, P).soul?.total), fmt: n => `${Math.round(n)} / 100` },
+  // A healthy-food day: Food 28 of 40 or more (70 %).
+  { id: 'healthyFood', icon: 'nutrition-outline', color: '#EBA987', agg: 'sum', titles: { streak: 'Longest streak of healthy food' },
+    value: (d, P) => ((d.meals.length || d.fasting) && (bodyScore(d, P)?.nutrition ?? 0) >= 28 ? 1 : null), fmt: int },
   { id: 'gratitude', icon: 'heart-outline', color: '#D9A7BD', agg: 'sum', titles: { streak: 'Longest gratitude streak' },
     value: d => { const n = countGratitude(d.soul?.gratitude); return n || null; }, fmt: int },
 ];
@@ -121,4 +130,55 @@ export function closeToRecord(days: Record<string, DayLog>, P: Profile, today: s
     if (now > 0 && best > now && (best - now) / best <= 0.25) return { def, more: Math.ceil(best - now + 1) };
   }
   return null;
+}
+
+// ---------- Fresh records only (founder, 4 Nov 2026: "the record shall be such that it would have completed yesterday …
+// but the record can't be stale"). Today's card shows only a best that yesterday completed: yesterday's day, the 7 or
+// 30 days ending yesterday, or a streak still running through yesterday. ----------
+
+function windowValue(def: RecDef, days: Record<string, DayLog>, P: Profile, end: string, len: number, need: number): number | null {
+  const v: number[] = [];
+  for (let i = 0; i < len; i++) { const d = days[addDays(end, -i)]; const x = d ? def.value(d, P) : null; if (x != null) v.push(x); }
+  if (v.length < need) return null;
+  return def.agg === 'sum' ? v.reduce((a, b) => a + b, 0) : v.reduce((a, b) => a + b, 0) / v.length;
+}
+
+export function freshRecords(daysIn: Record<string, DayLog>, P: Profile, today: string): Rec[] {
+  // Each day's value is worked out once per kind of record (windows reuse the same days many times).
+  const cache = new Map<string, number | null>();
+  const defs = REC_DEFS.map(d => ({ ...d, value: (x: DayLog, p: Profile) => { const k = `${d.id}|${x.date}`; if (!cache.has(k)) cache.set(k, d.value(x, p)); return cache.get(k)!; } }));
+  const days = daysIn;
+  const y = addDays(today, -1);
+  const first = Object.keys(days).sort()[0];
+  if (!first || first > y) return [];
+  const out: Rec[] = [];
+  for (const def of defs) {
+    // Yesterday against every earlier day (at least 7 of them).
+    if (def.titles.day && days[y]) {
+      const v = def.value(days[y], P);
+      const before = Object.keys(days).filter(k => k < y).map(k => def.value(days[k], P)).filter((x): x is number => x != null);
+      if (v != null && before.length >= 7 && v > Math.max(...before)) out.push({ key: `${def.id}.day`, def, kind: 'day', title: def.titles.day, value: v, text: def.fmt(v), start: y, end: y, beat: Math.max(...before), isNew: true });
+    }
+    // The 7 (or 30) days ending yesterday against every earlier window of the same length (at least 7 of them).
+    for (const [kind, len, need] of [['week', 7, 4], ['month', 30, 10]] as const) {
+      const title = def.titles[kind]; if (!title) continue;
+      const v = windowValue(def, days, P, y, len, need); if (v == null) continue;
+      const earlier: number[] = [];
+      for (let e = addDays(y, -1); e >= addDays(first, len - 1); e = addDays(e, -1)) { const w = windowValue(def, days, P, e, len, need); if (w != null) earlier.push(w); }
+      if (earlier.length >= 7 && v > Math.max(...earlier)) out.push({ key: `${def.id}.${kind}`, def, kind, title, value: v, text: def.fmt(v), start: addDays(y, -(len - 1)), end: y, beat: Math.max(...earlier), isNew: true });
+    }
+    // A streak running through yesterday that is the longest ever (at least 3 days).
+    if (def.titles.streak) {
+      let len = 0;
+      for (let d = y; days[d] && def.value(days[d], P); d = addDays(d, -1)) len++;
+      if (len >= 3) {
+        let best = 0, cur = 0;
+        for (let d = first; d < addDays(y, -(len - 1)); d = addDays(d, 1)) { cur = days[d] && def.value(days[d], P) ? cur + 1 : 0; best = Math.max(best, cur); }
+        if (len > best) out.push({ key: `${def.id}.streak`, def, kind: 'streak', title: def.titles.streak, value: len, text: String(len), start: addDays(y, -(len - 1)), end: y, beat: best || null, isNew: true, ongoing: true });
+      }
+    }
+  }
+  // The proudest first: longest streaks and windows, then single days.
+  const rank: Record<RecKind, number> = { streak: 0, month: 1, week: 2, day: 3 };
+  return out.sort((a, b) => rank[a.kind] - rank[b.kind]);
 }

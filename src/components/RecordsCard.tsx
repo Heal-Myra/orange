@@ -7,13 +7,19 @@ import { router } from 'expo-router';
 import { Pressable, Text, View } from 'react-native';
 import { shiftISO, todayISO } from '../lib/dates';
 import { locale, tr } from '../lib/i18n';
-import { closeToRecord, findRecords, type Rec } from '../lib/records';
+import { closeToRecord, freshRecords, type Rec } from '../lib/records';
 import { useHeal } from '../lib/store';
 import { colors } from '../theme';
 
 const date = (iso: string, o: Intl.DateTimeFormatOptions) => { const [y, m, d] = iso.split('-').map(Number); return new Date(y, m - 1, d).toLocaleDateString(locale(), o); };
 
 export function when(r: Rec, today: string): string {
+  // Fresh records end yesterday: say what they cover.
+  if (r.end === shiftISO(today, -1) && r.isNew) {
+    if (r.kind === 'week' && r.start === shiftISO(today, -7)) return tr('7 days to yesterday');
+    if (r.kind === 'month' && r.start === shiftISO(today, -30)) return tr('30 days to yesterday');
+    if (r.kind === 'streak' && r.ongoing) return tr('and counting');
+  }
   if (r.kind === 'day') return r.end === today ? tr('Today') : r.end === shiftISO(today, -1) ? tr('Yesterday') : date(r.end, { day: 'numeric', month: 'short' });
   if (r.kind === 'week') return r.start === shiftISO(today, -((new Date().getDay() + 6) % 7) - 7) ? tr('Last week') : tr('Week of {d}', { d: date(r.start, { day: 'numeric', month: 'short' }) });
   if (r.kind === 'month') return date(r.start, { month: 'long', year: 'numeric' });
@@ -23,21 +29,21 @@ export function when(r: Rec, today: string): string {
 export function RecordsCard() {
   const { days, profile } = useHeal();
   const today = todayISO();
-  const r = useMemo(() => findRecords(days, profile, today)[0], [days, profile, today]);
+  // Only a best that yesterday completed (founder, 4 Nov 2026: never a stale record).
+  const r = useMemo(() => freshRecords(days, profile, today)[0], [days, profile, today]);
   const close = useMemo(() => (r ? null : closeToRecord(days, profile, today)), [r, days, profile, today]);
-  if (!r && !close) return null;
   // Founder, 1 Nov 2026: a card named "Top of My Game", a gold trophy (option 2) and one line (option 8).
   return (
     <View style={{ gap: 10, backgroundColor: colors.surface, borderRadius: 22, paddingHorizontal: 16, paddingVertical: 14 }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
         <Text style={{ fontSize: 18, fontWeight: '700', color: colors.ink }}>{tr('Top of My Game')}</Text>
-        {r ? <Pressable onPress={() => router.push('/records')} hitSlop={10} accessibilityRole="button"><Text style={{ color: colors.accent, fontWeight: '600', fontSize: 13 }}>{tr('All')} ›</Text></Pressable> : null}
+        <Pressable onPress={() => router.push('/records')} hitSlop={10} accessibilityRole="button"><Text style={{ color: colors.accent, fontWeight: '600', fontSize: 13 }}>{tr('All')} ›</Text></Pressable>
       </View>
       {r ? <RecordRow r={r} today={today} /> : (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
           <Trophy />
           <Text style={{ flex: 1, color: colors.ink, fontSize: 14, lineHeight: 19 }} numberOfLines={2}>
-            <Text style={{ fontWeight: '600' }}>{tr('Close to a record:')}</Text> {tr(close!.def.close!, { n: close!.more.toLocaleString('en-IN') })}
+            {close ? <><Text style={{ fontWeight: '600' }}>{tr('Close to a record:')}</Text> {tr(close.def.close!, { n: close.more.toLocaleString('en-IN') })}</> : <Text style={{ color: colors.muted }}>{tr('No new best yesterday. Today is a fresh chance.')}</Text>}
           </Text>
         </View>
       )}

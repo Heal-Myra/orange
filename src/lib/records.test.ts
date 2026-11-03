@@ -46,3 +46,22 @@ describe('your records (1 Nov 2026)', () => {
     expect(closeToRecord(days, P, '2026-09-10')).toMatchObject({ more: 1501 });
   });
 });
+
+describe('fresh records only (4 Nov 2026)', () => {
+  it('shows a best only when yesterday completed it', async () => {
+    const { freshRecords } = await import('./records');
+    // 20 days of 6,000 steps, then yesterday 9,000 (a best day); today is the 21st.
+    const days = build(20, i => (i === 19 ? 9000 : 6000));
+    const r = freshRecords(days, P, '2026-09-21');
+    expect(r.find(x => x.key === 'steps.day')).toMatchObject({ value: 9000, end: '2026-09-20' });
+    // A day later the same best is stale: nothing for steps.day.
+    expect(freshRecords(days, P, '2026-09-22').find(x => x.key === 'steps.day')).toBeUndefined();
+  });
+
+  it('a streak counts only while it runs through yesterday and is the longest', async () => {
+    const { freshRecords } = await import('./records');
+    const days = build(20, () => undefined, i => (i < 3 || i >= 14 ? 10 : undefined)); // 3 days, a gap, then 6 days to the 20th
+    const s = freshRecords(days, P, '2026-09-21').find(x => x.key === 'meditation.streak')!;
+    expect(s).toMatchObject({ value: 6, beat: 3, ongoing: true });
+  });
+});
