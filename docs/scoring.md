@@ -12,6 +12,7 @@ No bonuses: each tab's 100 is shared out between its parts.
 | --- | --- | --- |
 | Food | 40 | calories 16 (full at or under the target, 0 at 140 % of it) + protein 12 (share of calories: 0 at 10 %, full at 25 %+) + fibre 8 (full at 14 g per 1,000 kcal) + fat 4 (full at 30 % of calories or less, 0 at 45 %). Eating under the target, or a declared fast, is not penalised. |
 | Food, fasting by choice (from 1 Nov 2026) | 40 | Fasting 16 (hours from last night's last meal to today's first meal ÷ the person's target, at most 1) + 0.6 × the meal score above (24). See docs/decisions/0044. |
+| Food (from 3 Nov 2026) | 40 | Fasting 8 + Early dinner 8 (3 h before sleep) + Meals 24 (0.6 × the meal score) − up to 4 for carb or fat calories above the aim, graded. See docs/decisions/0047. |
 | Sleep | 30 | 20 for 7–9 hours (less outside that range) + 10 × quality ÷ 5 |
 | Movement | 30 | 15 × steps ÷ target + 15 × active minutes ÷ target (each capped) |
 

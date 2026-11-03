@@ -2,7 +2,7 @@
 // Android's Health Connect comes later (docs/decisions/0011-native-app-and-apple-health.md).
 
 export interface HealthDay {
-  steps?: number; activeMin?: number; sleepHours?: number;
+  steps?: number; activeMin?: number; sleepHours?: number; sleepBed?: string; // sleepBed: when sleep began last night (ISO)
   // Added 20 Oct 2026 (founder): body measures (latest), heart and recovery, energy, mindful minutes, workouts, sleep stages.
   weightKg?: number; weightAt?: number; bodyFatPct?: number; restingHr?: number; hrv?: number; vo2max?: number;
   activeKcal?: number; mindfulMin?: number;

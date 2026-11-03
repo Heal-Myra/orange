@@ -71,14 +71,14 @@ async function sleepOf(iso: string) {
   const end = new Date(dayStart(iso).getTime() + 12 * 3600 * 1000);
   const samples = await queryCategorySamples('HKCategoryTypeIdentifierSleepAnalysis', { limit: 0, ...range(start, end) } as never);
   // 0 in bed, 1 asleep (unspecified), 2 awake, 3 core, 4 deep, 5 REM
-  const bySource: Record<string, { asleep: number; deep: number; core: number; rem: number; awake: number }> = {};
+  const bySource: Record<string, { asleep: number; deep: number; core: number; rem: number; awake: number; bed?: number }> = {};
   for (const s of samples) {
     const v = Number(s.value);
     const ms = new Date(s.endDate as unknown as string).getTime() - new Date(s.startDate as unknown as string).getTime();
     const key = s.sourceRevision?.source?.bundleIdentifier ?? 'unknown';
     const b = (bySource[key] ??= { asleep: 0, deep: 0, core: 0, rem: 0, awake: 0 });
     if (v === 2) b.awake += ms;
-    if (v === 1 || v >= 3) b.asleep += ms;
+    if (v === 1 || v >= 3) { b.asleep += ms; const t0 = new Date(s.startDate as unknown as string).getTime(); if (!b.bed || t0 < b.bed) b.bed = t0; } // first fell asleep
     if (v === 3) b.core += ms;
     if (v === 4) b.deep += ms;
     if (v === 5) b.rem += ms;
@@ -87,7 +87,7 @@ async function sleepOf(iso: string) {
   if (!best || best.asleep <= 0) return { hours: undefined, stages: undefined };
   const h = (ms: number) => (ms > 0 ? r1(ms / 3600000) : undefined);
   const staged = best.deep + best.core + best.rem > 0;
-  return { hours: h(best.asleep), stages: staged ? { deep: h(best.deep), core: h(best.core), rem: h(best.rem), awake: h(best.awake) } : undefined };
+  return { hours: h(best.asleep), bed: best.bed ? new Date(best.bed).toISOString() : undefined, stages: staged ? { deep: h(best.deep), core: h(best.core), rem: h(best.rem), awake: h(best.awake) } : undefined };
 }
 
 async function mindfulMinutes(start: Date, end: Date) {
@@ -141,6 +141,7 @@ export async function readHealthDay(iso: string): Promise<HealthDay> {
     steps: steps != null ? Math.round(steps) : undefined,
     activeMin: activeMin != null ? Math.round(activeMin) : undefined,
     sleepHours: sleep?.hours,
+    sleepBed: sleep?.bed,
     sleepStages: sleep?.stages,
     activeKcal: activeKcal != null ? Math.round(activeKcal) : undefined,
     weightKg: weight != null ? r1(weight.value) : undefined,

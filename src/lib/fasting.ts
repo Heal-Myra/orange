@@ -53,3 +53,52 @@ export const fastPoints = (hours: number, h: FastHabit) => FAST_POINTS * Math.ma
 
 /** "12½" for 12.5 hours. */
 export const fmtHours = (x: number) => { const r = Math.round(x * 2) / 2; return Number.isInteger(r) ? String(r) : `${Math.floor(r)}½`; };
+
+// ---------- Food from 3 Nov 2026 (founder): Fasting 20 % + Dinner time 20 % + Quality and quantity 60 %, minus up to
+// 10 % when carbs or fat give more of the calories than recommended (a graded penalty). Out of 40. ----------
+export const FOOD_V3_FROM = '2026-11-03';
+export const FOOD_PARTS = { fasting: 8, dinner: 8, meals: 24, penaltyMax: 4 } as const;
+export const DEFAULT_FAST_HOURS = 14; // an overnight fast for people with no fasting habit
+const c01 = (x: number) => Math.max(0, Math.min(1, x));
+
+export interface FoodV3 { fasting: number; fastHours: number; fastTarget: number; ongoing: boolean; since: Date;
+  dinner: number; dinnerGap: number | null; meals: number; penalty: number; carbOver: number; fatOver: number; total: number }
+
+/** Usual times from About you: the last meal, and bedtime (from their usual day), with plain defaults. */
+function usual(me: AboutMe | undefined) {
+  const r = me?.routine ?? [];
+  const lastMeal = me?.fast && !me.fast.off ? me.fast.lastMeal : r.filter(x => x.kind === 'meal' && x.at >= '17:00').map(x => x.at).sort().pop() ?? '21:00';
+  const sleep = r.filter(x => x.kind === 'sleep').map(x => x.at).sort().pop() ?? '22:30';
+  return { lastMeal, sleep };
+}
+
+/**
+ * Food for one day. mealScore40 is the usual 40-point meal score (calories, protein, fibre, fat) of the day's meals or
+ * null when nothing was eaten; shares are carbs and fat as a share of calories; aims are the recommended shares.
+ */
+export function foodV3(d: DayLog, me: AboutMe | undefined, mealScore40: number | null, shares: { carb: number; fat: number } | null, aims: { carb: number; fat: number }, now: Date = new Date()): FoodV3 {
+  const habit = fastHabit(me);
+  const u = usual(me);
+  const target = habit?.hours ?? DEFAULT_FAST_HOURS;
+  const f = fastHoursOf(d, { hours: target, lastMeal: habit?.lastMeal ?? u.lastMeal }, now);
+  const fasting = FOOD_PARTS.fasting * c01(f.hours / target);
+  // Dinner at least 3 hours before sleep: full at 3 h or more, nothing at 1 h or less (founder, 3 Nov 2026).
+  const dinnerAt = f.since;
+  const bed = d.sleep.bedAt ? new Date(d.sleep.bedAt) : at(d.date, u.sleep, u.sleep < '12:00' ? 0 : -1);
+  const gap = (bed.getTime() - dinnerAt.getTime()) / 3600_000;
+  const dinnerGap = gap > -6 && gap < 18 ? gap : null; // a wrong date would give nonsense
+  const dinner = dinnerGap == null ? 0 : FOOD_PARTS.dinner * c01((dinnerGap - 1) / 2);
+  const meals = mealScore40 == null ? 0 : (FOOD_PARTS.meals * mealScore40) / 40;
+  // Graded penalty: up to 4 points, growing with how far carbs or fat go above the recommended share (0 to 15 points
+  // of the day's calories over), so a small slip costs little and a big one costs the most.
+  const carbOver = shares ? Math.max(0, shares.carb - aims.carb) : 0, fatOver = shares ? Math.max(0, shares.fat - aims.fat) : 0;
+  const penalty = Math.min(FOOD_PARTS.penaltyMax, FOOD_PARTS.penaltyMax * (c01(carbOver / 0.15) + c01(fatOver / 0.15)));
+  return { fasting, fastHours: f.hours, fastTarget: target, ongoing: f.ongoing, since: f.since, dinner, dinnerGap, meals, penalty, carbOver, fatOver,
+    total: Math.max(0, Math.min(40, fasting + dinner + meals - penalty)) };
+}
+
+/** Recommended shares of calories (same as the food table's aim): fat 25 %, protein by target, fibre, carbs the rest. */
+export function aimShares(kcal: number, proteinG: number) {
+  const p = Math.min(0.35, (proteinG * 4) / kcal), f = 0.25, fib = Math.min(0.06, ((14 * kcal) / 1000) * 2 / kcal);
+  return { carb: 1 - p - f - fib, fat: f };
+}

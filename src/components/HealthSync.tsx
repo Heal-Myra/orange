@@ -49,6 +49,7 @@ export function HealthProvider({ children }: { children: ReactNode }) {
       if (h.activeMin != null && !d.activity.activeTyped) { d.activity.activeMin = h.activeMin; d.activity.source = HEALTH_SOURCE; }
       // Sleep typed by hand (no watch at night) is never overwritten by Apple Health (founder, 21 Oct 2026).
       if (h.sleepHours != null && d.sleep.source !== 'Typed in') { d.sleep.hours = h.sleepHours; d.sleep.source = HEALTH_SOURCE; }
+      if (h.sleepBed) d.sleep.bedAt = h.sleepBed; // for dinner timing (founder, 3 Nov 2026)
       const health = { ...(d.health ?? {}) };
       // A weighing newer than the typed weight wins (founder, 23 Oct 2026: the Withings reading did not show).
       // Older typed weights have no time: then any weighing from today wins.

@@ -42,3 +42,33 @@ describe('fasting by choice (1 Nov 2026)', () => {
     expect(fmtHours(18)).toBe('18');
   });
 });
+
+describe('Food from 3 Nov 2026: fasting 8 + dinner time 8 + meals 24 − up to 4', () => {
+  const aims = { carb: 0.5, fat: 0.25 };
+  it('fasting counts for everyone (14 h unless they fast longer) and dinner 3 h before sleep earns full', async () => {
+    const { foodV3 } = await import('./fasting');
+    const d = emptyDay('2026-11-04');
+    d.fastFrom = new Date(2026, 10, 3, 19, 0).toISOString();       // dinner at 7 pm
+    d.sleep = { bedAt: new Date(2026, 10, 3, 22, 30).toISOString() }; // asleep 10:30 pm: 3½ h later
+    const r = foodV3(d, undefined, null, null, aims, new Date(2026, 10, 4, 9, 0)); // 14 h fasted by 9 am
+    expect(r.fasting).toBeCloseTo(8);
+    expect(r.dinner).toBeCloseTo(8);
+    expect(r.total).toBeCloseTo(16);
+  });
+  it('a late dinner earns less: 2 h before sleep is half, 1 h is nothing', async () => {
+    const { foodV3 } = await import('./fasting');
+    const d = emptyDay('2026-11-04');
+    d.fastFrom = new Date(2026, 10, 3, 21, 0).toISOString();
+    d.sleep = { bedAt: new Date(2026, 10, 3, 23, 0).toISOString() };
+    expect(foodV3(d, undefined, null, null, aims, new Date(2026, 10, 4, 8, 0)).dinner).toBeCloseTo(4);
+  });
+  it('meals are worth 24 and too many carb or fat calories cost up to 4, graded', async () => {
+    const { foodV3 } = await import('./fasting');
+    const d = emptyDay('2026-11-04');
+    const small = foodV3(d, undefined, 40, { carb: 0.53, fat: 0.25 }, aims);  // 3 points over on carbs
+    const big = foodV3(d, undefined, 40, { carb: 0.70, fat: 0.40 }, aims);    // far over on both
+    expect(small.meals).toBeCloseTo(24);
+    expect(small.penalty).toBeCloseTo(0.8);
+    expect(big.penalty).toBe(4);
+  });
+});

@@ -22,7 +22,8 @@ import { FAST_KCAL, bodyScore, mealTotals } from '../../lib/scoring';
 import { useHeal } from '../../lib/store';
 import { colors } from '../../theme';
 import { tr } from '../../lib/i18n';
-import { FastAsk, FastStatus, fastRing, useFast } from '../../components/FastBits';
+import { FastAsk, FastStatus, FoodPenalty, fastRing, foodV3Of, foodV3Rings, useFast } from '../../components/FastBits';
+import { FOOD_V3_FROM } from '../../lib/fasting';
 
 export default function Body() {
   const { day, date, profile, update, setProfile } = useHeal();
@@ -30,6 +31,8 @@ export default function Body() {
   const totals = mealTotals(day.meals);
   const { connected } = useHealth();
   const fast = useFast(); // fasting by choice (decision 0044)
+  // From 3 Nov 2026: Fasting, Dinner before sleep, Meals; the nutrients move to See details (decision 0047).
+  const v3 = date >= FOOD_V3_FROM ? foodV3Of(day, profile) : null;
   const [details, setDetails] = useState(false);
   const auto = connected; // Apple Health fills sleep and movement; typing is only for phones without it
   const h = day.health;
@@ -38,7 +41,7 @@ export default function Body() {
   return (
     <Screen feedback="Body">
       <Anchor id="food"><MealPhoto right={<Score value={score?.nutrition} max={40} />} top={
-        <RingPanel trend="food" score={score?.nutrition} max={40} items={(() => {
+        <RingPanel trend="food" score={score?.nutrition} max={40} items={v3 ? foodV3Rings(v3) : (() => {
           // Calories, then carbs, protein, fibre and fat (founder, 31 Oct 2026); carb and fat aims from the same mix as the table.
           const fib = fibreTarget(profile.kcal), aim = aimMix(profile.kcal, profile.protein, fib);
           const carbAim = Math.round((aim.c * profile.kcal) / 4), fatAim = Math.round((aim.f * profile.kcal) / 9);
@@ -52,6 +55,7 @@ export default function Body() {
           ];
         })()} />}>
         <FastStatus />
+        {v3 ? <FoodPenalty v={v3} /> : null}
         <FastAsk />
         <CareNote part="food" />
         {/* "I'm fasting today" (founder, 22 Oct 2026): a declared fast scores Food in full while only water, black tea

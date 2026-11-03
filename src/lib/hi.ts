@@ -1427,4 +1427,9 @@ export const HI: Record<string, string> = {
   'Wash gently twice a day and leave spots alone.': 'दिन में दो बार हल्के से धोएँ और दानों को न छेड़ें।',
   'Sip water through the day; a little ghee on the lips.': 'दिन भर पानी पिएँ; होंठों पर थोड़ा घी लगाएँ।',
   'Sunscreen before you step out, even on cloudy days.': 'बाहर जाने से पहले सनस्क्रीन लगाएँ, बादल हों तब भी।',
+  'Early dinner': 'जल्दी रात का खाना',
+  'Meals': 'भोजन',
+  'Carbs and fat above your aim': 'कार्ब और फ़ैट आपके लक्ष्य से ज़्यादा',
+  'Carbs above your aim': 'कार्ब आपके लक्ष्य से ज़्यादा',
+  'Fat above your aim': 'फ़ैट आपके लक्ष्य से ज़्यादा',
 };

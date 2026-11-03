@@ -3,7 +3,7 @@
 // A working model to help people understand themselves, not a medical measure
 // (The Orange Book, Chapter 2). Weights are documented in docs/scoring.md.
 
-import { FAST_FROM, MEAL_SHARE, fastHabit, fastHoursOf, fastPoints } from './fasting';
+import { FAST_FROM, FOOD_V3_FROM, MEAL_SHARE, aimShares, fastHabit, fastHoursOf, fastPoints, foodV3 } from './fasting';
 import { DEFAULT_PROFILE, type ContentCategoryId, type DayLog, type Meal, type MediaSession, type PracticeId, type Profile } from './types';
 
 export const CONTENT_CATEGORIES: { id: ContentCategoryId; name: string; weight: number }[] = [
@@ -76,7 +76,10 @@ export function bodyScore(d: DayLog, P: Profile, now: Date = new Date()): BodySc
   const hasSleep = s.hours != null;
   // Fasting by choice (decision 0044): the hours without food count from 1 Nov 2026.
   const habit = (d.date ?? '') >= FAST_FROM ? fastHabit(P.me) : null;
-  const hasFood = d.meals.length > 0 || !!d.fasting || !!habit;
+  // From 3 Nov 2026 Food = fasting 8 + dinner time 8 + meals 24 − up to 4 (decision 0047). It counts once there is
+  // something to go on: a meal today, last night's meal logged, a fasting habit, or a declared fast.
+  const v3 = (d.date ?? '') >= FOOD_V3_FROM;
+  const hasFood = d.meals.length > 0 || !!d.fasting || !!habit || (v3 && !!d.fastFrom);
   if (!hasAct && !hasSleep && !hasFood) return null;
 
   // Body = Food 40 + Sleep 30 + Movement 30 (founder, 24 Oct 2026).
@@ -94,6 +97,11 @@ export function bodyScore(d: DayLog, P: Profile, now: Date = new Date()): BodySc
   let nutrition = 0;
   // A declared fast scores full, as long as only water, black tea or black coffee (a few calories) went in.
   if (d.fasting && totals.kcal <= FAST_KCAL) nutrition = 40;
+  else if (v3) {
+    const energy = totals.p * 4 + totals.c * 4 + totals.f * 9;
+    nutrition = foodV3(d, P.me, d.meals.length ? foodScore(totals, P.kcal).total : null,
+      energy ? { carb: (totals.c * 4) / energy, fat: (totals.f * 9) / energy } : null, aimShares(P.kcal, P.protein), now).total;
+  }
   else if (habit) {
     const f = fastHoursOf(d, habit, now);
     nutrition = fastPoints(f.hours, habit) + (d.meals.length ? MEAL_SHARE * foodScore(totals, P.kcal).total : 0);

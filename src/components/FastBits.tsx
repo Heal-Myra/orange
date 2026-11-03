@@ -5,7 +5,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { shiftISO, todayISO } from '../lib/dates';
-import { FAST_FROM, fastHabit, fastHoursOf, fmtHours, type FastHabit } from '../lib/fasting';
+import { FAST_FROM, FOOD_PARTS, FOOD_V3_FROM, aimShares, fastHabit, fastHoursOf, fmtHours, foodV3, type FastHabit } from '../lib/fasting';
+import { foodScore, mealTotals } from '../lib/scoring';
 import { tr } from '../lib/i18n';
 import { useHeal } from '../lib/store';
 import { colors } from '../theme';
@@ -14,13 +15,47 @@ import type { AboutMe } from '../lib/targets';
 
 const SKY_INK = '#2F567A';
 
-/** The habit and today's fast, re-read every minute so the hours keep moving. */
+/** The habit and today's fast, re-read every minute so the hours keep moving. From 3 Nov 2026 everyone has a fast
+ *  (14 h unless they fast longer by choice). */
 export function useFast() {
   const { day, date, profile } = useHeal();
   const [, tick] = useState(0);
   useEffect(() => { const t = setInterval(() => tick(x => x + 1), 60_000); return () => clearInterval(t); }, []);
+  if (date >= FOOD_V3_FROM) {
+    const v = foodV3Of(day, profile);
+    return { habit: { hours: v.fastTarget, lastMeal: '' }, hours: v.fastHours, since: v.since, ongoing: v.ongoing && !day.meals.length };
+  }
   const habit = date >= FAST_FROM ? fastHabit(profile.me) : null;
   return habit ? { habit, ...fastHoursOf(day, habit) } : null;
+}
+
+/** Today's Food parts (decision 0047). */
+export function foodV3Of(day: import('../lib/types').DayLog, profile: import('../lib/types').Profile) {
+  const t = mealTotals(day.meals), energy = t.p * 4 + t.c * 4 + t.f * 9;
+  return foodV3(day, profile.me, day.meals.length ? foodScore(t, profile.kcal).total : null,
+    energy ? { carb: (t.c * 4) / energy, fat: (t.f * 9) / energy } : null, aimShares(profile.kcal, profile.protein));
+}
+
+/** The three Food rings from 3 Nov 2026: Fasting, Dinner time, Meals. */
+export function foodV3Rings(v: ReturnType<typeof foodV3Of>) {
+  return [
+    { id: 'fast', color: PASTEL.sky, label: tr('Fasting'), value: v.fasting / FOOD_PARTS.fasting, text: `${fmtHours(Math.min(v.fastHours, v.fastTarget))} / ${v.fastTarget} h` },
+    { id: 'dinner', color: PASTEL.lavender, label: tr('Early dinner'), value: v.dinner / FOOD_PARTS.dinner, text: v.dinnerGap == null ? '–' : `${fmtHours(Math.max(0, v.dinnerGap))} / 3 h` },
+    { id: 'meals', color: PASTEL.peach, label: tr('Meals'), value: v.meals / FOOD_PARTS.meals, text: `${Math.round(v.meals)} / ${FOOD_PARTS.meals}` },
+  ];
+}
+
+/** Shown only when carbs or fat gave too many of the calories: what it cost. */
+export function FoodPenalty({ v }: { v: ReturnType<typeof foodV3Of> }) {
+  if (v.penalty < 0.5) return null;
+  const what = v.carbOver && v.fatOver ? tr('Carbs and fat above your aim') : v.carbOver ? tr('Carbs above your aim') : tr('Fat above your aim');
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10, paddingHorizontal: 12, borderRadius: 14, backgroundColor: PASTEL.sand + '22' }}>
+      <Ionicons name="trending-down-outline" size={18} color={colors.ink} />
+      <Text style={{ flex: 1, color: colors.ink, fontSize: 14.5 }}>{what}</Text>
+      <Text style={{ color: '#9A7A3A', fontWeight: '800', fontSize: 15 }}>−{Math.round(v.penalty * 2) / 2}</Text>
+    </View>
+  );
 }
 
 const clock = (d: Date) => d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });

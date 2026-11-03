@@ -61,7 +61,7 @@ export interface DayLog {
   phoneFrom?: { date: string; media: MediaSession[]; noMedia?: boolean };
   savedAt?: string; // when this day was last changed (ISO); the newer copy wins between phone and account
   activity: { steps?: number; activeMin?: number; source?: string; stepsTyped?: boolean; activeTyped?: boolean }; // *Typed: the person's own number wins over Apple Health
-  sleep: { hours?: number; quality?: 1 | 2 | 3 | 4 | 5; source?: string }; // source 'Typed in' = the person's own number wins over Apple Health
+  sleep: { hours?: number; quality?: 1 | 2 | 3 | 4 | 5; source?: string; bedAt?: string }; // bedAt: when sleep began (Apple Health), for dinner timing // source 'Typed in' = the person's own number wins over Apple Health
   meals: Meal[];
   fasting?: boolean;
   fastFrom?: string; // ISO time of the last meal of the day before (fasting by choice; 1 Nov 2026)
