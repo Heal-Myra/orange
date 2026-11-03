@@ -1432,4 +1432,5 @@ export const HI: Record<string, string> = {
   'Carbs and fat above your aim': 'कार्ब और फ़ैट आपके लक्ष्य से ज़्यादा',
   'Carbs above your aim': 'कार्ब आपके लक्ष्य से ज़्यादा',
   'Fat above your aim': 'फ़ैट आपके लक्ष्य से ज़्यादा',
+  'Dinner {h} h before sleep (aim 3 h)': 'सोने से {h} घंटे पहले रात का खाना (लक्ष्य 3 घंटे)',
 };

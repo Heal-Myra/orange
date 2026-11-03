@@ -3,7 +3,7 @@
 ## 3 Nov 2026 — Food: fasting, early dinner and meals, with a graded penalty (decision 0047)
 - Food (40) from 3 Nov = Fasting 8 (hours since the last meal, up to the person's fast, 14 h if they have none) + Early dinner 8 (last meal 3 h or more before falling asleep; half at 2 h; none at 1 h) + Meals 24 (the usual calories, protein, fibre and fat score) − up to 4 when carbs or fat give more of the calories than the aim (graded over 0–15 points of calories above it). A declared fasting day still scores 40.
 - Bedtime comes from Apple Health (when sleep began), else the usual day in About you, else 10:30 pm.
-- Food card: three rings (Fasting, Early dinner, Meals); the nutrient numbers are under See details; a soft line shows the penalty only when there is one.
+- Food card: the score is fasting + early dinner + meals, but the rings and the list beside them show Calories, Carbs, Protein, Fat and Fibre (founder, 3 Nov evening). Fasting and how early dinner was sit in the soft blue line; the penalty line shows only when there is one.
 
 ## 1 Nov 2026 — Face & beauty in four rings
 - The seven skin points are grouped into four rings: Eyes (dark circles, puffiness), Clear skin (redness, pimples), Moisture (dryness, lips) and Sun (tan), each the weighted average of its points; the skin score is unchanged. The four sit beside the rings with their scores; the group needing most care sits in a soft box below with one tip; Show details lists all seven points.

@@ -60,7 +60,7 @@ export function FoodPenalty({ v }: { v: ReturnType<typeof foodV3Of> }) {
 
 const clock = (d: Date) => d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
 
-export function FastStatus() {
+export function FastStatus({ dinnerGap }: { dinnerGap?: number | null } = {}) {
   const f = useFast();
   if (!f) return null;
   const left = f.habit.hours - f.hours;
@@ -70,7 +70,10 @@ export function FastStatus() {
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10, paddingHorizontal: 12, borderRadius: 14, backgroundColor: PASTEL.sky + '22' }}>
       <Ionicons name="moon-outline" size={18} color={SKY_INK} />
-      <Text style={{ flex: 1, color: SKY_INK, fontSize: 14.5 }}>{text}</Text>
+      <View style={{ flex: 1 }}>
+        <Text style={{ color: SKY_INK, fontSize: 14.5 }}>{text}</Text>
+        {dinnerGap != null ? <Text style={{ color: SKY_INK, fontSize: 13, opacity: 0.85 }}>{tr('Dinner {h} h before sleep (aim 3 h)', { h: fmtHours(Math.max(0, dinnerGap)) })}</Text> : null}
+      </View>
     </View>
   );
 }

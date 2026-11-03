@@ -22,7 +22,7 @@ import { FAST_KCAL, bodyScore, mealTotals } from '../../lib/scoring';
 import { useHeal } from '../../lib/store';
 import { colors } from '../../theme';
 import { tr } from '../../lib/i18n';
-import { FastAsk, FastStatus, FoodPenalty, fastRing, foodV3Of, foodV3Rings, useFast } from '../../components/FastBits';
+import { FastAsk, FastStatus, FoodPenalty, fastRing, foodV3Of, useFast } from '../../components/FastBits';
 import { FOOD_V3_FROM } from '../../lib/fasting';
 
 export default function Body() {
@@ -41,20 +41,21 @@ export default function Body() {
   return (
     <Screen feedback="Body">
       <Anchor id="food"><MealPhoto right={<Score value={score?.nutrition} max={40} />} top={
-        <RingPanel trend="food" score={score?.nutrition} max={40} items={v3 ? foodV3Rings(v3) : (() => {
-          // Calories, then carbs, protein, fibre and fat (founder, 31 Oct 2026); carb and fat aims from the same mix as the table.
+        <RingPanel trend="food" score={score?.nutrition} max={40} items={(() => {
+          // Calories, carbs, protein, fat and fibre (founder, 3 Nov 2026: the score is fasting + early dinner + meals, but the
+          // rings show the nutrients); carb and fat aims from the same mix as the table.
           const fib = fibreTarget(profile.kcal), aim = aimMix(profile.kcal, profile.protein, fib);
           const carbAim = Math.round((aim.c * profile.kcal) / 4), fatAim = Math.round((aim.f * profile.kcal) / 9);
           return [
-            ...(fast ? [fastRing(fast)] : []),
+            ...(fast && !v3 ? [fastRing(fast)] : []),
             { id: 'kcal', color: PASTEL.peach, label: tr('Calories'), value: totals.kcal / profile.kcal, text: `${Math.round(totals.kcal)} / ${profile.kcal}` },
             { id: 'carbs', color: PASTEL.sand, label: tr('Carbs'), value: totals.c / carbAim, text: `${Math.round(totals.c)} / ${carbAim} g` },
             { id: 'protein', color: PASTEL.lavender, label: tr('Protein'), value: totals.p / profile.protein, text: `${Math.round(totals.p)} / ${profile.protein} g` },
-            { id: 'fibre', color: PASTEL.teal, label: tr('Fibre'), value: (totals.fib ?? 0) / fib, text: `${Math.round(totals.fib ?? 0)} / ${fib} g` },
             { id: 'fat', color: PASTEL.rose, label: tr('Fat'), value: totals.f / fatAim, text: `${Math.round(totals.f)} / ${fatAim} g` },
+            { id: 'fibre', color: PASTEL.teal, label: tr('Fibre'), value: (totals.fib ?? 0) / fib, text: `${Math.round(totals.fib ?? 0)} / ${fib} g` },
           ];
         })()} />}>
-        <FastStatus />
+        <FastStatus dinnerGap={v3?.dinnerGap} />
         {v3 ? <FoodPenalty v={v3} /> : null}
         <FastAsk />
         <CareNote part="food" />
