@@ -3,10 +3,10 @@
 // same scoring as the cards (src/lib/scoring.ts), so the "+N" is worked out, never guessed.
 
 import { FAST_FROM, fastHabit, fastHoursOf } from './fasting';
-import { FOCUS_EACH, POINTS, SECTIONS_FROM, SECTION_AREAS, type WellBeing } from './scoring';
+import { FOCUS_EACH, LEARN_SHARE, POINTS, SECTIONS_FROM, SECTION_AREAS, lived, taoStudied, wisdomStudied, type WellBeing } from './scoring';
 import type { DayLog, Profile } from './types';
 
-export type StepId = 'sleep' | 'meditation' | 'nidra' | 'movement' | 'food' | 'tasks' | 'gratitude' | 'kind' | 'wisdom' | 'tao';
+export type StepId = 'sleep' | 'meditation' | 'nidra' | 'movement' | 'food' | 'tasks' | 'gratitude' | 'kind' | 'wisdom' | 'wisdomLive' | 'tao' | 'taoLive';
 export interface Step { id: StepId; pillar: 'body' | 'mind' | 'soul'; card: string; gain: number; minutes?: number }
 
 const c01 = (x: number) => Math.max(0, Math.min(1, x));
@@ -15,7 +15,7 @@ export const isBedtime = (hour: number) => hour >= 21.5 || hour < 5;
 
 /** Which steps suit this hour more than others: morning for stillness and sleep, midday for food and doing, evening for the heart. */
 function preferred(hour: number): StepId[] {
-  if (hour < 11) return ['sleep', 'meditation', 'wisdom', 'tao'];
+  if (hour < 11) return ['sleep', 'meditation', 'wisdom', 'wisdomLive', 'tao', 'taoLive'];
   if (hour < 17) return ['food', 'movement', 'tasks'];
   return ['gratitude', 'kind', 'movement', 'food'];
 }
@@ -61,8 +61,12 @@ export function candidates(d: DayLog, P: Profile, w: WellBeing, hour: number): S
     add({ id: 'gratitude', pillar: 'soul', card: 'gratitude', gain: POINTS.gratitude - (s?.gratitude ?? 0) });
     add({ id: 'kind', pillar: 'soul', card: 'gratitude', gain: POINTS.love - (s?.love ?? 0) });
   }
-  add({ id: 'wisdom', pillar: 'soul', card: 'wisdom', gain: POINTS.wisdom - (s?.verse ?? 0) });
-  add({ id: 'tao', pillar: 'soul', card: 'tao', gain: POINTS.tao - (s?.tao ?? 0) });
+  // Wisdom and Tao (founder, 4 Nov 2026): reading is a quarter of the points, living it is the rest. Myra suggests
+  // reading first; once read, she suggests living it (writing one line on how), which is the bigger win.
+  if (!wisdomStudied(d.soul)) add({ id: 'wisdom', pillar: 'soul', card: 'wisdom', gain: LEARN_SHARE * POINTS.wisdom });
+  else if (!lived(d.soul?.verseLived)) add({ id: 'wisdomLive', pillar: 'soul', card: 'wisdom', gain: (1 - LEARN_SHARE) * POINTS.wisdom });
+  if (!taoStudied(d.tao)) add({ id: 'tao', pillar: 'soul', card: 'tao', gain: LEARN_SHARE * POINTS.tao });
+  else if (!lived(d.tao?.lived)) add({ id: 'taoLive', pillar: 'soul', card: 'tao', gain: (1 - LEARN_SHARE) * POINTS.tao });
   return out;
 }
 

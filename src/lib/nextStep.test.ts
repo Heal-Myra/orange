@@ -44,4 +44,11 @@ describe("Myra's one recommendation", () => {
     expect(candidates(d, p, wellBeing(d, p), 10).map(x => x.id)).not.toContain('food');
     expect(candidates(d, p, wellBeing(d, p), 16).map(x => x.id)).toContain('food');
   });
+
+  it('Wisdom: reading is worth a quarter (+5), living it the rest (+15)', () => {
+    const d = day();
+    expect(candidates(d, P, wellBeing(d, P), 9).find(x => x.card === 'wisdom')).toMatchObject({ id: 'wisdom', gain: 5 });
+    d.soul = { ...d.soul, verseStudied: true } as typeof d.soul;
+    expect(candidates(d, P, wellBeing(d, P), 9).find(x => x.card === 'wisdom')).toMatchObject({ id: 'wisdomLive', gain: 15 });
+  });
 });

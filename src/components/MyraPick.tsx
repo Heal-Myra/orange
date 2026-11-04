@@ -36,6 +36,8 @@ const what = (id: StepId): string => ({
   kind: tr('Note one kind act.'),
   wisdom: tr("Read today's wisdom."),
   tao: tr("Try today's Tao."),
+  wisdomLive: tr("Live today's wisdom: write one line."),
+  taoLive: tr("Live today's Tao: write one line."),
 }[id]);
 
 

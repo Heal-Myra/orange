@@ -1343,6 +1343,8 @@ export const HI: Record<string, string> = {
   'Write your gratitude.': 'अपना आभार लिखिए।',
   'Note one kind act.': 'एक भलाई लिखिए।',
   "Read today's wisdom.": 'आज का ज्ञान पढ़िए।',
+  "Live today's wisdom: write one line.": 'आज का ज्ञान जिएँ: एक पंक्ति लिखिए।',
+  "Live today's Tao: write one line.": 'आज का ताओ जिएँ: एक पंक्ति लिखिए।',
   "Try today's Tao.": 'आज का ताओ कीजिए।',
   'Social time': 'सोशल समय',
   "Add yesterday's Screen Time…": 'कल का स्क्रीन टाइम जोड़ें…',
