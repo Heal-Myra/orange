@@ -11,6 +11,8 @@ import { tr } from '../../lib/i18n';
 import { usePendingRequests } from '../../lib/adminAlerts';
 import { useHeal } from '../../lib/store';
 import { useAuth } from '../../lib/auth';
+import { wellBeing } from '../../lib/scoring';
+import { Score } from '../../components/ui';
 
 type IconName = ComponentProps<typeof Ionicons>['name'];
 
@@ -20,8 +22,16 @@ const tab = (title: string, icon: IconName, tint: string) => ({
   tabBarIcon: ({ color }: { color: ColorValue }) => <Ionicons name={icon} size={28} color={color as string} />,
 });
 
+/** The pillar's score in the title bar, on the right (founder, 4 Nov 2026). */
+function PillarScore({ pillar }: { pillar: 'body' | 'mind' | 'soul' }) {
+  const { day, profile } = useHeal();
+  const w = wellBeing(day, profile);
+  return <View style={{ paddingHorizontal: 16 }}><Score value={w[pillar]?.total} max={100} /></View>;
+}
+
 const ringTab = (title: string, pillar: 'body' | 'mind' | 'soul', icon: IconName, tint: string) => ({
   title,
+  headerRight: () => <PillarScore pillar={pillar} />,
   tabBarActiveTintColor: tint,
   tabBarIcon: ({ color }: { color: ColorValue }) => <TabRing pillar={pillar} icon={icon} color={color as string} />,
 });

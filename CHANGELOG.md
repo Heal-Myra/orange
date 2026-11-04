@@ -1,5 +1,8 @@
 # Changelog
 
+## 4 Nov 2026 — Pillar score in the title bar
+- Body, Mind and Soul show their score (out of 100) on the right of the title bar; the "Mind today" and "Soul today" cards are gone, so the cards start at the top.
+
 ## 4 Nov 2026 — Top of My Game shows only fresh records
 - Today's card shows only a best that yesterday completed: yesterday as a best day, the 7 or 30 days ending yesterday as the best such stretch, or a streak running through yesterday that is the longest ever. Never an older record; if there is none, the "close to a record" nudge or "No new best yesterday". All › still lists every best.
 - New records: highest Body, Mind and Soul score (day and 7 days), and the longest streak of healthy food (Food 28 of 40 or more).

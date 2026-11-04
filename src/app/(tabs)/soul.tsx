@@ -16,9 +16,7 @@ export default function Soul() {
   const score = soulScore(day, profile);
   return (
     <Screen feedback="Soul">
-      <Card style={{ paddingVertical: 12 }}>
-        <Heading right={<Score value={score?.total} max={100} />}>{tr('Soul today')}</Heading>
-      </Card>
+      {/* The score sits in the title bar now (founder, 4 Nov 2026: "Soul" and "Soul today" said the same thing). */}
       {/* Gratitude journal (27 Oct 2026) replaces the Gratitude and Love cards; older days keep them. */}
       {journal ? <Anchor id="gratitude"><GratitudeJournal /></Anchor> : <Anchor id="gratitude"><GratitudeCard /></Anchor>}
       <Anchor id="tao"><TaoCard on="soul" /></Anchor>

@@ -43,9 +43,7 @@ export default function Mind() {
 
   return (
     <Screen feedback="Mind">
-      <Card style={{ paddingVertical: 12 }}>
-        <Heading right={<Score value={score?.total} max={100} />}>{tr('Mind today')}</Heading>
-      </Card>
+      {/* The score sits in the title bar now (founder, 4 Nov 2026). */}
 
       {/* How I feel today, first on Mind (founder, 31 Oct 2026); Myra fits every suggestion to it. */}
       {date === todayISO() ? <Anchor id="feel"><FeelingCard /></Anchor> : null}
