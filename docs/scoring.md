@@ -19,7 +19,7 @@ No bonuses: each tab's 100 is shared out between its parts.
 ## Mind (100)
 | Part | Points | How |
 | --- | --- | --- |
-| Focus to-dos | 40 | 20 for each to-do finished today, up to two (from 1 Nov 2026 any to-do; before, only Myra's two picks) |
+| Focus to-dos | 40 | From 4 Nov 2026: Family, Work and Better me, 13⅓ each: 20 % for writing down two to-dos for today, 80 % for finishing them. (1–3 Nov: 20 for each to-do finished, two max; before: Myra's two picks.) |
 | Breathing & meditation | 30 | minutes (guided, on my own, or mindful minutes from Apple Health, the larger) ÷ daily target. The card moved here from Soul on 24 Oct 2026. |
 | Phone activity | 30 | 30 × content quality (minutes weighted by category: learning, spiritual 100 % … outrage, gossip 0 %), minus 1 point for every 10 social and video minutes over the daily limit; never below 0. Learning and AI tools never count toward the limit. (Founder, 1 Nov 2026: quality matters most; until then quality 18 + within the limit 12.) |
 

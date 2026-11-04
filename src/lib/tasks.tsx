@@ -140,6 +140,15 @@ export function TasksProvider({ children }: { children: ReactNode }) {
     if (doneToday > (days[today]?.mind?.focusDone ?? 0)) updateOn(today, d => { d.mind.focusDone = Math.max(d.mind.focusDone ?? 0, doneToday); });
   }, [tasks, today]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Today's to-dos in each section, written and done, for the Clear your mind score (founder, 4 Nov 2026).
+  useEffect(() => {
+    const now = new Date().toDateString();
+    const doneToday = (x: Task) => !!x.doneAt && new Date(x.doneAt).toDateString() === now;
+    const forToday = (x: Task) => doneToday(x) || (!x.doneAt && (!x.due || x.due <= today));
+    const s = Object.fromEntries((['family', 'work', 'self'] as const).map(a => [a, [tasks.filter(x => x.area === a && forToday(x)).length, tasks.filter(x => x.area === a && doneToday(x)).length]])) as Record<'family' | 'work' | 'self', [number, number]>;
+    if (JSON.stringify(days[today]?.mind?.sections) !== JSON.stringify(s)) updateOn(today, d => { d.mind.sections = s; });
+  }, [tasks, today]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const value = useMemo<TasksState>(() => {
     const open = tasks.filter(t => !t.doneAt).sort(sortOpen);
     const focus = focusRec.date === today ? focusRec.ids.map(id => open.find(t => t.id === id)).filter((t): t is Task => !!t) : [];

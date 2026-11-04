@@ -117,7 +117,12 @@ export function bodyScore(d: DayLog, P: Profile, now: Date = new Date()): BodySc
  * Soul = Gratitude 30 + Love 30 + Daily Wisdom 20 + Tao practice 20 = 100 (founder, 25 Oct 2026, ending the 130 overrun).
  */
 export const POINTS = { food: 40, sleep: 30, movement: 30, focus: 40, meditation: 30, phone: 30, gratitude: 30, wisdom: 20, tao: 20, love: 30 } as const;
-export const FOCUS_EACH = POINTS.focus / 2;          // each of up to two focus to-dos
+export const FOCUS_EACH = POINTS.focus / 2;          // each of up to two focus to-dos (until 3 Nov 2026)
+export const SECTIONS_FROM = '2026-11-04';
+export const SECTION_AREAS = ['family', 'work', 'self'] as const;
+/** One section's points: [written, done] today, two of each count. */
+export const sectionPoint = ([w, dn]: [number, number]) => (POINTS.focus / 3) * (0.2 * Math.min(2, Math.max(w, dn)) / 2 + 0.8 * Math.min(2, dn) / 2);
+export const sectionPoints = (s: Partial<Record<'family' | 'work' | 'self', [number, number]>>) => SECTION_AREAS.reduce((a, k) => a + sectionPoint(s[k] ?? [0, 0]), 0);
 export const GRATITUDE_EACH = POINTS.gratitude / 4;  // each of up to four gratitudes
 /** Daily Wisdom and Tao: reading earns this share, living it (a line on how it was used today) the rest. */
 export const LEARN_SHARE = 0.25;
@@ -164,7 +169,9 @@ export function mindScore(d: DayLog, P: Profile): MindScore | null {
   const m = d.mind;
   // Older days with the Attention/Learning ticks count them as done focus tasks.
   const done = Math.min(2, (m.focusDone ?? 0) + (m.attention ? 1 : 0) + (m.learning ? 1 : 0));
-  const practices = done * FOCUS_EACH;
+  // From 4 Nov 2026 (founder): a third for each of Family, Work and Better me; writing down two to-dos earns 20 % of it,
+  // finishing them the other 80 % (decision 0048).
+  const practices = (d.date ?? '') >= SECTIONS_FROM && m.sections ? sectionPoints(m.sections) : done * FOCUS_EACH;
   const meditation = POINTS.meditation * c01((m.meditationMin ?? 0) / P.meditation);
 
   // Since 27 Oct 2026 the phone points are yesterday's (copied in as phoneFrom); older days keep their own.

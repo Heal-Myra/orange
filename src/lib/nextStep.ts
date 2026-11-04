@@ -3,7 +3,7 @@
 // same scoring as the cards (src/lib/scoring.ts), so the "+N" is worked out, never guessed.
 
 import { FAST_FROM, fastHabit, fastHoursOf } from './fasting';
-import { FOCUS_EACH, POINTS, type WellBeing } from './scoring';
+import { FOCUS_EACH, POINTS, SECTIONS_FROM, SECTION_AREAS, type WellBeing } from './scoring';
 import type { DayLog, Profile } from './types';
 
 export type StepId = 'sleep' | 'meditation' | 'nidra' | 'movement' | 'food' | 'tasks' | 'gratitude' | 'kind' | 'wisdom' | 'tao';
@@ -53,7 +53,10 @@ export function candidates(d: DayLog, P: Profile, w: WellBeing, hour: number): S
     const left = hour < 11 ? 3 : hour < 16 ? 2 : 1;
     add({ id: 'food', pillar: 'body', card: 'food', gain: (POINTS.food - (b?.nutrition ?? 0)) / left });
   }
-  if (hour >= 8 && hour < 21) add({ id: 'tasks', pillar: 'mind', card: 'tasks', gain: Math.min(FOCUS_EACH, POINTS.focus - (m?.practices ?? 0)) });
+  // Finishing one more to-do: from 4 Nov 2026 that is 80 % ÷ 2 of a section (about 5 points) where one is still open.
+  const secs = (d.date ?? '') >= SECTIONS_FROM ? d.mind?.sections : undefined;
+  const taskGain = secs ? (SECTION_AREAS.some(a => (secs[a]?.[1] ?? 0) < 2) ? (POINTS.focus / 3) * 0.4 : 0) : Math.min(FOCUS_EACH, POINTS.focus - (m?.practices ?? 0));
+  if (hour >= 8 && hour < 21) add({ id: 'tasks', pillar: 'mind', card: 'tasks', gain: taskGain });
   if (hour >= 16) {
     add({ id: 'gratitude', pillar: 'soul', card: 'gratitude', gain: POINTS.gratitude - (s?.gratitude ?? 0) });
     add({ id: 'kind', pillar: 'soul', card: 'gratitude', gain: POINTS.love - (s?.love ?? 0) });

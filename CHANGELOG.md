@@ -1,5 +1,9 @@
 # Changelog
 
+## 4 Nov 2026 — Parts in %; Clear your mind by section (decision 0048)
+- Inside every card, each part now shows as a percentage (e.g. Calories 34%, Eyes 60%, I'm thankful for 67%); only the card's own score at the top stays in points (e.g. 24/40).
+- Clear your mind: one ring each for Family, Work and Better me, a third of the 40 each. Writing down two to-dos in a part earns 20% of it; finishing them the other 80%. Each ring shows "2 written · 1 done".
+
 ## 4 Nov 2026 — Pillar score in the title bar
 - Body, Mind and Soul show their score (out of 100) on the right of the title bar; the "Mind today" and "Soul today" cards are gone, so the cards start at the top.
 

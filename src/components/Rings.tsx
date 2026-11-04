@@ -15,7 +15,9 @@ export const PASTEL = {
   peach: '#EBA987', lavender: '#9C95D0', teal: '#6FB7BD', sky: '#86B4DE', sand: '#E3B873', rose: '#D9A7BD', sage: '#9CC08E',
 } as const;
 
-export interface RingItem { id: string; color: string; label: string; value: number /* 0..1 */; text?: string }
+export interface RingItem { id: string; color: string; label: string; value: number /* 0..1 */; text?: string; sub?: string }
+/** Inside cards every part shows as a percentage (founder, 4 Nov 2026); only the card's own score stays in points. */
+export const pct = (v: number) => `${Math.round((Number.isFinite(v) ? Math.max(0, v) : 0) * 100)}%`;
 
 const c01 = (x: number) => (Number.isFinite(x) ? Math.max(0, Math.min(1, x)) : 0);
 /** Whole numbers, except the journal's natural halves (7.5, 17.5). */
@@ -57,8 +59,11 @@ export function RingKey({ items }: { items: RingItem[] }) {
       {items.map(k => (
         <View key={k.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           <Dot color={k.color} />
-          <Text style={{ flex: 1, color: colors.ink, fontSize: 13 }} numberOfLines={2}>{k.label}</Text>
-          {k.text ? <Text style={{ color: colors.muted, fontWeight: '600', fontSize: 12.5 }}>{k.text}</Text> : null}
+          <View style={{ flex: 1 }}>
+            <Text style={{ color: colors.ink, fontSize: 13 }} numberOfLines={2}>{k.label}</Text>
+            {k.sub ? <Text style={{ color: colors.muted, fontSize: 11.5 }} numberOfLines={1}>{k.sub}</Text> : null}
+          </View>
+          <Text style={{ color: colors.muted, fontWeight: '600', fontSize: 12.5 }}>{pct(k.value)}</Text>
         </View>
       ))}
     </View>
@@ -107,4 +112,4 @@ export function EntryHead({ color, title, points }: { color: string; title: stri
   );
 }
 
-export const pts = (got: number, of: number) => `${fmt(got)} / ${fmt(of)}`;
+export const pts = (got: number, of: number) => pct(of ? got / of : 0); // a percentage since 4 Nov 2026

@@ -15,7 +15,9 @@ import { loadOn, PER_AREA_DAY } from '../lib/taskPlan';
 import { colors } from '../theme';
 import { Button, Card, Heading, Note, Score, s, useKeepVisible } from './ui';
 import { useHeal } from '../lib/store';
-import { FOCUS_EACH } from '../lib/scoring';
+import { SECTION_AREAS, mindScore, sectionPoint } from '../lib/scoring';
+
+const SECTION_COLOR = { family: '#D9A7BD', work: '#6FB7BD', self: '#9CC08E' } as const;
 import { tr } from '../lib/i18n';
 import { readNoteTasks, type NoteTask } from '../lib/ai';
 import { useAttach } from './AttachPlus';
@@ -38,7 +40,8 @@ const shortDate = (iso: string) => {
 
 export function TasksCard() {
   const { open, focus, doneToday } = useTasks();
-  const { day } = useHeal();
+  const { day, profile } = useHeal();
+  const mind = mindScore(day, profile);
   const [area, setArea] = useState<Area>('family');
   const [all, setAll] = useState(false);
   const today = todayISO();
@@ -51,12 +54,14 @@ export function TasksCard() {
 
   return (
     <Card>
-      <Heading right={<Score value={Math.min(2, day.mind.focusDone ?? 0) * FOCUS_EACH} max={40} />}>{tr('Clear your mind')}</Heading>
-      <RingPanel trend="tasks" score={Math.min(2, day.mind.focusDone ?? 0) * FOCUS_EACH} max={40} items={[
-        { id: 'first', color: PASTEL.teal, label: tr('First to-do done'), value: (day.mind.focusDone ?? 0) >= 1 ? 1 : 0, text: `${(day.mind.focusDone ?? 0) >= 1 ? FOCUS_EACH : 0} / ${FOCUS_EACH}` },
-        { id: 'second', color: PASTEL.sky, label: tr('Second to-do done'), value: (day.mind.focusDone ?? 0) >= 2 ? 1 : 0, text: `${(day.mind.focusDone ?? 0) >= 2 ? FOCUS_EACH : 0} / ${FOCUS_EACH}` },
-      ]} />
-      <Note>{tr('Write it down. Myra puts one in front of you at a time, on Today. Finishing two of them earns the full 40.')}</Note>
+      {/* One ring each for Family, Work and Better me (founder, 4 Nov 2026; decision 0048). */}
+      <Heading right={<Score value={mind?.practices ?? 0} max={40} />}>{tr('Clear your mind')}</Heading>
+      <RingPanel trend="tasks" score={mind?.practices ?? 0} max={40} items={SECTION_AREAS.map(a => {
+        const [w, dn] = day.mind.sections?.[a] ?? [0, 0];
+        return { id: a, color: SECTION_COLOR[a], label: tr(areaName(a)), value: sectionPoint([w, dn]) / (40 / 3),
+          sub: tr('{w} written · {d} done', { w: Math.min(2, Math.max(w, dn)), d: Math.min(2, dn) }) };
+      })} />
+      <Note>{tr('Two to-dos in each part: writing them down earns a little, finishing them earns the most.')}</Note>
 
       {/* Three groups */}
       <View style={{ flexDirection: 'row', gap: 8 }}>

@@ -201,3 +201,14 @@ describe('studied = a line written (31 Oct 2026)', () => {
     expect(soulScore2(d)?.verse).toBe(5);
   });
 });
+
+describe('Clear your mind by section (4 Nov 2026)', () => {
+  it('a third each; writing two earns 20 %, finishing two the other 80 %', async () => {
+    const { sectionPoints, mindScore: ms } = await import('./scoring');
+    expect(sectionPoints({ family: [2, 2], work: [2, 2], self: [2, 2] })).toBeCloseTo(40);
+    expect(sectionPoints({ family: [2, 0] })).toBeCloseTo(40 / 3 * 0.2);
+    expect(sectionPoints({ family: [2, 1] })).toBeCloseTo(40 / 3 * 0.6);
+    const d = emptyDay('2026-11-04'); d.mind = { sections: { family: [2, 1], work: [2, 0], self: [1, 0] } };
+    expect(ms(d, P)!.practices).toBeCloseTo(40 / 3 * (0.6 + 0.2 + 0.1));
+  });
+});

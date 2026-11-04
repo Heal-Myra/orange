@@ -46,7 +46,7 @@ function Legend({ color, label, value, small }: { color: string; label: string; 
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
       <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: color }} />
       <Text style={{ flex: 1, color: colors.ink, fontSize: small ? 13.5 : 15 }} numberOfLines={1}>{label}</Text>
-      <Text style={{ color: tone(value), fontWeight: '700', fontSize: small ? 13.5 : 15 }}>{value}</Text>
+      <Text style={{ color: tone(value), fontWeight: '700', fontSize: small ? 13.5 : 15 }}>{value}%</Text>
     </View>
   );
 }
@@ -98,7 +98,7 @@ export function FaceCard() {
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, padding: 12, borderRadius: 14, backgroundColor: care.color + '1A' }}>
                   <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: care.color }} />
                   <View style={{ flex: 1, gap: 2 }}>
-                    <Text style={{ color: colors.ink, fontWeight: '700', fontSize: 15 }}>{tr('Needs most care: {g} · {v}', { g: tr(care.label), v: care.v })}</Text>
+                    <Text style={{ color: colors.ink, fontWeight: '700', fontSize: 15 }}>{tr('Needs most care: {g} · {v}', { g: tr(care.label), v: `${care.v}%` })}</Text>
                     <Text style={{ color: colors.muted, fontSize: 13.5, lineHeight: 19 }}>{tr(care.tip)}</Text>
                   </View>
                 </View>

@@ -1444,4 +1444,6 @@ export const HI: Record<string, string> = {
   'Highest Soul score': 'सबसे ऊँचा आत्मा स्कोर',
   'Best week for Soul': 'आत्मा का सबसे अच्छा हफ़्ता',
   'Longest streak of healthy food': 'सेहतमंद खाने का सबसे लंबा सिलसिला',
+  '{w} written · {d} done': '{w} लिखे · {d} पूरे',
+  'Two to-dos in each part: writing them down earns a little, finishing them earns the most.': 'हर हिस्से में दो काम: लिखने पर थोड़े अंक, पूरा करने पर सबसे ज़्यादा।',
 };
