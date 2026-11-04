@@ -2,6 +2,7 @@
 
 ## 4 Nov 2026 — Myra: read the wisdom, then live it
 - Myra's suggestion for Daily Wisdom and Tao is now in two steps. First "Read today's wisdom." (a quarter of the points, shown +2 on My day). Once read, "Live today's wisdom: write one line." (the other three quarters, shown +5). Same for Tao.
+- "Live today's wisdom" and "Live today's Tao" are suggested only from 3 pm: they are a way of living the day, not a morning task.
 
 ## 4 Nov 2026 — Parts in %; Clear your mind by section (decision 0048)
 - Inside every card, each part now shows as a percentage (e.g. Calories 34%, Eyes 60%, I'm thankful for 67%); only the card's own score at the top stays in points (e.g. 24/40).

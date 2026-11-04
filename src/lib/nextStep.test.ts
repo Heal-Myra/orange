@@ -49,6 +49,7 @@ describe("Myra's one recommendation", () => {
     const d = day();
     expect(candidates(d, P, wellBeing(d, P), 9).find(x => x.card === 'wisdom')).toMatchObject({ id: 'wisdom', gain: 5 });
     d.soul = { ...d.soul, verseStudied: true } as typeof d.soul;
-    expect(candidates(d, P, wellBeing(d, P), 9).find(x => x.card === 'wisdom')).toMatchObject({ id: 'wisdomLive', gain: 15 });
+    expect(candidates(d, P, wellBeing(d, P), 9).find(x => x.card === 'wisdom')).toBeUndefined(); // living it waits till 3 pm
+    expect(candidates(d, P, wellBeing(d, P), 15).find(x => x.card === 'wisdom')).toMatchObject({ id: 'wisdomLive', gain: 15 });
   });
 });

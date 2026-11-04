@@ -15,7 +15,7 @@ export const isBedtime = (hour: number) => hour >= 21.5 || hour < 5;
 
 /** Which steps suit this hour more than others: morning for stillness and sleep, midday for food and doing, evening for the heart. */
 function preferred(hour: number): StepId[] {
-  if (hour < 11) return ['sleep', 'meditation', 'wisdom', 'wisdomLive', 'tao', 'taoLive'];
+  if (hour < 11) return ['sleep', 'meditation', 'wisdom', 'tao'];
   if (hour < 17) return ['food', 'movement', 'tasks'];
   return ['gratitude', 'kind', 'movement', 'food'];
 }
@@ -62,11 +62,12 @@ export function candidates(d: DayLog, P: Profile, w: WellBeing, hour: number): S
     add({ id: 'kind', pillar: 'soul', card: 'gratitude', gain: POINTS.love - (s?.love ?? 0) });
   }
   // Wisdom and Tao (founder, 4 Nov 2026): reading is a quarter of the points, living it is the rest. Myra suggests
-  // reading first; once read, she suggests living it (writing one line on how), which is the bigger win.
+  // reading first; once read, she suggests living it (writing one line on how), which is the bigger win. Living it is a
+  // way of life, not a task to tick off in the morning, so that suggestion waits until 3 pm (founder, 4 Nov 2026).
   if (!wisdomStudied(d.soul)) add({ id: 'wisdom', pillar: 'soul', card: 'wisdom', gain: LEARN_SHARE * POINTS.wisdom });
-  else if (!lived(d.soul?.verseLived)) add({ id: 'wisdomLive', pillar: 'soul', card: 'wisdom', gain: (1 - LEARN_SHARE) * POINTS.wisdom });
+  else if (hour >= 15 && !lived(d.soul?.verseLived)) add({ id: 'wisdomLive', pillar: 'soul', card: 'wisdom', gain: (1 - LEARN_SHARE) * POINTS.wisdom });
   if (!taoStudied(d.tao)) add({ id: 'tao', pillar: 'soul', card: 'tao', gain: LEARN_SHARE * POINTS.tao });
-  else if (!lived(d.tao?.lived)) add({ id: 'taoLive', pillar: 'soul', card: 'tao', gain: (1 - LEARN_SHARE) * POINTS.tao });
+  else if (hour >= 15 && !lived(d.tao?.lived)) add({ id: 'taoLive', pillar: 'soul', card: 'tao', gain: (1 - LEARN_SHARE) * POINTS.tao });
   return out;
 }
 
