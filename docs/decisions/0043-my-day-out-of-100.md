@@ -11,3 +11,6 @@ Date: 1 Nov 2026 · Founder chose option 1 of 2; to be revisited on 4 Nov 2026 (
 
 ## Option 2, for the revisit
 One 100 shared out: Body 34 (Food 14, Sleep 10, Movement 10), Mind 33 (Focus 13, Breathing 10, Phone 10), Soul 33 (Gratitude 10, Kindness 10, Daily Wisdom 7, Tao 6). One currency everywhere, but small numbers on each card.
+
+## Revisited 5 Nov 2026
+After three days of option 1, the founder chose to keep it ("Keep 1"). Option 2 is set aside.

@@ -1,5 +1,8 @@
 # Changelog
 
+## 5 Nov 2026 — My day stays the average of Body, Mind and Soul
+- Revisited after three days (decision 0043): the founder keeps option 1.
+
 ## 4 Nov 2026 — Phone activity: our own Paste button on every phone
 - Apple's paste control drew nothing on some iPhones (a tester saw an empty space). Everyone now gets the coral Paste button; only the founder's account keeps Apple's button. iPhone asks "Allow Paste" unless Settings › Happy Orange › Paste from Other Apps is set to Allow.
 
