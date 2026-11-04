@@ -3,7 +3,7 @@
 // same scoring as the cards (src/lib/scoring.ts), so the "+N" is worked out, never guessed.
 
 import { FAST_FROM, fastHabit, fastHoursOf } from './fasting';
-import { FOCUS_EACH, LEARN_SHARE, POINTS, SECTIONS_FROM, SECTION_AREAS, lived, taoStudied, wisdomStudied, type WellBeing } from './scoring';
+import { FOCUS_EACH, JOURNAL_FROM, journalParts, LEARN_SHARE, POINTS, SECTIONS_FROM, SECTION_AREAS, lived, taoStudied, wisdomStudied, type WellBeing } from './scoring';
 import type { DayLog, Profile } from './types';
 
 export type StepId = 'sleep' | 'meditation' | 'nidra' | 'movement' | 'food' | 'tasks' | 'gratitude' | 'kind' | 'wisdom' | 'wisdomLive' | 'tao' | 'taoLive';
@@ -25,13 +25,17 @@ export function candidates(d: DayLog, P: Profile, w: WellBeing, hour: number): S
   const out: Step[] = [];
   const b = w.body, m = w.mind, s = w.soul;
   const add = (st: Step) => { if (st.gain >= 1) out.push({ ...st, gain: Math.round(st.gain) }); };
+  // Gratitude journal: "write your gratitude" covers thanks, laugh and best part; "one kind act" the kind part.
+  const jp = journalParts(d), journal = (d.date ?? '') >= JOURNAL_FROM;
+  const gratGain = journal ? jp.of.thanks - jp.thanks + jp.of.laugh - jp.laugh + jp.of.best - jp.best : POINTS.gratitude - (s?.gratitude ?? 0);
+  const kindGain = journal ? jp.of.kind - jp.kind : POINTS.love - (s?.love ?? 0);
   const medLeft = Math.max(0, P.meditation - (d.mind?.meditationMin ?? 0));
 
   if (isBedtime(hour)) {
     if (medLeft > 0) { const n = Math.min(20, medLeft); add({ id: 'nidra', pillar: 'mind', card: 'meditation', minutes: n, gain: POINTS.meditation * n / P.meditation }); }
     if (hour >= 21.5) {
-      add({ id: 'gratitude', pillar: 'soul', card: 'gratitude', gain: POINTS.gratitude - (s?.gratitude ?? 0) });
-      add({ id: 'kind', pillar: 'soul', card: 'gratitude', gain: POINTS.love - (s?.love ?? 0) });
+      add({ id: 'gratitude', pillar: 'soul', card: 'gratitude', gain: gratGain });
+      add({ id: 'kind', pillar: 'soul', card: 'gratitude', gain: kindGain });
     }
     return out;
   }
@@ -58,8 +62,8 @@ export function candidates(d: DayLog, P: Profile, w: WellBeing, hour: number): S
   const taskGain = secs ? (SECTION_AREAS.some(a => (secs[a]?.[1] ?? 0) < 2) ? (POINTS.focus / 3) * 0.4 : 0) : Math.min(FOCUS_EACH, POINTS.focus - (m?.practices ?? 0));
   if (hour >= 8 && hour < 21) add({ id: 'tasks', pillar: 'mind', card: 'tasks', gain: taskGain });
   if (hour >= 16) {
-    add({ id: 'gratitude', pillar: 'soul', card: 'gratitude', gain: POINTS.gratitude - (s?.gratitude ?? 0) });
-    add({ id: 'kind', pillar: 'soul', card: 'gratitude', gain: POINTS.love - (s?.love ?? 0) });
+    add({ id: 'gratitude', pillar: 'soul', card: 'gratitude', gain: gratGain });
+    add({ id: 'kind', pillar: 'soul', card: 'gratitude', gain: kindGain });
   }
   // Wisdom and Tao (founder, 4 Nov 2026): reading is a quarter of the points, living it is the rest. Myra suggests
   // reading first; once read, she suggests living it (writing one line on how), which is the bigger win. Living it is a

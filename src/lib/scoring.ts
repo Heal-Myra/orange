@@ -129,6 +129,20 @@ export const LEARN_SHARE = 0.25;
 /** The Gratitude journal replaces the Gratitude and Love cards from this day. */
 export const JOURNAL_FROM = '2026-10-27';
 export const filledText = (t?: string) => !!t && t.trim().length >= 2;
+/** Gratitude journal weights from 5 Nov 2026 (founder), out of the card's 60: thankful for three things 20 %, best part
+ *  of my day 20 %, I was kind to 30 %, made me laugh 30 %. Kept as Gratitude (thanks + laugh) and Love (kind + best). */
+export const JOURNAL_V2_FROM = '2026-11-05';
+export const JOURNAL_PARTS = { thanks: 12, best: 12, kind: 18, laugh: 18 } as const;
+/** Points of each journal part for the day (days 27 Oct – 4 Nov keep the first journal's weights). */
+export function journalParts(d: DayLog) {
+  const so = d.soul ?? {};
+  const n = Math.min(3, countGratitude(so.gratitude)), laugh = filledText(so.laugh), best = filledText(so.best), kind = filledText(d.love?.kindTo);
+  if ((d.date ?? '') >= JOURNAL_V2_FROM) {
+    const W = JOURNAL_PARTS;
+    return { thanks: (W.thanks * n) / 3, laugh: laugh ? W.laugh : 0, kind: kind ? W.kind : 0, best: best ? W.best : 0, of: W };
+  }
+  return { thanks: n * 5, laugh: laugh ? 7.5 : 0, kind: kind ? 30 : 0, best: best ? 7.5 : 0, of: { thanks: 15, laugh: 7.5, kind: 30, best: 7.5 } };
+}
 /** A line on how the learning was lived: at least three words. */
 export const lived = (text?: string) => (text ?? '').trim().split(/\s+/).filter(Boolean).length >= 3;
 
@@ -214,13 +228,13 @@ export function soulScore(d: DayLog, _P: Profile = DEFAULT_PROFILE): SoulScore |
   // Gratitude journal from 27 Oct 2026 (founder): three thank-yous 5 each + made me laugh 7.5 + best part of my day 7.5
   // = 30; I was kind to someone = Love 30. Older days keep four gratitudes and the old Love card.
   const journal = (d.date ?? '') >= JOURNAL_FROM;
-  const gratitude = journal
-    ? Math.min(3, countGratitude(so.gratitude)) * 5 + (filledText(so.laugh) ? 7.5 : 0) + (filledText(so.best) ? 7.5 : 0)
-    : Math.min(4, countGratitude(so.gratitude)) * GRATITUDE_EACH;
+  // From 5 Nov 2026 the weights are thanks 12 + laugh 18 (Gratitude 30) and kind 18 + best part 12 (Love 30).
+  const jp = journalParts(d), v2 = (d.date ?? '') >= JOURNAL_V2_FROM;
+  const gratitude = journal ? jp.thanks + jp.laugh + (v2 ? 0 : jp.best) : Math.min(4, countGratitude(so.gratitude)) * GRATITUDE_EACH;
   // Learning earns 25 %, living it during the day earns 75 % (founder, 26 Oct 2026).
   const verse = (wisdomStudied(so) ? LEARN_SHARE * POINTS.wisdom : 0) + (lived(so.verseLived) ? (1 - LEARN_SHARE) * POINTS.wisdom : 0);
   const tao = (taoStudied(d.tao) ? LEARN_SHARE * POINTS.tao : 0) + (lived(d.tao?.lived) ? (1 - LEARN_SHARE) * POINTS.tao : 0);
-  const love = journal ? (filledText(d.love?.kindTo) ? POINTS.love : 0) : lovePoints(d);
+  const love = journal ? jp.kind + (v2 ? jp.best : 0) : lovePoints(d);
   if (!gratitude && !verse && !tao && !love) return null;
   return { total: Math.min(100, gratitude + verse + tao + love), gratitude, verse, tao, love };
 }

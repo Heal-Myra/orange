@@ -30,8 +30,8 @@ Phone activity is added each morning for **yesterday** (a full day is only known
 ## Soul (100)
 | Part | Points | How |
 | --- | --- | --- |
-| Gratitude journal: gratitude | 30 | I'm thankful for: 5 each, up to three; made me laugh 7.5; best part of my day 7.5 |
-| Gratitude journal: love | 30 | I was kind to (someone, and how) |
+| Gratitude journal: gratitude | 30 | From 5 Nov 2026: I'm thankful for 12 (4 each, up to three, 20 % of the card); made me laugh 18 (30 %) |
+| Gratitude journal: love | 30 | From 5 Nov 2026: I was kind to 18 (30 %); best part of my day 12 (20 %). Days 27 Oct – 4 Nov: thanks 5 each, laugh 7.5, best 7.5, kind 30 |
 | Daily Wisdom | 20 | "What it means to me today", a line written, 5 (the tick box was removed 31 Oct 2026; older ticks still count) + "How I lived it today", at least three words, 15 |
 | Tao practice | 20 | "What it means to me today", a line written, 5 (the tick box was removed 31 Oct 2026; older ticks still count) + "How I lived it today", at least three words, 15 |
 

@@ -212,3 +212,17 @@ describe('Clear your mind by section (4 Nov 2026)', () => {
     expect(ms(d, P)!.practices).toBeCloseTo(40 / 3 * (0.6 + 0.2 + 0.1));
   });
 });
+
+describe('Gratitude journal from 5 Nov 2026: thanks 20 %, best part 20 %, kind 30 %, laugh 30 % of 60', async () => {
+  const { soulScore } = await import('./scoring');
+  const { emptyDay } = await import('./types');
+  it('weights each part', () => {
+    const d = emptyDay('2026-11-05');
+    d.soul = { gratitude: ['Sapna', 'Jitendra', 'Manasi'], laugh: 'Jitendra', best: 'A long walk' };
+    expect(soulScore(d)).toMatchObject({ gratitude: 30, love: 12 }); // 12 + 18, and best 12
+    d.love = { kindTo: 'Helped Mum' };
+    expect(soulScore(d)!.love).toBe(30);
+    const old = emptyDay('2026-11-04'); old.soul = { gratitude: ['a1', 'b1', 'c1'], laugh: 'xx', best: 'yy' };
+    expect(soulScore(old)!.gratitude).toBe(30); // first journal weights before 5 Nov
+  });
+});

@@ -1,5 +1,8 @@
 # Changelog
 
+## 5 Nov 2026 — Gratitude journal: new weights
+- From today the journal's 60 points are shared: I'm thankful for three things 20 % (12), best part of my day 20 % (12), I was kind to 30 % (18), made me laugh 30 % (18). Earlier days keep their old points. Myra's "Note one kind act" now shows only the kindness part.
+
 ## 5 Nov 2026 — New Meditation card and the 10-day Dhamma path (decision 0049)
 - Meditation: tap what you want help with (Focus, Calm, Sleep, Energy, Let go of anger, Steady mind) and Myra recommends one practice, e.g. Anulom Vilom for focus, with "Start · guided" or "On my own". Then choose your way: Dhamma path, Guided or On my own. Length and voice language fold away.
 - Dhamma path: two gentle safety questions, then one step a day for 10 days (breath, body, kindness) with today's promise, a calm sitting screen where Myra speaks a few words and then mostly silence, and "How did it feel?" after each sitting. After Day 10: morning and evening sittings and a pointer to dhamma.org.
