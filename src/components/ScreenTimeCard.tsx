@@ -106,15 +106,6 @@ export function ScreenTimeCard({ children }: { children?: ReactNode }) {
     await read(async () => img.uri.startsWith('data:') && Platform.OS !== 'web' ? shrink(img.uri, img.data, img.type) : { data: img.data, type: img.type });
   };
 
-  // Apple's Paste button hands over the picture itself, so iPhone does not ask "Allow Paste?" (founder, 1 Nov 2026).
-  const pastedFromButton = async (e: { type: string; data?: string }) => {
-    if (e.type !== 'image' || !e.data) { setMessage(tr('No picture to paste. Take the screenshot, tap Copy, then Paste here.')); return; }
-    setMessage(null); setRows(null);
-    const uri = e.data.startsWith('data:') ? e.data : `data:image/jpeg;base64,${e.data}`;
-    setPreview(uri);
-    await read(() => shrink(uri, uri.split(',')[1] ?? '', 'image/jpeg'));
-  };
-
   const read = async (get: () => Promise<{ data: string; type: string }>) => {
     setBusy(true); setMessage(tr('Reading your Screen Time…'));
     try {
@@ -168,17 +159,13 @@ export function ScreenTimeCard({ children }: { children?: ReactNode }) {
               <Ionicons name="add" size={24} color={colors.insight} />
             </Pressable>
             <View style={{ flex: 1 }} />
-            {Platform.OS === 'ios' && Clip?.isPasteButtonAvailable ? (
-              <Clip.ClipboardPasteButton acceptedContentTypes={['image']} imageOptions={{ format: 'jpeg', jpegQuality: 0.8 }}
-                backgroundColor={colors.insight} foregroundColor="#FFFFFF" cornerStyle="capsule" displayMode="iconAndLabel"
-                style={{ width: 104, height: 40 }} onPress={pastedFromButton} />
-            ) : (
-              <Pressable onPress={paste} disabled={busy} accessibilityRole="button"
+            {/* Our own Paste button on every phone (founder, 4 Nov 2026): Apple's paste control drew nothing on some
+                iPhones. iPhone asks "Allow Paste" unless Settings › Happy Orange › Paste from Other Apps is Allow. */}
+            <Pressable onPress={paste} disabled={busy} accessibilityRole="button"
                 style={{ flexDirection: 'row', alignItems: 'center', gap: 6, height: 40, paddingHorizontal: 16, borderRadius: 20, backgroundColor: colors.insight }}>
                 <Ionicons name="clipboard-outline" size={17} color={colors.onInsight} />
                 <Text style={{ color: colors.onInsight, fontWeight: '700', fontSize: 15 }}>{tr('Paste')}</Text>
               </Pressable>
-            )}
           </View>
         </View>
       ) : <Note>{tr('Sign in to read a screenshot. You can still add sessions by hand below.')}</Note>}

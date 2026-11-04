@@ -1,5 +1,8 @@
 # Changelog
 
+## 4 Nov 2026 — Phone activity: our own Paste button on every phone
+- Apple's paste control drew nothing on some iPhones (a tester saw an empty space). The card now always shows the coral Paste button. iPhone asks "Allow Paste" unless Settings › Happy Orange › Paste from Other Apps is set to Allow.
+
 ## 4 Nov 2026 — Myra: read the wisdom, then live it
 - Myra's suggestion for Daily Wisdom and Tao is now in two steps. First "Read today's wisdom." (a quarter of the points, shown +2 on My day). Once read, "Live today's wisdom: write one line." (the other three quarters, shown +5). Same for Tao.
 - "Live today's wisdom" and "Live today's Tao" are suggested only from 3 pm: they are a way of living the day, not a morning task.
