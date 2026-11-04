@@ -1,5 +1,9 @@
 # Changelog
 
+## 5 Nov 2026 — New Meditation card and the 10-day Dhamma path (decision 0049)
+- Meditation: tap what you want help with (Focus, Calm, Sleep, Energy, Let go of anger, Steady mind) and Myra recommends one practice, e.g. Anulom Vilom for focus, with "Start · guided" or "On my own". Then choose your way: Dhamma path, Guided or On my own. Length and voice language fold away.
+- Dhamma path: two gentle safety questions, then one step a day for 10 days (breath, body, kindness) with today's promise, a calm sitting screen where Myra speaks a few words and then mostly silence, and "How did it feel?" after each sitting. After Day 10: morning and evening sittings and a pointer to dhamma.org.
+
 ## 5 Nov 2026 — My day stays the average of Body, Mind and Soul
 - Revisited after three days (decision 0043): the founder keeps option 1.
 

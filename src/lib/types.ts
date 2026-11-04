@@ -76,7 +76,7 @@ export interface DayLog {
   plan?: import('./foodPlan').FoodPlan; // the food planned for this day (made the day before; founder, 23 Oct 2026) // "I'm fasting today" (founder, 22 Oct 2026): water, black tea and black coffee are fine
   media: MediaSession[];
   noMedia: boolean;
-  mind: { meditationMin?: number; attention?: boolean; learning?: boolean; focusDone?: number; sections?: Record<'family' | 'work' | 'self', [number, number]>; learned?: { text?: string; link?: string; by?: 'myra' } }; // focusDone: Myra's focus tasks ticked off today (attention/learning: older days only)
+  mind: { meditationMin?: number; attention?: boolean; learning?: boolean; focusDone?: number; sections?: Record<'family' | 'work' | 'self', [number, number]>; learned?: { text?: string; link?: string; by?: 'myra' }; dhamma?: import('./dhamma').DhammaDay }; // focusDone: Myra's focus tasks ticked off today (attention/learning: older days only)
   dharma: Partial<Record<PracticeId, boolean>>;
   actions: ReflectedAction[];
   tao?: { done?: boolean; note?: string; lived?: string }; // lived: how I used it today (26 Oct 2026)
