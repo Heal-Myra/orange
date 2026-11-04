@@ -49,6 +49,7 @@ export function GratitudeJournal() {
   });
   // Rings on top, one per prompt; the writing boxes below, each with its ring's dot (founder, 31 Oct 2026; decision 0037).
   const nThanks = Math.min(3, thanks.filter(x => filledText(x ?? '')).length);
+  // Each part shows its share of the card's 60 (founder, 5 Nov 2026), e.g. 20 %, not done or not done.
   const jp = journalParts(day);
   const laughOk = filledText(so.laugh ?? ''), kindOk = filledText(day.love?.kindTo ?? ''), bestOk = filledText(so.best ?? '');
   const RING = { thanks: PASTEL.peach, laugh: PASTEL.sand, kind: PASTEL.rose, best: PASTEL.teal };
@@ -68,7 +69,7 @@ export function GratitudeJournal() {
       </View>
       {attach.status}
 
-      <EntryHead color={RING.thanks} title={tr('I\'m thankful for')} points={pts(jp.thanks, jp.of.thanks)} />
+      <EntryHead color={RING.thanks} title={tr('I\'m thankful for')} points={pts(jp.of.thanks, 60)} />
       <View style={soft}>
         {[0, 1, 2].map(i => (
           <View key={date + 't' + i} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, borderBottomWidth: i < 2 ? 1 : 0, borderBottomColor: colors.line, borderStyle: 'dashed' }}>
@@ -80,13 +81,13 @@ export function GratitudeJournal() {
         ))}
       </View>
 
-      <EntryHead color={RING.laugh} title={tr('Made me laugh')} points={pts(jp.laugh, jp.of.laugh)} />
+      <EntryHead color={RING.laugh} title={tr('Made me laugh')} points={pts(jp.of.laugh, 60)} />
       <View style={soft}>{box(so.laugh ?? '', t => update(d => { d.soul = { ...d.soul, laugh: t }; }), tr('Write here'), 'laugh', 2)}</View>
 
-      <EntryHead color={RING.kind} title={tr('I was kind to')} points={pts(jp.kind, jp.of.kind)} />
+      <EntryHead color={RING.kind} title={tr('I was kind to')} points={pts(jp.of.kind, 60)} />
       <View style={soft}>{box(day.love?.kindTo ?? '', t => update(d => { d.love = { ...(d.love ?? {}), kindTo: t }; }), tr('Someone, and how'), 'kind', 2)}</View>
 
-      <EntryHead color={RING.best} title={tr('Best part of my day')} points={pts(jp.best, jp.of.best)} />
+      <EntryHead color={RING.best} title={tr('Best part of my day')} points={pts(jp.of.best, 60)} />
       <View style={soft}>{box(so.best ?? '', t => update(d => { d.soul = { ...d.soul, best: t }; }), tr('Write here'), 'best', 2)}</View>
 
       <MyraLine card="gratitude" />
