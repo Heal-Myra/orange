@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Pressable, Share, Text, View } from 'react-native';
 import { Button, Card, Expandable, Heading, Note, Screen } from '../components/ui';
 import { useNeoSapien } from '../lib/neosapien';
+import { useHealth } from '../components/HealthSync';
 import { FeedbackBox } from '../components/FeedbackBox';
 import { useAuth } from '../lib/auth';
 import { usePendingRequests } from '../lib/adminAlerts';
@@ -103,6 +104,9 @@ export default function Account() {
         </Card>
       </Pressable>
 
+      {/* Connectors (founder, 6 Nov 2026): Apple Health, NeoSapien and the ones coming, in one place. */}
+      {session ? <ConnectorsRow /> : null}
+
       <Pressable onPress={() => router.push('/tradition')}>
         <Card style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
           <Ionicons name="sparkles-outline" size={24} color={colors.accent} />
@@ -125,8 +129,6 @@ export default function Account() {
         </Card>
       </Pressable>
 
-      {/* NeoSapien (decision 0050): connect a Neo 1 so Myra can suggest the journal and to-dos from your day. */}
-      {session ? <NeoSapienRow /> : null}
 
       {/* Send feedback (founder, 31 Oct 2026): moved here from the top of every page; folded until tapped. */}
       {session ? (
@@ -167,18 +169,20 @@ export default function Account() {
   );
 }
 
-/** Connect NeoSapien: one sign-in on NeoSapien's own page; no other AI account needed. */
-function NeoSapienRow() {
-  const { connected, connect, disconnect } = useNeoSapien();
-  const [msg, setMsg] = useState<string | null>(null);
+
+function ConnectorsRow() {
+  const health = useHealth(), ns = useNeoSapien();
+  const names = [health.connected ? 'Apple Health' : null, ns.connected ? 'NeoSapien' : null].filter(Boolean) as string[];
   return (
-    <Card style={{ paddingVertical: 4 }}>
-      <Expandable icon="radio-outline" title={tr('NeoSapien (Neo 1)')} status={connected ? tr('Connected') : tr('Not connected · journal and to-dos from your conversations')}>
-        <Note>{tr('Myra reads the day Neo 1 heard and suggests your gratitude journal, your to-dos and the tone of your day. Nothing is added without your yes. Only short lines come in; transcripts and business details stay with NeoSapien.')}</Note>
-        {connected ? <Button kind="plain" title={tr('Disconnect NeoSapien')} onPress={() => disconnect().catch(e => setMsg(String(e.message ?? e)))} />
-          : <Button title={tr('Connect NeoSapien')} onPress={() => { setMsg(tr('Sign in on the NeoSapien page, then come back here.')); connect().catch(e => setMsg(String(e.message ?? e))); }} />}
-        {msg && !connected ? <Note>{msg}</Note> : null}
-      </Expandable>
-    </Card>
+    <Pressable onPress={() => router.push('/connectors')}>
+      <Card style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+        <Ionicons name="git-network-outline" size={24} color={colors.accent} />
+        <View style={{ flex: 1 }}>
+          <Text style={{ fontSize: 17, fontWeight: '600', color: colors.ink }}>{tr('Connectors')}</Text>
+          <Note>{names.length ? `${tr('{n} connected', { n: names.length })} · ${names.join(', ')}` : tr('Apple Health, NeoSapien and more')}</Note>
+        </View>
+        <Ionicons name="chevron-forward" size={20} color={colors.muted} />
+      </Card>
+    </Pressable>
   );
 }

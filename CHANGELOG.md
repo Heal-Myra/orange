@@ -1,5 +1,8 @@
 # Changelog
 
+## 6 Nov 2026 — Connectors in Profile
+- Profile › Connectors: Apple Health and NeoSapien in one place (✓ On, or Connect), with Google Calendar, Gmail and Claude · ChatGPT marked "Soon". Coming back from the NeoSapien sign-in opens Connectors.
+
 ## 6 Nov 2026 — NeoSapien (Neo 1) connection (decision 0050)
 - Profile › NeoSapien (Neo 1) › Connect: one sign-in on NeoSapien's page; no other AI account needed.
 - Today › "From your day": the tone of the day, to-dos for you and journal lines from what Neo 1 heard. Review adds only the ✓ ones. The Gratitude journal shows the suggestions in green under empty boxes (Keep or ✕); typing your own always works.
