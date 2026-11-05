@@ -9,7 +9,7 @@
 import type { DayLog } from './types';
 
 export type Feel = 'calm' | 'restless' | 'uneasy';
-export interface Sit { step: number; min: number; at: string; feel?: Feel }
+export interface Sit { step: number; min: number; sec?: number; at: string; feel?: Feel }
 export interface DhammaDay { begun?: { gentle: boolean; at: string }; sits?: Sit[]; left?: boolean }
 
 export type Stage = 'breath' | 'body' | 'kind';

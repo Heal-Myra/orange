@@ -1543,4 +1543,8 @@ export const HI: Record<string, string> = {
   "Slowly, let the sitting come to an end. Take a moment before you open your eyes.": "धीरे-धीरे बैठक को समाप्त होने दें। आँखें खोलने से पहले एक पल लें।",
   "May all beings be happy. Slowly, let the sitting come to an end.": "सब प्राणी सुखी हों। धीरे-धीरे बैठक को समाप्त होने दें।",
   'To do': 'करना है',
+  'You sat {m} min {s} s of {t} min.': 'आप {t} मिनट में से {m} मिनट {s} सेकंड बैठे।',
+  'Day {n} again next time': 'अगली बार फिर दिन {n}',
+  'A day counts when you sit at least half the time ({h} min). Your minutes still count.': 'दिन तब गिना जाता है जब आप कम से कम आधा समय ({h} मिनट) बैठें। आपके मिनट फिर भी गिने जाते हैं।',
+  'Day {n} again tomorrow': 'कल फिर दिन {n}',
 };

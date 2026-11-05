@@ -35,8 +35,11 @@ export default function Sit() {
   const { preparing } = useServerVoice(gLang, lines, !loading);
 
   const [phase, setPhase] = useState<'ready' | 'sitting' | 'feel' | 'done'>('ready');
+  // Time sat, from the clock (not by counting ticks), so it is exact even if the phone was busy (5 Nov 2026).
   const [sat, setSat] = useState(0); // seconds sat
   const [paused, setPaused] = useState(false);
+  const since = useRef<number | null>(null), before = useRef(0);
+  const [satFinal, setSatFinal] = useState(0);
   const [feel, setFeel] = useState<Feel | null>(null);
   const spoken = useRef(new Set<number>());
   const stop = useRef<() => void>(() => {});
@@ -45,8 +48,9 @@ export default function Sit() {
 
   useEffect(() => {
     if (phase !== 'sitting' || paused) return;
-    const t = setInterval(() => setSat(s => s + 1), 1000);
-    return () => clearInterval(t);
+    since.current = Date.now();
+    const t = setInterval(() => setSat(Math.floor((before.current + Date.now() - since.current!) / 1000)), 500);
+    return () => { clearInterval(t); if (since.current) { before.current += Date.now() - since.current; since.current = null; } };
   }, [phase, paused]);
 
   useEffect(() => {
@@ -54,7 +58,7 @@ export default function Sit() {
     cues.forEach((c, k) => {
       if (sat >= c.at && !spoken.current.has(k)) { spoken.current.add(k); stop.current(); stop.current = speak(say(c.line), voiceLang(gLang), () => {}); }
     });
-    if (sat >= total) finish(total);
+    if (sat >= total) finish(total + 1);
   }, [sat, phase]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
@@ -64,13 +68,15 @@ export default function Sit() {
   useEffect(() => () => { stop.current(); try { Awake?.deactivateKeepAwake('sit'); } catch { /* fine */ } }, []);
 
   /** Save the minutes; the step counts when at least half the time was sat. */
-  const finish = (secs: number) => {
+  const finish = (upTo: number) => {
     stop.current();
-    const m = Math.round(secs / 60);
+    const secs = Math.min(total, upTo, Math.floor((before.current + (since.current ? Date.now() - since.current : 0)) / 1000));
+    setSatFinal(secs);
+    const m = Math.floor(secs / 60); // whole minutes actually sat
     const counts = secs >= total / 2;
     if (m > 0 || counts) update(d => {
       d.mind.meditationMin = (d.mind.meditationMin ?? 0) + m;
-      if (counts) d.mind.dhamma = { ...d.mind.dhamma, sits: [...(d.mind.dhamma?.sits ?? []), { step, min: m, at: new Date().toISOString() }] };
+      if (counts) d.mind.dhamma = { ...d.mind.dhamma, sits: [...(d.mind.dhamma?.sits ?? []), { step, min: m, sec: secs, at: new Date().toISOString() }] };
     });
     setPhase(counts ? 'feel' : 'done');
   };
@@ -85,7 +91,7 @@ export default function Sit() {
   };
 
   const close = () => {
-    if (phase === 'sitting') { finish(sat); return; }
+    if (phase === 'sitting') { finish(Infinity); return; }
     router.canGoBack() ? router.back() : router.replace('/');
   };
   const left = Math.max(0, total - sat);
@@ -122,7 +128,7 @@ export default function Sit() {
               style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: C.ring, alignItems: 'center', justifyContent: 'center' }}>
               <Ionicons name={paused ? 'play' : 'pause'} size={28} color={C.ink} />
             </Pressable>
-            <Pressable onPress={() => finish(sat)} hitSlop={10} accessibilityLabel={tr('End and save')} style={{ justifyContent: 'center' }}>
+            <Pressable onPress={() => finish(Infinity)} hitSlop={10} accessibilityLabel={tr('End and save')} style={{ justifyContent: 'center' }}>
               <Ionicons name="stop-circle-outline" size={30} color={C.muted} />
             </Pressable>
           </View>
@@ -130,6 +136,7 @@ export default function Sit() {
       ) : phase === 'feel' ? (
         <View style={{ flex: 1, paddingHorizontal: 28, justifyContent: 'center', gap: 16 }}>
           <Text style={{ color: C.ink, fontSize: 26, fontWeight: '600' }}>{step > STEPS ? tr('Sitting done') : tr('Day {n} done', { n: step })}</Text>
+          <Text style={{ color: C.muted, fontSize: 15 }}>{tr('You sat {m} min {s} s of {t} min.', { m: Math.floor(satFinal / 60), s: satFinal % 60, t: minutes })}</Text>
           <Text style={{ color: C.muted, fontSize: 17 }}>{tr('How did it feel?')}</Text>
           <View style={{ flexDirection: 'row', gap: 8 }}>
             {([['calm', '😌', 'Calm'], ['restless', '🌀', 'Restless'], ['uneasy', '😟', 'Uneasy']] as const).map(([id, icon, name]) => (
@@ -148,8 +155,8 @@ export default function Sit() {
         </View>
       ) : (
         <View style={{ flex: 1, paddingHorizontal: 28, justifyContent: 'center', gap: 14 }}>
-          <Text style={{ color: C.ink, fontSize: 24, fontWeight: '600' }}>{tr('Your minutes are saved.')}</Text>
-          <Text style={{ color: C.muted, fontSize: 16, lineHeight: 23 }}>{tr('The step counts when you sit at least half the time. Try again whenever you are ready.')}</Text>
+          <Text style={{ color: C.ink, fontSize: 24, fontWeight: '600' }}>{step > STEPS ? tr('Your minutes are saved.') : tr('Day {n} again next time', { n: step })}</Text>
+          <Text style={{ color: C.muted, fontSize: 16, lineHeight: 23 }}>{tr('You sat {m} min {s} s of {t} min.', { m: Math.floor(satFinal / 60), s: satFinal % 60, t: minutes })} {tr('A day counts when you sit at least half the time ({h} min). Your minutes still count.', { h: Math.ceil(minutes / 2) })}</Text>
           <Pressable onPress={close} accessibilityRole="button" style={{ backgroundColor: C.glow, borderRadius: 99, paddingVertical: 14, alignItems: 'center', marginTop: 8 }}>
             <Text style={{ color: '#1E2A3A', fontSize: 17, fontWeight: '700' }}>{tr('Done')}</Text>
           </Pressable>

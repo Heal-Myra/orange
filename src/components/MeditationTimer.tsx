@@ -321,7 +321,7 @@ function DhammaToday({ path, gLang }: { path: PathState; gLang: string }) {
     return (
       <View style={{ gap: 10 }}>
         <Dots path={path} />
-        <Text style={{ fontSize: 20, fontWeight: '800', color: colors.ink }}>{tr('Day {n} done', { n: t.step })}</Text>
+        <Text style={{ fontSize: 20, fontWeight: '800', color: colors.ink }}>{t.feel === 'restless' || t.feel === 'uneasy' ? tr('Day {n} again tomorrow', { n: t.step }) : tr('Day {n} done', { n: t.step })}</Text>
         {!t.feel ? (
           <>
             <Text style={{ color: colors.ink, fontWeight: '600' }}>{tr('How did it feel?')}</Text>
