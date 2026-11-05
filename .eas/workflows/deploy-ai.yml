@@ -8,7 +8,7 @@ name: Deploy AI server
 on:
   push:
     branches: ['main']
-    paths: ['supabase/functions/**']
+    paths: ['supabase/functions/**', 'supabase/migrations/**']
 
 jobs:
   deploy_ai:
@@ -24,3 +24,11 @@ jobs:
           npx -y supabase@2.121.0 functions deploy heal-ai --project-ref vjhzlszubdinmesfvmex --use-api
           npx -y supabase@2.121.0 functions deploy voice --project-ref vjhzlszubdinmesfvmex --use-api
           npx -y supabase@2.121.0 functions deploy review-login --project-ref vjhzlszubdinmesfvmex --use-api --no-verify-jwt
+          # NeoSapien sign-in (decision 0050): checks the person itself, so the browser can reach its callback.
+          npx -y supabase@2.121.0 functions deploy neosapien --project-ref vjhzlszubdinmesfvmex --use-api --no-verify-jwt
+          # Database changes that are safe to run again (create ... if not exists), through Supabase's API.
+          for f in supabase/migrations/0008_neosapien.sql; do
+            node -e "process.stdout.write(JSON.stringify({query: require('fs').readFileSync('$f','utf8')}))" > /tmp/q.json
+            curl -sS -f -X POST "https://api.supabase.com/v1/projects/vjhzlszubdinmesfvmex/database/query" \
+              -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" -H "Content-Type: application/json" --data @/tmp/q.json && echo " ran $f"
+          done

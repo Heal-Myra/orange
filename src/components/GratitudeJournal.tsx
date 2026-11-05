@@ -2,9 +2,11 @@
 // and colours: I'm thankful for (three), Made me laugh, I was kind to (Love), Best part of my day. It replaces the
 // Gratitude and Love cards. Points from 5 Nov 2026 (of 60): thankful for three things 20 %, best part of my day 20 %,
 // I was kind to 30 %, made me laugh 30 % (src/lib/scoring.ts journalParts).
-import { TextInput, Text, View } from 'react-native';
+import { Pressable, TextInput, Text, View } from 'react-native';
 import { tr } from '../lib/i18n';
 import { filledText, journalParts, soulScore } from '../lib/scoring';
+import { applyJournal, pending } from '../lib/neosapien';
+import { NS_GREEN } from './FromYourDay';
 import { EntryHead, PASTEL, RingTop, pts } from './Rings';
 import { MyraLine } from './MyraLine';
 import { useHeal } from '../lib/store';
@@ -53,6 +55,24 @@ export function GratitudeJournal() {
   const jp = journalParts(day);
   const laughOk = filledText(so.laugh ?? ''), kindOk = filledText(day.love?.kindTo ?? ''), bestOk = filledText(so.best ?? '');
   const RING = { thanks: PASTEL.peach, laugh: PASTEL.sand, kind: PASTEL.rose, best: PASTEL.teal };
+  // NeoSapien suggestions (decision 0050) show in green under an empty box: Keep puts it in, ✕ skips it. Typing your own
+  // words always works, and a filled box is never replaced.
+  const sugg = pending(day.fromDay).filter(x => x.kind !== 'todo');
+  const decide = (key: string, v: 'yes' | 'no', kind?: 'thankful' | 'laugh' | 'kind' | 'best', text?: string) => update(d => {
+    if (v === 'yes' && kind && text) applyJournal(d, kind, text);
+    if (d.fromDay) d.fromDay = { ...d.fromDay, decided: { ...(d.fromDay.decided ?? {}), [key]: v } };
+  });
+  const hint = (kind: 'thankful' | 'laugh' | 'kind' | 'best', empty: boolean) => {
+    const x = empty ? sugg.find(g => g.kind === kind) : undefined;
+    if (!x) return null;
+    return (
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: -4 }}>
+        <Text style={{ flex: 1, color: NS_GREEN, fontSize: 13.5 }}>● {x.text}</Text>
+        <Pressable onPress={() => decide(x.key, 'yes', kind, x.text)} hitSlop={6}><Text style={{ color: NS_GREEN, fontWeight: '700', fontSize: 13 }}>{tr('Keep')} ✓</Text></Pressable>
+        <Pressable onPress={() => decide(x.key, 'no')} hitSlop={6} accessibilityLabel={tr('Skip')}><Text style={{ color: colors.muted, fontSize: 13 }}>✕</Text></Pressable>
+      </View>
+    );
+  };
   const soft = { borderWidth: 1, borderColor: colors.line, backgroundColor: '#F8FAFB', borderRadius: 12, paddingHorizontal: 10 } as const;
   return (
     <Card style={{ gap: 10 }}>
@@ -81,14 +101,22 @@ export function GratitudeJournal() {
         ))}
       </View>
 
+      {hint('thankful', nThanks < 3)}
+
       <EntryHead color={RING.laugh} title={tr('Made me laugh')} points={pts(jp.of.laugh, 60)} />
       <View style={soft}>{box(so.laugh ?? '', t => update(d => { d.soul = { ...d.soul, laugh: t }; }), tr('Write here'), 'laugh', 2)}</View>
+
+      {hint('laugh', !laughOk)}
 
       <EntryHead color={RING.kind} title={tr('I was kind to')} points={pts(jp.of.kind, 60)} />
       <View style={soft}>{box(day.love?.kindTo ?? '', t => update(d => { d.love = { ...(d.love ?? {}), kindTo: t }; }), tr('Someone, and how'), 'kind', 2)}</View>
 
+      {hint('kind', !kindOk)}
+
       <EntryHead color={RING.best} title={tr('Best part of my day')} points={pts(jp.of.best, 60)} />
       <View style={soft}>{box(so.best ?? '', t => update(d => { d.soul = { ...d.soul, best: t }; }), tr('Write here'), 'best', 2)}</View>
+
+      {hint('best', !bestOk)}
 
       <MyraLine card="gratitude" />
     </Card>

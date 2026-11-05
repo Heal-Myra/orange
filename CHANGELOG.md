@@ -1,5 +1,10 @@
 # Changelog
 
+## 6 Nov 2026 — NeoSapien (Neo 1) connection (decision 0050)
+- Profile › NeoSapien (Neo 1) › Connect: one sign-in on NeoSapien's page; no other AI account needed.
+- Today › "From your day": the tone of the day, to-dos for you and journal lines from what Neo 1 heard. Review adds only the ✓ ones. The Gratitude journal shows the suggestions in green under empty boxes (Keep or ✕); typing your own always works.
+- Only short lines are kept; transcripts and business details stay with NeoSapien.
+
 ## 6 Nov 2026 — Top of My Game: which record shows first
 - When yesterday set more than one record, the card shows them in this order: "Highest …" (highest ever) records first, then daily bests, then weekly, then monthly, then streaks.
 

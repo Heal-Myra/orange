@@ -5,6 +5,7 @@ import { Text, View } from 'react-native';
 import { PillarRings, TodayRings } from '../../components/TodayRings';
 import { MyraCard } from '../../components/MyraCard';
 import { RecordsCard } from '../../components/RecordsCard';
+import { FromYourDay } from '../../components/FromYourDay';
 import { AirLine } from '../../components/AirLine';
 import { todayISO } from '../../lib/dates';
 import { useAuth } from '../../lib/auth';
@@ -32,6 +33,9 @@ export default function Today() {
       {/* Back under the total (founder, 1 Nov 2026: the page looked too blank): Body, Mind and Soul with their parts. The tab
           icons keep their single score rings. */}
       <PillarRings w={w} />
+
+      {/* NeoSapien (decision 0050): what Neo 1 heard today, ready to review; only when connected. */}
+      {date === todayISO() ? <FromYourDay /> : null}
 
       {date === todayISO() ? <RecordsCard /> : null}
 

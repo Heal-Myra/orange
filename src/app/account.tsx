@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable, Share, Text, View } from 'react-native';
 import { Button, Card, Expandable, Heading, Note, Screen } from '../components/ui';
+import { useNeoSapien } from '../lib/neosapien';
 import { FeedbackBox } from '../components/FeedbackBox';
 import { useAuth } from '../lib/auth';
 import { usePendingRequests } from '../lib/adminAlerts';
@@ -124,6 +125,9 @@ export default function Account() {
         </Card>
       </Pressable>
 
+      {/* NeoSapien (decision 0050): connect a Neo 1 so Myra can suggest the journal and to-dos from your day. */}
+      {session ? <NeoSapienRow /> : null}
+
       {/* Send feedback (founder, 31 Oct 2026): moved here from the top of every page; folded until tapped. */}
       {session ? (
         <Card style={{ paddingVertical: 4 }}>
@@ -160,5 +164,21 @@ export default function Account() {
       {/* Which version is running (25 Oct 2026), so a missing quick update can be spotted. */}
       <Text style={{ color: colors.muted, fontSize: 12, textAlign: 'center' }}>{versionLine()}</Text>
     </Screen>
+  );
+}
+
+/** Connect NeoSapien: one sign-in on NeoSapien's own page; no other AI account needed. */
+function NeoSapienRow() {
+  const { connected, connect, disconnect } = useNeoSapien();
+  const [msg, setMsg] = useState<string | null>(null);
+  return (
+    <Card style={{ paddingVertical: 4 }}>
+      <Expandable icon="radio-outline" title={tr('NeoSapien (Neo 1)')} status={connected ? tr('Connected') : tr('Not connected · journal and to-dos from your conversations')}>
+        <Note>{tr('Myra reads the day Neo 1 heard and suggests your gratitude journal, your to-dos and the tone of your day. Nothing is added without your yes. Only short lines come in; transcripts and business details stay with NeoSapien.')}</Note>
+        {connected ? <Button kind="plain" title={tr('Disconnect NeoSapien')} onPress={() => disconnect().catch(e => setMsg(String(e.message ?? e)))} />
+          : <Button title={tr('Connect NeoSapien')} onPress={() => { setMsg(tr('Sign in on the NeoSapien page, then come back here.')); connect().catch(e => setMsg(String(e.message ?? e))); }} />}
+        {msg && !connected ? <Note>{msg}</Note> : null}
+      </Expandable>
+    </Card>
   );
 }

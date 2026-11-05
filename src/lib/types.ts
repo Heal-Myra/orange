@@ -59,6 +59,7 @@ export interface DayLog {
   date: string; // YYYY-MM-DD, local
   /** Yesterday's phone activity, counted in this day's Mind score (founder, 27 Oct 2026). A copy kept in step by the app. */
   phoneFrom?: { date: string; media: MediaSession[]; noMedia?: boolean };
+  fromDay?: import('./neosapien').FromDay; // NeoSapien suggestions for this day and what was said yes/no to (decision 0050)
   savedAt?: string; // when this day was last changed (ISO); the newer copy wins between phone and account
   activity: { steps?: number; activeMin?: number; source?: string; stepsTyped?: boolean; activeTyped?: boolean }; // *Typed: the person's own number wins over Apple Health
   sleep: { hours?: number; quality?: 1 | 2 | 3 | 4 | 5; source?: string; bedAt?: string }; // bedAt: when sleep began (Apple Health), for dinner timing // source 'Typed in' = the person's own number wins over Apple Health
