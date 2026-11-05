@@ -12,6 +12,7 @@ import { lang, tr } from '../lib/i18n';
 import { partOfDay } from '../lib/context';
 import { momentOf } from '../lib/routine';
 import { useHeal } from '../lib/store';
+import { addSession } from '../lib/medSessions';
 import { useGuideText } from '../lib/guideText';
 import { speak, voiceLang } from '../lib/voice';
 import { serverVoiceFor, useServerVoice } from '../lib/serverVoice';
@@ -57,7 +58,7 @@ export default function YogaNidra() {
   const save = useCallback(() => {
     if (saved.current) return;
     const minutes = Math.round(elapsed() / 60_000);
-    if (minutes > 0) { saved.current = true; update(d => { d.mind.meditationMin = (d.mind.meditationMin ?? 0) + minutes; }); }
+    if (minutes > 0) { saved.current = true; update(d => addSession(d, 'nidra', 'Yoga Nidra', minutes)); }
   }, [update]);
 
   // Speak the current step, then wait its silence, then move on.

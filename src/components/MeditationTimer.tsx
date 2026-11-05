@@ -21,6 +21,7 @@ import { AIMS, practicesFor, WHY, type AimId } from '../lib/medAims';
 import { minutesFor, pathState, satToday, stageOf, STEPS, type Feel, type PathState } from '../lib/dhamma';
 import { CARD_LINE, feelLine, STAGE_NAME } from '../lib/dhammaScript';
 import { tr } from '../lib/i18n';
+import { addSession, unlisted } from '../lib/medSessions';
 
 const CHOICES = [5, 10, 15]; // founder, 24 Oct 2026
 // A calm breathing rhythm: breathe in 4 s, breathe out 6 s (a longer out-breath settles the body).
@@ -70,7 +71,7 @@ export function MeditationTimer() {
 
   const finish = (ms: number) => {
     const minutes = Math.round(ms / 60_000);
-    if (minutes > 0) update(d => { d.mind.meditationMin = (d.mind.meditationMin ?? 0) + minutes; });
+    if (minutes > 0) update(d => addSession(d, 'self', 'On my own', minutes));
     setStartedAt(null); setPausedMs(0);
   };
 
@@ -129,6 +130,7 @@ export function MeditationTimer() {
       ) : onPath ? (
         <>
           <DhammaToday path={path} gLang={gLang} />
+          <TodaySessions />
           <Expandable icon="leaf-outline" color={colors.soul} title={tr('Other practices')} status={tr('Paused during the 10 days: one method at a time')}>
             {practices}
             {lengthAndVoice}
@@ -164,6 +166,7 @@ export function MeditationTimer() {
           {way !== 'dhamma' ? lengthAndVoice : null}
         </>
       )}
+      {!onPath && !sitting ? <TodaySessions /> : null}
       {profile.me && !onPath ? <GoalRow /> : null}
       <MyraLine card="meditation" />
     </Card>
@@ -416,6 +419,36 @@ function GoalRow() {
       }} />
       <Note>{tr('Guided sessions start from what you do now and grow a little each week. If sessions get hard, Myra slows down to your pace.')}</Note>
       {goal ? <Pressable onPress={() => profile.me && setProfile({ ...profile, me: { ...profile.me, meditationGoal: undefined } })}><Text style={{ color: colors.bad }}>{tr('Remove goal')}</Text></Pressable> : null}
+    </Expandable>
+  );
+}
+
+/** Today's sessions, folded away (founder, 5 Nov 2026, option B): one line each, with what no session explains. */
+function TodaySessions() {
+  const { day, profile } = useHeal();
+  const done = day.mind.meditationMin ?? 0;
+  if (!done) return null;
+  const list = day.mind.medSessions ?? [];
+  const other = unlisted(day);
+  const icon = { dhamma: '🪷', guided: '🎧', nidra: '🌙', self: '⏱' } as const;
+  const name = (k: typeof list[number]) => k.kind === 'dhamma' ? (Number(k.name) > STEPS ? tr('Dhamma path, daily sitting') : tr('Dhamma path, Day {n}', { n: k.name })) : tr(k.name);
+  const at = (iso: string) => new Date(iso).toLocaleTimeString(locale(), { hour: 'numeric', minute: '2-digit' });
+  const n = list.length + (other ? 1 : 0);
+  return (
+    <Expandable icon="timer-outline" color={colors.soul} title={tr("Today's sessions")}
+      status={`${n === 1 ? tr('1 session') : tr('{n} sessions', { n })} · ${tr('{d} of {t} min', { d: done, t: profile.meditation })}`}>
+      {list.map((k, i) => (
+        <View key={i} style={{ flexDirection: 'row', justifyContent: 'space-between', paddingLeft: 32 }}>
+          <Text style={{ color: colors.ink, fontSize: 14.5, flex: 1 }}>{icon[k.kind]} {name(k)}</Text>
+          <Text style={{ color: colors.muted, fontSize: 14 }}>{k.min} {tr('min')} · {at(k.at)}</Text>
+        </View>
+      ))}
+      {other ? (
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingLeft: 32 }}>
+          <Text style={{ color: colors.ink, fontSize: 14.5, flex: 1 }}>• {tr('Earlier today or Apple Health')}</Text>
+          <Text style={{ color: colors.muted, fontSize: 14 }}>{other} {tr('min')}</Text>
+        </View>
+      ) : null}
     </Expandable>
   );
 }

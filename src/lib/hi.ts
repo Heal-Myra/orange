@@ -1547,4 +1547,11 @@ export const HI: Record<string, string> = {
   'Day {n} again next time': 'अगली बार फिर दिन {n}',
   'A day counts when you sit at least half the time ({h} min). Your minutes still count.': 'दिन तब गिना जाता है जब आप कम से कम आधा समय ({h} मिनट) बैठें। आपके मिनट फिर भी गिने जाते हैं।',
   'Day {n} again tomorrow': 'कल फिर दिन {n}',
+  "Today's sessions": 'आज के सत्र',
+  '1 session': '1 सत्र',
+  '{n} sessions': '{n} सत्र',
+  '{d} of {t} min': '{t} में से {d} मिनट',
+  'Dhamma path, daily sitting': 'धम्म मार्ग, रोज़ की बैठक',
+  'Dhamma path, Day {n}': 'धम्म मार्ग, दिन {n}',
+  'Earlier today or Apple Health': 'आज पहले या Apple Health से',
 };

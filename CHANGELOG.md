@@ -1,5 +1,8 @@
 # Changelog
 
+## 5 Nov 2026 — Today's sessions on the Meditation card
+- A folded row "Today's sessions · 3 sessions · 25 of 20 min" opens to one line per session (Dhamma path day, guided practice, Yoga Nidra, On my own) with minutes and time. Minutes no session explains (earlier today, or Apple Health mindful minutes) show as one line.
+
 ## 5 Nov 2026 — Dhamma sittings timed by the clock
 - A sitting's time now comes from the clock, not from counting ticks, and the screen says exactly how long you sat ("You sat 4 min 40 s of 10 min"). A day counts only at half the time or more; otherwise "Day 1 again next time" (the minutes still count). Only whole minutes sat are added.
 - After Restless or Uneasy the card says "Day 1 again tomorrow" instead of "Day 1 done".

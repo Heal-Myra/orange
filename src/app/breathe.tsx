@@ -12,6 +12,7 @@ import { useGuideText } from '../lib/guideText';
 import { optional } from '../lib/native';
 import { phasesFor, practice, segmentName, sessionPlan, type Phase, type PracticeId, type Segment } from '../lib/pranayama';
 import { useHeal } from '../lib/store';
+import { addSession } from '../lib/medSessions';
 import { gentleToday } from '../lib/feeling';
 import { carePlan } from '../lib/care';
 import { todayISO } from '../lib/dates';
@@ -71,7 +72,7 @@ export default function Breathe() {
     if (saved.current) return;
     if (since.current) { sat.current += Date.now() - since.current; since.current = null; }
     const m = Math.round(sat.current / 60000);
-    if (m > 0) { saved.current = true; update(d => { d.mind.meditationMin = (d.mind.meditationMin ?? 0) + m; }); }
+    if (m > 0) { saved.current = true; update(d => addSession(d, 'guided', choice === 'mix' ? "Myra's mix" : practice(choice).name, m)); }
   };
 
   // Play each step: move the circle, speak the cue (not on every quick breath), then the next step.

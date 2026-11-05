@@ -15,6 +15,7 @@ import { lang, tr } from '../lib/i18n';
 import { optional } from '../lib/native';
 import { useServerVoice } from '../lib/serverVoice';
 import { useHeal } from '../lib/store';
+import { addSession } from '../lib/medSessions';
 import { speak, voiceLang } from '../lib/voice';
 
 const Awake = optional(['ExpoKeepAwake'], () => require('expo-keep-awake') as typeof import('expo-keep-awake'));
@@ -75,7 +76,7 @@ export default function Sit() {
     const m = Math.floor(secs / 60); // whole minutes actually sat
     const counts = secs >= total / 2;
     if (m > 0 || counts) update(d => {
-      d.mind.meditationMin = (d.mind.meditationMin ?? 0) + m;
+      addSession(d, 'dhamma', String(step), m); // name = the day (11 = after Day 10)
       if (counts) d.mind.dhamma = { ...d.mind.dhamma, sits: [...(d.mind.dhamma?.sits ?? []), { step, min: m, sec: secs, at: new Date().toISOString() }] };
     });
     setPhase(counts ? 'feel' : 'done');
