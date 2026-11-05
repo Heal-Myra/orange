@@ -1,5 +1,8 @@
 # Changelog
 
+## 5 Nov 2026 — Mindful minutes from Apple Health counted once
+- When two apps (or the Watch and an app) log the same mindful time, the overlap now counts once.
+
 ## 5 Nov 2026 — To do / Done switch and the flying unicorn
 - Every to-do (Clear your mind, and Today's focus) has a To do / Done switch instead of the circle. Sliding it to Done crosses the to-do out and sends a unicorn flying up the screen with a sparkle trail. Done to-dos stay in today's list and can be slid back to To do (no unicorn). The dates menu opens by tapping or long-pressing the to-do's words.
 - Scoring unchanged: writing two to-dos in a part earns 20 % of it, finishing them 80 % (decision 0048).

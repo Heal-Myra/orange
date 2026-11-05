@@ -92,7 +92,11 @@ async function sleepOf(iso: string) {
 
 async function mindfulMinutes(start: Date, end: Date) {
   const samples = await queryCategorySamples('HKCategoryTypeIdentifierMindfulSession', { limit: 0, ...range(start, end) } as never);
-  const ms = samples.reduce((t, s) => t + (new Date(s.endDate as unknown as string).getTime() - new Date(s.startDate as unknown as string).getTime()), 0);
+  // Two apps (or the Watch and an app) can log the same minutes: count overlapping time once (5 Nov 2026).
+  const spans = samples.map(s => [new Date(s.startDate as unknown as string).getTime(), new Date(s.endDate as unknown as string).getTime()] as const)
+    .filter(([a, b]) => b > a).sort((x, y) => x[0] - y[0]);
+  let ms = 0, upTo = -Infinity;
+  for (const [a, b] of spans) { if (b <= upTo) continue; ms += b - Math.max(a, upTo); upTo = b; }
   return ms > 0 ? Math.round(ms / 60000) : undefined;
 }
 
