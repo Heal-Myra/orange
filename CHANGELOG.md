@@ -1,5 +1,8 @@
 # Changelog
 
+## 6 Nov 2026 — Top of My Game: which record shows first
+- When yesterday set more than one record, the card shows them in this order: "Highest …" (highest ever) records first, then daily bests, then weekly, then monthly, then streaks.
+
 ## 5 Nov 2026 — Meditation always shows all three ways
 - The full card is back during the Dhamma path: what you want help with, Myra's practice, and Dhamma path · Guided · On my own. The Dhamma tile (chosen by default while the path runs) shows today's step; tap Guided or On my own any time.
 

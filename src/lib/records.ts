@@ -143,6 +143,9 @@ function windowValue(def: RecDef, days: Record<string, DayLog>, P: Profile, end:
   return def.agg === 'sum' ? v.reduce((a, b) => a + b, 0) : v.reduce((a, b) => a + b, 0) / v.length;
 }
 
+const KIND_RANK: Record<RecKind, number> = { day: 1, week: 2, month: 3, streak: 4 };
+export const recRank = (r: Pick<Rec, 'kind' | 'title'>) => (/^Highest/.test(r.title) ? 0 : KIND_RANK[r.kind]);
+
 export function freshRecords(daysIn: Record<string, DayLog>, P: Profile, today: string): Rec[] {
   // Each day's value is worked out once per kind of record (windows reuse the same days many times).
   const cache = new Map<string, number | null>();
@@ -178,7 +181,7 @@ export function freshRecords(daysIn: Record<string, DayLog>, P: Profile, today: 
       }
     }
   }
-  // The proudest first: longest streaks and windows, then single days.
-  const rank: Record<RecKind, number> = { streak: 0, month: 1, week: 2, day: 3 };
-  return out.sort((a, b) => rank[a.kind] - rank[b.kind]);
+  // Which one shows first (founder, 6 Nov 2026): "Highest ever" records, then other daily records, then weekly, then
+  // monthly; streaks last. So a highest-ever day beats a best week.
+  return out.sort((a, b) => recRank(a) - recRank(b));
 }

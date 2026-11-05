@@ -65,3 +65,12 @@ describe('fresh records only (4 Nov 2026)', () => {
     expect(s).toMatchObject({ value: 6, beat: 3, ongoing: true });
   });
 });
+
+describe('which fresh record shows first (6 Nov 2026)', async () => {
+  const { recRank } = await import('./records');
+  it('highest ever, then day, week, month, streak', () => {
+    const list = [{ kind: 'week', title: 'Best week ever' }, { kind: 'streak', title: 'Longest gratitude streak' }, { kind: 'month', title: 'Best month ever' },
+      { kind: 'day', title: 'Best day ever' }, { kind: 'day', title: 'Highest Mind score' }] as const;
+    expect([...list].sort((a, b) => recRank(a) - recRank(b)).map(x => x.title)).toEqual(['Highest Mind score', 'Best day ever', 'Best week ever', 'Best month ever', 'Longest gratitude streak']);
+  });
+});
