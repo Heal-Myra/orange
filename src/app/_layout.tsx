@@ -12,6 +12,7 @@ import { ReminderScheduler } from '../components/Reminders';
 import { ShareProvider, ShareReceiver } from '../components/ShareReceiver';
 import { RangeProvider } from '../lib/range';
 import { UpdateWatcher } from '../components/UpdateWatcher';
+import { UnicornLayer } from '../components/DoneSwitch';
 import { LangProvider, tr, useLang } from '../lib/i18n';
 import { colors } from '../theme';
 
@@ -162,6 +163,7 @@ export default function RootLayout() {
           <ReminderScheduler />
           <ShareReceiver />
           <UpdateWatcher />
+          <UnicornLayer />
         </TasksProvider>
         </HealthProvider>
       </HealProvider>

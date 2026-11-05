@@ -1,6 +1,7 @@
 // Mind: "Clear your mind". One to-do list in three groups (Family, Work, Better me).
 // Writing a task down with a "when" quiets the mind even before it is done. Myra puts one at a time in front of the
-// person (the Mind line of Myra recommends on Today, 21 Oct 2026); the rest get dates automatically. Done tasks leave the list.
+// person (the Mind line of Myra recommends on Today, 21 Oct 2026); the rest get dates automatically. Each to-do has a
+// To do / Done switch; done today stays in the list, crossed out, and a unicorn flies up the screen (founder, 5 Nov 2026).
 
 import { MyraLine } from './MyraLine';
 import { PASTEL, RingPanel } from './Rings';
@@ -14,6 +15,7 @@ import { DatePicker } from './DatePicker';
 import { loadOn, PER_AREA_DAY } from '../lib/taskPlan';
 import { colors } from '../theme';
 import { Button, Card, Heading, Note, Score, s, useKeepVisible } from './ui';
+import { DoneSwitch } from './DoneSwitch';
 import { useHeal } from '../lib/store';
 import { SECTION_AREAS, mindScore, sectionPoint } from '../lib/scoring';
 
@@ -39,7 +41,7 @@ const shortDate = (iso: string) => {
 };
 
 export function TasksCard() {
-  const { open, focus, doneToday } = useTasks();
+  const { open, focus, doneToday, tasks } = useTasks();
   const { day, profile } = useHeal();
   const mind = mindScore(day, profile);
   const [area, setArea] = useState<Area>('family');
@@ -48,7 +50,9 @@ export function TasksCard() {
   // Today's list first (founder, 23 Oct 2026); later tasks only after "See all".
   const isToday = (t: Task) => !t.due || t.due <= today;
   const mine = open.filter(t => t.area === area);
-  const shown = mine.filter(isToday);
+  // Done today stays in the list (crossed out) so it can be slid back.
+  const doneHere = tasks.filter(t => t.area === area && t.doneAt && new Date(t.doneAt).toDateString() === new Date().toDateString());
+  const shown = [...mine.filter(isToday), ...doneHere];
   const later = mine.filter(t => !isToday(t));
   const focusIds = focus.map(t => t.id);
 
@@ -255,26 +259,25 @@ function AddTask({ area }: { area: Area }) {
 }
 
 function TaskRow({ t, inFocus }: { t: Task; inFocus: boolean }) {
-  const { complete, moveTo, remove, addHabit } = useTasks();
+  const { complete, reopen, moveTo, remove, addHabit } = useTasks();
   const [open, setOpen] = useState(false);
+  const done = !!t.doneAt;
   const [cal, setCal] = useState(false);
   const { tasks } = useTasks();
   const today = todayISO();
   return (
     <View style={{ gap: 6, borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 8 }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-        <Pressable accessibilityRole="checkbox" accessibilityLabel={`Done: ${t.title}`} onPress={() => complete(t.id)} hitSlop={8}>
-          <Ionicons name="ellipse-outline" size={24} color={colors.accent} />
+        {/* Tap or long-press the words for the dates menu (the calendar icon made way for the switch). */}
+        <Pressable style={{ flex: 1 }} onPress={() => !done && setOpen(o => !o)} onLongPress={() => !done && setOpen(o => !o)}>
+          <Text style={{ color: done ? colors.muted : colors.ink, fontSize: 15, textDecorationLine: done ? 'line-through' : 'none' }}>{t.title}</Text>
+          {!done ? (
+            <Text style={{ fontSize: 12, color: inFocus ? colors.insight : colors.muted }}>
+              {inFocus ? tr('In today’s focus') : t.due ? shortDate(t.due) : tr('Myra will choose a day')}
+            </Text>
+          ) : null}
         </Pressable>
-        <Pressable style={{ flex: 1 }} onPress={() => setOpen(o => !o)}>
-          <Text style={{ color: colors.ink, fontSize: 15 }}>{t.title}</Text>
-          <Text style={{ fontSize: 12, color: inFocus ? colors.insight : colors.muted }}>
-            {inFocus ? tr('In today’s focus') : t.due ? shortDate(t.due) : tr('Myra will choose a day')}
-          </Text>
-        </Pressable>
-        <Pressable onPress={() => setOpen(o => !o)} hitSlop={8}>
-          <Ionicons name="calendar-outline" size={20} color={colors.muted} />
-        </Pressable>
+        <DoneSwitch done={done} onDone={() => complete(t.id)} onUndo={() => reopen(t.id)} label={t.title} />
       </View>
       {readHabit(t.title).repeat ? (
         <Pressable onPress={() => { const r = readHabit(t.title); addHabit({ title: t.title, area: t.area, repeat: r.repeat!, at: r.at, weekday: r.weekday }); remove(t.id); }} hitSlop={6} style={{ paddingLeft: 34 }}>
@@ -353,9 +356,7 @@ export function FocusBlock() {
         <View key={t.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
           <Text style={{ color: colors.insight, fontWeight: '700', fontSize: 14, width: 44 }}>{tr('Focus')}</Text>
           <Text style={{ flex: 1, color: colors.ink, fontSize: 14, lineHeight: 20 }}>{t.title} <Text style={{ color: colors.muted, fontSize: 12 }}>· {tr(areaName(t.area))}</Text></Text>
-          <Pressable accessibilityRole="checkbox" accessibilityLabel={`Done: ${t.title}`} onPress={() => complete(t.id)} hitSlop={10}>
-            <Ionicons name="ellipse-outline" size={24} color={colors.accent} />
-          </Pressable>
+          <DoneSwitch done={false} onDone={() => complete(t.id)} label={t.title} />
         </View>
       ))}
     </Card>

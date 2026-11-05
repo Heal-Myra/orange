@@ -1,5 +1,9 @@
 # Changelog
 
+## 5 Nov 2026 — To do / Done switch and the flying unicorn
+- Every to-do (Clear your mind, and Today's focus) has a To do / Done switch instead of the circle. Sliding it to Done crosses the to-do out and sends a unicorn flying up the screen with a sparkle trail. Done to-dos stay in today's list and can be slid back to To do (no unicorn). The dates menu opens by tapping or long-pressing the to-do's words.
+- Scoring unchanged: writing two to-dos in a part earns 20 % of it, finishing them 80 % (decision 0048).
+
 ## 5 Nov 2026 — Gratitude journal: new weights
 - From today the journal's 60 points are shared: I'm thankful for three things 20 % (12), best part of my day 20 % (12), I was kind to 30 % (18), made me laugh 30 % (18). Earlier days keep their old points. Myra's "Note one kind act" now shows only the kindness part.
 - Each part of the journal shows its share of the card (20%, 30%, 30%, 20%) instead of 0% or 100%. Myra no longer says "four" gratitudes.

@@ -1542,4 +1542,5 @@ export const HI: Record<string, string> = {
   "Let the wish spread gently, in every direction.": "इस कामना को धीरे-धीरे हर दिशा में फैलने दें।",
   "Slowly, let the sitting come to an end. Take a moment before you open your eyes.": "धीरे-धीरे बैठक को समाप्त होने दें। आँखें खोलने से पहले एक पल लें।",
   "May all beings be happy. Slowly, let the sitting come to an end.": "सब प्राणी सुखी हों। धीरे-धीरे बैठक को समाप्त होने दें।",
+  'To do': 'करना है',
 };

@@ -30,6 +30,7 @@ interface TasksState {
   removeHabit: (id: string) => void;
   tickHabit: (id: string) => void; // done (or undone) today
   complete: (id: string) => void;
+  reopen: (id: string) => void; // slide back to "To do"
   moveTo: (id: string, due: string) => void;
   remove: (id: string) => void;
   setFocus: (ids: string[]) => void; // Myra's pick for today
@@ -181,6 +182,12 @@ export function TasksProvider({ children }: { children: ReactNode }) {
         // "shoes shopping" did not move the score because only Myra's two picks counted). Not twice for the same one.
         if (!tasks.find(t => t.id === id)?.doneAt) updateOn(today, d => { d.mind.focusDone = (d.mind.focusDone ?? 0) + 1; });
         change(ts => ts.map(t => t.id === id ? { ...t, doneAt: new Date().toISOString() } : t));
+      },
+      reopen: id => {
+        const t = tasks.find(x => x.id === id);
+        if (!t?.doneAt) return;
+        if (t.doneAt.startsWith(today) || new Date(t.doneAt).toDateString() === new Date().toDateString()) updateOn(today, d => { d.mind.focusDone = Math.max(0, (d.mind.focusDone ?? 0) - 1); });
+        change(ts => ts.map(x => x.id === id ? { ...x, doneAt: undefined } : x));
       },
       moveTo: (id, due) => change(ts => ts.map(t => t.id === id ? { ...t, due, moved: t.moved + 1 } : t),
         focusRec.ids.includes(id) ? { date: focusRec.date, ids: focusRec.ids.filter(x => x !== id) } : undefined),
