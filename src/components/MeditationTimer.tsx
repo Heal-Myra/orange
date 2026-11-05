@@ -1,6 +1,6 @@
 // Meditation (founder, 3 and 5 Nov 2026; decision 0049): what do you want help with? → Myra recommends one practice;
 // then choose your way: the 10-day Dhamma path, guided (Myra's voice) or on my own (a quiet timer). While the Dhamma
-// path runs, the card shows only today's step; the other practices fold away (one method at a time).
+// path runs, the three ways still show (founder, 5 Nov 2026); the Dhamma tile opens today's step.
 
 import { MyraLine } from './MyraLine';
 import { PASTEL, RingStack } from './Rings';
@@ -84,16 +84,8 @@ export function MeditationTimer() {
   const guided = (id: PracticeId) => (id === 'nidra' ? router.push({ pathname: '/yoga-nidra', params: { lang: gLang } }) : router.push({ pathname: '/breathe', params: { practice: id, minutes: String(length), lang: gLang } }));
   const score = Math.min(30, (30 * done) / target);
   const dayNo = path.today?.step ?? path.next;
-  const title = onPath ? tr('Meditation · Day {n} of 10', { n: Math.min(STEPS, dayNo) }) : tr('Meditation');
+  const title = onPath && way === 'dhamma' ? tr('Meditation · Day {n} of 10', { n: Math.min(STEPS, dayNo) }) : tr('Meditation');
 
-  // What do you want help with? → Myra's practice (shared by the card and, during the path, its folded "Other practices").
-  const practices = (
-    <>
-      <HelpWith aim={aim} onAim={setAim} />
-      {aim ? <Recommend aim={aim} pick={pick} onPick={setPick} gentle={path.gentle} length={length} gLang={gLang} onGuided={guided} onSelf={start} />
-        : <MyraBox>{tr("Pick what you want help with, and I'll choose the practice.")}</MyraBox>}
-    </>
-  );
   const lengthAndVoice = (
     <Expandable icon="options-outline" color={colors.soul} title={tr('Length and voice')} status={`${length} ${tr('min')} · ${MESSAGE_LANGS.find(l => l.code === gLang)?.name ?? 'English'}`}>
       <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
@@ -127,16 +119,6 @@ export function MeditationTimer() {
           </View>
           <Note>{tr('Keep this screen open while you sit.')}</Note>
         </View>
-      ) : onPath ? (
-        <>
-          <DhammaToday path={path} gLang={gLang} />
-          <TodaySessions />
-          <Expandable icon="leaf-outline" color={colors.soul} title={tr('Other practices')} status={tr('Paused during the 10 days: one method at a time')}>
-            {practices}
-            {lengthAndVoice}
-            <LeavePath />
-          </Expandable>
-        </>
       ) : (
         <>
           <View style={{ flexDirection: 'row', gap: 12, alignItems: 'center' }}>
@@ -155,7 +137,8 @@ export function MeditationTimer() {
               </Pressable>
             ))}
           </View>
-          {way === 'dhamma' ? (path.finished ? <AfterTen gLang={gLang} /> : <DhammaStart gLang={gLang} />)
+          {/* All three ways always show (founder, 5 Nov 2026); the Dhamma path keeps its place while it runs. */}
+          {way === 'dhamma' ? (onPath ? <><DhammaToday path={path} gLang={gLang} /><LeavePath /></> : path.finished ? <AfterTen gLang={gLang} /> : <DhammaStart gLang={gLang} />)
             : !aim && way === 'guided' ? <Button title={careName ? tr('Care breathing for {what}', { what: tr(careName) }) + ` · ${length} ${tr('min')}` : tr('Start {n}-minute session', { n: length })} onPress={() => guided('mix')} />
             : !aim ? (
               <>
@@ -166,8 +149,8 @@ export function MeditationTimer() {
           {way !== 'dhamma' ? lengthAndVoice : null}
         </>
       )}
-      {!onPath && !sitting ? <TodaySessions /> : null}
-      {profile.me && !onPath ? <GoalRow /> : null}
+      {!sitting ? <TodaySessions /> : null}
+      {profile.me && way !== 'dhamma' ? <GoalRow /> : null}
       <MyraLine card="meditation" />
     </Card>
   );

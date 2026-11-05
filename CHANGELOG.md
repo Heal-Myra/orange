@@ -1,5 +1,8 @@
 # Changelog
 
+## 5 Nov 2026 — Meditation always shows all three ways
+- The full card is back during the Dhamma path: what you want help with, Myra's practice, and Dhamma path · Guided · On my own. The Dhamma tile (chosen by default while the path runs) shows today's step; tap Guided or On my own any time.
+
 ## 5 Nov 2026 — Today's sessions on the Meditation card
 - A folded row "Today's sessions · 3 sessions · 25 of 20 min" opens to one line per session (Dhamma path day, guided practice, Yoga Nidra, On my own) with minutes and time. Minutes no session explains (earlier today, or Apple Health mindful minutes) show as one line.
 
