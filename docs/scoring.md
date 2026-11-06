@@ -50,3 +50,6 @@ Every tab has a D · W · M · Q · Y switch (src/lib/trends.ts). Calendar perio
 
 If the person switches on "I'm fasting today" on the Food card and the day's food stays at or under 60 kcal (water, black tea, black coffee), Food scores the full 40. If more food is logged, the day is scored as a normal day.
 
+
+
+**Long fasts (6 Nov 2026):** when the day before had no meals, today's fast counts from that day's start (up to three days back), e.g. Wednesday dinner to Friday lunch counts as one fast of about 40 hours.

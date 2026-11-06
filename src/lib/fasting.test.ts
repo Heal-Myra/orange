@@ -72,3 +72,17 @@ describe('Food from 3 Nov 2026: fasting 8 + dinner time 8 + meals 24 − up to 4
     expect(big.penalty).toBe(4);
   });
 });
+
+describe('a fast longer than a night (6 Nov 2026)', () => {
+  it('Wednesday dinner to Friday: Friday counts from Wednesday', async () => {
+    const { carriedFastFrom, fastHoursOf } = await import('./fasting');
+    const wedDinner = new Date(2026, 10, 4, 20, 0).toISOString();
+    const thu = emptyDay('2026-11-05'); thu.fastFrom = wedDinner; // no meals on Thursday
+    const fri = emptyDay('2026-11-06');
+    expect(carriedFastFrom({ '2026-11-05': thu, '2026-11-06': fri }, '2026-11-06')).toBe(wedDinner);
+    fri.fastFrom = wedDinner;
+    expect(fastHoursOf(fri, { hours: 16, lastMeal: '21:00' }, new Date(2026, 10, 6, 8, 20)).hours).toBeCloseTo(36.33, 1);
+    thu.meals = [{ name: 'Lunch', kcal: 500, p: 20, c: 60, f: 15, source: 'manual' }];
+    expect(carriedFastFrom({ '2026-11-05': thu, '2026-11-06': emptyDay('2026-11-06') }, '2026-11-06')).toBeNull();
+  });
+});

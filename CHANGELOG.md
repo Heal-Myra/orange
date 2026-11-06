@@ -1,5 +1,8 @@
 # Changelog
 
+## 6 Nov 2026 — Long fasts count from their real start
+- A fast that runs through a whole day without food (e.g. Wednesday dinner to Friday lunch) now counts from Wednesday's dinner, not from last night: Food shows "Fast kept: 36 h" and the fasting part is full.
+
 ## 6 Nov 2026 — "Snap my meal" link for Siri, Action Button and Back Tap
 - Opening projectheal://snap (from an iPhone Shortcut) opens Body › Food and starts the meal camera straight away. With one Shortcut it works from Siri ("Happy Orange food"), the Action Button and Back Tap.
 

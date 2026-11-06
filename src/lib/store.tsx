@@ -4,6 +4,7 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppState, Platform } from 'react-native';
+import { carriedFastFrom } from './fasting';
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useAuth } from './auth';
 import { shiftISO, todayISO } from './dates';
@@ -193,6 +194,15 @@ export function HealProvider({ children }: { children: ReactNode }) {
   }, [profile, persistLocal, pushDay]);
 
   const update = useCallback((change: (d: DayLog) => void) => updateOn(date, change), [date, updateOn]);
+
+  // A fast that ran through a whole day without food (e.g. Wednesday dinner to Friday lunch) keeps counting from its
+  // real start, not from last night (founder, 6 Nov 2026).
+  useEffect(() => {
+    if (!ready) return;
+    const today = todayISO(), from = carriedFastFrom(days, today);
+    if (from) updateOn(today, d => { if (!d.fastFrom) d.fastFrom = from; });
+  }, [ready, days, updateOn]);
+
 
   const setProfile = useCallback((p: Profile) => {
     setProfileState(p);

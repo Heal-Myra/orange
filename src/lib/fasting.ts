@@ -102,3 +102,20 @@ export function aimShares(kcal: number, proteinG: number) {
   const p = Math.min(0.35, (proteinG * 4) / kcal), f = 0.25, fib = Math.min(0.06, ((14 * kcal) / 1000) * 2 / kcal);
   return { carb: 1 - p - f - fib, fat: f };
 }
+
+/**
+ * A fast longer than a night (founder, 6 Nov 2026: "I fast from Wednesday dinner till Friday lunch"): when the day
+ * before had no meals at all, today's fast started where that day's started (up to three days back). Returns the
+ * start to keep on today's log, or null when today already has one or yesterday had food.
+ */
+export function carriedFastFrom(days: Record<string, DayLog | undefined>, date: string): string | null {
+  if (days[date]?.fastFrom) return null;
+  const back = (iso: string, n: number) => { const [y, m, d] = iso.split('-').map(Number); return iso_(new Date(y, m - 1, d - n)); };
+  for (let k = 1; k <= 3; k++) {
+    const day = days[back(date, k)];
+    if (!day || day.meals.length) return null; // a day with food (or nothing known) ends the chain
+    if (day.fastFrom) return day.fastFrom;
+  }
+  return null;
+}
+const iso_ = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
