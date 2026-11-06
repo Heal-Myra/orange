@@ -2,6 +2,7 @@
 // Milestone 3 replaces typing steps and sleep with automatic HealthKit / Health Connect sync.
 
 import { useState } from 'react';
+import { useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable, Text, View } from 'react-native';
 import { HealthLine, useHealth } from '../../components/HealthSync';
@@ -26,6 +27,8 @@ import { FastAsk, FastStatus, FoodPenalty, fastRing, foodV3Of, useFast } from '.
 import { FOOD_V3_FROM } from '../../lib/fasting';
 
 export default function Body() {
+  // projectheal://snap (Siri, Action Button, Back Tap; founder, 6 Nov 2026) opens here and starts the meal camera.
+  const { snap } = useLocalSearchParams<{ snap?: string }>();
   const { day, date, profile, update, setProfile } = useHeal();
   const score = bodyScore(day, profile);
   const totals = mealTotals(day.meals);
@@ -40,7 +43,7 @@ export default function Body() {
 
   return (
     <Screen feedback="Body">
-      <Anchor id="food"><MealPhoto right={<Score value={score?.nutrition} max={40} />} top={
+      <Anchor id="food"><MealPhoto snap={snap} right={<Score value={score?.nutrition} max={40} />} top={
         <RingPanel trend="food" score={score?.nutrition} max={40} items={(() => {
           // Calories, carbs, protein, fat and fibre (founder, 3 Nov 2026: the score is fasting + early dinner + meals, but the
           // rings show the nutrients); carb and fat aims from the same mix as the table.

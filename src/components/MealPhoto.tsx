@@ -3,7 +3,7 @@
 // The person checks and edits every number before it is added (understanding over tracking).
 
 import * as ImagePicker from 'expo-image-picker';
-import { useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { Image, Platform, Pressable, Text, TextInput, View } from 'react-native';
 import { analyseMeal, analyseMealText, oneLine, type MealItem } from '../lib/ai';
@@ -34,7 +34,7 @@ export function speechRecognition(): (new () => any) | null {
 }
 
 /** One Food card: log a meal (photo, speak, type) on top, today's meals and totals underneath. */
-export function MealPhoto({ right, top, children }: { right?: ReactNode; top?: ReactNode; children?: ReactNode }) {
+export function MealPhoto({ right, top, children, snap }: { right?: ReactNode; top?: ReactNode; children?: ReactNode; snap?: string }) {
   const { session } = useAuth();
   const { update } = useHeal();
   const logMeals = useLogMeals();
@@ -75,6 +75,15 @@ export function MealPhoto({ right, top, children }: { right?: ReactNode; top?: R
       setMessage(e instanceof Error ? e.message : tr('Something went wrong. Try again.'));
     } finally { setBusy(false); }
   };
+
+  // Opened by "snap my meal" from Siri, the Action Button or Back Tap: straight to the camera, once per request.
+  const snapped = useRef<string | undefined>(undefined);
+  useEffect(() => {
+    if (!snap || snapped.current === snap) return;
+    snapped.current = snap;
+    const t = setTimeout(() => { setMode('photo'); pick(true); }, 700);
+    return () => clearTimeout(t);
+  }, [snap]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const describe = async (said?: string) => {
     const text = (said ?? words).trim();

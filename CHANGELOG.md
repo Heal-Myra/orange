@@ -1,5 +1,8 @@
 # Changelog
 
+## 6 Nov 2026 — "Snap my meal" link for Siri, Action Button and Back Tap
+- Opening projectheal://snap (from an iPhone Shortcut) opens Body › Food and starts the meal camera straight away. With one Shortcut it works from Siri ("Happy Orange food"), the Action Button and Back Tap.
+
 ## 6 Nov 2026 — A neat Profile page; Privacy and permissions
 - Profile: your name and email at the top; About you, Language and Daily Wisdom in one card; Connectors and Privacy and permissions in another; Admin for admins; Log out at the bottom. Removed: the Signed-in card, Send feedback (Myra passes feedback to the team), Library, and the extra Back button.
 - New Privacy and permissions page: Apple Health, notifications, camera and photos, microphone and connectors (change any time), where your data is kept, and Delete my data.
