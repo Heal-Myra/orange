@@ -189,11 +189,12 @@ async function day(userId: string, name: string, date: string, hindi: boolean) {
   return result;
 }
 
-const page = (title: string, line: string) => new Response(`<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title}</title>
-<body style="font-family:-apple-system,Arial;background:#F4F7F8;color:#1F2A2E;display:flex;min-height:90vh;align-items:center;justify-content:center;text-align:center;padding:24px">
-<div><h2 style="color:#C0513A">${title}</h2><p style="font-size:17px;line-height:1.5">${line}</p>
-<p><a href="${APP_RETURN}" style="display:inline-block;background:#2A7C83;color:#fff;padding:14px 26px;border-radius:99px;text-decoration:none;font-weight:700">Back to Happy Orange</a></p></div>
-<script>setTimeout(function(){location.href=${JSON.stringify(APP_RETURN)}},1200)</script></body>`, { headers: { 'content-type': 'text/html; charset=utf-8' } });
+// Supabase shows web pages from functions as plain text, so the sign-in ends by sending the browser straight back into
+// the app (Connectors), which then shows whether it worked.
+const page = (title: string, line: string) => {
+  const ok = title === 'NeoSapien connected';
+  return new Response(null, { status: 302, headers: { location: `${APP_RETURN}?${ok ? 'connected=1' : `error=${encodeURIComponent(line)}`}` } });
+};
 
 Deno.serve(async req => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });

@@ -1,5 +1,10 @@
 # Changelog
 
+## 6 Nov 2026 — A neat Profile page; Privacy and permissions
+- Profile: your name and email at the top; About you, Language and Daily Wisdom in one card; Connectors and Privacy and permissions in another; Admin for admins; Log out at the bottom. Removed: the Signed-in card, Send feedback (Myra passes feedback to the team), Library, and the extra Back button.
+- New Privacy and permissions page: Apple Health, notifications, camera and photos, microphone and connectors (change any time), where your data is kept, and Delete my data.
+- NeoSapien sign-in now returns straight to Connectors instead of showing a page of code.
+
 ## 6 Nov 2026 — Connectors in Profile
 - Profile › Connectors: Apple Health and NeoSapien in one place (✓ On, or Connect), with Google Calendar, Gmail and Claude · ChatGPT marked "Soon". Coming back from the NeoSapien sign-in opens Connectors.
 

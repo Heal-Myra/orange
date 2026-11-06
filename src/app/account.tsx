@@ -1,4 +1,4 @@
-// Profile: who is signed in, where data is saved, sign out, delete my data.
+// Profile: who you are, your details, connectors, privacy and permissions, admin (admins only), log out.
 
 import { router } from 'expo-router';
 import { useState } from 'react';
@@ -7,7 +7,6 @@ import { Pressable, Share, Text, View } from 'react-native';
 import { Button, Card, Expandable, Heading, Note, Screen } from '../components/ui';
 import { useNeoSapien } from '../lib/neosapien';
 import { useHealth } from '../components/HealthSync';
-import { FeedbackBox } from '../components/FeedbackBox';
 import { useAuth } from '../lib/auth';
 import { usePendingRequests } from '../lib/adminAlerts';
 import { traditionName } from '../lib/wisdom';
@@ -49,93 +48,46 @@ const SYNC_TEXT = {
 } as const;
 
 export default function Account() {
-  const { session, online, signOut, deleteMyData, leaveGuest, admin, tradition } = useAuth();
+  const { session, online, signOut, leaveGuest, admin, tradition } = useAuth();
   const pending = usePendingRequests(); // 0 for everyone except admins
-  const { sync, syncError, clearDevice, profile } = useHeal();
-  const [confirm, setConfirm] = useState(false);
+  const { sync, syncError, profile } = useHeal();
   const [message, setMessage] = useState<string | null>(null);
 
   const invite = async () => {
     try { await Share.share({ message: INVITE }); }
     catch { setMessage(tr('Sharing is not available here. Send this link yourself: https://testflight.apple.com/join/Mcp2jHbc')); }
   };
+  const me = profile.me;
+  const aboutLine = me
+    ? `${me.weightKg} kg · ${me.goal === 'lose' ? tr('Lose {kg} kg', { kg: me.goalKg ?? 0 }) : me.goal === 'gain' ? tr('Gain {kg} kg', { kg: me.goalKg ?? 0 }) : tr('Keep weight')} · ${profile.kcal} kcal`
+    : tr('Not set yet');
 
-  const remove = async () => {
-    const err = await deleteMyData();
-    if (err) { setMessage(err); return; }
-    await clearDevice();
-    router.replace('/sign-in');
-  };
-
+  // A neat Profile (founder, 6 Nov 2026): who you are, your details in one card, connectors, privacy & permissions;
+  // admin for admins; log out at the very bottom. Feedback goes through Myra; the Library lives on the server.
   return (
     <Screen showDay={false}>
-      <Button kind="plain" title={tr('‹ Back to Today')} onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))} />
-      <Card>
-        <Heading>{session ? tr('Signed in') : tr('Not signed in')}</Heading>
-        <Text style={{ color: colors.ink }}>{session?.user.email ?? tr('You are using Happy Orange on this device only.')}</Text>
-        <Note>{tr(SYNC_TEXT[sync])}</Note>
-        {sync === 'error' && syncError ? <Text selectable style={{ color: colors.bad, fontSize: 12 }}>Details for Claude: {syncError}</Text> : null}
-        {session
-          ? <Button kind="plain" title={tr('Sign out')} onPress={async () => { await signOut(); router.replace('/sign-in'); }} />
-          : online ? <Button title={tr('Sign in to save online')} onPress={async () => { await leaveGuest(); router.replace('/sign-in'); }} /> : null}
+      <Card style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+        <View style={{ width: 52, height: 52, borderRadius: 26, backgroundColor: colors.accent + '18', alignItems: 'center', justifyContent: 'center' }}>
+          <Text style={{ fontSize: 22, fontWeight: '800', color: colors.accent }}>{(me?.name ?? session?.user.email ?? '?').trim().charAt(0).toUpperCase()}</Text>
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text style={{ fontSize: 19, fontWeight: '700', color: colors.ink }}>{me?.name || tr('Your profile')}</Text>
+          <Text style={{ color: colors.muted, fontSize: 13 }}>{session?.user.email ?? tr('You are using Happy Orange on this device only.')}</Text>
+          <Text style={{ color: sync === 'error' ? colors.warn : colors.muted, fontSize: 12, marginTop: 2 }}>{tr(SYNC_TEXT[sync])}</Text>
+          {sync === 'error' && syncError ? <Text selectable style={{ color: colors.muted, fontSize: 11 }}>Details for Claude: {syncError}</Text> : null}
+        </View>
       </Card>
 
-      <Pressable onPress={() => router.push('/language')}>
-        <Card style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-          <Ionicons name="language-outline" size={24} color={colors.accent} />
-          <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: 17, fontWeight: '600', color: colors.ink }}>{tr('Language')}</Text>
-            <Note>{lang() === 'hi' ? 'हिंदी' : 'English'} · {tr('tap to change')}</Note>
-          </View>
-          <Ionicons name="chevron-forward" size={20} color={colors.muted} />
-        </Card>
-      </Pressable>
+      <Card style={{ paddingVertical: 4, gap: 0 }}>
+        <Row icon="body-outline" title={tr('About you')} line={aboutLine} onPress={() => router.push('/about-you')} />
+        <Row icon="language-outline" title={tr('Language')} line={lang() === 'hi' ? 'हिंदी' : 'English'} onPress={() => router.push('/language')} />
+        <Row icon="sparkles-outline" title={tr('Daily Wisdom')} line={tradition ? tr(traditionName(tradition)) : tr('Not chosen yet (Bhagavad Gita)')} onPress={() => router.push('/tradition')} last />
+      </Card>
 
-      <Pressable onPress={() => router.push('/about-you')}>
-        <Card style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-          <Ionicons name="body-outline" size={24} color={colors.accent} />
-          <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: 17, fontWeight: '600', color: colors.ink }}>{tr('About you')}</Text>
-            <Note>{profile.me
-              ? `${profile.me.weightKg} kg · ${profile.me.goal === 'lose' ? tr('Lose {kg} kg', { kg: profile.me.goalKg ?? 0 }) : profile.me.goal === 'gain' ? tr('Gain {kg} kg', { kg: profile.me.goalKg ?? 0 }) : tr('Keep weight')} · ${profile.kcal} kcal`
-              : tr('Not set yet')} · {tr('tap to change')}</Note>
-          </View>
-          <Ionicons name="chevron-forward" size={20} color={colors.muted} />
-        </Card>
-      </Pressable>
-
-      {/* Connectors (founder, 6 Nov 2026): Apple Health, NeoSapien and the ones coming, in one place. */}
-      {session ? <ConnectorsRow /> : null}
-
-      <Pressable onPress={() => router.push('/tradition')}>
-        <Card style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-          <Ionicons name="sparkles-outline" size={24} color={colors.accent} />
-          <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: 17, fontWeight: '600', color: colors.ink }}>{tr('Daily Wisdom')}</Text>
-            <Note>{tradition ? tr(traditionName(tradition)) : tr('Not chosen yet (Bhagavad Gita)')} · {tr('tap to change')}</Note>
-          </View>
-          <Ionicons name="chevron-forward" size={20} color={colors.muted} />
-        </Card>
-      </Pressable>
-
-      <Pressable onPress={() => router.push('/library')}>
-        <Card style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-          <Ionicons name="library-outline" size={24} color={colors.accent} />
-          <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: 17, fontWeight: '600', color: colors.ink }}>{tr('Library')}</Text>
-            <Note>{tr('Indian foods, Gita, Tao Te Ching and exercises')}</Note>
-          </View>
-          <Ionicons name="chevron-forward" size={20} color={colors.muted} />
-        </Card>
-      </Pressable>
-
-
-      {/* Send feedback (founder, 31 Oct 2026): moved here from the top of every page; folded until tapped. */}
       {session ? (
-        <Card style={{ paddingVertical: 4 }}>
-          <Expandable icon="chatbubble-ellipses-outline" title={tr('Send feedback')} status={tr('Tell us what to keep or improve')}>
-            <View style={{ paddingBottom: 12 }}><FeedbackBox area="Profile" always /></View>
-          </Expandable>
+        <Card style={{ paddingVertical: 4, gap: 0 }}>
+          <ConnectorsRow />
+          <Row icon="shield-checkmark-outline" title={tr('Privacy and permissions')} line={tr('Permissions, where your data is kept, delete your data')} onPress={() => router.push('/privacy')} last />
         </Card>
       ) : null}
 
@@ -146,43 +98,35 @@ export default function Account() {
           {pending > 0 && <Text style={{ color: colors.brand, fontWeight: '700' }}>● {tr('{n} AI requests waiting for you', { n: pending })}</Text>}
           <Button title={tr('Open admin')} onPress={() => router.push('/admin')} />
           <Button kind="plain" title={tr('Invite a friend to test')} onPress={invite} />
+          {message ? <Note>{message}</Note> : null}
         </Card>
       )}
 
-      {session && (
-        <Card>
-          <Heading>{tr('Delete my data')}</Heading>
-          <Note>{tr('This permanently removes every entry and setting saved to your account, then signs you out.')}</Note>
-          {confirm ? (
-            <View style={{ gap: 8 }}>
-              <Text style={{ color: colors.bad, fontWeight: '600' }}>{tr('Are you sure? This cannot be undone.')}</Text>
-              <Button title={tr('Yes, delete everything')} onPress={remove} />
-              <Button kind="plain" title={tr('Keep my data')} onPress={() => setConfirm(false)} />
-            </View>
-          ) : <Button kind="plain" title={tr('Delete my data…')} onPress={() => setConfirm(true)} />}
-          {message ? <Text style={{ color: colors.bad }}>{message}</Text> : null}
-        </Card>
-      )}
+      {session
+        ? <Button kind="plain" title={tr('Log out')} onPress={async () => { await signOut(); router.replace('/sign-in'); }} />
+        : online ? <Button title={tr('Sign in to save online')} onPress={async () => { await leaveGuest(); router.replace('/sign-in'); }} /> : null}
       {/* Which version is running (25 Oct 2026), so a missing quick update can be spotted. */}
       <Text style={{ color: colors.muted, fontSize: 12, textAlign: 'center' }}>{versionLine()}</Text>
     </Screen>
   );
 }
 
+/** One row inside a grouped card: icon, name, one-line status, chevron. */
+function Row({ icon, title, line, onPress, last }: { icon: keyof typeof Ionicons.glyphMap; title: string; line: string; onPress: () => void; last?: boolean }) {
+  return (
+    <Pressable onPress={onPress} accessibilityRole="button" style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, borderBottomWidth: last ? 0 : 1, borderBottomColor: colors.line }}>
+      <Ionicons name={icon} size={22} color={colors.accent} />
+      <View style={{ flex: 1 }}>
+        <Text style={{ fontSize: 16, fontWeight: '600', color: colors.ink }}>{title}</Text>
+        <Text style={{ fontSize: 13, color: colors.muted }} numberOfLines={1}>{line}</Text>
+      </View>
+      <Ionicons name="chevron-forward" size={18} color={colors.muted} />
+    </Pressable>
+  );
+}
 
 function ConnectorsRow() {
   const health = useHealth(), ns = useNeoSapien();
   const names = [health.connected ? 'Apple Health' : null, ns.connected ? 'NeoSapien' : null].filter(Boolean) as string[];
-  return (
-    <Pressable onPress={() => router.push('/connectors')}>
-      <Card style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-        <Ionicons name="git-network-outline" size={24} color={colors.accent} />
-        <View style={{ flex: 1 }}>
-          <Text style={{ fontSize: 17, fontWeight: '600', color: colors.ink }}>{tr('Connectors')}</Text>
-          <Note>{names.length ? `${tr('{n} connected', { n: names.length })} · ${names.join(', ')}` : tr('Apple Health, NeoSapien and more')}</Note>
-        </View>
-        <Ionicons name="chevron-forward" size={20} color={colors.muted} />
-      </Card>
-    </Pressable>
-  );
+  return <Row icon="git-network-outline" title={tr('Connectors')} line={names.length ? `${tr('{n} connected', { n: names.length })} · ${names.join(', ')}` : tr('Apple Health, NeoSapien and more')} onPress={() => router.push('/connectors')} />;
 }

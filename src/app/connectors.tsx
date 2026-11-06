@@ -1,7 +1,7 @@
 // Connectors (founder, 6 Nov 2026): every outside connection in one place. Each says in one line what it brings to Happy
 // Orange; connected ones show a green tick, the rest a Connect button or "Soon".
 
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useState, type ReactNode } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { Button, Note } from '../components/ui';
@@ -39,7 +39,8 @@ export default function Connectors() {
   const health = useHealth();
   const ns = useNeoSapien();
   const [open, setOpen] = useState<string | null>(null);
-  const [msg, setMsg] = useState<string | null>(null);
+  const back = useLocalSearchParams<{ error?: string }>();
+  const [msg, setMsg] = useState<string | null>(back.error ? String(back.error) : null);
   const label = { fontSize: 11, fontWeight: '800' as const, letterSpacing: 0.6, color: colors.muted, marginTop: 6, marginLeft: 4 };
   const healthRow = health.available ? (
     <Row key="health" icon="❤️" bg="#F6E3E3" title="Apple Health" line={tr('Steps, sleep, weight, heart, mindful minutes')}

@@ -5,7 +5,7 @@ export function redirectSystemPath({ path }: { path: string; initial: boolean })
   try {
     if (path.includes('dataUrl=')) return '/';
     // Back from the NeoSapien sign-in page (decision 0050): show Connectors, now with NeoSapien connected.
-    if (path.includes('neosapien')) return '/connectors';
+    if (path.includes('neosapien')) { const q = path.indexOf('?'); return `/connectors${q >= 0 ? path.slice(q) : ''}`; }
     return path;
   } catch {
     return '/';
