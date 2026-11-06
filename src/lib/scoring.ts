@@ -3,7 +3,7 @@
 // A working model to help people understand themselves, not a medical measure
 // (The Orange Book, Chapter 2). Weights are documented in docs/scoring.md.
 
-import { FAST_FROM, FOOD_V3_FROM, MEAL_SHARE, aimShares, fastHabit, fastHoursOf, fastPoints, foodV3 } from './fasting';
+import { FAST_FROM, FOOD_V3_FROM, fastCurve, MEAL_SHARE, aimShares, fastHabit, fastHoursOf, fastPoints, foodV3 } from './fasting';
 import { DEFAULT_PROFILE, type ContentCategoryId, type DayLog, type Meal, type MediaSession, type PracticeId, type Profile } from './types';
 
 export const CONTENT_CATEGORIES: { id: ContentCategoryId; name: string; weight: number }[] = [
@@ -67,6 +67,7 @@ export function foodScore(t: MealTotals, targetKcal: number) {
   return { total: kcal + protein + fibre + fat, kcal, protein, fibre, fat };
 }
 
+export const FAST_CURVE_FROM = '2026-11-05'; // the founder's Wednesday–Friday fast counts from Thursday
 export const FAST_KCAL = 60; // black tea and coffee through a day stay under this
 
 /** Body: food 40, sleep 30, movement 30 (founder, 24 Oct 2026). Returns null when nothing is logged. */
@@ -99,8 +100,13 @@ export function bodyScore(d: DayLog, P: Profile, now: Date = new Date()): BodySc
   if (d.fasting && totals.kcal <= FAST_KCAL) nutrition = 40;
   else if (v3) {
     const energy = totals.p * 4 + totals.c * 4 + totals.f * 9;
-    nutrition = foodV3(d, P.me, d.meals.length ? foodScore(totals, P.kcal).total : null,
-      energy ? { carb: (totals.c * 4) / energy, fat: (totals.f * 9) / energy } : null, aimShares(P.kcal, P.protein), now).total;
+    const v = foodV3(d, P.me, d.meals.length ? foodScore(totals, P.kcal).total : null,
+      energy ? { carb: (totals.c * 4) / energy, fat: (totals.f * 9) / energy } : null, aimShares(P.kcal, P.protein), now);
+    // From 6 Nov 2026: the higher of the usual Food and the points for the hours fasted (longer fasts rise faster).
+    // Only for people who fast on purpose (a fasting habit, or "I'm fasting today"), so a day with meals not yet
+    // logged never looks like a long fast.
+    const fasts = !!habit || !!d.fasting || !!fastHabit(P.me);
+    nutrition = fasts && (d.date ?? '') >= FAST_CURVE_FROM ? Math.max(v.total, fastCurve(v.fastHours)) : v.total;
   }
   else if (habit) {
     const f = fastHoursOf(d, habit, now);

@@ -72,6 +72,7 @@ export function FastStatus({ dinnerGap }: { dinnerGap?: number | null } = {}) {
       <Ionicons name="moon-outline" size={18} color={SKY_INK} />
       <View style={{ flex: 1 }}>
         <Text style={{ color: SKY_INK, fontSize: 14.5 }}>{text}</Text>
+        {f.hours >= 24 ? <Text style={{ color: SKY_INK, fontSize: 13, opacity: 0.85 }}>{tr('The deep part of your fast. Long fasts aren\'t for everyone: check with your doctor if you take medicines.')}</Text> : null}
         {dinnerGap != null ? <Text style={{ color: SKY_INK, fontSize: 13, opacity: 0.85 }}>{tr('Dinner {h} h before sleep (aim 3 h)', { h: fmtHours(Math.max(0, dinnerGap)) })}</Text> : null}
       </View>
     </View>

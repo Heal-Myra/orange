@@ -53,3 +53,5 @@ If the person switches on "I'm fasting today" on the Food card and the day's foo
 
 
 **Long fasts (6 Nov 2026):** when the day before had no meals, today's fast counts from that day's start (up to three days back), e.g. Wednesday dinner to Friday lunch counts as one fast of about 40 hours.
+
+**Fasting curve (6 Nov 2026):** for people who fast on purpose (a fasting habit, or "I'm fasting today"), Food is the higher of the usual Food score and points for the hours of the fast: 12 h 8, 16 h 12, 24 h 20, 36 h 40 (straight lines between; steepest from 24 to 36 h; no more after 48 h). From 24 h the card adds a gentle care line.

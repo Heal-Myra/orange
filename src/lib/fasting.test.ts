@@ -86,3 +86,17 @@ describe('a fast longer than a night (6 Nov 2026)', () => {
     expect(carriedFastFrom({ '2026-11-05': thu, '2026-11-06': emptyDay('2026-11-06') }, '2026-11-06')).toBeNull();
   });
 });
+
+describe('fasting curve (6 Nov 2026)', () => {
+  it('12 h 8, 16 h 12, 24 h 20, 36 h 40, no more after', async () => {
+    const { fastCurve } = await import('./fasting');
+    expect([12, 16, 24, 30, 36, 50].map(h => Math.round(fastCurve(h)))).toEqual([8, 12, 20, 30, 40, 40]);
+  });
+  it('a 40-hour fast ending at Friday lunch gives Food 40', () => {
+    const p = P(me({ fast: { hours: 18, lastMeal: '21:00' } }));
+    const fri = emptyDay('2026-11-06');
+    fri.fastFrom = new Date(2026, 10, 4, 20, 0).toISOString();
+    fri.meals = [{ name: 'Lunch', kcal: 600, p: 25, c: 70, f: 20, source: 'manual', at: new Date(2026, 10, 6, 12, 30).toISOString() }];
+    expect(bodyScore(fri, p, new Date(2026, 10, 6, 14, 0))!.nutrition).toBe(40);
+  });
+});

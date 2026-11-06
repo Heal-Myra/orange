@@ -119,3 +119,18 @@ export function carriedFastFrom(days: Record<string, DayLog | undefined>, date: 
   return null;
 }
 const iso_ = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
+/**
+ * Food points from the hours of one fast (founder, 6 Nov 2026): a normal night counts as today, a long fast rises
+ * faster, steepest from 24 to 36 hours, full 40 from 36 hours; no more after 48. Food takes the higher of this and
+ * the usual meals score, so days without a fast lose nothing.
+ */
+export const FAST_CURVE: [number, number][] = [[0, 0], [12, 8], [16, 12], [24, 20], [36, 40]];
+export function fastCurve(hours: number): number {
+  const h = Math.max(0, Math.min(48, hours));
+  for (let i = 1; i < FAST_CURVE.length; i++) {
+    const [h0, p0] = FAST_CURVE[i - 1], [h1, p1] = FAST_CURVE[i];
+    if (h <= h1) return p0 + ((p1 - p0) * (h - h0)) / (h1 - h0);
+  }
+  return 40;
+}
