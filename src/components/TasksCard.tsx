@@ -137,7 +137,7 @@ function MakingAHabit() {
 }
 
 const REPEATS: { id: Repeat | 'once'; label: string }[] = [
-  { id: 'once', label: 'Once' }, { id: 'daily', label: 'Daily' }, { id: 'weekdays', label: 'Weekdays' }, { id: 'weekly', label: 'Weekly' },
+  { id: 'once', label: 'Once' }, { id: 'daily', label: 'Daily' }, { id: 'weekdays', label: 'Weekdays' }, { id: 'weekly', label: 'Weekly' }, { id: 'monthly', label: 'Monthly' },
 ];
 
 function AddTask({ area }: { area: Area }) {
@@ -156,8 +156,11 @@ function AddTask({ area }: { area: Area }) {
     if (!title.trim()) return;
     if (rep !== 'once') {
       // A repeating to-do is a habit (founder, 23 Oct 2026): its own bar, and Myra shows it at its time.
-      addHabit({ title, area, repeat: rep, at: read.at, weekday: rep === 'weekly' ? read.weekday ?? new Date().getDay() : undefined });
-      setNote(tr('Added to Making a habit{at}: on Myra recommends every day, 21 days to make it stick.', { at: read.at ? ` · ${read.at}` : '' }));
+      // Monthly (rent, EMI; founder, 7 Nov 2026): on the day picked, the day in the words ("5th"), or today's date.
+      const dom = rep === 'monthly' ? (picked ? Number(picked.slice(8, 10)) : read.dayOfMonth ?? new Date().getDate()) : undefined;
+      addHabit({ title, area, repeat: rep, at: read.at, weekday: rep === 'weekly' ? read.weekday ?? new Date().getDay() : undefined, dayOfMonth: dom });
+      setNote(rep === 'monthly' ? tr('Added: every month on day {d}{at}. Myra reminds you that morning.', { d: dom ?? 1, at: read.at ? ` · ${read.at}` : '' })
+        : tr('Added to Making a habit{at}: on Myra recommends every day, 21 days to make it stick.', { at: read.at ? ` · ${read.at}` : '' }));
     } else {
       const asked = picked ?? (days == null ? undefined : shiftISO(todayISO(), days));
       const placed = add(title, area, asked);
@@ -207,6 +210,12 @@ function AddTask({ area }: { area: Area }) {
             </Pressable>
           ))}
           {rep !== 'once' ? <Text style={{ fontSize: 12, color: colors.muted }}>{read.at ? tr('at {t}', { t: read.at }) : tr('add a time, e.g. "at 9 am"')}</Text> : null}
+          {rep === 'monthly' ? (
+            <Pressable onPress={() => setCal(c => !c)} style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingVertical: 6, paddingHorizontal: 12, borderRadius: 99, borderWidth: 1, borderColor: colors.accent, backgroundColor: colors.accent + '14' }}>
+              <Ionicons name="calendar-outline" size={14} color={colors.accent} />
+              <Text style={{ color: colors.accent, fontSize: 13 }}>{tr('Every month on day {d}', { d: picked ? Number(picked.slice(8, 10)) : read.dayOfMonth ?? new Date().getDate() })}</Text>
+            </Pressable>
+          ) : null}
         </View>
       ) : null}
       {title.trim() && rep === 'once' ? (
@@ -227,6 +236,7 @@ function AddTask({ area }: { area: Area }) {
           <Text style={{ alignSelf: 'center', fontSize: 12, color: colors.muted }}>{days == null && !picked ? tr('or let Myra choose') : ''}</Text>
         </View>
       ) : null}
+      {title.trim() && rep === 'monthly' && cal ? <DatePicker value={picked ?? undefined} onPick={d => { setPicked(d); setCal(false); }} /> : null}
       {title.trim() && rep === 'once' && cal ? <DatePicker value={picked ?? undefined} full={d => loadOn(tasks, area, d) >= PER_AREA_DAY} onPick={d => { setPicked(d); setDays(null); setCal(false); }} /> : null}
       {attach.status}
       {found ? (
@@ -340,7 +350,7 @@ export function HabitsBar() {
       ) : <Note>{tr('No habits today.')}</Note>}
       {edit ? <Note>{tr('Tap a habit to remove it.')}</Note> : <Note>{tr('{done} of {n} done today', { done: list.filter(h => done.includes(h.id)).length, n: list.length })}</Note>}
       {edit ? habits.filter(h => !list.includes(h) && !forming(h, date)).map(h => (
-        <Pressable key={h.id} onPress={() => removeHabit(h.id)}><Text style={{ color: colors.muted }}>✕ {h.title} · {tr(repeatName(h.repeat))}</Text></Pressable>
+        <Pressable key={h.id} onPress={() => removeHabit(h.id)}><Text style={{ color: colors.muted }}>✕ {h.title} · {tr(repeatName(h.repeat))}{h.repeat === 'monthly' && h.dayOfMonth ? ` · ${tr('day {d}', { d: h.dayOfMonth })}` : ''}</Text></Pressable>
       )) : null}
     </Card>
   );

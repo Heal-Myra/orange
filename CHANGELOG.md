@@ -1,5 +1,8 @@
 # Changelog
 
+## 7 Nov 2026 — Monthly reminders
+- Clear your mind: a new **Monthly** repeat for things like rent and EMI. Pick the day of the month (or write "on 5th every month"); Myra shows it that morning with a phone reminder at its time. In short months it falls on the last day. Monthly reminders skip the 21-day "Making a habit" track.
+
 ## 6 Nov 2026 — Long fasts rise faster on the Food card
 - For people who fast on purpose, Food is the higher of the usual score and the fasting curve: 12 h 8, 16 h 12, 24 h 20, 36 h or more 40 (steepest from 24 to 36 h; no more after 48 h). From 24 h the card says "The deep part of your fast" with a gentle line to check with a doctor if taking medicines.
 

@@ -37,3 +37,14 @@ describe('habit names', () => {
     expect(habitTitle('Gym every Monday 6:30 pm')).toBe('Gym');
   });
 });
+
+describe('monthly reminders (7 Nov 2026)', async () => {
+  const { habitOn, readHabit, forming } = await import('./habits');
+  it('reads "rent on 5th every month", shows on that day, uses the last day in short months', () => {
+    expect(readHabit('Pay rent on 5th every month')).toMatchObject({ repeat: 'monthly', dayOfMonth: 5 });
+    const h = { id: 'r', title: 'Rent', area: 'family' as const, repeat: 'monthly' as const, dayOfMonth: 31, createdAt: '2026-11-07' };
+    expect(habitOn(h, new Date(2026, 10, 30))).toBe(true);  // November has 30 days
+    expect(habitOn(h, new Date(2026, 11, 30))).toBe(false); // December: the 31st
+    expect(forming(h, '2026-11-08')).toBe(false);
+  });
+});

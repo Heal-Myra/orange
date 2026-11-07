@@ -1618,4 +1618,8 @@ export const HI: Record<string, string> = {
   "Myra's reminders at the right time of day": "सही समय पर मायरा की याद",
   "Myra's answers come from Claude through a paid service that does not use your data to train AI.": "मायरा के जवाब Claude से एक भुगतान वाली सेवा के ज़रिए आते हैं, जो आपके डेटा से AI को नहीं सिखाती।",
   "The deep part of your fast. Long fasts aren't for everyone: check with your doctor if you take medicines.": 'आपके उपवास का गहरा हिस्सा। लंबा उपवास हर किसी के लिए नहीं होता: अगर आप दवा लेते हैं तो अपने डॉक्टर से पूछ लें।',
+  'Monthly': 'हर महीने',
+  'Added: every month on day {d}{at}. Myra reminds you that morning.': 'जोड़ दिया: हर महीने {d} तारीख को{at}। मायरा उस सुबह याद दिलाएगी।',
+  'Every month on day {d}': 'हर महीने {d} तारीख को',
+  'day {d}': '{d} तारीख',
 };

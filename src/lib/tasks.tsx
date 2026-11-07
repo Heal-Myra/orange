@@ -26,7 +26,7 @@ interface TasksState {
   doneToday: number;
   add: (title: string, area: Area, due?: string) => string | undefined; // returns the day it went on (at most three a day per group)
   habits: Habit[];
-  addHabit: (h: { title: string; area: Area; repeat: Repeat; at?: string; weekday?: number }) => void;
+  addHabit: (h: { title: string; area: Area; repeat: Repeat; at?: string; weekday?: number; dayOfMonth?: number }) => void;
   removeHabit: (id: string) => void;
   tickHabit: (id: string) => void; // done (or undone) today
   complete: (id: string) => void;

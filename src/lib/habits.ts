@@ -4,13 +4,14 @@
 
 import type { Area } from './taskPlan';
 
-export type Repeat = 'daily' | 'weekdays' | 'weekly';
+export type Repeat = 'daily' | 'weekdays' | 'weekly' | 'monthly';
 export interface Habit {
   id: string;
   title: string;
   area: Area;
   repeat: Repeat;
   weekday?: number;   // 0 Sunday … 6 Saturday, for weekly
+  dayOfMonth?: number; // 1 … 31, for monthly (rent, EMI; founder, 7 Nov 2026); a short month uses its last day
   at?: string;        // "HH:MM", 24-hour; none = any time of the day
   createdAt: string;
 }
@@ -18,10 +19,14 @@ export interface Habit {
 const pad = (n: number) => String(n).padStart(2, '0');
 
 /** Reads a repeat and a time from the words, e.g. "Call Dad daily at 9 AM" → daily, 09:00. */
-export function readHabit(text: string): { repeat?: Repeat; at?: string; weekday?: number } {
+export function readHabit(text: string): { repeat?: Repeat; at?: string; weekday?: number; dayOfMonth?: number } {
   const t = text.toLowerCase();
-  const out: { repeat?: Repeat; at?: string; weekday?: number } = {};
-  if (/\b(every ?day|daily|each day|roz|rozana|har din)\b/.test(t)) out.repeat = 'daily';
+  const out: { repeat?: Repeat; at?: string; weekday?: number; dayOfMonth?: number } = {};
+  if (/\b(monthly|every month|each month|har mahine|mahine ki)\b/.test(t)) {
+    out.repeat = 'monthly';
+    const dm = t.match(/\b([1-9]|[12]\d|3[01])(st|nd|rd|th)\b/);
+    if (dm) out.dayOfMonth = Number(dm[1]);
+  } else if (/\b(every ?day|daily|each day|roz|rozana|har din)\b/.test(t)) out.repeat = 'daily';
   else if (/\b(weekdays?|mon(day)?\s*(to|-)\s*fri(day)?)\b/.test(t)) out.repeat = 'weekdays';
   else {
     const days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
@@ -40,8 +45,13 @@ export function readHabit(text: string): { repeat?: Repeat; at?: string; weekday
 }
 
 /** Whether the habit is for this day. */
-export const habitOn = (h: Habit, d: Date) =>
-  h.repeat === 'daily' || (h.repeat === 'weekdays' ? d.getDay() >= 1 && d.getDay() <= 5 : d.getDay() === (h.weekday ?? new Date(h.createdAt).getDay()));
+export const habitOn = (h: Habit, d: Date) => {
+  if (h.repeat === 'monthly') {
+    const last = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+    return d.getDate() === Math.min(h.dayOfMonth ?? new Date(h.createdAt).getDate(), last);
+  }
+  return h.repeat === 'daily' || (h.repeat === 'weekdays' ? d.getDay() >= 1 && d.getDay() <= 5 : d.getDay() === (h.weekday ?? new Date(h.createdAt).getDay()));
+};
 
 /** Today's habits in time order (habits without a time last). */
 export const habitsToday = (list: Habit[], d = new Date()) =>
@@ -71,17 +81,17 @@ const dayStart = (iso: string) => {
 /** Day of the habit: 1 on the day it was made. */
 export const habitDay = (h: Habit, todayIso: string) => Math.floor((dayStart(todayIso) - dayStart(h.createdAt)) / 86_400_000) + 1;
 /** Still being formed: within its first 21 days. */
-export const forming = (h: Habit, todayIso: string) => habitDay(h, todayIso) <= FORMING_DAYS;
+export const forming = (h: Habit, todayIso: string) => h.repeat !== 'monthly' && habitDay(h, todayIso) <= FORMING_DAYS; // a monthly reminder is not a habit to form
 /** How many days it was ticked so far. */
 export const timesDone = (h: Habit, days: Record<string, { habitsDone?: string[] } | undefined>) =>
   Object.entries(days).filter(([iso, d]) => dayStart(iso) >= dayStart(h.createdAt) && d?.habitsDone?.includes(h.id)).length;
 
-export const repeatName = (r: Repeat) => (r === 'daily' ? 'Daily' : r === 'weekdays' ? 'Weekdays' : 'Weekly');
+export const repeatName = (r: Repeat) => (r === 'daily' ? 'Daily' : r === 'weekdays' ? 'Weekdays' : r === 'monthly' ? 'Monthly' : 'Weekly');
 
 /** The habit's name without the repeat and time words: "Call Dad daily at 9 AM" → "Call Dad". */
 export function habitTitle(text: string): string {
   const t = text
-    .replace(/\b(every ?day|daily|each day|weekdays?|weekly|every week|(every|each)\s+(sun|mon|tue|wed|thu|fri|sat)[a-z]*)\b/gi, '')
+    .replace(/\b(every ?day|daily|each day|weekdays?|weekly|every week|monthly|every month|each month|(every|each)\s+(sun|mon|tue|wed|thu|fri|sat)[a-z]*)\b/gi, '')
     .replace(/\b(at\s*)?\d{1,2}([:.]?\d{2})?\s*(am|pm|a\.m\.|p\.m\.)/gi, '')
     .replace(/\bat\s*([01]?\d|2[0-3])[:.]?[0-5]\d\b/gi, '')
     .replace(/\s{2,}/g, ' ').replace(/\s+([,.])/g, '$1').trim().replace(/[,.\-–]+$/, '').trim();
