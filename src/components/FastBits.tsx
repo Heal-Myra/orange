@@ -23,10 +23,10 @@ export function useFast() {
   useEffect(() => { const t = setInterval(() => tick(x => x + 1), 60_000); return () => clearInterval(t); }, []);
   if (date >= FOOD_V3_FROM) {
     const v = foodV3Of(day, profile);
-    return { habit: { hours: v.fastTarget, lastMeal: '' }, hours: v.fastHours, since: v.since, ongoing: v.ongoing && !day.meals.length };
+    return { asked: v.asked, habit: { hours: v.fastTarget, lastMeal: '' }, hours: v.fastHours, since: v.since, ongoing: v.ongoing && !day.meals.length };
   }
   const habit = date >= FAST_FROM ? fastHabit(profile.me) : null;
-  return habit ? { habit, ...fastHoursOf(day, habit) } : null;
+  return habit ? { asked: true, habit, ...fastHoursOf(day, habit) } : null;
 }
 
 /** Today's Food parts (decision 0047). */
@@ -63,6 +63,13 @@ const clock = (d: Date) => d.toLocaleTimeString(undefined, { hour: 'numeric', mi
 export function FastStatus({ dinnerGap }: { dinnerGap?: number | null } = {}) {
   const f = useFast();
   if (!f) return null;
+  // No fast said (decision 0047, 9 Nov 2026): no fasting hours, only the dinner-time line.
+  if (!f.asked) return dinnerGap == null ? null : (
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10, paddingHorizontal: 12, borderRadius: 14, backgroundColor: PASTEL.sky + '22' }}>
+      <Ionicons name="moon-outline" size={18} color={SKY_INK} />
+      <Text style={{ flex: 1, color: SKY_INK, fontSize: 14.5 }}>{tr('Dinner {h} h before sleep (aim 3 h)', { h: fmtHours(Math.max(0, dinnerGap)) })}</Text>
+    </View>
+  );
   const left = f.habit.hours - f.hours;
   const text = f.ongoing
     ? left > 0 ? tr('Fasting since {t} · {h} h to your {n}', { t: clock(f.since), h: fmtHours(left), n: f.habit.hours }) : tr('Fast kept: {h} h · eat when you are ready', { h: fmtHours(f.hours) })

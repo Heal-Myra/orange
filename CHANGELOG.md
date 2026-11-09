@@ -1,5 +1,8 @@
 # Changelog
 
+## 9 Nov 2026 — Fasting counts only when you say so
+- Testers often forget to photograph a meal, and the gap showed as a long fast ("Fast kept: 25 h"). Now the hours without food count only when you tick "I'm fasting today" (or have a fasting habit in About you). Otherwise the Food card shows just the dinner-time line, and its 8 fasting points go to Meals (Meals 32 + Early dinner 8). Days before today keep their scores.
+
 ## 9 Nov 2026 — Meal photos: quick first, checked after, and "My dishes" (decision 0053)
 - A meal photo now shows Myra's quick reading in a few seconds; add it at once. Meanwhile the careful IFCT 2017 check runs on our server and its numbers replace the quick ones by themselves (coral "Myra is double-checking with IFCT…", then green "Checked with IFCT 2017"), even if you closed the app. Numbers you changed always stay.
 - **My dishes:** Myra remembers your own confirmed dishes. When a photo shows one of them, she uses your numbers for today's portion ("YOURS · Your usual"), with no wait for a check.

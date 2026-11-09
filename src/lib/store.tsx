@@ -4,7 +4,7 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppState, Platform } from 'react-native';
-import { carriedFastFrom } from './fasting';
+import { carriedFastFrom, fastHabit } from './fasting';
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useAuth } from './auth';
 import { shiftISO, todayISO } from './dates';
@@ -199,9 +199,10 @@ export function HealProvider({ children }: { children: ReactNode }) {
   // real start, not from last night (founder, 6 Nov 2026).
   useEffect(() => {
     if (!ready) return;
+    // Only for a fast the person said (founder, 9 Nov 2026): a day with no meals logged is usually a forgotten photo.
     const today = todayISO(), from = carriedFastFrom(days, today);
-    if (from) updateOn(today, d => { if (!d.fastFrom) d.fastFrom = from; });
-  }, [ready, days, updateOn]);
+    if (from && (days[today]?.fasting || fastHabit(profile.me))) updateOn(today, d => { if (!d.fastFrom) d.fastFrom = from; });
+  }, [ready, days, updateOn, profile.me]);
 
 
   const setProfile = useCallback((p: Profile) => {
