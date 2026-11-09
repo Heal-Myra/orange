@@ -1,5 +1,8 @@
 # Changelog
 
+## 9 Nov 2026 — Reading a plate is faster
+- A tester waited a long time on "Reading your plate…". Now the careful and the quick AI start together: the careful one's answer is used when it comes within 18 seconds, otherwise the first answer. The IFCT 2017 matching runs only when there is time, so a plate comes back in well under a minute, usually in 10–25 seconds.
+
 ## 9 Nov 2026 — A screenshot of a plate is a meal
 - A tester sent Myra a screenshot of her Food card with her lunch photo in it. Myra treated it as "something else" and wrote a long reply instead of offering "Add to my day". Now a screenshot whose main picture is a plate counts as a meal, and Myra offers to add it to Food, as she does for a camera photo.
 

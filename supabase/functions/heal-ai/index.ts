@@ -186,8 +186,13 @@ Reply with JSON only:
  "insight":"one natural, food-first tweak as ONE direct instruction of at most 10 words, e.g. Add curd to the next meal."}
 If there is no food: {"items":[],"confidence":"low","note":"${image ? 'No food found in the photo.' : 'No food found in the description.'}","insight":""}`;
   const sys1 = `${ORANGE_BOOK} You are also a careful nutrition analyst.`;
-  let step1 = await within(askJson(ask, 'smart', sys1, prompt1, image ?? undefined), 32_000);
-  if (step1 === SLOW) step1 = await askJson(ask, 'quick', sys1, prompt1, image ?? undefined);
+  // Both models start together (tester, 9 Nov 2026: "Reading your plate…" for a long time). The careful one is used when
+  // it answers within 18 s; otherwise whichever answers first. The quick one costs little.
+  const careful = askJson(ask, 'smart', sys1, prompt1, image ?? undefined);
+  const quick = askJson(ask, 'quick', sys1, prompt1, image ?? undefined);
+  careful.catch(() => {}); quick.catch(() => {});
+  let step1 = await within(careful, 18_000).catch(() => SLOW);
+  if (step1 === SLOW) step1 = await Promise.any([careful, quick]);
 
   const items = Array.isArray(step1.items) ? step1.items : [];
   const ingredients: { item: number; ingredient: string; grams: number; candidates: ReturnType<typeof searchIfct> }[] = [];
@@ -196,12 +201,12 @@ If there is no food: {"items":[],"confidence":"low","note":"${image ? 'No food f
 
   let picks: Record<string, string | null> = {};
   // Matching to IFCT 2017 adds a second AI call; when time is short, the AI's own estimate stands (marked "estimate").
-  if (ingredients.some(x => x.candidates.length) && Date.now() - t0 < 38_000) {
+  if (ingredients.some(x => x.candidates.length) && Date.now() - t0 < 30_000) {
     const list = ingredients.map((x, n) => `${n}. ${x.ingredient}: ${x.candidates.map(c => `${c.code} = ${c.name}`).join(' | ') || 'no candidates'}`).join('\n');
     const step2 = await within(askJson(ask, 'quick', ORANGE_BOOK,
 `For each ingredient, choose the IFCT 2017 food code that matches it best, or null if none is a fair match (for example, raw versus cooked forms are usually fine; a different food is not).
 ${list}
-Reply with JSON only: {"picks":{"0":"CODE or null","1":"CODE or null"}}`), Math.max(5_000, 50_000 - (Date.now() - t0)));
+Reply with JSON only: {"picks":{"0":"CODE or null","1":"CODE or null"}}`), Math.max(5_000, 40_000 - (Date.now() - t0)));
     picks = step2 === SLOW ? {} : step2.picks ?? {};
   }
 
