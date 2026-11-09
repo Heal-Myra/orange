@@ -9,7 +9,7 @@ import { HealthLine, useHealth } from '../../components/HealthSync';
 import { Dots, Rows, StatRow } from '../../components/StatRows';
 import { MacroMix, NutritionTable, aimMix } from '../../components/MacroMix';
 import { bmiOf, fibreTarget, planFor } from '../../lib/targets';
-import { MealPhoto } from '../../components/MealPhoto';
+import { CheckLine, MealPhoto } from '../../components/MealPhoto';
 import { FoodPlanRow } from '../../components/FoodPlan';
 import { MealRow } from '../../components/MealRow';
 import { CareNote } from '../../components/CareCard';
@@ -87,6 +87,8 @@ export default function Body() {
               </Pressable>
             ) : null}
           </View>
+          {day.meals.some(m => m.check) ? <CheckLine kind="logged" />
+            : day.meals.some(m => m.checked === 'ifct' && m.checkedAt && Date.now() - Date.parse(m.checkedAt) < 30 * 60_000) ? <CheckLine kind="ifct" /> : null}
           {details && day.meals.length ? (
             <>
               <NutritionTable totals={totals} kcal={profile.kcal} protein={profile.protein} fibre={fibreTarget(profile.kcal)} />

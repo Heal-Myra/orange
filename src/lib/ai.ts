@@ -6,7 +6,7 @@ import { lang, tr } from './i18n';
 import { supabase } from './supabase';
 import type { ContentCategoryId } from './types';
 
-export interface MealItem { name: string; grams: number; kcal: number; protein_g: number; carbs_g: number; fat_g: number; fibre_g?: number; basis: 'IFCT' | 'estimate' }
+export interface MealItem { name: string; grams: number; kcal: number; protein_g: number; carbs_g: number; fat_g: number; fibre_g?: number; basis: 'IFCT' | 'estimate' | 'mine'; usual?: string; edited?: boolean }
 export interface MealResult { items: MealItem[]; confidence: string; note: string; insight: string }
 export interface Guidance { headline: string; body: string[]; mind: string[]; soul: string[]; focus?: string[]; cards?: { body?: string; mind?: string; soul?: string }; pick?: 'body' | 'mind' | 'soul' }
 export interface Reflection { principle: string; alignment: number; reflection: string }
@@ -44,6 +44,15 @@ async function call<T>(action: string, payload: Record<string, unknown>): Promis
 
 export const analyseMeal = (image_base64: string, media_type: string, hint: string) =>
   call<MealResult>('meal_photo', { image_base64, media_type, hint });
+
+/** Meal photos (decision 0053): a quick first look in a few seconds, told the person's usual dishes… */
+export const analyseMealQuick = (image_base64: string, media_type: string, hint: string, usual: string[]) =>
+  call<MealResult>('meal_quick', { image_base64, media_type, hint, usual });
+/** …and the careful IFCT check, which runs on the server; ask for its result by id. */
+export const startMealCheck = (image_base64: string, media_type: string, hint: string, usual: string[]) =>
+  call<{ id: string }>('meal_check_start', { image_base64, media_type, hint, usual });
+export const getMealCheck = (id: string) =>
+  call<{ status: 'running' | 'done' | 'failed' | 'missing'; result?: MealResult | null }>('meal_check_get', { id });
 
 export const analyseMealText = (text: string) => call<MealResult>('meal_text', { text });
 

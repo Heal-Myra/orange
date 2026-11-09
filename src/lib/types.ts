@@ -2,7 +2,7 @@
 import type { AboutMe } from './targets';
 // One DayLog holds everything a person logs for one calendar day.
 
-export type MealSource = 'manual' | 'ifct' | 'photo' | 'photo+ifct' | 'words' | 'words+ifct';
+export type MealSource = 'manual' | 'ifct' | 'photo' | 'photo+ifct' | 'photo+mine' | 'words' | 'words+ifct';
 
 export interface Meal {
   name: string;
@@ -14,6 +14,11 @@ export interface Meal {
   fib?: number; // fibre, g (from 21 Oct 2026)
   source: MealSource;
   at?: string; // when it was logged (ISO), for fasting hours (from 1 Nov 2026)
+  /** Meal photos (decision 0053): the careful IFCT check still running on the server; its numbers replace these. */
+  check?: { id: string; until: string };
+  checked?: 'ifct' | 'usual'; // how the numbers were confirmed: the careful IFCT check, or the person's own usual dish
+  checkedAt?: string;
+  edited?: boolean; // the person changed a number: theirs always stays
 }
 
 export type ContentCategoryId =

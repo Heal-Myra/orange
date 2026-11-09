@@ -1,5 +1,9 @@
 # Changelog
 
+## 9 Nov 2026 — Meal photos: quick first, checked after, and "My dishes" (decision 0053)
+- A meal photo now shows Myra's quick reading in a few seconds; add it at once. Meanwhile the careful IFCT 2017 check runs on our server and its numbers replace the quick ones by themselves (coral "Myra is double-checking with IFCT…", then green "Checked with IFCT 2017"), even if you closed the app. Numbers you changed always stay.
+- **My dishes:** Myra remembers your own confirmed dishes. When a photo shows one of them, she uses your numbers for today's portion ("YOURS · Your usual"), with no wait for a check.
+
 ## 9 Nov 2026 — Reading a plate is faster
 - A tester waited a long time on "Reading your plate…". Now the careful and the quick AI start together: the careful one's answer is used when it comes within 18 seconds, otherwise the first answer. The IFCT 2017 matching runs only when there is time, so a plate comes back in well under a minute, usually in 10–25 seconds.
 

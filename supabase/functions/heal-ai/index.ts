@@ -169,7 +169,13 @@ const r1 = (v: number) => Math.round(v * 10) / 10;
 const SLOW = Symbol('slow');
 const within = <T,>(p: Promise<T>, ms: number) => Promise.race([p, new Promise<typeof SLOW>(r => setTimeout(() => r(SLOW), ms))]);
 
-async function mealAnalyse(image: Image | null, hint: string, hindi = false) {
+/**
+ * mode "race" (the chat, typed meals): careful and quick start together, the careful answer if within 18 s.
+ * mode "quick" (meal photo, first look): the quick model only, no IFCT matching, back in a few seconds.
+ * mode "careful" (meal photo, the background check): the careful model and full IFCT matching, no hurry.
+ * usual: the person's own past dishes (decision 0053); an item that is clearly one of them is named with "usual".
+ */
+async function mealAnalyse(image: Image | null, hint: string, hindi = false, mode: 'race' | 'quick' | 'careful' = 'race', usual: string[] = []) {
   const ask = askWith(hindi);
   const t0 = Date.now();
   const what = image
@@ -181,18 +187,23 @@ List each item. Use the quantities they give (e.g. "2 rotis", "1 katori dal"); o
 Break each item into its main raw ingredients with grams (include cooking oil or ghee). Also give your own estimate for the whole item.
 Reply with JSON only:
 {"items":[{"name":"short everyday name, at most 4 words, e.g. Roti, Moong dal, Aloo capsicum sabzi","grams":number,"ingredients":[{"ingredient":"plain raw name, e.g. wheat flour atta, bengal gram dal, ghee","grams":number}],
-  "estimate":{"kcal":number,"protein_g":number,"carbs_g":number,"fat_g":number,"fibre_g":number}}],
+  "estimate":{"kcal":number,"protein_g":number,"carbs_g":number,"fat_g":number,"fibre_g":number}${usual.length ? ',"usual":"exact name from the usual list, or null"' : ''}}],
  "confidence":"low"|"medium"|"high","note":"one sentence on what was hardest to estimate",
  "insight":"one natural, food-first tweak as ONE direct instruction of at most 10 words, e.g. Add curd to the next meal."}
-If there is no food: {"items":[],"confidence":"low","note":"${image ? 'No food found in the photo.' : 'No food found in the description.'}","insight":""}`;
+If there is no food: {"items":[],"confidence":"low","note":"${image ? 'No food found in the photo.' : 'No food found in the description.'}","insight":""}${usual.length ? `
+This person's usual dishes (from their own past meals): ${usual.map(u => `"${u}"`).join(', ')}.
+For each item that is clearly one of these usual dishes (same dish, made the same way), set "usual" to that exact name; if unsure or different, null.` : ''}`;
   const sys1 = `${ORANGE_BOOK} You are also a careful nutrition analyst.`;
   // Both models start together (tester, 9 Nov 2026: "Reading your plate…" for a long time). The careful one is used when
   // it answers within 18 s; otherwise whichever answers first. The quick one costs little.
-  const careful = askJson(ask, 'smart', sys1, prompt1, image ?? undefined);
-  const quick = askJson(ask, 'quick', sys1, prompt1, image ?? undefined);
-  careful.catch(() => {}); quick.catch(() => {});
-  let step1 = await within(careful, 18_000).catch(() => SLOW);
-  if (step1 === SLOW) step1 = await Promise.any([careful, quick]);
+  let step1;
+  if (mode === 'race') {
+    const careful = askJson(ask, 'smart', sys1, prompt1, image ?? undefined);
+    const quick = askJson(ask, 'quick', sys1, prompt1, image ?? undefined);
+    careful.catch(() => {}); quick.catch(() => {});
+    step1 = await within(careful, 18_000).catch(() => SLOW);
+    if (step1 === SLOW) step1 = await Promise.any([careful, quick]);
+  } else step1 = await askJson(ask, mode === 'quick' ? 'quick' : 'smart', sys1, prompt1, image ?? undefined);
 
   const items = Array.isArray(step1.items) ? step1.items : [];
   const ingredients: { item: number; ingredient: string; grams: number; candidates: ReturnType<typeof searchIfct> }[] = [];
@@ -201,30 +212,31 @@ If there is no food: {"items":[],"confidence":"low","note":"${image ? 'No food f
 
   let picks: Record<string, string | null> = {};
   // Matching to IFCT 2017 adds a second AI call; when time is short, the AI's own estimate stands (marked "estimate").
-  if (ingredients.some(x => x.candidates.length) && Date.now() - t0 < 30_000) {
+  if (mode !== 'quick' && ingredients.some(x => x.candidates.length) && (mode === 'careful' || Date.now() - t0 < 30_000)) {
     const list = ingredients.map((x, n) => `${n}. ${x.ingredient}: ${x.candidates.map(c => `${c.code} = ${c.name}`).join(' | ') || 'no candidates'}`).join('\n');
     const step2 = await within(askJson(ask, 'quick', ORANGE_BOOK,
 `For each ingredient, choose the IFCT 2017 food code that matches it best, or null if none is a fair match (for example, raw versus cooked forms are usually fine; a different food is not).
 ${list}
-Reply with JSON only: {"picks":{"0":"CODE or null","1":"CODE or null"}}`), Math.max(5_000, 40_000 - (Date.now() - t0)));
+Reply with JSON only: {"picks":{"0":"CODE or null","1":"CODE or null"}}`), mode === 'careful' ? 120_000 : Math.max(5_000, 40_000 - (Date.now() - t0)));
     picks = step2 === SLOW ? {} : step2.picks ?? {};
   }
 
   const byCode = new Map(ingredients.flatMap(x => x.candidates).map(c => [String(c.code), c]));
   return {
-    items: items.map((it: { name: string; grams: number; estimate?: Record<string, number> }, i: number) => {
+    items: items.map((it: { name: string; grams: number; estimate?: Record<string, number>; usual?: string | null }, i: number) => {
+      const mineName = usual.includes(String(it.usual ?? '')) ? String(it.usual) : undefined;
       const mine = ingredients.map((x, n) => ({ ...x, n })).filter(x => x.item === i);
       const matched = mine.filter(x => picks[String(x.n)] && byCode.has(String(picks[String(x.n)])));
       const allMatched = mine.length > 0 && matched.length === mine.length;
       if (!allMatched) {
         const e = it.estimate ?? {};
-        return { name: it.name, grams: Math.round(it.grams || 0), kcal: Math.round(e.kcal || 0), protein_g: r1(e.protein_g || 0), carbs_g: r1(e.carbs_g || 0), fat_g: r1(e.fat_g || 0), fibre_g: r1(e.fibre_g || 0), basis: 'estimate' };
+        return { name: it.name, grams: Math.round(it.grams || 0), kcal: Math.round(e.kcal || 0), protein_g: r1(e.protein_g || 0), carbs_g: r1(e.carbs_g || 0), fat_g: r1(e.fat_g || 0), fibre_g: r1(e.fibre_g || 0), basis: 'estimate', usual: mineName };
       }
       const t = matched.reduce((acc, x) => {
         const c = byCode.get(String(picks[String(x.n)]))!.per100g, k = x.grams / 100;
         return { kcal: acc.kcal + c.kcal * k, p: acc.p + c.protein_g * k, c: acc.c + c.carbs_g * k, f: acc.f + c.fat_g * k, fib: acc.fib + (c.fibre_g || 0) * k };
       }, { kcal: 0, p: 0, c: 0, f: 0, fib: 0 });
-      return { name: it.name, grams: Math.round(it.grams || 0), kcal: Math.round(t.kcal), protein_g: r1(t.p), carbs_g: r1(t.c), fat_g: r1(t.f), fibre_g: r1(t.fib), basis: 'IFCT' };
+      return { name: it.name, grams: Math.round(it.grams || 0), kcal: Math.round(t.kcal), protein_g: r1(t.p), carbs_g: r1(t.c), fat_g: r1(t.f), fibre_g: r1(t.fib), basis: 'IFCT', usual: mineName };
     }),
     confidence: step1.confidence ?? 'low',
     note: step1.note ?? '',
@@ -277,6 +289,9 @@ const CATEGORIES = 'learning, spiritual, inspiring, connect, news, fun, scrollin
 async function run(action: string, p: Record<string, unknown>, hindi = false) {
   const ask = askWith(hindi);
   switch (action) {
+    case 'meal_quick': // the first look at a meal photo (decision 0053)
+      return mealAnalyse({ media_type: String(p.media_type ?? 'image/jpeg'), data: String(p.image_base64 ?? '') }, String(p.hint ?? '').slice(0, 300), hindi,
+        'quick', (Array.isArray(p.usual) ? p.usual : []).map(String).map(x => x.slice(0, 60)).slice(0, 60));
     case 'meal_photo':
       return mealAnalyse({ media_type: String(p.media_type ?? 'image/jpeg'), data: String(p.image_base64 ?? '') }, String(p.hint ?? '').slice(0, 300), hindi);
     case 'meal_plan': {
@@ -654,6 +669,24 @@ export default {
     let body: { action?: string; payload?: Record<string, unknown>; uiLang?: string };
     try { body = await req.json(); } catch { return Response.json({ error: 'Bad request.' }, { status: 400 }); }
     const action = String(body.action ?? '');
+
+    // The careful check of a meal photo runs on after the reply (decision 0053): start returns an id at once, the
+    // phone asks for the result every few seconds. Neither counts as a separate AI request (the first look did).
+    if (action === 'meal_check_get') {
+      const { data: row } = await ctx.supabase.from('meal_checks').select('status, result').eq('id', String(body.payload?.id ?? '')).maybeSingle();
+      return Response.json({ result: row ?? { status: 'missing' } });
+    }
+    if (action === 'meal_check_start') {
+      const p = body.payload ?? {};
+      const { data: row, error } = await ctx.supabase.from('meal_checks').insert({ status: 'running' }).select('id').single();
+      if (error || !row) return Response.json({ error: 'Could not start the meal check.' }, { status: 500 });
+      const job = mealAnalyse({ media_type: String(p.media_type ?? 'image/jpeg'), data: String(p.image_base64 ?? '') }, String(p.hint ?? '').slice(0, 300), body.uiLang === 'hi', 'careful',
+        (Array.isArray(p.usual) ? p.usual : []).map(String).map(x => x.slice(0, 60)).slice(0, 60))
+        .then(result => ctx.supabase.from('meal_checks').update({ status: 'done', result }).eq('id', row.id))
+        .catch(e => { console.error('meal_check', e); return ctx.supabase.from('meal_checks').update({ status: 'failed' }).eq('id', row.id); });
+      (globalThis as { EdgeRuntime?: { waitUntil(p: Promise<unknown>): void } }).EdgeRuntime?.waitUntil(job);
+      return Response.json({ result: { id: row.id } });
+    }
 
     // Daily cap per person.
     const since = new Date(Date.now() - 24 * 3600 * 1000).toISOString();

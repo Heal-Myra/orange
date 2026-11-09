@@ -13,6 +13,7 @@ import { ShareProvider, ShareReceiver } from '../components/ShareReceiver';
 import { RangeProvider } from '../lib/range';
 import { UpdateWatcher } from '../components/UpdateWatcher';
 import { UnicornLayer } from '../components/DoneSwitch';
+import { MealChecks } from '../lib/mealChecks';
 import { LangProvider, tr, useLang } from '../lib/i18n';
 import { colors } from '../theme';
 
@@ -167,6 +168,7 @@ export default function RootLayout() {
           <ShareReceiver />
           <UpdateWatcher />
           <UnicornLayer />
+          <MealChecks />
         </TasksProvider>
         </HealthProvider>
       </HealProvider>

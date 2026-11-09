@@ -6,7 +6,9 @@ import * as ImagePicker from 'expo-image-picker';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { Image, Platform, Pressable, Text, TextInput, View } from 'react-native';
-import { analyseMeal, analyseMealText, oneLine, type MealItem } from '../lib/ai';
+import { analyseMeal, analyseMealQuick, analyseMealText, getMealCheck, oneLine, startMealCheck, type MealItem } from '../lib/ai';
+import { myDishes, withMyDishes } from '../lib/dishes';
+import { todayISO } from '../lib/dates';
 import { useAuth } from '../lib/auth';
 import { useHeal } from '../lib/store';
 import { useLogMeals } from '../lib/logMeals';
@@ -36,7 +38,7 @@ export function speechRecognition(): (new () => any) | null {
 /** One Food card: log a meal (photo, speak, type) on top, today's meals and totals underneath. */
 export function MealPhoto({ right, top, children, snap }: { right?: ReactNode; top?: ReactNode; children?: ReactNode; snap?: string }) {
   const { session } = useAuth();
-  const { update } = useHeal();
+  const { update, days } = useHeal();
   const logMeals = useLogMeals();
   const [mode, setMode] = useState<'photo' | 'speak' | 'type' | null>(null);
   const [words, setWords] = useState('');
@@ -51,9 +53,13 @@ export function MealPhoto({ right, top, children, snap }: { right?: ReactNode; t
   const [insight, setInsight] = useState('');
   const [note, setNote] = useState('');
   const [noAi, setNoAi] = useState<string | null>(null); // why the AI could not be used: Type then searches IFCT directly
+  // Meal photos (decision 0053): the quick reading shows first; the careful IFCT check runs on the server and replaces
+  // it, unless the person already changed something (touched). "usual": every item is one of their own dishes.
+  const [check, setCheck] = useState<null | { state: 'checking'; id: string } | { state: 'done' } | { state: 'usual' }>(null);
+  const touched = useRef(false);
 
   const pick = async (camera: boolean) => {
-    setMessage(null); setItems(null);
+    setMessage(null); setItems(null); setCheck(null); touched.current = false;
     const opts: ImagePicker.ImagePickerOptions = { mediaTypes: ['images'], quality: 0.7, base64: true };
     if (camera) {
       const perm = await ImagePicker.requestCameraPermissionsAsync();
@@ -66,8 +72,18 @@ export function MealPhoto({ right, top, children, snap }: { right?: ReactNode; t
     setBusy(true); setMessage(tr('Reading your plate…'));
     try {
       const img = await shrink(a.uri, a.base64, a.mimeType);
-      const r = await analyseMeal(img.data, img.type, hint);
-      setItems(r.items); setNamed({});
+      const dishes = myDishes(days, todayISO());
+      let r = await analyseMealQuick(img.data, img.type, hint, dishes.slice(0, 60).map(d => d.name)).catch(e => {
+        if (e instanceof Error && e.name === 'AiUnreachable') throw e;
+        return null; // the quick look could not be read: the one-step reading as before
+      });
+      if (!r) r = { ...(await analyseMeal(img.data, img.type, hint)) };
+      const list = withMyDishes(r.items, dishes);
+      setItems(list); setNamed({});
+      if (list.length && list.every(it => it.basis === 'mine')) setCheck({ state: 'usual' });
+      else if (list.length && list.some(it => it.basis !== 'IFCT')) {
+        startMealCheck(img.data, img.type, hint, dishes.slice(0, 60).map(d => d.name)).then(c => setCheck(now => (now ? now : { state: 'checking', id: c.id }))).catch(() => {});
+      }
       setInsight(r.insight);
       setNote([r.confidence && `Confidence: ${r.confidence}.`, r.note].filter(Boolean).join(' '));
       setMessage(r.items.length ? tr('Check the numbers, change anything that looks off, then add.') : (r.note || tr('No food found in the photo.')));
@@ -75,6 +91,28 @@ export function MealPhoto({ right, top, children, snap }: { right?: ReactNode; t
       setMessage(e instanceof Error ? e.message : tr('Something went wrong. Try again.'));
     } finally { setBusy(false); }
   };
+
+  // While the person looks at the quick reading, ask for the careful one every few seconds.
+  const checkId = check?.state === 'checking' ? check.id : null;
+  useEffect(() => {
+    if (!checkId) return;
+    let stop = false;
+    const tick = async () => {
+      const r = await getMealCheck(checkId).catch(() => null);
+      if (stop || !r) return;
+      if (r.status === 'done' && r.result?.items?.length) {
+        if (!touched.current) {
+          setItems(withMyDishes(r.result.items, myDishes(days, todayISO()))); setNamed({});
+          if (r.result.insight) setInsight(r.result.insight);
+          setNote([r.result.confidence && `Confidence: ${r.result.confidence}.`, r.result.note].filter(Boolean).join(' '));
+        }
+        setCheck({ state: 'done' });
+      } else if (r.status !== 'running') setCheck(null);
+    };
+    const t = setInterval(tick, 4000);
+    const quit = setTimeout(() => setCheck(c => (c?.state === 'checking' ? null : c)), 10 * 60_000);
+    return () => { stop = true; clearInterval(t); clearTimeout(quit); };
+  }, [checkId]);
 
   // Opened by "snap my meal" from Siri, the Action Button or Back Tap: straight to the camera, once per request.
   const snapped = useRef<string | undefined>(undefined);
@@ -139,15 +177,20 @@ export function MealPhoto({ right, top, children, snap }: { right?: ReactNode; t
     setTimeout(() => { if (rec.current === r) finishListening(); }, 15_000);
   };
 
-  const edit = (i: number, key: keyof MealItem, value: string) => setItems(list => list && list.map((it, n) => n !== i ? it : {
-    ...it, [key]: key === 'name' ? value : (parseFloat(value) || 0),
-  }));
+  const edit = (i: number, key: keyof MealItem, value: string) => {
+    const was = items?.[i]?.[key];
+    const next = key === 'name' ? value : (parseFloat(value) || 0);
+    if (was === next) return; // the field lost focus without a change
+    touched.current = true;
+    setItems(list => list && list.map((it, n) => n !== i ? it : { ...it, [key]: next, ...(key !== 'name' ? { edited: true } : {}) }));
+  };
 
   // Founder, 31 Oct 2026: remove any item, and a corrected name gets its own nutrition (e.g. "Amli", not what the photo
   // seemed to show). The new numbers come from Myra (IFCT first) for the same grams.
   const [named, setNamed] = useState<Record<number, string>>({}); // the name each row's numbers belong to
   const [fixing, setFixing] = useState<number | null>(null);
   const remove = (i: number) => {
+    touched.current = true;
     setItems(list => list && list.filter((_, n) => n !== i));
     setNamed(m => Object.fromEntries(Object.entries(m).filter(([k]) => +k !== i).map(([k, v]) => [+k > i ? +k - 1 : +k, v])));
   };
@@ -174,10 +217,15 @@ export function MealPhoto({ right, top, children, snap }: { right?: ReactNode; t
 
   const add = () => {
     if (!items?.length) return;
+    const pendingId = check?.state === 'checking' && !touched.current ? check.id : null;
+    const until = new Date(Date.now() + 10 * 60_000).toISOString();
     logMeals(items.map(it => ({
       name: it.name, grams: it.grams, kcal: it.kcal, p: it.protein_g, c: it.carbs_g, f: it.fat_g, fib: it.fibre_g ?? 0,
-      source: source === 'words' ? (it.basis === 'IFCT' ? 'words+ifct' : 'words') : (it.basis === 'IFCT' ? 'photo+ifct' : 'photo'),
+      source: source === 'words' ? (it.basis === 'IFCT' ? 'words+ifct' : 'words') : (it.basis === 'IFCT' ? 'photo+ifct' : it.basis === 'mine' ? 'photo+mine' : 'photo'),
+      ...(it.edited ? { edited: true } : {}),
+      ...(pendingId ? { check: { id: pendingId, until } } : it.basis === 'mine' ? { checked: 'usual' as const } : check?.state === 'done' && !touched.current && it.basis === 'IFCT' ? { checked: 'ifct' as const, checkedAt: new Date().toISOString() } : {}),
     })));
+    setCheck(null);
     setMessage(`Added ${items.length} item${items.length > 1 ? 's' : ''} to your day.`);
     setItems(null); setUri(null); setInsight(''); setWords(''); setMode(null);
   };
@@ -239,7 +287,7 @@ export function MealPhoto({ right, top, children, snap }: { right?: ReactNode; t
           <View style={[s.headingRow]}>
             <TextInput style={[s.input, { flex: 1 }]} value={it.name} onChangeText={v => { if (named[i] == null) setNamed(m => ({ ...m, [i]: it.name })); edit(i, 'name', v); }}
               onEndEditing={() => renamed(i)} onSubmitEditing={() => renamed(i)} returnKeyType="done" />
-            <Text style={{ color: it.basis === 'IFCT' ? colors.body : colors.muted, fontSize: 12, fontWeight: '700' }}>{it.basis === 'IFCT' ? 'IFCT' : 'ESTIMATE'}</Text>
+            <Text style={{ color: it.basis === 'IFCT' || it.basis === 'mine' ? colors.body : colors.muted, fontSize: 12, fontWeight: '700' }}>{it.basis === 'IFCT' ? 'IFCT' : it.basis === 'mine' ? tr('YOURS') : 'ESTIMATE'}</Text>
             <Pressable onPress={() => remove(i)} hitSlop={10} accessibilityRole="button" accessibilityLabel={tr('Remove {name}', { name: it.name })}
               style={{ width: 32, height: 32, borderRadius: 16, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' }}>
               <Ionicons name="close" size={18} color={colors.muted} />
@@ -257,14 +305,30 @@ export function MealPhoto({ right, top, children, snap }: { right?: ReactNode; t
         </View>
       ))}
       {note && items?.length ? <Note>{note}</Note> : null}
+      {items?.length && check ? <CheckLine kind={check.state === 'checking' ? (touched.current ? null : 'checking') : check.state === 'done' ? 'ifct' : 'usual'} /> : null}
       {items?.length ? (
         <View style={s.row}>
           <Button title={tr('Add to my day')} onPress={add} disabled={fixing != null} />
-          <Button kind="plain" title={tr('Discard')} onPress={() => { setItems(null); setUri(null); setMessage(null); setInsight(''); }} />
+          <Button kind="plain" title={tr('Discard')} onPress={() => { setItems(null); setUri(null); setMessage(null); setInsight(''); setCheck(null); }} />
         </View>
       ) : null}
       {children}
     </Card>
+  );
+}
+
+/** One small line on a meal photo's numbers (decision 0053): still checking (coral), checked (green), or their usual dish. */
+export function CheckLine({ kind }: { kind: 'checking' | 'ifct' | 'usual' | 'logged' | null }) {
+  if (!kind) return null;
+  const green = kind === 'ifct' || kind === 'usual';
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+      {green ? <Ionicons name="checkmark" size={15} color={colors.good} /> : <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: colors.insight, opacity: 0.6 }} />}
+      <Text style={{ color: green ? colors.good : colors.insight, fontSize: 13, flex: 1 }}>
+        {kind === 'checking' ? tr('Myra is double-checking with IFCT…') : kind === 'logged' ? tr('Checking with IFCT… numbers may change a little')
+          : kind === 'ifct' ? tr('Checked with IFCT 2017') : tr('Your usual · from your history')}
+      </Text>
+    </View>
   );
 }
 
