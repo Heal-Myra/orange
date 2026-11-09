@@ -28,8 +28,13 @@ async function call<T>(action: string, payload: Record<string, unknown>): Promis
       if (body?.error) throw new Error(body.error);
       code = String(error.context?.status ?? '');
     } else code = Date.now() - t0 > 50_000 ? 'slow' : 'net';
-    // The short code after the message tells us what went wrong when someone sends a screenshot.
-    const e = new Error(`${tr('Could not reach the AI just now. Check your connection and try again.')} (${code || '?'})`);
+    // The short code after the message tells us what went wrong when someone sends a screenshot: the reason, how long
+    // the phone waited and how big the photo was, e.g. "(net · 61 s · 4800 KB)".
+    const img = ['image_base64', 'image', 'data'].map(k => payload[k]).find(v => typeof v === 'string') as string | undefined;
+    const att = (payload.attachment as { data?: string } | undefined)?.data;
+    const kb = Math.round(((img ?? att)?.length ?? 0) * 0.75 / 1024);
+    const bits = [code || '?', `${Math.round((Date.now() - t0) / 1000)} s`, kb ? `${kb} KB` : ''].filter(Boolean).join(' · ');
+    const e = new Error(`${tr('Could not reach the AI just now. Check your connection and try again.')} (${bits})`);
     e.name = 'AiUnreachable';
     throw e;
   }

@@ -110,7 +110,15 @@ export default function Myra() {
           setMessages(done); save(done); setBusy(false);
           return;
         }
-      } catch { /* fall back to talking about it */ }
+      } catch (e) {
+        // No answer from the AI at all: say so now rather than wait another minute for the chat reply (tester, 9 Nov 2026).
+        if (e instanceof Error && e.name === 'AiUnreachable') {
+          const done: ChatMessage[] = [...next, { role: 'myra', text: e.message }];
+          setMessages(done); save(done); setBusy(false);
+          return;
+        }
+        /* otherwise fall back to talking about it */
+      }
     }
     try {
       const r = await askMyra(next.filter(m => m !== HELLO), buildContext(day, days, date, profile, tasksForAI(open, todayISO()), tradition), page,

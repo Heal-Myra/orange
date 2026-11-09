@@ -1,5 +1,9 @@
 # Changelog
 
+## 9 Nov 2026 — Myra's chat: no long "thinking" after a photo fails
+- A tester sent a photo to Myra and saw "Myra is thinking…" for minutes: the photo check failed, then the chat tried again with the same photo. Now Myra says at once that she could not reach the AI.
+- The message's code now also shows how long the phone waited and how big the photo was, e.g. "(net · 61 s · 240 KB)", so one screenshot tells us whether it is the connection, a slow AI or a too-large photo.
+
 ## 9 Nov 2026 — Meal photos no longer stall on "Could not reach the AI"
 - A tester's meal photo failed with "Could not reach the AI just now". That message appears when the phone gets no answer at all, and an iPhone gives up after about 60 seconds of silence. Reading a plate takes two AI steps, which can run past that on a slow day.
 - Now the server keeps a meal inside about 50 seconds: if the careful model is slow, the quick one answers; if time is short, the IFCT 2017 matching step is skipped and the AI's own estimate is used (shown as "estimate").
