@@ -1,5 +1,8 @@
 # Changelog
 
+## 9 Nov 2026 — A screenshot of a plate is a meal
+- A tester sent Myra a screenshot of her Food card with her lunch photo in it. Myra treated it as "something else" and wrote a long reply instead of offering "Add to my day". Now a screenshot whose main picture is a plate counts as a meal, and Myra offers to add it to Food, as she does for a camera photo.
+
 ## 9 Nov 2026 — Myra's chat: no long "thinking" after a photo fails
 - A tester sent a photo to Myra and saw "Myra is thinking…" for minutes: the photo check failed, then the chat tried again with the same photo. Now Myra says at once that she could not reach the AI.
 - The message's code now also shows how long the phone waited and how big the photo was, e.g. "(net · 61 s · 240 KB)", so one screenshot tells us whether it is the connection, a slow AI or a too-large photo.

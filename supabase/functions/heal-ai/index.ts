@@ -350,7 +350,7 @@ Reply with JSON only: {"isFace":true|false,"skin":{"dryness":"none"|"mild"|"noti
       // Myra as the one place to drop anything (founder, 1 Nov 2026; decision 0046): first, what is this picture?
       return await askJson(ask, 'quick', ORANGE_BOOK,
 `What is this picture? Choose one kind:
-- "meal": food or drink being eaten or about to be (a plate, thali, bowl, snack, restaurant dish). Not a recipe page or a menu.
+- "meal": food or drink being eaten or about to be (a plate, thali, bowl, snack, restaurant dish). Also a screenshot (from any app, including Happy Orange) whose main picture is such a plate. Not a recipe page or a menu.
 - "screen_time": a phone's Screen Time (iPhone) or Digital Wellbeing (Android) screen with app times.
 - "todo": a handwritten or printed to-do list, task list or reminders note.
 - "journal": a gratitude journal page (thankful for, what made me laugh, kind to, best part of the day).
