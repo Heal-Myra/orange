@@ -1,5 +1,10 @@
 # Changelog
 
+## 9 Nov 2026 — Meal photos no longer stall on "Could not reach the AI"
+- A tester's meal photo failed with "Could not reach the AI just now". That message appears when the phone gets no answer at all, and an iPhone gives up after about 60 seconds of silence. Reading a plate takes two AI steps, which can run past that on a slow day.
+- Now the server keeps a meal inside about 50 seconds: if the careful model is slow, the quick one answers; if time is short, the IFCT 2017 matching step is skipped and the AI's own estimate is used (shown as "estimate").
+- The app quietly tries once more after a quick network blip, and the message now ends with a short code, (net), (slow) or a number, so a screenshot tells us the cause. The Hindi app shows this message in Hindi too.
+
 ## 7 Nov 2026 — Monthly reminders
 - Clear your mind: a new **Monthly** repeat for things like rent and EMI. Pick the day of the month (or write "on 5th every month"); Myra shows it that morning with a phone reminder at its time. In short months it falls on the last day. Monthly reminders skip the 21-day "Making a habit" track.
 

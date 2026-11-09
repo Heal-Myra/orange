@@ -2,7 +2,7 @@
 // Every AI feature needs the person to be signed in, so the daily cap and privacy rules apply.
 
 import { FunctionsHttpError } from '@supabase/supabase-js';
-import { lang } from './i18n';
+import { lang, tr } from './i18n';
 import { supabase } from './supabase';
 import type { ContentCategoryId } from './types';
 
@@ -15,14 +15,23 @@ async function call<T>(action: string, payload: Record<string, unknown>): Promis
   if (!supabase) throw new Error('AI features need the online version of the app.');
   const { data: session } = await supabase.auth.getSession();
   if (!session.session) throw new Error('Please sign in to use AI features.');
-  const { data, error } = await supabase.functions.invoke('heal-ai', { body: { action, payload, uiLang: lang() } });
+  const send = () => supabase!.functions.invoke('heal-ai', { body: { action, payload, uiLang: lang() } });
+  const t0 = Date.now();
+  let { data, error } = await send();
+  // A quick network blip (weak signal, switching Wi-Fi): one quiet second try (tester, 9 Nov 2026).
+  if (error && !(error instanceof FunctionsHttpError) && Date.now() - t0 < 20_000) ({ data, error } = await send());
   if (error) {
     // The function sends a friendly message in its JSON body; show that when we can.
+    let code = '';
     if (error instanceof FunctionsHttpError) {
       const body = await error.context.json().catch(() => null);
       if (body?.error) throw new Error(body.error);
-    }
-    throw new Error('Could not reach the AI just now. Check your connection and try again.');
+      code = String(error.context?.status ?? '');
+    } else code = Date.now() - t0 > 50_000 ? 'slow' : 'net';
+    // The short code after the message tells us what went wrong when someone sends a screenshot.
+    const e = new Error(`${tr('Could not reach the AI just now. Check your connection and try again.')} (${code || '?'})`);
+    e.name = 'AiUnreachable';
+    throw e;
   }
   if (data?.error) throw new Error(data.error);
   return data.result as T;

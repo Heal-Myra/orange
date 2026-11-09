@@ -282,6 +282,7 @@ export const HI: Record<string, string> = {
   'That code is wrong or has expired. Check the latest email, or ask for a new code.': 'यह कोड गलत है या इसकी अवधि खत्म हो गई। नया ईमेल देखें या नया कोड माँगें।',
   'Too many sign-in emails were sent in the last hour. Please check your inbox for the last one, or try again in about an hour.': 'पिछले घंटे में बहुत सारे साइन-इन ईमेल भेजे गए। आख़िरी ईमेल देखें, या लगभग एक घंटे बाद फिर कोशिश करें।',
   'Please wait a minute before asking for another code.': 'नया कोड माँगने से पहले एक मिनट रुकें।',
+  'Could not reach the AI just now. Check your connection and try again.': 'अभी AI से जुड़ नहीं सके। कनेक्शन जाँचें और फिर कोशिश करें।',
   'Could not reach the internet. Check your connection and try again.': 'इंटरनेट से जुड़ नहीं सके। कनेक्शन जाँचें और फिर कोशिश करें।',
   'Online accounts are not set up in this version.': 'इस संस्करण में ऑनलाइन खाते उपलब्ध नहीं हैं।',
   'Please sign in first.': 'कृपया पहले साइन इन करें।',

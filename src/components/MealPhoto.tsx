@@ -271,6 +271,7 @@ export function MealPhoto({ right, top, children, snap }: { right?: ReactNode; t
 /** True when the AI itself can't be used (no key, out of credit, a limit, offline); other errors are worth a retry. */
 function aiUnavailable(e: unknown) {
   const m = e instanceof Error ? e.message : '';
+  if (e instanceof Error && e.name === 'AiUnreachable') return true;
   return /key|credit|billing|limit|quota|sign in|online version|reach the AI/i.test(m);
 }
 

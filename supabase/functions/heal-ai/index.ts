@@ -164,22 +164,30 @@ const r1 = (v: number) => Math.round(v * 10) / 10;
  *    the server does the arithmetic. Ingredients with no good IFCT match keep the AI's estimate.
  */
 /** Meal to nutrition, from a photo or from words the person typed or spoke. Numbers come from IFCT 2017 where ingredients match. */
+// The iPhone gives up on a request after about 60 seconds of silence, and the person then sees "Could not reach the AI"
+// (tester, 9 Nov 2026). So a meal must come back well inside that: if the careful model is slow, the quick one answers.
+const SLOW = Symbol('slow');
+const within = <T,>(p: Promise<T>, ms: number) => Promise.race([p, new Promise<typeof SLOW>(r => setTimeout(() => r(SLOW), ms))]);
+
 async function mealAnalyse(image: Image | null, hint: string, hindi = false) {
   const ask = askWith(hindi);
+  const t0 = Date.now();
   const what = image
     ? `Identify every food or drink in this photo and estimate the portion on the plate. Assume Indian home cooking where dishes look Indian, with typical household oil or ghee.
 ${hint ? `The person adds: "${hint}"` : ''}`
     : `The person describes what they ate or drank (typed or spoken, so expect spelling mistakes and Hindi or regional words): "${hint}"
 List each item. Use the quantities they give (e.g. "2 rotis", "1 katori dal"); otherwise assume typical Indian household portions and household oil or ghee.`;
-  const step1 = (await askJson(ask, 'smart', `${ORANGE_BOOK} You are also a careful nutrition analyst.`,
-`${what}
+  const prompt1 = `${what}
 Break each item into its main raw ingredients with grams (include cooking oil or ghee). Also give your own estimate for the whole item.
 Reply with JSON only:
 {"items":[{"name":"short everyday name, at most 4 words, e.g. Roti, Moong dal, Aloo capsicum sabzi","grams":number,"ingredients":[{"ingredient":"plain raw name, e.g. wheat flour atta, bengal gram dal, ghee","grams":number}],
   "estimate":{"kcal":number,"protein_g":number,"carbs_g":number,"fat_g":number,"fibre_g":number}}],
  "confidence":"low"|"medium"|"high","note":"one sentence on what was hardest to estimate",
  "insight":"one natural, food-first tweak as ONE direct instruction of at most 10 words, e.g. Add curd to the next meal."}
-If there is no food: {"items":[],"confidence":"low","note":"${image ? 'No food found in the photo.' : 'No food found in the description.'}","insight":""}`, image ?? undefined));
+If there is no food: {"items":[],"confidence":"low","note":"${image ? 'No food found in the photo.' : 'No food found in the description.'}","insight":""}`;
+  const sys1 = `${ORANGE_BOOK} You are also a careful nutrition analyst.`;
+  let step1 = await within(askJson(ask, 'smart', sys1, prompt1, image ?? undefined), 32_000);
+  if (step1 === SLOW) step1 = await askJson(ask, 'quick', sys1, prompt1, image ?? undefined);
 
   const items = Array.isArray(step1.items) ? step1.items : [];
   const ingredients: { item: number; ingredient: string; grams: number; candidates: ReturnType<typeof searchIfct> }[] = [];
@@ -187,13 +195,14 @@ If there is no food: {"items":[],"confidence":"low","note":"${image ? 'No food f
     (it.ingredients ?? []).slice(0, 8).forEach(g => ingredients.push({ item: i, ingredient: String(g.ingredient), grams: Number(g.grams) || 0, candidates: searchIfct(String(g.ingredient), 4) })));
 
   let picks: Record<string, string | null> = {};
-  if (ingredients.some(x => x.candidates.length)) {
+  // Matching to IFCT 2017 adds a second AI call; when time is short, the AI's own estimate stands (marked "estimate").
+  if (ingredients.some(x => x.candidates.length) && Date.now() - t0 < 38_000) {
     const list = ingredients.map((x, n) => `${n}. ${x.ingredient}: ${x.candidates.map(c => `${c.code} = ${c.name}`).join(' | ') || 'no candidates'}`).join('\n');
-    const step2 = (await askJson(ask, 'quick', ORANGE_BOOK,
+    const step2 = await within(askJson(ask, 'quick', ORANGE_BOOK,
 `For each ingredient, choose the IFCT 2017 food code that matches it best, or null if none is a fair match (for example, raw versus cooked forms are usually fine; a different food is not).
 ${list}
-Reply with JSON only: {"picks":{"0":"CODE or null","1":"CODE or null"}}`));
-    picks = step2.picks ?? {};
+Reply with JSON only: {"picks":{"0":"CODE or null","1":"CODE or null"}}`), Math.max(5_000, 50_000 - (Date.now() - t0)));
+    picks = step2 === SLOW ? {} : step2.picks ?? {};
   }
 
   const byCode = new Map(ingredients.flatMap(x => x.candidates).map(c => [String(c.code), c]));
