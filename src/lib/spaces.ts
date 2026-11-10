@@ -53,6 +53,25 @@ export function weekNudge(all: SpacesState, day: number /* 0 Sunday … 6 Saturd
   return fresh ? { kind: 'home', id: fresh, score: null } : null;
 }
 
+/** Myra's one move for the Spaces page (founder, 10 Nov 2026): the change that lifts the Spaces score most. An after photo
+ *  that is due comes first (it is how points are earned); then the space with the biggest gap to its potential; then
+ *  the first space not snapped yet. `gain` = points that space can still add, shared across its changes not done. */
+export function bestMove(all: SpacesState, today: string): null | { id: SpaceId; kind: 'after' | 'change' | 'snap'; text?: string; gain?: number } {
+  const due = SPACES.find(x => afterDue(all[x.id], today) && scoreOf(all[x.id]) != null);
+  if (due) return { id: due.id, kind: 'after' };
+  let best: { id: SpaceId; gap: number; text: string; open: number } | null = null;
+  for (const x of SPACES) {
+    const st = all[x.id], sc = scoreOf(st);
+    if (!st || sc == null || st.round.potential == null) continue;
+    const open = st.round.changes.filter(c => !c.done);
+    const gap = st.round.potential - sc;
+    if (gap > 0 && open.length && (!best || gap > best.gap)) best = { id: x.id, gap, text: open[0].text, open: open.length };
+  }
+  if (best) return { id: best.id, kind: 'change', text: best.text, gain: Math.max(10, Math.round(best.gap / best.open / 10) * 10) };
+  const fresh = SPACES.find(x => scoreOf(all[x.id]) == null);
+  return fresh ? { id: fresh.id, kind: 'snap' } : null;
+}
+
 export const AGAIN_AFTER = 7; // days until the after photo
 
 /** spot: where the change goes on the photo, 0–1 from the left and from the top (Myra's pins; build 14 quick update). */

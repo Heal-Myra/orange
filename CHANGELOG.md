@@ -1,5 +1,8 @@
 # Changelog
 
+## 10 Nov 2026 — Spaces page in the Today style
+- Founder: the Spaces page now looks like Today. On top, the Spaces score in rings (one per space) and, beside it, Myra's one move with the most impact (e.g. "Fruit bowl on the counter, left corner. Kitchen · up to +10"); an after photo that is due comes first. Below, each space as its own ring circle (its five checks), two per row; tap one to go inside.
+
 ## 10 Nov 2026 — Spaces score rings on the Spaces page
 - Founder: the Spaces page now opens with the Spaces score as concentric rings, one per space, the score in the middle (the same look as every scored card). Spaces not yet snapped show "–".
 

@@ -9,13 +9,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Image, Pressable, Text, View } from 'react-native';
 import { Button, Card, Check, Expandable, Note, Screen, Segmented } from '../components/ui';
-import { PASTEL, RingPanel, type RingItem } from '../components/Rings';
+import { PASTEL, RingPanel, RingStack, fmt, type RingItem } from '../components/Rings';
 import { readSpace } from '../lib/ai';
 import { formatDay, todayISO } from '../lib/dates';
 import { tr } from '../lib/i18n';
 import { captureSpace, hasSpaceCamera, keepCopy } from '../lib/spaceCapture';
 import {
-  CHECKS, CHECK_MAX, SPACES, afterDue, scoreOf, spacesScore, afterPhoto, againOn, doneCount, latestPhoto, loadPhotos, nextPhotos, nextSpace, savePhotos, statusOf,
+  CHECKS, CHECK_MAX, SPACES, afterDue, bestMove, scoreOf, spacesScore, afterPhoto, againOn, doneCount, latestPhoto, loadPhotos, nextPhotos, savePhotos,
   type SpaceChange, type SpaceId, type SpacePhoto, type SpacePhotos, type SpacesState,
 } from '../lib/spaces';
 import { useHeal } from '../lib/store';
@@ -58,43 +58,55 @@ export default function Spaces() {
 
 function List({ all }: { all: SpacesState }) {
   const today = todayISO();
-  const next = nextSpace(all, today);
   const open = (id: SpaceId) => router.push({ pathname: '/spaces', params: { id } });
+  const total = spacesScore(all);
+  const items: RingItem[] = SPACES.map((x, i) => ({ id: x.id, color: SPACE_RING[i], label: tr(x.name), value: (scoreOf(all[x.id]) ?? 0) / 100 }));
+  const move = bestMove(all, today);
+  const moveName = move ? nameOf(move.id).toLowerCase() : '';
+  const line = !move ? tr('Every space is at its best. Lovely.')
+    : move.kind === 'after' ? tr('A week has passed. Snap your {space} again.', { space: moveName })
+    : move.kind === 'change' ? move.text!
+    : move.id === 'kitchen' ? tr('Start with the kitchen. It shapes every meal.') : tr('Next, your {space}.', { space: moveName });
+  const sub = !move ? null : move.kind === 'change' ? tr('{space} · up to +{n}', { space: nameOf(move.id), n: move.gain ?? 10 })
+    : move.kind === 'after' ? tr('Your score can rise') : tr('Snap it to get its score');
   return (
     <Screen>
-      <Note>{tr('Your home, set up to help you.')}</Note>
-      {/* The Spaces score on the front page (founder, 10 Nov 2026): one ring per space, the score in the middle (decision 0037). */}
-      <Card>
-        <Text style={{ fontSize: 13, color: colors.muted, fontWeight: '600' }}>{tr('Spaces score')}</Text>
-        <RingPanel items={SPACES.map((x, i) => {
-          const sc = scoreOf(all[x.id]);
-          return { id: x.id, color: SPACE_RING[i], label: tr(x.name), value: (sc ?? 0) / 100, ...(sc == null ? { keyText: '–' } : {}) };
-        })} score={spacesScore(all)} max={100} sub={tr('of 100')} />
+      {/* Like Today (founder, 10 Nov 2026): the Spaces score in rings, one per space, and Myra's one move with the most
+          impact beside it; below, each space as its own small ring circle, tap to go inside. */}
+      <Card style={{ gap: 12 }}>
+        <Text style={{ fontSize: 18, fontWeight: '700', color: colors.ink }}>{tr('Spaces score')}</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+          <RingStack items={items} center={total == null ? '–' : fmt(total)} sub={tr('of {n}', { n: 100 })} size={156} />
+          <View style={{ width: 1, alignSelf: 'stretch', marginVertical: 12, backgroundColor: colors.line }} />
+          <Pressable disabled={!move} onPress={() => move && open(move.id)} accessibilityRole="button"
+            style={({ pressed }) => ({ flex: 1, gap: 8, opacity: pressed ? 0.8 : 1 })}>
+            <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: colors.insight, alignItems: 'center', justifyContent: 'center' }}>
+              <Text style={{ color: colors.onInsight, fontWeight: '800', fontSize: 15 }}>M</Text>
+            </View>
+            <Text style={{ color: colors.insight, fontSize: 16, fontWeight: '600' }}>{line}</Text>
+            {sub ? <Text style={{ color: colors.muted, fontSize: 13 }}>{sub}</Text> : null}
+            {move ? <Text style={{ color: colors.accent, fontSize: 13, fontWeight: '700' }}>{move.kind === 'change' ? tr('Open {space}', { space: nameOf(move.id) }) : tr('Snap my {space}', { space: moveName })} ›</Text> : null}
+          </Pressable>
+        </View>
       </Card>
-      {next ? (
-        <Card>
-          <MyraSays text={next.due ? tr('A week has passed. Snap your {space} again.', { space: nameOf(next.id).toLowerCase() })
-            : next.id === 'kitchen' ? tr('Start with the kitchen. It shapes every meal.') : tr('Next, your {space}.', { space: nameOf(next.id).toLowerCase() })} />
-          <Button title={tr('Snap my {space}', { space: nameOf(next.id).toLowerCase() })} onPress={() => open(next.id)} />
-        </Card>
-      ) : null}
-      <Card style={{ paddingVertical: 4, gap: 0 }}>
+
+      <View style={{ backgroundColor: colors.surface, borderRadius: 22, paddingVertical: 4, flexDirection: 'row', flexWrap: 'wrap' }}>
         {SPACES.map((x, i) => {
-          const st = statusOf(all[x.id], today);
-          const due = afterDue(all[x.id], today);
+          const st = all[x.id], sc = scoreOf(st);
+          const due = afterDue(st, today);
+          const rings: RingItem[] = CHECKS[x.id].map((c, j) => ({ id: String(j), color: RING[j], label: tr(c), value: (st?.round.checks?.[j] ?? 0) / CHECK_MAX }));
           return (
-            <Pressable key={x.id} onPress={() => open(x.id)} accessibilityRole="button"
-              style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 13, borderBottomWidth: i === SPACES.length - 1 ? 0 : 1, borderBottomColor: colors.line }}>
-              <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 16, fontWeight: '600', color: colors.ink }}>{tr(x.name)}</Text>
-                <Text style={{ fontSize: 13, color: colors.muted }}>{tr(x.helps)}</Text>
-              </View>
-              <Text style={{ fontSize: 13, fontWeight: all[x.id] ? '600' : '400', color: due ? colors.insight : all[x.id] ? colors.accent : colors.muted }}>{tr(st.key, st.vars)}</Text>
-              <Ionicons name="chevron-forward" size={18} color={colors.muted} />
+            <Pressable key={x.id} onPress={() => open(x.id)} accessibilityRole="button" accessibilityLabel={`${tr(x.name)}: ${sc == null ? '–' : sc}/100`}
+              style={({ pressed }) => ({ width: '50%', alignItems: 'center', gap: 4, paddingVertical: 14, borderLeftWidth: i % 2 ? 1 : 0, borderTopWidth: i >= 2 ? 1 : 0, borderColor: colors.line, opacity: pressed ? 0.85 : 1 })}>
+              <RingStack items={rings} center={sc == null ? '–' : fmt(sc)} sub={tr('of {n}', { n: 100 })} size={120} />
+              <Text style={{ fontSize: 14, fontWeight: '700', color: colors.ink, textAlign: 'center' }} numberOfLines={1}>{tr(x.name)}</Text>
+              <Text style={{ fontSize: 11.5, color: due ? colors.insight : colors.muted, textAlign: 'center' }} numberOfLines={1}>
+                {due ? tr('After photo due') : sc == null ? tr('Add a photo') : tr(x.helps.replace('Helps ', '').split(' · ')[1] ?? '')}
+              </Text>
             </Pressable>
           );
         })}
-      </Card>
+      </View>
       <Text style={{ color: colors.muted, fontSize: 12, textAlign: 'center' }}>{tr('Photos of your home stay on this phone.')}</Text>
     </Screen>
   );

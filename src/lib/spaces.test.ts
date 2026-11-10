@@ -72,3 +72,13 @@ describe('Space score', () => {
     expect(weekNudge({ kitchen: k }, 3)).toBeNull();
   });
 });
+
+describe('Myra\'s best move', () => {
+  it('picks the change with the biggest gain, an after photo first, then a space to snap', async () => {
+    const { bestMove } = await import('./spaces');
+    expect(bestMove({}, '2026-11-10')).toEqual({ id: 'kitchen', kind: 'snap' });
+    const k = afterPhoto(undefined, { ...read, points: [0, 20, 0, 10, 10], potential: 70 }, '2026-11-10');
+    expect(bestMove({ kitchen: k }, '2026-11-11')).toEqual({ id: 'kitchen', kind: 'change', text: 'a', gain: 10 });
+    expect(bestMove({ kitchen: k }, '2026-11-17')).toEqual({ id: 'kitchen', kind: 'after' });
+  });
+});

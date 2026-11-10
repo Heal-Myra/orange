@@ -1762,4 +1762,10 @@ export const HI: Record<string, string> = {
   'Journal or book at hand': 'डायरी या किताब पास में',
   'Away from screens': 'स्क्रीन से दूर',
   'Spaces score': 'जगहों का स्कोर',
+  'Every space is at its best. Lovely.': 'हर जगह अपने सबसे अच्छे रूप में है। बढ़िया।',
+  '{space} · up to +{n}': '{space} · +{n} तक',
+  'Your score can rise': 'आपका स्कोर बढ़ सकता है',
+  'Snap it to get its score': 'स्कोर के लिए फ़ोटो लें',
+  'Open {space}': '{space} खोलें',
+  'After photo due': 'बाद वाली फ़ोटो बाकी',
 };
