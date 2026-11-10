@@ -1,5 +1,10 @@
 # Changelog
 
+## 10 Nov 2026 — Spaces: a home set up to help you (decision 0055)
+- New in Profile › **Spaces**: Kitchen, Bedroom, Work desk and Quiet corner. Snap one as it is; Myra says in one line what she sees and gives three small changes (tick them as you go; "Why these?" folds open).
+- Seven days later, snap it again: before and after side by side, how many changes you made, and the next three. A phone nudge at 10 am that day.
+- Photos of your home stay on your phone; only Myra's words and your ticks are saved to your account. No points yet.
+
 ## 10 Nov 2026 — Mind: "How do you feel today?" and the Habits card removed
 - Founder: both cards are gone from Mind. Habits and monthly reminders (like the Tata Play payment) due today now sit inside Clear your mind, with the same tick; new habits still show their 21-day count. Earlier feelings stay in your history.
 

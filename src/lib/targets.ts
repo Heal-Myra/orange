@@ -18,6 +18,7 @@ export interface AboutMe {
   goalNote?: string;  // Myra's one-line reply about the goal (e.g. that it is too steep and what she planned instead)
   foodPrefs?: string;
   oneChange?: { change: string; start: string; ended?: string };
+  spaces?: import('./spaces').SpacesState; // Spaces (decision 0055): Myra's lines and the ticks; photos stay on the phone
   style?: string; // how the person talks, as Myra has come to understand it (founder, 10 Nov 2026); Myra mirrors it // the 30-day one-change test (founder, 10 Nov 2026)
   guideLang?: string; // language of guided sessions (en, hi or a regional code; 24 Oct 2026)
   saved?: { url: string; title: string; note?: string; at: string }[]; // shared to Happy Orange: "Save to my journey" (24 Oct 2026)

@@ -12,6 +12,8 @@ import { usePendingRequests } from '../lib/adminAlerts';
 import { traditionName } from '../lib/wisdom';
 import { useHeal } from '../lib/store';
 import { colors } from '../theme';
+import { SPACES, afterDue } from '../lib/spaces';
+import { todayISO } from '../lib/dates';
 import { lang, tr } from '../lib/i18n';
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
@@ -81,6 +83,7 @@ export default function Account() {
       <Card style={{ paddingVertical: 4, gap: 0 }}>
         <Row icon="body-outline" title={tr('About you')} line={aboutLine} onPress={() => router.push('/about-you')} />
         <Row icon="language-outline" title={tr('Language')} line={lang() === 'hi' ? 'हिंदी' : 'English'} onPress={() => router.push('/language')} />
+        <SpacesRow />
         <Row icon="sparkles-outline" title={tr('Daily Wisdom')} line={tradition ? tr(traditionName(tradition)) : tr('Not chosen yet (Bhagavad Gita)')} onPress={() => router.push('/tradition')} last />
       </Card>
 
@@ -123,6 +126,17 @@ function Row({ icon, title, line, onPress, last }: { icon: keyof typeof Ionicons
       <Ionicons name="chevron-forward" size={18} color={colors.muted} />
     </Pressable>
   );
+}
+
+/** Spaces (decision 0055): a home set up to help you. */
+function SpacesRow() {
+  const { profile } = useHeal();
+  const all = profile.me?.spaces ?? {};
+  const today = todayISO();
+  const n = SPACES.filter(x => all[x.id]).length;
+  const due = SPACES.find(x => afterDue(all[x.id], today));
+  const line = due ? tr('Time for an after photo') : n ? tr('{n} of {m} spaces set up', { n, m: SPACES.length }) : tr('Your home, set up to help you.');
+  return <Row icon="home-outline" title={tr('Spaces')} line={line} onPress={() => router.push('/spaces')} />;
 }
 
 function ConnectorsRow() {

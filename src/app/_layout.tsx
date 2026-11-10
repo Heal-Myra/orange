@@ -71,6 +71,7 @@ function Gate() {
       <Stack.Screen name="myra" options={{ headerShown: true, title: tr('Myra'), presentation: 'modal', headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
       <Stack.Screen name="records" options={{ headerShown: true, title: tr('Top of My Game'), headerBackTitle: tr('Back'), headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
       <Stack.Screen name="privacy" options={{ headerShown: true, title: tr('Privacy and permissions'), headerBackTitle: tr('Back'), headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
+      <Stack.Screen name="spaces" options={{ headerShown: true, title: tr('Spaces'), headerBackTitle: tr('Back'), headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
       <Stack.Screen name="connectors" options={{ headerShown: true, title: tr('Connectors'), headerBackTitle: tr('Back'), headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
       <Stack.Screen name="from-your-day" options={{ headerShown: true, title: tr('From your day'), headerBackTitle: tr('Back'), headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
       <Stack.Screen name="trend" options={{ headerShown: true, title: tr('Trends'), headerBackTitle: tr('Back'), headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />

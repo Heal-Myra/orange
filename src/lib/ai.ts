@@ -132,3 +132,9 @@ export const translateRecipes = (meals: { dish: string; portion: string; ingredi
 
 /** Fixed lines of a guided session in a regional language (translated once, kept on the phone). */
 export const translateLines = (lines: string[], to: string) => call<{ lines: string[] }>('translate_lines', { lines, to });
+
+/** Spaces (decision 0055): Myra reads a photo of a space at home. With `before` (the earlier changes), it is the after
+ *  photo: which changes she can see were made, and a line about what changed. */
+export interface SpaceReading { isSpace: boolean; seen: string; changes: { text: string; why: string }[]; kept?: number[]; note?: string }
+export const readSpace = (image_base64: string, media_type: string, space: string, before?: string[]) =>
+  call<SpaceReading>('space_read', { image_base64, media_type, space, before });

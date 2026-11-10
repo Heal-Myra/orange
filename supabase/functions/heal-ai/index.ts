@@ -366,6 +366,41 @@ Give:
 Reply with JSON only: {"isFace":true|false,"skin":{"dryness":"none"|"mild"|"noticeable","darkCircles":"…","puffiness":"…","redness":"…","breakouts":"…","tan":"…","lips":"…"},"looks":"…","looksNote":"…","hints":[],"tips":["…"],"witty":"…","note":"one short sentence"}`,
         { media_type: String(p.media_type ?? 'image/jpeg'), data: String(p.image_base64 ?? '') });
     }
+    case 'space_read': {
+      // Spaces (founder, 10 Nov 2026; decision 0055): a photo of a space at home. The specialist for that space (Food for the
+      // kitchen, Sleep for the bedroom, Mind for the desk, Soul for the quiet corner) reads it; Myra speaks. The photo is not stored.
+      const space = String(p.space ?? 'room').slice(0, 40);
+      const before = (Array.isArray(p.before) ? p.before : []).map(String).map(x => x.slice(0, 120)).slice(0, 5);
+      const lens: Record<string, string> = {
+        kitchen: 'You are the Food specialist. Look for what makes healthy eating the easy choice: fruit and vegetables in sight, packaged snacks, sugar and fried food within easy reach, water at hand, a clear place to cook.',
+        bedroom: 'You are the Sleep specialist. Look for what helps sleep: light and curtains, a phone or charger by the bed, a TV or work in the bedroom, clutter, fresh air, a calm bedside.',
+        'work desk': 'You are the Mind specialist. Look for what helps focus: clutter, the phone within reach, light, screen height, a water bottle, room to stand or stretch.',
+        'quiet corner': 'You are the Soul specialist. Look for what helps a daily sitting or prayer: a clear seat or mat, calm, little clutter, soft light, a place for the gratitude journal or a lamp.',
+      };
+      const rules = `Rules:
+- A home in India, as it is. Kind and practical: never judge taste, size, wealth or tidiness, never comment on people in the photo.
+- Use what they already have: move, hide, put out, put away. Nothing to buy, no renovation.
+- "seen": what you notice that matters most for this space, one line of at most 10 words, warm, a touch witty (e.g. "Biscuits are closer to your hand than fruit.").
+- "changes": exactly 3, the most helpful first. "text": a direct instruction of at most 10 words (e.g. "Fruit bowl on the counter, at eye level."). "why": at most 15 words, the reason in everyday words, no medical claims.`;
+      const image = { media_type: String(p.media_type ?? 'image/jpeg'), data: String(p.image_base64 ?? '') };
+      const sys = `${ORANGE_BOOK} ${lens[space.toLowerCase()] ?? 'Look for what makes the healthy choice the easy one in this space.'} You speak as Myra: minimalist, warm, witty.`;
+      if (before.length) {
+        return await askJson(ask, 'smart', sys,
+`This is the "after" photo of the person's ${space}, a week after these changes were suggested:
+${before.map((b, i) => `${i}. ${b}`).join('\n')}
+${rules}
+- "kept": the numbers of the changes above you can clearly see were made (when unsure, leave it out).
+- "seen": what changed, one line of at most 10 words, warm (e.g. "Fruit is out, snacks are hidden. Well done."). If nothing changed, kind and light.
+- "changes": the next 3 small changes for this space (the ones not made may come again, reworded).
+Reply with JSON only: {"isSpace":true,"seen":"…","kept":[0],"changes":[{"text":"…","why":"…"}],"note":""}
+If this is not a photo of a ${space} or a room: {"isSpace":false,"seen":"","changes":[],"kept":[],"note":"say briefly what it shows"}`, image);
+      }
+      return await askJson(ask, 'smart', sys,
+`This is a photo of the person's ${space}. Read it so the healthy choice becomes the easy one.
+${rules}
+Reply with JSON only: {"isSpace":true,"seen":"…","changes":[{"text":"…","why":"…"}],"note":""}
+If this is not a photo of a ${space} or a room: {"isSpace":false,"seen":"","changes":[],"note":"say briefly what it shows"}`, image);
+    }
     case 'what_is_this': {
       // Myra as the one place to drop anything (founder, 1 Nov 2026; decision 0046): first, what is this picture?
       return await askJson(ask, 'quick', ORANGE_BOOK,
