@@ -50,3 +50,25 @@ describe('Myra\'s pins', () => {
     expect(s.round.changes[0]).toEqual({ text: 'a', why: 'b', where: 'left corner', spot: { x: 0.1, y: 0.6 } });
   });
 });
+
+describe('Space score', () => {
+  it('adds up five checks and the average leaves out spaces not snapped', async () => {
+    const { spacesScore, scoreOf, checkPoints } = await import('./spaces');
+    expect(checkPoints([0, 20, 3, 12, 20])).toEqual([0, 20, 0, 10, 20]);
+    expect(checkPoints([1, 2])).toBeUndefined();
+    const k = afterPhoto(undefined, { ...read, points: [0, 20, 0, 10, 20], potential: 93 }, '2026-11-10');
+    expect(scoreOf(k)).toBe(50);
+    expect(k.round.potential).toBe(90);
+    const b = afterPhoto(undefined, { ...read, points: [20, 20, 20, 0, 20] }, '2026-11-10');
+    expect(spacesScore({ kitchen: k, bedroom: b })).toBe(65);
+    expect(spacesScore({})).toBeNull();
+  });
+  it('nudges a home space at the weekend and the desk on Friday', async () => {
+    const { weekNudge } = await import('./spaces');
+    const k = afterPhoto(undefined, { ...read, points: [0, 20, 0, 10, 20] }, '2026-11-10');
+    expect(weekNudge({ kitchen: k }, 6)).toMatchObject({ kind: 'home', id: 'kitchen', score: 50 });
+    expect(weekNudge({}, 0)).toMatchObject({ kind: 'home', id: 'kitchen', score: null });
+    expect(weekNudge({}, 5)).toMatchObject({ kind: 'office', id: 'desk' });
+    expect(weekNudge({ kitchen: k }, 3)).toBeNull();
+  });
+});

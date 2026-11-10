@@ -11,7 +11,7 @@ import { useAuth } from '../lib/auth';
 import { usePendingRequests } from '../lib/adminAlerts';
 import { useHeal } from '../lib/store';
 import { colors } from '../theme';
-import { SPACES, afterDue } from '../lib/spaces';
+import { SPACES, afterDue, spacesScore } from '../lib/spaces';
 import { todayISO } from '../lib/dates';
 import { lang, tr } from '../lib/i18n';
 import { traditionName } from '../lib/wisdom';
@@ -136,7 +136,8 @@ function SpacesRow({ last }: { last?: boolean }) {
   const today = todayISO();
   const n = SPACES.filter(x => all[x.id]).length;
   const due = SPACES.find(x => afterDue(all[x.id], today));
-  const line = due ? tr('Time for an after photo') : n ? tr('{n} of {m} spaces set up', { n, m: SPACES.length }) : tr('Your home, set up to help you.');
+  const sc = spacesScore(all);
+  const line = due ? tr('Time for an after photo') : sc != null ? tr('Spaces score {n} · {m} snapped', { n: sc, m: n }) : n ? tr('{n} of {m} spaces set up', { n, m: SPACES.length }) : tr('Your home, set up to help you.');
   return <Row icon="home-outline" title={tr('Spaces')} line={line} onPress={() => router.push('/spaces')} last={last} />;
 }
 

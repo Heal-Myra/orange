@@ -8,6 +8,7 @@ import { RecordsCard } from '../../components/RecordsCard';
 import { FromYourDay } from '../../components/FromYourDay';
 import { AirLine } from '../../components/AirLine';
 import { OneChange } from '../../components/OneChange';
+import { SpacesNudge } from '../../components/SpacesNudge';
 import { todayISO } from '../../lib/dates';
 import { useAuth } from '../../lib/auth';
 import { Screen } from '../../components/ui';
@@ -41,6 +42,9 @@ export default function Today() {
       {date === todayISO() ? <RecordsCard /> : null}
 
       <MyraCard />
+
+      {/* Spaces (founder, 10 Nov 2026): Saturday and Sunday a home space, Friday the office desk. */}
+      {date === todayISO() ? <SpacesNudge /> : null}
 
       {/* The 30-day one-change test (founder, 10 Nov 2026), one folded row. */}
       {date === todayISO() ? <OneChange /> : null}

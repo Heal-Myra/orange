@@ -398,6 +398,12 @@ Reply with JSON only: {"isFace":true|false,"skin":{"dryness":"none"|"mild"|"noti
       const spots = `- "frame": ${many ? 'the number of the frame that shows the most of the space; the app shows that one' : '0'}.
 - For each change, "spot": where it goes on that frame, as {"x":0.0-1.0 from the left edge,"y":0.0-1.0 from the top edge}, at the exact place (e.g. the bare stretch of counter for a fruit bowl). Use null if the place is not in that frame.
 - For each change, "where": at most 15 words saying exactly where and what to move, naming what is there now (e.g. "Left corner of the counter, where the paper roll stands; roll goes on the wall hook.").`;
+      // The Space score (founder, 10 Nov 2026): five fixed checks, 0, 10 or 20 points each, only for what can be seen.
+      const checks = (Array.isArray(p.checks) ? p.checks : []).map(String).map(x => x.slice(0, 60)).slice(0, 5);
+      const scoring = checks.length === 5 ? `
+- "points": exactly 5 numbers, one per check below, in this order: 20 = clearly true in what you see, 10 = partly, 0 = not true or cannot be seen. Mark only what is visible; be fair and consistent, so the same space scores the same.
+${checks.map((c, i) => `  ${i + 1}. ${c}`).join('\n')}
+- "potential": the total these 5 checks would reach once the 3 changes are made (a multiple of 10, at most 100).` : '';
       const sys = `${ORANGE_BOOK} ${lens[space.toLowerCase()] ?? 'Look for what makes the healthy choice the easy one in this space.'} You speak as Myra: minimalist, warm, witty.`;
       if (before.length) {
         return await askJson(ask, 'smart', sys,
@@ -407,15 +413,15 @@ ${rules}
 - "kept": the numbers of the changes above you can clearly see were made (when unsure, leave it out).
 - "seen": what changed, one line of at most 10 words, warm (e.g. "Fruit is out, snacks are hidden. Well done."). If nothing changed, kind and light.
 - "changes": the next 3 small changes for this space (the ones not made may come again, reworded).
-${spots}
-Reply with JSON only: {"isSpace":true,"seen":"…","kept":[0],"frame":0,"changes":[{"text":"…","why":"…","where":"…","spot":{"x":0.5,"y":0.5}}],"note":""}
+${spots}${scoring}
+Reply with JSON only: {"isSpace":true,"seen":"…","kept":[0],"frame":0,"points":[0,0,0,0,0],"potential":0,"changes":[{"text":"…","why":"…","where":"…","spot":{"x":0.5,"y":0.5}}],"note":""}
 If these do not show a ${space} or a room: {"isSpace":false,"seen":"","changes":[],"kept":[],"note":"say briefly what it shows"}`, image);
       }
       return await askJson(ask, 'smart', sys,
 `${seeing} Read it so the healthy choice becomes the easy one.
 ${rules}
-${spots}
-Reply with JSON only: {"isSpace":true,"seen":"…","frame":0,"changes":[{"text":"…","why":"…","where":"…","spot":{"x":0.5,"y":0.5}}],"note":""}
+${spots}${scoring}
+Reply with JSON only: {"isSpace":true,"seen":"…","frame":0,"points":[0,0,0,0,0],"potential":0,"changes":[{"text":"…","why":"…","where":"…","spot":{"x":0.5,"y":0.5}}],"note":""}
 If these do not show a ${space} or a room: {"isSpace":false,"seen":"","changes":[],"note":"say briefly what it shows"}`, image);
     }
     case 'what_is_this': {

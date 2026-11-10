@@ -59,6 +59,7 @@ export function ReminderScheduler() {
   const mealsToday = (['lunch', 'dinner'] as Slot[]).filter(s => needsNudge(todayLog, s)).join(',');
   // Spaces (decision 0055): at 10 am on the day an after photo is due, one gentle nudge.
   const spaces = profile.me?.spaces ?? {};
+  const spacesOn = !!profile.me; // Spaces lives with About you
   const spacesDue = SPACES.flatMap(x => (spaces[x.id] ? [`${x.id}@${againOn(spaces[x.id]!)}`] : [])).join(',');
 
   useEffect(() => {
@@ -118,6 +119,17 @@ export function ReminderScheduler() {
           });
           if (cancelled) return;
         }
+        // Spaces week nudges (founder, 10 Nov 2026): Saturday 10 am a home space, Friday 4 pm the office desk.
+        if (spacesOn && (day.getDay() === 6 || day.getDay() === 5)) {
+          const when = new Date(day); when.setHours(day.getDay() === 6 ? 10 : 16, 0, 0, 0);
+          if (when.getTime() > now + 30_000 && when.getTime() <= horizon) {
+            await Notif.scheduleNotificationAsync({
+              content: { title: tr('Spaces'), body: day.getDay() === 6 ? tr('Weekend fix: one small change at home.') : tr('Friday desk check: snap it before you leave.'), data: { kind: 'space', id: day.getDay() === 6 ? '' : 'desk', lang: lang() } },
+              trigger: { type: Notif.SchedulableTriggerInputTypes.DATE, date: when },
+            });
+            if (cancelled) return;
+          }
+        }
         for (const sd of spacesDue ? spacesDue.split(',') : []) {
           const [sid, on] = sd.split('@');
           const when = new Date(day); when.setHours(10, 0, 0, 0);
@@ -156,7 +168,7 @@ export function ReminderScheduler() {
     } catch { tap = null; }
     const sub = AppState.addEventListener('change', s => { if (s === 'active') plan().catch(() => {}); });
     return () => { cancelled = true; sub.remove(); tap?.remove(); };
-  }, [routine, open, fastingToday, habits, doneKey, weighed, scale, fastUntil, mealsToday, spacesDue]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [routine, open, fastingToday, habits, doneKey, weighed, scale, fastUntil, mealsToday, spacesDue, spacesOn]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return null;
 }

@@ -1,5 +1,10 @@
 # Changelog
 
+## 10 Nov 2026 — Space score and weekend / Friday nudges (decision 0057)
+- Every space now has a **score out of 100**: five checks Myra marks from your photo, 20 points each, shown as rings with the score in the middle and what it would be after her 3 changes. The Spaces score (average of the spaces you've snapped) shows in Spaces and in Profile. It is not part of My day.
+- **Saturday and Sunday:** a card on Today for one home space worth improving, and a 10 am phone note on Saturday. **Friday:** a card and a 4 pm note to snap your work desk before you leave. "Not now" hides the card for the day.
+- Snapping again the same day now says "changes made since your last photo" instead of "since Today".
+
 ## 10 Nov 2026 — Spaces: Myra's pins, walk-round video, faces blurred (build 14)
 - **Myra's pins** (quick update, every build): Myra marks where each change goes with numbered coral pins on your own photo, and each change shows exactly where and what to move (e.g. "Where the paper roll stands; roll goes on the wall hook."). Switch between "Changes marked" and "Now".
 - **Walk-round video** (build 14): film the space for up to 30 seconds; the phone takes 4 still frames and only those go to Myra. She puts her pins on the frame that shows the most. The video never leaves the phone.
