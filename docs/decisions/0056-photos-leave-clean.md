@@ -17,3 +17,8 @@ paid service whose data is not used for training.
 Next (build 14, needs native code): blur faces on the phone before a Spaces photo is sent.
 
 Also confirmed: **no other AI company** receives people's data (no outside image AI; see 0055).
+
+## Update, 10 Nov 2026: open models on the phone looked at, staying with Claude
+Free open vision models that run on the phone (SmolVLM, a small Qwen vision model, Gemma 3n) or on a rented GPU computer (Qwen 2.5 VL,
+Pixtral, Gemma 3) were considered. Small phone models give much weaker advice and need a 0.6–2 GB download; big ones need
+a rented GPU. **Founder: stick with Claude for the time being.** A "Keep on my phone" choice stays a later idea.
