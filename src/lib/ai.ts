@@ -4,6 +4,7 @@
 import { FunctionsHttpError } from '@supabase/supabase-js';
 import { lang, tr } from './i18n';
 import { supabase } from './supabase';
+import { cleanPayload } from './jpegClean';
 import type { ContentCategoryId } from './types';
 
 export interface MealItem { name: string; grams: number; kcal: number; protein_g: number; carbs_g: number; fat_g: number; fibre_g?: number; basis: 'IFCT' | 'estimate' | 'mine'; usual?: string; edited?: boolean }
@@ -15,6 +16,8 @@ async function call<T>(action: string, payload: Record<string, unknown>): Promis
   if (!supabase) throw new Error('AI features need the online version of the app.');
   const { data: session } = await supabase.auth.getSession();
   if (!session.session) throw new Error('Please sign in to use AI features.');
+  // Every photo leaves the phone clean (decision 0056): no location, phone model or time hidden inside it.
+  payload = cleanPayload(payload);
   const send = () => supabase!.functions.invoke('heal-ai', { body: { action, payload, uiLang: lang() } });
   const t0 = Date.now();
   let { data, error } = await send();

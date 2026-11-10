@@ -1,5 +1,9 @@
 # Changelog
 
+## 10 Nov 2026 — Photos leave the phone clean (decision 0056)
+- Before any photo goes to Myra (meals, Spaces, chat, Screen Time, notebook pages, selfies), the hidden details inside it are removed: where it was taken, which phone took it, and when. Only the picture itself is sent.
+- Founder's rule confirmed: people's photos go to Claude only, never to another AI company. Face blurring on the phone comes with build 14.
+
 ## 10 Nov 2026 — Spaces: living room and washroom
 - Founder: two more spaces. **Living room** (helps family time · Soul: TV, phones at the sofa, seats that face each other) and **Washroom** (helps your morning · Body: phone kept out, scale in one spot, fresh air, a dry floor). Myra never mentions personal items she may see in a washroom photo.
 
