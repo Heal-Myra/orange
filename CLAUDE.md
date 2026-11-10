@@ -49,6 +49,7 @@ Docs: https://docs.expo.dev/eas/index.md
 - **Show a picture before building any visual change** (founder, 31 Oct 2026): a real screenshot of the web build or a drawn preview first; build and ship only after he says go. Every scored card follows decision 0037 (concentric rings, details at the side or boxes below, Myra's line at the bottom).
 - **Languages (English, Hindi):** every visible text goes through `tr('English text')` (`src/lib/i18n.tsx`) and needs its Hindi in `src/lib/hi.ts`; `npm test` fails if one is missing. AI replies follow the app language (see docs/decisions/0010).
 - **Multi-agent AI (founder, 7 Nov 2026; decision 0052):** Myra is the coordinator and the only voice; specialist agents own Food, Movement, Sleep, Mind/meditation, Soul/wisdom and Connectors. Put every new feature in its specialist's place; specialists suggest, Myra merges into one next step and explains why.
+- **Myra's voice (founder, 10 Nov 2026):** minimalist, warm, witty. One or two short sentences, only what was asked, at most one 10-word suggestion; never talkative or a list of tactics. Every AI prompt that speaks as Myra follows this.
 - **Scoring** lives in `src/lib/scoring.ts` and is documented in `docs/scoring.md`. Change both together and keep `npm test` passing.
 - **Secrets** (Claude API key, Supabase service key) live only in Supabase / EAS secrets, never in this repository or the app.
 - **Bundled data** in `assets/data/` is licensed (see `docs/decisions/0002-data-architecture.md`). Do not add modern Gita translations — they are under copyright.
