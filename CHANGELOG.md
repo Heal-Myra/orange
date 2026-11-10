@@ -1,5 +1,10 @@
 # Changelog
 
+## 10 Nov 2026 — Missed-meal nudge, protein top-up and the 30-day test (decision 0054)
+- **Missed-meal nudge:** at 2 pm with no lunch logged, and at 9:30 pm with no dinner, a gentle phone note and a row in Food: Snap · Skipped · Ate, no photo. Skipped carries no penalty. Not on fasting days.
+- **Protein top-up:** from 6 pm, when protein is still under 80 % of the aim, Food shows protein so far and one line from Myra with the food that closes the gap, plus three picks (your own dishes first; vegetarian unless About you says otherwise). Tap one once you've eaten it.
+- **30-day test** on Today: pick one change (or write your own), tap Kept today or Not today once a day; on day 30 Myra shows sleep, Body score, My day and mood before and after.
+
 ## 9 Nov 2026 — Fasting counts only when you say so
 - Testers often forget to photograph a meal, and the gap showed as a long fast ("Fast kept: 25 h"). Now the hours without food count only when you tick "I'm fasting today" (or have a fasting habit in About you). Otherwise the Food card shows just the dinner-time line, and its 8 fasting points go to Meals (Meals 32 + Early dinner 8). Days before today keep their scores.
 

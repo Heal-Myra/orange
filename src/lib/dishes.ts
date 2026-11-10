@@ -5,7 +5,7 @@
 import type { MealItem } from './ai';
 import type { DayLog, Meal } from './types';
 
-export interface Dish { name: string; per100: { kcal: number; p: number; c: number; f: number; fib: number }; times: number }
+export interface Dish { name: string; grams: number; per100: { kcal: number; p: number; c: number; f: number; fib: number }; times: number }
 
 const confirmed = (m: Meal) => (m.grams ?? 0) > 0 && !m.check && (m.edited || m.checked || m.source.endsWith('+ifct') || m.source.endsWith('+mine'));
 export const dishKey = (name: string) => name.trim().toLowerCase().replace(/\s+/g, ' ');
@@ -20,7 +20,7 @@ export function myDishes(days: Record<string, DayLog>, today: string): Dish[] {
       if (!confirmed(m)) continue;
       const k = dishKey(m.name), g = m.grams! / 100, had = map.get(k);
       if (had) { had.times++; continue; } // newest first: the first one seen is the latest recipe
-      map.set(k, { name: m.name.trim(), times: 1, per100: { kcal: m.kcal / g, p: m.p / g, c: m.c / g, f: m.f / g, fib: (m.fib ?? 0) / g } });
+      map.set(k, { name: m.name.trim(), grams: m.grams!, times: 1, per100: { kcal: m.kcal / g, p: m.p / g, c: m.c / g, f: m.f / g, fib: (m.fib ?? 0) / g } });
     }
   }
   return [...map.values()].sort((a, b) => b.times - a.times);

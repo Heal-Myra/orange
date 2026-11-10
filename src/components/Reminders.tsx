@@ -15,6 +15,7 @@ import { lang, tr } from '../lib/i18n';
 import { todayISO } from '../lib/dates';
 import { optional } from '../lib/native';
 import { WEIGHT_NUDGE, usesScale, weighedOn } from '../lib/weightNudge';
+import { SLOTS, needsNudge, type Slot } from '../lib/missedMeal';
 
 // Arrived with build 7; older installed builds simply schedule nothing.
 let N: typeof import('expo-notifications') | null = null;
@@ -52,9 +53,12 @@ export function ReminderScheduler() {
   const doneKey = doneToday.join(',');
   const routine = profile.me?.routine;
   const fastUntil = days[todayISO()]?.infoFast?.ended ? undefined : days[todayISO()]?.infoFast?.until; // information fast end (31 Oct 2026)
+  // Missed-meal nudges (10 Nov 2026): today's, only for a meal still not logged or skipped; tomorrow's always planned.
+  const todayLog = days[todayISO()];
+  const mealsToday = (['lunch', 'dinner'] as Slot[]).filter(s => needsNudge(todayLog, s)).join(',');
 
   useEffect(() => {
-    if (!N || (!routine?.length && !habits.length && !scale && !fastUntil)) return;
+    if (!N) return;
     const Notif = N;
     let cancelled = false;
     const plan = async () => {
@@ -76,6 +80,17 @@ export function ReminderScheduler() {
       }
       for (const offset of [0, 1]) {
         const day = new Date(); day.setDate(day.getDate() + offset);
+        for (const slot of ['lunch', 'dinner'] as Slot[]) {
+          if (offset === 0 && !mealsToday.split(',').includes(slot)) continue;
+          const [h, m] = SLOTS[slot].nudge.split(':').map(Number);
+          const when = new Date(day); when.setHours(h, m, 0, 0);
+          if (when.getTime() <= now + 30_000 || when.getTime() > horizon) continue;
+          await Notif.scheduleNotificationAsync({
+            content: { title: 'Happy Orange', body: slot === 'lunch' ? tr('Lunch not logged yet. Snap it, or say skipped.') : tr('Dinner not logged yet. Snap it, or say skipped.'), data: { kind: 'meal-missed', lang: lang() } },
+            trigger: { type: Notif.SchedulableTriggerInputTypes.DATE, date: when },
+          });
+          if (cancelled) return;
+        }
         // No weight by 3 pm (founder, 25 Oct 2026): the Withings app sends weighings to Apple Health only when it runs.
         if (scale && !(offset === 0 && weighed)) {
           const [h, m] = WEIGHT_NUDGE.split(':').map(Number);
@@ -118,12 +133,13 @@ export function ReminderScheduler() {
       tap = Notif.addNotificationResponseReceivedListener(r => {
         const kind = (r.notification.request.content.data as { kind?: string } | undefined)?.kind;
         if (kind === 'sleep') router.push('/yoga-nidra');
+        else if (kind === 'meal-missed') router.navigate({ pathname: '/body', params: { card: 'food', at: String(Date.now()) } });
         else if (kind === 'weight') router.navigate({ pathname: '/body', params: { card: 'body', at: String(Date.now()) } });
       });
     } catch { tap = null; }
     const sub = AppState.addEventListener('change', s => { if (s === 'active') plan().catch(() => {}); });
     return () => { cancelled = true; sub.remove(); tap?.remove(); };
-  }, [routine, open, fastingToday, habits, doneKey, weighed, scale, fastUntil]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [routine, open, fastingToday, habits, doneKey, weighed, scale, fastUntil, mealsToday]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return null;
 }

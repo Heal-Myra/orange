@@ -70,6 +70,8 @@ export interface DayLog {
   sleep: { hours?: number; quality?: 1 | 2 | 3 | 4 | 5; source?: string; bedAt?: string }; // bedAt: when sleep began (Apple Health), for dinner timing // source 'Typed in' = the person's own number wins over Apple Health
   meals: Meal[];
   fasting?: boolean;
+  skipped?: ('lunch' | 'dinner')[]; // "Skipped" on the missed-meal row (founder, 10 Nov 2026): no nudge, no penalty
+  oneChange?: 'yes' | 'no'; // the 30-day test's daily answer (founder, 10 Nov 2026)
   fastFrom?: string; // ISO time of the last meal of the day before (fasting by choice; 1 Nov 2026)
   // Love (founder, 24 Oct 2026): whom I love today and how, what makes me happy today, the friend I meet this week.
   love?: { whom?: string; self?: string; done?: boolean; act?: string; happy?: string; friend?: string; kindTo?: string }; // self: how I love myself (happy: older days); kindTo: Gratitude journal, I was kind to (27 Oct 2026)

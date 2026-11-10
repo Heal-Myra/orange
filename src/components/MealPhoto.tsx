@@ -36,7 +36,7 @@ export function speechRecognition(): (new () => any) | null {
 }
 
 /** One Food card: log a meal (photo, speak, type) on top, today's meals and totals underneath. */
-export function MealPhoto({ right, top, children, snap }: { right?: ReactNode; top?: ReactNode; children?: ReactNode; snap?: string }) {
+export function MealPhoto({ right, top, children, snap, typeIt }: { right?: ReactNode; top?: ReactNode; children?: ReactNode; snap?: string; typeIt?: string }) {
   const { session } = useAuth();
   const { update, days } = useHeal();
   const logMeals = useLogMeals();
@@ -122,6 +122,9 @@ export function MealPhoto({ right, top, children, snap }: { right?: ReactNode; t
     const t = setTimeout(() => { setMode('photo'); pick(true); }, 700);
     return () => clearTimeout(t);
   }, [snap]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // "Ate, no photo" on the missed-meal row (founder, 10 Nov 2026): straight to Type.
+  useEffect(() => { if (typeIt) { setMode('type'); setMessage(null); } }, [typeIt]);
 
   const describe = async (said?: string) => {
     const text = (said ?? words).trim();

@@ -17,6 +17,7 @@ export interface AboutMe {
   aims?: string;      // the non-weight part of the goal, e.g. "run 5 km", "sleep better"
   goalNote?: string;  // Myra's one-line reply about the goal (e.g. that it is too steep and what she planned instead)
   foodPrefs?: string;
+  oneChange?: { change: string; start: string; ended?: string }; // the 30-day one-change test (founder, 10 Nov 2026)
   guideLang?: string; // language of guided sessions (en, hi or a regional code; 24 Oct 2026)
   saved?: { url: string; title: string; note?: string; at: string }[]; // shared to Happy Orange: "Save to my journey" (24 Oct 2026)
   party?: { what?: string; when?: string; who?: string; plan?: string }; // a party being planned (24 Oct 2026)

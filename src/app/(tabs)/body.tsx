@@ -10,6 +10,8 @@ import { Dots, Rows, StatRow } from '../../components/StatRows';
 import { MacroMix, NutritionTable, aimMix } from '../../components/MacroMix';
 import { bmiOf, fibreTarget, planFor } from '../../lib/targets';
 import { CheckLine, MealPhoto } from '../../components/MealPhoto';
+import { MissedMeal } from '../../components/MissedMeal';
+import { ProteinTopUp } from '../../components/ProteinTopUp';
 import { FoodPlanRow } from '../../components/FoodPlan';
 import { MealRow } from '../../components/MealRow';
 import { CareNote } from '../../components/CareCard';
@@ -37,13 +39,14 @@ export default function Body() {
   // From 3 Nov 2026: Fasting, Dinner before sleep, Meals; the nutrients move to See details (decision 0047).
   const v3 = date >= FOOD_V3_FROM ? foodV3Of(day, profile) : null;
   const [details, setDetails] = useState(false);
+  const [ask, setAsk] = useState<{ snap?: string; type?: string }>({}); // from the missed-meal row (10 Nov 2026)
   const auto = connected; // Apple Health fills sleep and movement; typing is only for phones without it
   const h = day.health;
   const st = h?.sleepStages;
 
   return (
     <Screen feedback="Body">
-      <Anchor id="food"><MealPhoto snap={snap} right={<Score value={score?.nutrition} max={40} />} top={
+      <Anchor id="food"><MealPhoto snap={ask.snap ?? snap} typeIt={ask.type} right={<Score value={score?.nutrition} max={40} />} top={
         <RingPanel trend="food" score={score?.nutrition} max={40} items={(() => {
           // Calories, carbs, protein, fat and fibre (founder, 3 Nov 2026: the score is fasting + early dinner + meals, but the
           // rings show the nutrients); carb and fat aims from the same mix as the table.
@@ -58,10 +61,12 @@ export default function Body() {
             { id: 'fibre', color: PASTEL.teal, label: tr('Fibre'), value: (totals.fib ?? 0) / fib, text: `${Math.round(totals.fib ?? 0)} / ${fib} g` },
           ];
         })()} />}>
+        <MissedMeal onSnap={() => setAsk({ snap: String(Date.now()) })} onType={() => setAsk({ type: String(Date.now()) })} />
         <FastStatus dinnerGap={v3?.dinnerGap} />
         {v3 ? <FoodPenalty v={v3} /> : null}
         <FastAsk />
         <CareNote part="food" />
+        <ProteinTopUp />
         {/* "I'm fasting today" (founder, 22 Oct 2026): a declared fast scores Food in full while only water, black tea
             or black coffee go in, and Myra changes her advice. */}
         <Pressable accessibilityRole="switch" accessibilityState={{ checked: !!day.fasting }} onPress={() => update(d => { d.fasting = !d.fasting; })}
