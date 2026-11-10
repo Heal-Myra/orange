@@ -108,8 +108,8 @@ export interface ChatMessage { role: 'user' | 'myra'; text: string; attach?: Cha
 export interface AttachmentData { kind: 'image' | 'pdf' | 'text'; name: string; media_type?: string; data?: string; text?: string }
 
 /** Myra, the in-app assistant: answers using the person's own summary and the screen they are on. */
-export const askMyra = (messages: ChatMessage[], context: string, page: string, attachment?: AttachmentData) =>
-  call<{ text: string; feedback?: string }>('myra', { messages: messages.slice(-12).map(({ role, text, attach }) => ({ role, text, attach: attach ? { name: attach.name } : undefined })), context, page, attachment });
+export const askMyra = (messages: ChatMessage[], context: string, page: string, attachment?: AttachmentData, style?: string) =>
+  call<{ text: string; feedback?: string; style?: string }>('myra', { messages: messages.slice(-12).map(({ role, text, attach }) => ({ role, text, attach: attach ? { name: attach.name } : undefined })), context, page, attachment, style });
 
 /** Founder's rule (19 Oct 2026): every suggestion shown to the person is one line of at most 10 words. */
 export const oneLine = (text: string, max = 10): string => {

@@ -1,5 +1,9 @@
 # Changelog
 
+## 10 Nov 2026 — Myra becomes like you, and tries something new now and then
+- Myra mirrors how you talk: your length, tone, humour, emoji and language mix (Hinglish too). She keeps a short note of how you talk, kept with About you (no health details), and every Myra line uses it.
+- About one reply in five she nudges you to try something different, in how she talks or a small new thing to do. What you enjoy she offers more often; what you ignore she drops.
+
 ## 10 Nov 2026 — Myra says less, with a smile
 - Founder: Myra was talkative and offered too many tactics. Her chat personality is now minimalist, warm and witty: usually one or two short sentences (30 words at most; 60 when asked to explain), only what was asked, at most one 10-word suggestion, and a single playful line for a stray letter ("Pocket typing? 😄 What can I do for you?").
 

@@ -61,7 +61,7 @@ export default function Myra() {
   const speakRef = useRef<(() => void) | null>(null);
   const page = typeof from === 'string' && SUGGESTIONS[from] ? from : 'today';
   const { session, tradition } = useAuth();
-  const { day, days, date, profile } = useHeal();
+  const { day, days, date, profile, setProfile } = useHeal();
   const { open } = useTasks();
   const insets = useSafeAreaInsets();
   const [messages, setMessages] = useState<ChatMessage[]>([HELLO]);
@@ -122,9 +122,11 @@ export default function Myra() {
     }
     try {
       const r = await askMyra(next.filter(m => m !== HELLO), buildContext(day, days, date, profile, tasksForAI(open, todayISO()), tradition), page,
-        sending ? { kind: sending.kind, name: sending.name, media_type: sending.media_type, data: sending.data, text: sending.text } : undefined);
+        sending ? { kind: sending.kind, name: sending.name, media_type: sending.media_type, data: sending.data, text: sending.text } : undefined, profile.me?.style);
       const done: ChatMessage[] = [...next, { role: 'myra', text: r.text }];
       setMessages(done); save(done);
+      // What Myra has learned about how the person talks (founder, 10 Nov 2026), kept with About you so it syncs.
+      if (r.style && profile.me && r.style !== profile.me.style) setProfile({ ...profile, me: { ...profile.me, style: r.style } });
       // Feedback told to Myra goes to the team (founder, 31 Oct 2026): Admin › Feedback, area "Myra chat".
       if (r.feedback && supabase && session) {
         supabase.from('feedback').insert({ email: session.user.email, area: 'Myra chat', rating: null, message: r.feedback,
