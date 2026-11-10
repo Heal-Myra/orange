@@ -1,5 +1,8 @@
 # Changelog
 
+## 10 Nov 2026 — Myra says less, with a smile
+- Founder: Myra was talkative and offered too many tactics. Her chat personality is now minimalist, warm and witty: usually one or two short sentences (30 words at most; 60 when asked to explain), only what was asked, at most one 10-word suggestion, and a single playful line for a stray letter ("Pocket typing? 😄 What can I do for you?").
+
 ## 10 Nov 2026 — Meditation: nothing preselected
 - The Dhamma path was always selected, so tapping Calm or Energy showed nothing. Now the card opens with nothing chosen: tap what you want help with to see Myra's practice, or tap a way (Dhamma path, Guided, On my own). Picking a help-with closes the Dhamma path view, and picking the Dhamma path clears the help-with. Tapping a chosen way again unselects it.
 
