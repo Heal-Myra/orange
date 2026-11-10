@@ -43,9 +43,10 @@ export function MeditationTimer() {
   const [length, setLength] = useState(choices.includes(suggested) ? suggested : 10);
   const path = useMemo(() => pathState(days, date), [days, date]);
   const onPath = path.active && !path.finished;
-  const [way, setWay] = useState<Way>(path.active ? 'dhamma' : 'guided');
+  // Nothing chosen at first (founder, 10 Nov 2026): a preselected Dhamma path hid what Calm or Energy recommend.
+  const [way, setWay] = useState<Way | null>(null);
   const [aim, setAimState] = useState<AimId | null>(lastAim);
-  const setAim = (a: AimId | null) => { lastAim = a; setAimState(a); setPick(null); };
+  const setAim = (a: AimId | null) => { lastAim = a; setAimState(a); setPick(null); if (a) setWay(w => (w === 'dhamma' ? null : w)); };
   const [pick, setPick] = useState<PracticeId | null>(null);
   const careName = carePlan(day.feeling?.symptoms ?? [])?.name; // care plan (25 Oct 2026)
   const [gLangLocal, setGLangLocal] = useState<string | null>(null);
@@ -129,7 +130,7 @@ export function MeditationTimer() {
           <Text style={lab}>{tr('CHOOSE YOUR WAY')}</Text>
           <View style={{ flexDirection: 'row', gap: 8 }}>
             {([['dhamma', '🪷', 'Dhamma path', '10 days, one step a day'], ['guided', '🎧', 'Guided', "Myra's voice leads you"], ['self', '⏱', 'On my own', 'A quiet timer and bell']] as const).map(([id, icon, name, line]) => (
-              <Pressable key={id} onPress={() => setWay(id)} accessibilityRole="radio" accessibilityState={{ selected: way === id }}
+              <Pressable key={id} onPress={() => { if (id === 'dhamma') { lastAim = null; setAimState(null); } setWay(w => (w === id ? null : id)); }} accessibilityRole="radio" accessibilityState={{ selected: way === id }}
                 style={{ flex: 1, borderWidth: way === id ? 1.5 : 1, borderColor: way === id ? colors.accent : colors.line, backgroundColor: way === id ? colors.accent + '0D' : colors.surface, borderRadius: 16, paddingVertical: 10, paddingHorizontal: 6, alignItems: 'center', gap: 3 }}>
                 <Text style={{ fontSize: 22 }}>{icon}</Text>
                 <Text style={{ fontSize: 14, fontWeight: '700', color: colors.ink, textAlign: 'center' }}>{tr(name)}</Text>
@@ -140,17 +141,17 @@ export function MeditationTimer() {
           {/* All three ways always show (founder, 5 Nov 2026); the Dhamma path keeps its place while it runs. */}
           {way === 'dhamma' ? (onPath ? <><DhammaToday path={path} gLang={gLang} /><LeavePath /></> : path.finished ? <AfterTen gLang={gLang} /> : <DhammaStart gLang={gLang} />)
             : !aim && way === 'guided' ? <Button title={careName ? tr('Care breathing for {what}', { what: tr(careName) }) + ` · ${length} ${tr('min')}` : tr('Start {n}-minute session', { n: length })} onPress={() => guided('mix')} />
-            : !aim ? (
+            : !aim && way === 'self' ? (
               <>
                 <Note>{tr('Sit comfortably, let your eyes close, and follow the breath. The app counts only the minutes you actually sit.')}</Note>
                 <Button title={tr('Start {n}-minute session', { n: length })} onPress={start} />
               </>
             ) : null}
-          {way !== 'dhamma' ? lengthAndVoice : null}
+          {(way && way !== 'dhamma') || aim ? lengthAndVoice : null}
         </>
       )}
       {!sitting ? <TodaySessions /> : null}
-      {profile.me && way !== 'dhamma' ? <GoalRow /> : null}
+      {profile.me && way && way !== 'dhamma' ? <GoalRow /> : null}
       <MyraLine card="meditation" />
     </Card>
   );

@@ -1,5 +1,8 @@
 # Changelog
 
+## 10 Nov 2026 — Meditation: nothing preselected
+- The Dhamma path was always selected, so tapping Calm or Energy showed nothing. Now the card opens with nothing chosen: tap what you want help with to see Myra's practice, or tap a way (Dhamma path, Guided, On my own). Picking a help-with closes the Dhamma path view, and picking the Dhamma path clears the help-with. Tapping a chosen way again unselects it.
+
 ## 10 Nov 2026 — Missed-meal nudge, protein top-up and the 30-day test (decision 0054)
 - **Missed-meal nudge:** at 2 pm with no lunch logged, and at 9:30 pm with no dinner, a gentle phone note and a row in Food: Snap · Skipped · Ate, no photo. Skipped carries no penalty. Not on fasting days.
 - **Protein top-up:** from 6 pm, when protein is still under 80 % of the aim, Food shows protein so far and one line from Myra with the food that closes the gap, plus three picks (your own dishes first; vegetarian unless About you says otherwise). Tap one once you've eaten it.
