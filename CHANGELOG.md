@@ -1,5 +1,8 @@
 # Changelog
 
+## 10 Nov 2026 — Language and Daily Wisdom live in About you
+- Founder: one place for your profile. Profile now lists About you and Spaces; Language (English · हिंदी) and Daily Wisdom (your tradition) are chosen inside About you. The first-run language and wisdom screens are unchanged.
+
 ## 10 Nov 2026 — No "Habits" heading: recurring items are just to-dos
 - Founder: a monthly bill like the Tata Play payment is not a habit. Everything that repeats (bills, EMIs, daily practices) now sits in its group's to-do list like any other to-do, with the same Done switch and a small "↻ Monthly · 10" (new daily practices still show "Day 5 of 21"). The group counts include them. Tap the words to stop it repeating.
 

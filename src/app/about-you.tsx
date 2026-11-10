@@ -11,7 +11,7 @@ import { Button, Card, Heading, Note, NumberField, Screen, Segmented, TextField,
 import { readRoutine, understandGoal } from '../lib/ai';
 import { useAuth } from '../lib/auth';
 import { todayISO } from '../lib/dates';
-import { tr } from '../lib/i18n';
+import { tr, useLang } from '../lib/i18n';
 import { useHeal } from '../lib/store';
 import { parseGoal, planFor, type AboutMe, type Plan, type Sex } from '../lib/targets';
 import { TRADITIONS, type Tradition } from '../lib/wisdom';
@@ -21,6 +21,7 @@ export default function AboutYou() {
   const { profile, setProfile, markMeAsked, day } = useHeal();
   const { session, tradition, setTradition } = useAuth();
   const me = profile.me;
+  const { lang: appLang, setLang } = useLang(); // Language lives here now (founder, 10 Nov 2026)
   const [name, setName] = useState(me?.name ?? '');
   const [age, setAge] = useState<number | undefined>(me?.age);
   const [sex, setSex] = useState<Sex | undefined>(me?.sex);
@@ -118,7 +119,24 @@ export default function AboutYou() {
       </Card>
 
       <Card>
-        <Heading>{tr('Religion')}</Heading>
+        <Heading>{tr('Language')}</Heading>
+        <View style={{ flexDirection: 'row', gap: 8 }}>
+          {([['en', 'English'], ['hi', 'हिंदी']] as const).map(([id, name]) => {
+            const on = appLang === id;
+            return (
+              <Pressable key={id} onPress={() => setLang(id)} accessibilityRole="radio" accessibilityState={{ selected: on }}
+                style={{ paddingVertical: 8, paddingHorizontal: 14, borderRadius: 99, borderWidth: 1,
+                  borderColor: on ? colors.accent : colors.line, backgroundColor: on ? colors.accent + '14' : colors.surface }}>
+                <Text style={{ color: on ? colors.accent : colors.ink, fontWeight: on ? '700' : '400' }}>{name}</Text>
+              </Pressable>
+            );
+          })}
+        </View>
+        <Note>{tr('The whole app and Myra follow it.')}</Note>
+      </Card>
+
+      <Card>
+        <Heading>{tr('Daily Wisdom')}</Heading>
         <Note>{tr('Your Daily Wisdom on the Soul tab comes from this. Optional and private.')}</Note>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
           {TRADITIONS.map(t => {

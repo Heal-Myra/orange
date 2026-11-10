@@ -9,12 +9,11 @@ import { useNeoSapien } from '../lib/neosapien';
 import { useHealth } from '../components/HealthSync';
 import { useAuth } from '../lib/auth';
 import { usePendingRequests } from '../lib/adminAlerts';
-import { traditionName } from '../lib/wisdom';
 import { useHeal } from '../lib/store';
 import { colors } from '../theme';
 import { SPACES, afterDue } from '../lib/spaces';
 import { todayISO } from '../lib/dates';
-import { lang, tr } from '../lib/i18n';
+import { tr } from '../lib/i18n';
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 
@@ -50,7 +49,7 @@ const SYNC_TEXT = {
 } as const;
 
 export default function Account() {
-  const { session, online, signOut, leaveGuest, admin, tradition } = useAuth();
+  const { session, online, signOut, leaveGuest, admin } = useAuth();
   const pending = usePendingRequests(); // 0 for everyone except admins
   const { sync, syncError, profile } = useHeal();
   const [message, setMessage] = useState<string | null>(null);
@@ -82,9 +81,8 @@ export default function Account() {
 
       <Card style={{ paddingVertical: 4, gap: 0 }}>
         <Row icon="body-outline" title={tr('About you')} line={aboutLine} onPress={() => router.push('/about-you')} />
-        <Row icon="language-outline" title={tr('Language')} line={lang() === 'hi' ? 'हिंदी' : 'English'} onPress={() => router.push('/language')} />
-        <SpacesRow />
-        <Row icon="sparkles-outline" title={tr('Daily Wisdom')} line={tradition ? tr(traditionName(tradition)) : tr('Not chosen yet (Bhagavad Gita)')} onPress={() => router.push('/tradition')} last />
+        {/* Language and Daily Wisdom are set inside About you now (founder, 10 Nov 2026). */}
+        <SpacesRow last />
       </Card>
 
       {session ? (
@@ -129,14 +127,14 @@ function Row({ icon, title, line, onPress, last }: { icon: keyof typeof Ionicons
 }
 
 /** Spaces (decision 0055): a home set up to help you. */
-function SpacesRow() {
+function SpacesRow({ last }: { last?: boolean }) {
   const { profile } = useHeal();
   const all = profile.me?.spaces ?? {};
   const today = todayISO();
   const n = SPACES.filter(x => all[x.id]).length;
   const due = SPACES.find(x => afterDue(all[x.id], today));
   const line = due ? tr('Time for an after photo') : n ? tr('{n} of {m} spaces set up', { n, m: SPACES.length }) : tr('Your home, set up to help you.');
-  return <Row icon="home-outline" title={tr('Spaces')} line={line} onPress={() => router.push('/spaces')} />;
+  return <Row icon="home-outline" title={tr('Spaces')} line={line} onPress={() => router.push('/spaces')} last={last} />;
 }
 
 function ConnectorsRow() {
