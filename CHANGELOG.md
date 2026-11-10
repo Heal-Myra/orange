@@ -1,5 +1,8 @@
 # Changelog
 
+## 10 Nov 2026 — Profile: My profile · My goals · Spaces
+- Founder: three clear places. **My profile** is who you are now (details, language, Daily Wisdom, your usual day, fasting). **My goals** opens with where you are (start, now from your latest weight, aim, a progress bar and today's plan), then your goal in your own words. **Spaces** stays as it was. At sign-up everything still shows on one screen.
+
 ## 10 Nov 2026 — Language and Daily Wisdom live in About you
 - Founder: one place for your profile. Profile now lists About you and Spaces; Language (English · हिंदी) and Daily Wisdom (your tradition) are chosen inside About you. The first-run language and wisdom screens are unchanged.
 

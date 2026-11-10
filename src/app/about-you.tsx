@@ -4,7 +4,7 @@
 // (src/lib/targets.ts, with safe limits) and says plainly when a goal is too steep.
 
 import { fastHabit } from '../lib/fasting';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { Button, Card, Heading, Note, NumberField, Screen, Segmented, TextField, s } from '../components/ui';
@@ -17,8 +17,13 @@ import { parseGoal, planFor, type AboutMe, type Plan, type Sex } from '../lib/ta
 import { TRADITIONS, type Tradition } from '../lib/wisdom';
 import { colors } from '../theme';
 
+// From Profile it opens in two parts (founder, 10 Nov 2026): "My profile" (who you are now: details, language, Daily
+// Wisdom, your usual day, fasting) and "My goals" (where you are against your goal, and the goal itself). At sign-up,
+// with no part, everything shows on one screen.
 export default function AboutYou() {
-  const { profile, setProfile, markMeAsked, day } = useHeal();
+  const { part } = useLocalSearchParams<{ part?: 'profile' | 'goals' }>();
+  const showProfile = part !== 'goals', showGoals = part !== 'profile';
+  const { profile, setProfile, markMeAsked, day, days } = useHeal();
   const { session, tradition, setTradition } = useAuth();
   const me = profile.me;
   const { lang: appLang, setLang } = useLang(); // Language lives here now (founder, 10 Nov 2026)
@@ -102,8 +107,36 @@ export default function AboutYou() {
     );
   }
 
+  // Where you are now: the latest weight from any day, against the start and the aim.
+  const latest = Object.keys(days).sort().reverse().map(k => days[k]?.health?.weightKg).find((w): w is number => typeof w === 'number');
+  const aimKg = me?.goalKg && me.goal !== 'keep' ? Math.round((me.weightKg + (me.goal === 'lose' ? -1 : 1) * me.goalKg) * 10) / 10 : null;
+  const progress = me && aimKg != null && latest != null
+    ? Math.max(0, Math.min(1, (me.weightKg - latest) / (me.weightKg - aimKg))) : null;
+
   return (
     <Screen showDay={false}>
+      {showGoals && part === 'goals' && me ? (
+        <Card style={{ gap: 8 }}>
+          <Heading>{tr('Where you are')}</Heading>
+          <View style={{ flexDirection: 'row' }}>
+            {[[tr('Start'), `${me.weightKg} kg`], [tr('Now'), latest != null ? `${latest} kg` : '–'], [tr('Aim'), aimKg != null ? `${aimKg} kg` : tr('Keep weight')]].map(([l, v]) => (
+              <View key={l} style={{ flex: 1, alignItems: 'center' }}>
+                <Text style={{ color: colors.muted, fontSize: 12 }}>{l}</Text>
+                <Text style={{ color: colors.ink, fontSize: 18, fontWeight: '700' }}>{v}</Text>
+              </View>
+            ))}
+          </View>
+          {progress != null ? (
+            <View style={{ height: 8, borderRadius: 4, backgroundColor: colors.line }}>
+              <View style={{ height: 8, borderRadius: 4, width: `${Math.round(progress * 100)}%`, backgroundColor: colors.accent }} />
+            </View>
+          ) : null}
+          <Note>{tr('Daily plan: {kcal} kcal · protein {p} g · {steps} steps', { kcal: profile.kcal, p: profile.protein, steps: profile.steps.toLocaleString() })}</Note>
+          {me.goalNote ? <Text style={{ color: colors.insight }}>{me.goalNote}</Text> : null}
+        </Card>
+      ) : null}
+      {part === 'goals' && !me ? <Note>{tr('Fill in My profile first, so Myra can plan your goal.')}</Note> : null}
+      {showProfile ? <>
       <Card>
         <Heading>{tr('Your details')}</Heading>
         <Note>{tr('So Myra can set your daily food and movement targets. Only you can see them.')}</Note>
@@ -152,12 +185,16 @@ export default function AboutYou() {
         </View>
       </Card>
 
-      <Card>
+      </> : null}
+
+      {showGoals ? <Card>
         <Heading>{tr('Your goal')}</Heading>
         <TextField label={tr('In your own words')} value={goalText} onChangeText={setGoalText} multiline
           placeholder={tr('e.g. Lose 6 kg by March, walk 10,000 steps a day, sleep better')} />
         <Note>{tr('Myra will shape your food and exercise around it, and tell you if it is too steep.')}</Note>
-      </Card>
+      </Card> : null}
+
+      {showProfile ? <>
 
       <Card>
         <Heading>{tr('Your usual day')}</Heading>
@@ -179,10 +216,11 @@ export default function AboutYou() {
         {fastH ? <TextField label={tr('My last meal is usually at (24-hour, e.g. 21:00)')} value={lastMeal} onChangeText={setLastMeal} /> : null}
         <Note>{tr('The hours without food earn Food points, so a morning without breakfast counts as a good morning.')}</Note>
       </Card>
+      </> : null}
 
       <Button kind="insight" title={busy ? tr('Myra is reading your goal…') : tr('Save')} onPress={save} disabled={!complete || busy} />
-      {!complete ? <Note>{tr('Fill in age, sex, height and weight to continue.')}</Note> : null}
-      <Button kind="plain" title={tr('Skip for now')} onPress={done} />
+      {!complete && part !== 'goals' ? <Note>{tr('Fill in age, sex, height and weight to continue.')}</Note> : null}
+      {!part ? <Button kind="plain" title={tr('Skip for now')} onPress={done} /> : null}
     </Screen>
   );
 }

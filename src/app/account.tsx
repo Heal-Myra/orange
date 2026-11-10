@@ -13,7 +13,8 @@ import { useHeal } from '../lib/store';
 import { colors } from '../theme';
 import { SPACES, afterDue } from '../lib/spaces';
 import { todayISO } from '../lib/dates';
-import { tr } from '../lib/i18n';
+import { lang, tr } from '../lib/i18n';
+import { traditionName } from '../lib/wisdom';
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 
@@ -49,7 +50,7 @@ const SYNC_TEXT = {
 } as const;
 
 export default function Account() {
-  const { session, online, signOut, leaveGuest, admin } = useAuth();
+  const { session, online, signOut, leaveGuest, admin, tradition } = useAuth();
   const pending = usePendingRequests(); // 0 for everyone except admins
   const { sync, syncError, profile } = useHeal();
   const [message, setMessage] = useState<string | null>(null);
@@ -59,8 +60,9 @@ export default function Account() {
     catch { setMessage(tr('Sharing is not available here. Send this link yourself: https://testflight.apple.com/join/Mcp2jHbc')); }
   };
   const me = profile.me;
+  const profileLine = me ? [me.name, `${me.weightKg} kg`, lang() === 'hi' ? 'हिंदी' : 'English', tradition ? tr(traditionName(tradition)) : null].filter(Boolean).join(' · ') : tr('Not set yet');
   const aboutLine = me
-    ? `${me.weightKg} kg · ${me.goal === 'lose' ? tr('Lose {kg} kg', { kg: me.goalKg ?? 0 }) : me.goal === 'gain' ? tr('Gain {kg} kg', { kg: me.goalKg ?? 0 }) : tr('Keep weight')} · ${profile.kcal} kcal`
+    ? `${me.goal === 'lose' ? tr('Lose {kg} kg', { kg: me.goalKg ?? 0 }) : me.goal === 'gain' ? tr('Gain {kg} kg', { kg: me.goalKg ?? 0 }) : tr('Keep weight')} · ${profile.kcal} kcal`
     : tr('Not set yet');
 
   // A neat Profile (founder, 6 Nov 2026): who you are, your details in one card, connectors, privacy & permissions;
@@ -80,8 +82,9 @@ export default function Account() {
       </Card>
 
       <Card style={{ paddingVertical: 4, gap: 0 }}>
-        <Row icon="body-outline" title={tr('About you')} line={aboutLine} onPress={() => router.push('/about-you')} />
-        {/* Language and Daily Wisdom are set inside About you now (founder, 10 Nov 2026). */}
+        {/* My profile (who you are now, with language and Daily Wisdom), My goals, Spaces (founder, 10 Nov 2026). */}
+        <Row icon="person-outline" title={tr('My profile')} line={profileLine} onPress={() => router.push({ pathname: '/about-you', params: { part: 'profile' } })} />
+        <Row icon="flag-outline" title={tr('My goals')} line={aboutLine} onPress={() => router.push({ pathname: '/about-you', params: { part: 'goals' } })} />
         <SpacesRow last />
       </Card>
 
