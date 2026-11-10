@@ -7,6 +7,7 @@ import { fastHabit } from '../lib/fasting';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
+import { OneChange } from '../components/OneChange';
 import { Button, Card, Heading, Note, NumberField, Screen, Segmented, TextField, s } from '../components/ui';
 import { readRoutine, understandGoal } from '../lib/ai';
 import { useAuth } from '../lib/auth';
@@ -135,6 +136,8 @@ export default function AboutYou() {
           {me.goalNote ? <Text style={{ color: colors.insight }}>{me.goalNote}</Text> : null}
         </Card>
       ) : null}
+      {/* The 30-day one-change test lives with your goals, not on Today (founder, 10 Nov 2026). */}
+      {part === 'goals' && me ? <OneChange /> : null}
       {part === 'goals' && !me ? <Note>{tr('Fill in My profile first, so Myra can plan your goal.')}</Note> : null}
       {showProfile ? <>
       <Card>

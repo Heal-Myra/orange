@@ -1,5 +1,8 @@
 # Changelog
 
+## 10 Nov 2026 — 30-day test moves to My goals
+- Founder: it does not belong on Today. The 30-day test now sits in Profile › My goals, under Where you are.
+
 ## 10 Nov 2026 — Spaces page in the Today style
 - Founder: the Spaces page now looks like Today. On top, the Spaces score in rings (one per space) and, beside it, Myra's one move with the most impact (e.g. "Fruit bowl on the counter, left corner. Kitchen · up to +10"); an after photo that is due comes first. Below, each space as its own ring circle (its five checks), two per row; tap one to go inside.
 
