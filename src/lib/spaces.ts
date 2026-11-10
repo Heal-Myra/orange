@@ -19,7 +19,8 @@ export const SPACES: { id: SpaceId; name: string; helps: string; specialist: str
 
 export const AGAIN_AFTER = 7; // days until the after photo
 
-export interface SpaceChange { text: string; why: string; done?: string } // done = ISO date ticked
+/** spot: where the change goes on the photo, 0–1 from the left and from the top (Myra's pins; build 14 quick update). */
+export interface SpaceChange { text: string; why: string; where?: string; spot?: { x: number; y: number } | null; done?: string } // done = ISO date ticked
 export interface SpaceRound { at: string; seen: string; changes: SpaceChange[] }
 export interface SpaceState {
   round: SpaceRound; // the latest photo and its three changes
@@ -47,9 +48,19 @@ export function nextSpace(all: SpacesState, today: string): { id: SpaceId; due: 
   return fresh ? { id: fresh.id, due: false } : null;
 }
 
+type ReadChange = { text: string; why: string; where?: string; spot?: unknown };
+/** A pin's place, kept inside the picture; anything unreadable means no pin. */
+export function spotOf(v: unknown): { x: number; y: number } | null {
+  const o = v as { x?: unknown; y?: unknown } | null | undefined;
+  const x = Number(o?.x), y = Number(o?.y);
+  if (!o || !Number.isFinite(x) || !Number.isFinite(y)) return null;
+  const clamp = (n: number) => Math.min(0.97, Math.max(0.03, n));
+  return { x: clamp(x), y: clamp(y) };
+}
+
 /** The space after a new photo. `kept`: the earlier changes Myra could see were made; ticked ones count too. */
-export function afterPhoto(prev: SpaceState | undefined, read: { seen: string; changes: { text: string; why: string }[]; kept?: number[] }, today: string): SpaceState {
-  const round = { at: today, seen: read.seen, changes: read.changes.slice(0, 3).map(c => ({ text: c.text, why: c.why })) };
+export function afterPhoto(prev: SpaceState | undefined, read: { seen: string; changes: ReadChange[]; kept?: number[] }, today: string): SpaceState {
+  const round = { at: today, seen: read.seen, changes: read.changes.slice(0, 3).map(c => ({ text: c.text, why: c.why, ...(c.where ? { where: c.where } : {}), spot: spotOf(c.spot) })) };
   if (!prev) return { round };
   const of = prev.round.changes.length;
   const kept = new Set([...(read.kept ?? []).filter(i => i >= 0 && i < of), ...prev.round.changes.map((c, i) => (c.done ? i : -1)).filter(i => i >= 0)]);
@@ -58,10 +69,16 @@ export function afterPhoto(prev: SpaceState | undefined, read: { seen: string; c
 
 // ---- Photos, on this phone only ----
 const key = (id: SpaceId) => `spaces.photo.${id}`;
-export interface SpacePhotos { before?: { uri: string; at: string }; after?: { uri: string; at: string } } // small JPEG data URIs
+export interface SpacePhoto { uri: string; at: string; ratio?: number } // ratio = width ÷ height, so pins land in the right place
+export interface SpacePhotos { before?: SpacePhoto; after?: SpacePhoto } // small JPEG data URIs
 
 /** A new photo: the first is "before"; later ones become "after", and the last after becomes the new before. */
-export const nextPhotos = (p: SpacePhotos, uri: string, at: string): SpacePhotos => (p.before ? { before: p.after ?? p.before, after: { uri, at } } : { before: { uri, at } });
+export const nextPhotos = (p: SpacePhotos, uri: string, at: string, ratio?: number): SpacePhotos => {
+  const now: SpacePhoto = ratio ? { uri, at, ratio } : { uri, at };
+  return p.before ? { before: p.after ?? p.before, after: now } : { before: now };
+};
+/** The photo the current changes (and their pins) belong to. */
+export const latestPhoto = (p: SpacePhotos) => p.after ?? p.before;
 
 export async function loadPhotos(id: SpaceId): Promise<SpacePhotos> {
   try { return JSON.parse((await AsyncStorage.getItem(key(id))) ?? '{}'); } catch { return {}; }

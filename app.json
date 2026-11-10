@@ -41,8 +41,8 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "Happy Orange uses your photos to estimate the nutrition of your meals.",
-          "cameraPermission": "Happy Orange uses the camera to photograph your meals and estimate their nutrition."
+          "photosPermission": "Happy Orange uses the photos and videos you choose to read your meals and the spaces in your home.",
+          "cameraPermission": "Happy Orange uses the camera to photograph your meals and, when you choose, a space in your home."
         }
       ],
       [
@@ -56,7 +56,7 @@
       [
         "expo-speech-recognition",
         {
-          "microphonePermission": "Happy Orange listens only while you tap Speak, so you can say what you ate.",
+          "microphonePermission": "Happy Orange uses the microphone only while you tap Speak, or while you record a short video of a space (its sound is not used).",
           "speechRecognitionPermission": "Happy Orange turns what you say about your meal into text to work out its nutrition."
         }
       ],

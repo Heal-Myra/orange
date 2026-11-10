@@ -36,3 +36,17 @@ describe('Spaces', () => {
     expect([p.before?.uri, p.after?.uri]).toEqual(['two', 'three']);
   });
 });
+
+describe('Myra\'s pins', () => {
+  it('keeps pins inside the picture and drops unreadable ones', async () => {
+    const { spotOf } = await import('./spaces');
+    expect(spotOf({ x: 0.5, y: 0.2 })).toEqual({ x: 0.5, y: 0.2 });
+    expect(spotOf({ x: 1.4, y: -1 })).toEqual({ x: 0.97, y: 0.03 });
+    expect(spotOf(null)).toBeNull();
+    expect(spotOf({ x: 'left' })).toBeNull();
+  });
+  it('carries where and spot into the round', () => {
+    const s = afterPhoto(undefined, { seen: 'x', changes: [{ text: 'a', why: 'b', where: 'left corner', spot: { x: 0.1, y: 0.6 } }] }, '2026-11-10');
+    expect(s.round.changes[0]).toEqual({ text: 'a', why: 'b', where: 'left corner', spot: { x: 0.1, y: 0.6 } });
+  });
+});

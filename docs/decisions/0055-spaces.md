@@ -31,3 +31,9 @@ image service from another company (e.g. Google) would mean sending people's hom
 user data goes to another AI company.** Instead, Myra marks the spots on the person's own photo (numbered pins drawn by
 the app on the phone), with each change's details below. A walk-round **video** is planned for build 14 (still frames are
 taken on the phone; the video itself never leaves it).
+
+## Update, 10 Nov 2026: pins, video and face blur
+Founder said go. Myra returns, for each change, a spot (0–1 across and down) on the photo and a "where" line; the app
+draws numbered pins on the person's own photo. From build 14 a local native module (`modules/space-camera`) takes 4
+still frames from a walk-round video of up to 30 seconds and blurs faces with Apple Vision before anything is sent; Myra
+picks the frame that shows the most and pins on it. Older builds detect the module is missing and stay photo-only.

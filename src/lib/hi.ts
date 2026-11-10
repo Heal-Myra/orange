@@ -1709,4 +1709,12 @@ export const HI: Record<string, string> = {
   'Washroom': 'बाथरूम',
   'Helps family time · Soul': 'परिवार के समय में मदद · आत्मा',
   'Helps your morning · Body': 'सुबह की शुरुआत में मदद · शरीर',
+  'Change {n}': 'बदलाव {n}',
+  'Record a walk-round video': 'घूमकर एक वीडियो बनाएँ',
+  'Choose a video or photo': 'वीडियो या फ़ोटो चुनें',
+  'Videos stay on this phone. Faces are blurred before Myra looks.': 'वीडियो इसी फ़ोन पर रहते हैं। मायरा के देखने से पहले चेहरे धुंधले हो जाते हैं।',
+  'Walk me round, slowly. One full turn.': 'धीरे-धीरे पूरा एक चक्कर लगाकर दिखाइए।',
+  'Changes marked': 'बदलाव चिह्नित',
+  'Videos come with the next app version. A photo works now.': 'वीडियो ऐप के अगले संस्करण में आएगा। अभी फ़ोटो चलेगी।',
+  'Could not read that video. Try a photo instead.': 'यह वीडियो पढ़ा नहीं जा सका। फ़ोटो से कोशिश करें।',
 };

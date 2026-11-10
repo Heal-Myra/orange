@@ -138,6 +138,9 @@ export const translateLines = (lines: string[], to: string) => call<{ lines: str
 
 /** Spaces (decision 0055): Myra reads a photo of a space at home. With `before` (the earlier changes), it is the after
  *  photo: which changes she can see were made, and a line about what changed. */
-export interface SpaceReading { isSpace: boolean; seen: string; changes: { text: string; why: string }[]; kept?: number[]; note?: string }
-export const readSpace = (image_base64: string, media_type: string, space: string, before?: string[]) =>
-  call<SpaceReading>('space_read', { image_base64, media_type, space, before });
+export interface SpaceReading { isSpace: boolean; seen: string; frame?: number; changes: { text: string; why: string; where?: string; spot?: { x: number; y: number } | null }[]; kept?: number[]; note?: string }
+/** One photo, or up to 4 still frames from a walk-round video (build 14). */
+export const readSpace = (images: { data: string; media_type: string }[], space: string, before?: string[]) =>
+  call<SpaceReading>('space_read', images.length === 1
+    ? { image_base64: images[0].data, media_type: images[0].media_type, space, before }
+    : { images, space, before });

@@ -66,14 +66,16 @@ interface Image { media_type: string; data: string }
 // When the person uses the app in Hindi, every word meant for them comes back in Hindi (founder, 20 Oct 2026).
 const HINDI = `
 LANGUAGE: The person uses the app in Hindi. Write every word meant for the person in simple, warm Hindi (Devanagari script), unless this request explicitly asks for English. Keep JSON keys, ids, numbers, units and category names exactly as specified, in English.`;
-const askWith = (hindi: boolean) => (tier: 'smart' | 'quick', system: string, text: string, image?: Image) =>
+// One picture, or several (a Spaces walk-round video sends a few still frames; decision 0055).
+const askWith = (hindi: boolean) => (tier: 'smart' | 'quick', system: string, text: string, image?: Image | Image[]) =>
   askAI(tier, hindi ? system + HINDI : system, text, image);
 
-async function askAI(tier: 'smart' | 'quick', system: string, text: string, image?: Image): Promise<string> {
+async function askAI(tier: 'smart' | 'quick', system: string, text: string, image?: Image | Image[]): Promise<string> {
+  const images = image ? (Array.isArray(image) ? image : [image]) : [];
   if (PROVIDER === 'gemini') {
     const model = MODELS.gemini[tier];
     const parts: Record<string, unknown>[] = [{ text }];
-    if (image) parts.push({ inline_data: { mime_type: image.media_type, data: image.data } });
+    for (const im of images) parts.push({ inline_data: { mime_type: im.media_type, data: im.data } });
     const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
       method: 'POST',
       headers: { 'x-goog-api-key': GEMINI_KEY!, 'content-type': 'application/json' },
@@ -85,9 +87,9 @@ async function askAI(tier: 'smart' | 'quick', system: string, text: string, imag
   }
   const content: Record<string, unknown>[] = [];
   // A photo, or a PDF the person attached in Myra's chat (21 Oct 2026).
-  if (image) content.push(image.media_type === 'application/pdf'
-    ? { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: image.data } }
-    : { type: 'image', source: { type: 'base64', media_type: image.media_type, data: image.data } });
+  for (const im of images) content.push(im.media_type === 'application/pdf'
+    ? { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: im.data } }
+    : { type: 'image', source: { type: 'base64', media_type: im.media_type, data: im.data } });
   content.push({ type: 'text', text });
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
@@ -143,10 +145,10 @@ function parseJson(text: string) {
   try { return JSON.parse(cleaned); } catch { throw new Error(BAD_FORMAT); }
 }
 
-type Ask = (tier: 'smart' | 'quick', system: string, text: string, image?: Image) => Promise<string>;
+type Ask = (tier: 'smart' | 'quick', system: string, text: string, image?: Image | Image[]) => Promise<string>;
 
 /** Ask for JSON; if the reply cannot be read, ask once more, firmly (founder, 20 Oct 2026: a typed dinner failed on one bad reply). */
-async function askJson(ask: Ask, tier: 'smart' | 'quick', system: string, text: string, image?: Image) {
+async function askJson(ask: Ask, tier: 'smart' | 'quick', system: string, text: string, image?: Image | Image[]) {
   try { return parseJson(await ask(tier, system, text, image)); } catch (e) {
     if (e instanceof Error && e.message !== BAD_FORMAT) throw e;
     return parseJson(await ask(tier, system, `${text}
@@ -384,24 +386,37 @@ Reply with JSON only: {"isFace":true|false,"skin":{"dryness":"none"|"mild"|"noti
 - Use what they already have: move, hide, put out, put away. Nothing to buy, no renovation.
 - "seen": what you notice that matters most for this space, one line of at most 10 words, warm, a touch witty (e.g. "Biscuits are closer to your hand than fruit.").
 - "changes": exactly 3, the most helpful first. "text": a direct instruction of at most 10 words (e.g. "Fruit bowl on the counter, at eye level."). "why": at most 15 words, the reason in everyday words, no medical claims.`;
-      const image = { media_type: String(p.media_type ?? 'image/jpeg'), data: String(p.image_base64 ?? '') };
+      // A photo, or up to 4 still frames from a walk-round video (decision 0055, build 14).
+      const frames = (Array.isArray(p.images) ? p.images : []).slice(0, 4)
+        .map(x => ({ media_type: String((x as Record<string, unknown>)?.media_type ?? 'image/jpeg'), data: String((x as Record<string, unknown>)?.data ?? '') }))
+        .filter(x => x.data);
+      const image = frames.length ? frames : { media_type: String(p.media_type ?? 'image/jpeg'), data: String(p.image_base64 ?? '') };
+      const many = frames.length > 1;
+      const seeing = many
+        ? `These are ${frames.length} still frames (numbered 0 to ${frames.length - 1}, in order) from a short video walking round the person's ${space}. Together they show the whole space.`
+        : `This is a photo of the person's ${space}.`;
+      const spots = `- "frame": ${many ? 'the number of the frame that shows the most of the space; the app shows that one' : '0'}.
+- For each change, "spot": where it goes on that frame, as {"x":0.0-1.0 from the left edge,"y":0.0-1.0 from the top edge}, at the exact place (e.g. the bare stretch of counter for a fruit bowl). Use null if the place is not in that frame.
+- For each change, "where": at most 15 words saying exactly where and what to move, naming what is there now (e.g. "Left corner of the counter, where the paper roll stands; roll goes on the wall hook.").`;
       const sys = `${ORANGE_BOOK} ${lens[space.toLowerCase()] ?? 'Look for what makes the healthy choice the easy one in this space.'} You speak as Myra: minimalist, warm, witty.`;
       if (before.length) {
         return await askJson(ask, 'smart', sys,
-`This is the "after" photo of the person's ${space}, a week after these changes were suggested:
+`${seeing} It is the "after" look, a week after these changes were suggested:
 ${before.map((b, i) => `${i}. ${b}`).join('\n')}
 ${rules}
 - "kept": the numbers of the changes above you can clearly see were made (when unsure, leave it out).
 - "seen": what changed, one line of at most 10 words, warm (e.g. "Fruit is out, snacks are hidden. Well done."). If nothing changed, kind and light.
 - "changes": the next 3 small changes for this space (the ones not made may come again, reworded).
-Reply with JSON only: {"isSpace":true,"seen":"…","kept":[0],"changes":[{"text":"…","why":"…"}],"note":""}
-If this is not a photo of a ${space} or a room: {"isSpace":false,"seen":"","changes":[],"kept":[],"note":"say briefly what it shows"}`, image);
+${spots}
+Reply with JSON only: {"isSpace":true,"seen":"…","kept":[0],"frame":0,"changes":[{"text":"…","why":"…","where":"…","spot":{"x":0.5,"y":0.5}}],"note":""}
+If these do not show a ${space} or a room: {"isSpace":false,"seen":"","changes":[],"kept":[],"note":"say briefly what it shows"}`, image);
       }
       return await askJson(ask, 'smart', sys,
-`This is a photo of the person's ${space}. Read it so the healthy choice becomes the easy one.
+`${seeing} Read it so the healthy choice becomes the easy one.
 ${rules}
-Reply with JSON only: {"isSpace":true,"seen":"…","changes":[{"text":"…","why":"…"}],"note":""}
-If this is not a photo of a ${space} or a room: {"isSpace":false,"seen":"","changes":[],"note":"say briefly what it shows"}`, image);
+${spots}
+Reply with JSON only: {"isSpace":true,"seen":"…","frame":0,"changes":[{"text":"…","why":"…","where":"…","spot":{"x":0.5,"y":0.5}}],"note":""}
+If these do not show a ${space} or a room: {"isSpace":false,"seen":"","changes":[],"note":"say briefly what it shows"}`, image);
     }
     case 'what_is_this': {
       // Myra as the one place to drop anything (founder, 1 Nov 2026; decision 0046): first, what is this picture?

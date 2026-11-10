@@ -64,6 +64,7 @@ export function cleanPayload(payload: Record<string, unknown>): Record<string, u
   const jpeg = (t: unknown) => typeof t !== 'string' || /jpe?g/i.test(t);
   const out = { ...payload };
   if (typeof out.image_base64 === 'string' && jpeg(out.media_type)) out.image_base64 = cleanJpeg(out.image_base64);
+  if (Array.isArray(out.images)) out.images = (out.images as { media_type?: string; data?: string }[]).map(im => (typeof im?.data === 'string' && jpeg(im.media_type) ? { ...im, data: cleanJpeg(im.data) } : im));
   const att = out.attachment as { kind?: string; media_type?: string; data?: string } | undefined;
   if (att?.kind === 'image' && typeof att.data === 'string' && jpeg(att.media_type)) out.attachment = { ...att, data: cleanJpeg(att.data) };
   return out;

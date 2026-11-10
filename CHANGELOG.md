@@ -1,5 +1,12 @@
 # Changelog
 
+## 10 Nov 2026 — Spaces: Myra's pins, walk-round video, faces blurred (build 14)
+- **Myra's pins** (quick update, every build): Myra marks where each change goes with numbered coral pins on your own photo, and each change shows exactly where and what to move (e.g. "Where the paper roll stands; roll goes on the wall hook."). Switch between "Changes marked" and "Now".
+- **Walk-round video** (build 14): film the space for up to 30 seconds; the phone takes 4 still frames and only those go to Myra. She puts her pins on the frame that shows the most. The video never leaves the phone.
+- **Faces blurred** (build 14): Apple's own on-phone face finder blurs any faces in a Spaces photo or frame before Myra sees it. The copy kept in the app is the blurred one.
+- New phone part `modules/space-camera` (Swift: video frames with AVFoundation, face blur with Vision + Core Image). Older builds simply keep photos only.
+- Camera, photos and microphone permission wording now mention spaces and short videos.
+
 ## 10 Nov 2026 — Photos leave the phone clean (decision 0056)
 - Before any photo goes to Myra (meals, Spaces, chat, Screen Time, notebook pages, selfies), the hidden details inside it are removed: where it was taken, which phone took it, and when. Only the picture itself is sent.
 - Founder's rule confirmed: people's photos go to Claude only, never to another AI company. Face blurring on the phone comes with build 14.
