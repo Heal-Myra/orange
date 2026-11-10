@@ -10,7 +10,7 @@ import { useState } from 'react';
 import { Pressable, Text, TextInput, View } from 'react-native';
 import { shiftISO, todayISO } from '../lib/dates';
 import { AREAS, areaName, useTasks, type Area, type Task } from '../lib/tasks';
-import { FORMING_DAYS, forming, habitDay, habitsToday, readHabit, repeatName, timesDone, type Repeat } from '../lib/habits';
+import { FORMING_DAYS, forming, habitDay, habitsToday, readHabit, repeatName, timesDone, type Habit, type Repeat } from '../lib/habits';
 import { DatePicker } from './DatePicker';
 import { loadOn, PER_AREA_DAY } from '../lib/taskPlan';
 import { colors } from '../theme';
@@ -55,6 +55,11 @@ export function TasksCard() {
   const shown = [...mine.filter(isToday), ...doneHere];
   const later = mine.filter(t => !isToday(t));
   const focusIds = focus.map(t => t.id);
+  // Recurring items (bills, EMIs, daily practices) are simply to-dos that come back (founder, 10 Nov 2026).
+  const { habits } = useTasks();
+  const [yy, mm, dd] = today.split('-').map(Number);
+  const repeatsToday = habitsToday(habits, new Date(yy, mm - 1, dd));
+  const repeatsHere = repeatsToday.filter(h => h.area === area);
 
   return (
     <Card>
@@ -70,7 +75,7 @@ export function TasksCard() {
       {/* Three groups */}
       <View style={{ flexDirection: 'row', gap: 8 }}>
         {AREAS.map(a => {
-          const n = open.filter(t => t.area === a.id && isToday(t)).length;
+          const n = open.filter(t => t.area === a.id && isToday(t)).length + repeatsToday.filter(h => h.area === a.id && !(day.habitsDone ?? []).includes(h.id)).length;
           const on = a.id === area;
           return (
             <Pressable key={a.id} onPress={() => setArea(a.id)}
@@ -85,7 +90,8 @@ export function TasksCard() {
 
       <AddTask area={area} />
 
-      {shown.length ? shown.map(t => <TaskRow key={t.id} t={t} inFocus={focusIds.includes(t.id)} />)
+      {repeatsHere.map(h => <RepeatRow key={h.id} h={h} />)}
+      {shown.length || repeatsHere.length ? shown.map(t => <TaskRow key={t.id} t={t} inFocus={focusIds.includes(t.id)} />)
         : <Note>{tr('Nothing in {area} today. A clear mind!', { area: tr(areaName(area)) })}</Note>}
 
       {later.length ? (
@@ -95,7 +101,6 @@ export function TasksCard() {
       ) : null}
       {all ? later.map(t => <TaskRow key={t.id} t={t} inFocus={false} />) : null}
 
-      <MakingAHabit />
 
       {doneToday ? <Note>{tr('Done today: {n} ✓', { n: doneToday })}</Note> : null}
       <MyraLine card="tasks" />
@@ -103,35 +108,30 @@ export function TasksCard() {
   );
 }
 
-/** Habits inside Clear your mind (founder, 26 Oct 2026): for its first 21 days a habit shows its day count. Since
- *  10 Nov 2026 the separate Habits card is gone, so every habit due today sits here, monthly reminders included. */
-function MakingAHabit() {
-  const { habits, tickHabit, removeHabit } = useTasks();
+/** A to-do that comes back (founder, 10 Nov 2026: no separate "Habits" heading): it sits in its group's list like any
+ *  to-do, with the same Done switch. A new daily practice shows its 21-day count; others show how often they come back.
+ *  Tap the words to stop it repeating. */
+function RepeatRow({ h }: { h: Habit }) {
+  const { tickHabit, removeHabit } = useTasks();
   const { day, days, date } = useHeal();
-  const [y, m, d] = date.split('-').map(Number);
-  const list = habitsToday(habits, new Date(y, m - 1, d));
-  if (!list.length) return null;
-  const done = day.habitsDone ?? [];
+  const [open, setOpen] = useState(false);
+  const done = (day.habitsDone ?? []).includes(h.id);
+  const sub = forming(h, date) ? tr('Day {n} of {total} · done {times} times', { n: habitDay(h, date), total: FORMING_DAYS, times: timesDone(h, days) })
+    : `${tr(repeatName(h.repeat))}${h.repeat === 'monthly' && h.dayOfMonth ? ` · ${h.dayOfMonth}` : ''}`;
   return (
-    <View style={{ gap: 8, borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 10 }}>
-      <Text style={{ fontWeight: '700', color: colors.ink }}>{list.every(h => forming(h, date)) ? tr('Making a habit') : tr('Habits')}</Text>
-      {list.map(h => {
-        const on = done.includes(h.id);
-        return (
-          <View key={h.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-            <Pressable onPress={() => tickHabit(h.id)} accessibilityRole="checkbox" accessibilityState={{ checked: on }} hitSlop={8}>
-              <Ionicons name={on ? 'checkmark-circle' : 'ellipse-outline'} size={24} color={colors.accent} />
-            </Pressable>
-            <View style={{ flex: 1 }}>
-              <Text style={{ color: colors.ink, textDecorationLine: on ? 'line-through' : 'none' }}>{h.at ? `${h.at} · ` : ''}{h.title}</Text>
-              <Text style={{ color: colors.muted, fontSize: 12 }}>{forming(h, date) ? tr('Day {n} of {total} · done {times} times', { n: habitDay(h, date), total: FORMING_DAYS, times: timesDone(h, days) }) : tr(repeatName(h.repeat)) + (h.repeat === "monthly" && h.dayOfMonth ? ` · ${h.dayOfMonth}` : "")}</Text>
-            </View>
-            <Pressable onPress={() => removeHabit(h.id)} hitSlop={8} accessibilityLabel={tr('Stop this habit')}>
-              <Ionicons name="close" size={18} color={colors.muted} />
-            </Pressable>
-          </View>
-        );
-      })}
+    <View style={{ gap: 6, borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 8 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+        <Pressable style={{ flex: 1 }} onPress={() => setOpen(o => !o)} onLongPress={() => setOpen(o => !o)}>
+          <Text style={{ color: done ? colors.muted : colors.ink, fontSize: 15, textDecorationLine: done ? 'line-through' : 'none' }}>{h.at ? `${h.at} · ` : ''}{h.title}</Text>
+          <Text style={{ fontSize: 12, color: colors.muted }}>↻ {sub}</Text>
+        </Pressable>
+        <DoneSwitch done={done} onDone={() => tickHabit(h.id)} onUndo={() => tickHabit(h.id)} label={h.title} />
+      </View>
+      {open ? (
+        <Pressable onPress={() => removeHabit(h.id)} hitSlop={6}>
+          <Text style={{ fontSize: 13, color: colors.muted }}>{tr('Stop repeating')}</Text>
+        </Pressable>
+      ) : null}
     </View>
   );
 }
@@ -291,7 +291,7 @@ function TaskRow({ t, inFocus }: { t: Task; inFocus: boolean }) {
       </View>
       {readHabit(t.title).repeat ? (
         <Pressable onPress={() => { const r = readHabit(t.title); addHabit({ title: t.title, area: t.area, repeat: r.repeat!, at: r.at, weekday: r.weekday }); remove(t.id); }} hitSlop={6} style={{ paddingLeft: 34 }}>
-          <Text style={{ fontSize: 13, color: colors.insight }}>{tr('This repeats. Make it a habit')} →</Text>
+          <Text style={{ fontSize: 13, color: colors.insight }}>{tr('This repeats. Set it to repeat')} →</Text>
         </Pressable>
       ) : null}
       {t.moved >= 3 ? (

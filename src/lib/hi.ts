@@ -317,6 +317,8 @@ export const HI: Record<string, string> = {
   'No phone in bed': 'बिस्तर में फ़ोन नहीं',
   '10 minutes of meditation a day': 'रोज़ 10 मिनट ध्यान',
   'No packaged snacks': 'पैकेट वाले स्नैक्स नहीं',
+  'Stop repeating': 'दोहराना बंद करें',
+  'This repeats. Set it to repeat': 'यह दोहराया जाता है। इसे दोहराने वाला बनाएँ',
   'Could not reach the AI just now. Check your connection and try again.': 'अभी AI से जुड़ नहीं सके। कनेक्शन जाँचें और फिर कोशिश करें।',
   'Could not reach the internet. Check your connection and try again.': 'इंटरनेट से जुड़ नहीं सके। कनेक्शन जाँचें और फिर कोशिश करें।',
   'Online accounts are not set up in this version.': 'इस संस्करण में ऑनलाइन खाते उपलब्ध नहीं हैं।',

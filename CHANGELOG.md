@@ -1,5 +1,8 @@
 # Changelog
 
+## 10 Nov 2026 — No "Habits" heading: recurring items are just to-dos
+- Founder: a monthly bill like the Tata Play payment is not a habit. Everything that repeats (bills, EMIs, daily practices) now sits in its group's to-do list like any other to-do, with the same Done switch and a small "↻ Monthly · 10" (new daily practices still show "Day 5 of 21"). The group counts include them. Tap the words to stop it repeating.
+
 ## 10 Nov 2026 — Spaces: a home set up to help you (decision 0055)
 - New in Profile › **Spaces**: Kitchen, Bedroom, Work desk and Quiet corner. Snap one as it is; Myra says in one line what she sees and gives three small changes (tick them as you go; "Why these?" folds open).
 - Seven days later, snap it again: before and after side by side, how many changes you made, and the next three. A phone nudge at 10 am that day.
