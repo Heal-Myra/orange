@@ -1705,4 +1705,8 @@ export const HI: Record<string, string> = {
   'Helps meditation · Soul': 'साधना में मदद · आत्मा',
   'Add a photo': 'फ़ोटो जोड़ें',
   '{n} of {m} done': '{m} में से {n} हो गए',
+  'Living room': 'बैठक',
+  'Washroom': 'बाथरूम',
+  'Helps family time · Soul': 'परिवार के समय में मदद · आत्मा',
+  'Helps your morning · Body': 'सुबह की शुरुआत में मदद · शरीर',
 };

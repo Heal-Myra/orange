@@ -6,11 +6,13 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { shiftISO } from './dates';
 
-export type SpaceId = 'kitchen' | 'bedroom' | 'desk' | 'corner';
+export type SpaceId = 'kitchen' | 'bedroom' | 'living' | 'washroom' | 'desk' | 'corner';
 /** Which part of you each space helps, and the specialist who reads it (decision 0052). */
 export const SPACES: { id: SpaceId; name: string; helps: string; specialist: string }[] = [
   { id: 'kitchen', name: 'Kitchen', helps: 'Helps Food · Body', specialist: 'food' },
   { id: 'bedroom', name: 'Bedroom', helps: 'Helps Sleep · Body', specialist: 'sleep' },
+  { id: 'living', name: 'Living room', helps: 'Helps family time · Soul', specialist: 'soul' },
+  { id: 'washroom', name: 'Washroom', helps: 'Helps your morning · Body', specialist: 'body' },
   { id: 'desk', name: 'Work desk', helps: 'Helps focus · Mind', specialist: 'mind' },
   { id: 'corner', name: 'Quiet corner', helps: 'Helps meditation · Soul', specialist: 'soul' },
 ];

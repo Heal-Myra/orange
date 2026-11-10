@@ -1,5 +1,8 @@
 # Changelog
 
+## 10 Nov 2026 — Spaces: living room and washroom
+- Founder: two more spaces. **Living room** (helps family time · Soul: TV, phones at the sofa, seats that face each other) and **Washroom** (helps your morning · Body: phone kept out, scale in one spot, fresh air, a dry floor). Myra never mentions personal items she may see in a washroom photo.
+
 ## 10 Nov 2026 — Profile: My profile · My goals · Spaces
 - Founder: three clear places. **My profile** is who you are now (details, language, Daily Wisdom, your usual day, fasting). **My goals** opens with where you are (start, now from your latest weight, aim, a progress bar and today's plan), then your goal in your own words. **Spaces** stays as it was. At sign-up everything still shows on one screen.
 

@@ -374,6 +374,8 @@ Reply with JSON only: {"isFace":true|false,"skin":{"dryness":"none"|"mild"|"noti
       const lens: Record<string, string> = {
         kitchen: 'You are the Food specialist. Look for what makes healthy eating the easy choice: fruit and vegetables in sight, packaged snacks, sugar and fried food within easy reach, water at hand, a clear place to cook.',
         bedroom: 'You are the Sleep specialist. Look for what helps sleep: light and curtains, a phone or charger by the bed, a TV or work in the bedroom, clutter, fresh air, a calm bedside.',
+        'living room': 'You are the Soul specialist (love and connection). Look for what helps family time and rest: the TV as the centre of the room, phones and chargers at the sofa, seats that face each other for talking, room to stretch or play, fresh air and daylight, clutter.',
+        washroom: 'You are the Body specialist. Look for what helps a calm, healthy morning: the phone kept out, a weighing scale in a fixed spot, a tongue cleaner and toothbrush within reach, light and fresh air, a dry, non-slip floor, a clear shelf. Never mention personal or medical items you may see.',
         'work desk': 'You are the Mind specialist. Look for what helps focus: clutter, the phone within reach, light, screen height, a water bottle, room to stand or stretch.',
         'quiet corner': 'You are the Soul specialist. Look for what helps a daily sitting or prayer: a clear seat or mat, calm, little clutter, soft light, a place for the gratitude journal or a lamp.',
       };

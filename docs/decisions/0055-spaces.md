@@ -7,8 +7,9 @@ A new **Spaces** section (Profile › Spaces). The person snaps a space at home;
 gives **three small changes**, each a direct instruction of at most 10 words, with a short "why" folded away. Seven days
 later they snap it again: before and after side by side, how many changes were made, and the next three.
 
-- Four spaces to start, each read by its specialist (decision 0052): **Kitchen** (Food), **Bedroom** (Sleep),
-  **Work desk** (Mind), **Quiet corner** (Soul). Myra is the only voice.
+- Six spaces, each read by its specialist (decision 0052): **Kitchen** (Food), **Bedroom** (Sleep), **Living room**
+  (Soul: love and family time), **Washroom** (Body: a calm morning), **Work desk** (Mind), **Quiet corner** (Soul).
+  Living room and washroom added by the founder the same morning. Myra is the only voice.
 - Changes use what the person already has (move, hide, put out, put away): nothing to buy, no renovation. Myra never
   judges taste, size, wealth or tidiness and never comments on people in the photo.
 - **Photos stay on the phone** (small copies, kept on this device only; the server reads them and does not store them).
@@ -22,4 +23,4 @@ for everyone. A home quietly shapes habits more than willpower: what is in sight
 bed costs sleep. Photo in, three small changes out keeps to "always less effort for the person".
 
 ## Not yet
-More spaces of the person's own (living room, balcony), family members' spaces, and a points share in a pillar.
+More spaces of the person's own (balcony, a child's room), family members' spaces, and a points share in a pillar.
