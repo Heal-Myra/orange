@@ -14,7 +14,7 @@ import { readSpace } from '../lib/ai';
 import { formatDay, todayISO } from '../lib/dates';
 import { tr } from '../lib/i18n';
 import { captureSpace, hasSpaceCamera, keepCopy } from '../lib/spaceCapture';
-import {
+import { removeAllPhotos,
   CHECKS, CHECK_MAX, SPACES, afterDue, bestMove, scoreOf, spacesScore, afterPhoto, againOn, doneCount, latestPhoto, loadPhotos, nextPhotos, savePhotos,
   type SpaceChange, type SpaceId, type SpacePhoto, type SpacePhotos, type SpacesState,
 } from '../lib/spaces';
@@ -108,6 +108,7 @@ function List({ all }: { all: SpacesState }) {
         })}
       </View>
       <Text style={{ color: colors.muted, fontSize: 12, textAlign: 'center' }}>{tr('Photos of your home stay on this phone.')}</Text>
+      <RemovePhotos />
     </Screen>
   );
 }
@@ -261,6 +262,26 @@ function ScoreCard({ id, checks, potential }: { id: SpaceId; checks: number[]; p
       {potential != null && potential > score ? (
         <Text style={{ fontSize: 14, color: colors.insight, fontWeight: '600' }}>{tr('With the 3 changes: {n}', { n: potential })}</Text>
       ) : null}
+    </Card>
+  );
+}
+
+/** Remove all photos (founder, 10 Nov 2026), asked once more before it happens. Scores and Myra's changes stay. */
+function RemovePhotos() {
+  const [ask, setAsk] = useState<'no' | 'ask' | 'done'>('no');
+  if (ask === 'done') return <Text style={{ color: colors.muted, fontSize: 13, textAlign: 'center' }}>{tr('All photos removed from this phone.')}</Text>;
+  if (ask === 'no') return (
+    <Pressable onPress={() => setAsk('ask')} accessibilityRole="button" style={{ alignItems: 'center', padding: 8 }}>
+      <Text style={{ color: colors.accent, fontSize: 14, fontWeight: '600' }}>{tr('Remove all photos')}</Text>
+    </Pressable>
+  );
+  return (
+    <Card style={{ gap: 10 }}>
+      <Text style={{ color: colors.ink, fontSize: 15 }}>{tr('Remove every space photo from this phone? Your scores and Myra\'s changes stay.')}</Text>
+      <View style={{ flexDirection: 'row', gap: 10 }}>
+        <View style={{ flex: 1 }}><Button title={tr('Yes, remove')} onPress={() => { removeAllPhotos().then(() => setAsk('done')); }} /></View>
+        <View style={{ flex: 1 }}><Button kind="plain" title={tr('Cancel')} onPress={() => setAsk('no')} /></View>
+      </View>
     </Card>
   );
 }

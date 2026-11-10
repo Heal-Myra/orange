@@ -144,6 +144,10 @@ export const latestPhoto = (p: SpacePhotos) => p.after ?? p.before;
 export async function loadPhotos(id: SpaceId): Promise<SpacePhotos> {
   try { return JSON.parse((await AsyncStorage.getItem(key(id))) ?? '{}'); } catch { return {}; }
 }
+/** "Remove all photos" (founder, 10 Nov 2026): every space's photos off this phone. Myra's words, ticks and scores stay. */
+export async function removeAllPhotos() {
+  try { await AsyncStorage.multiRemove(SPACES.map(x => key(x.id))); } catch { /* nothing to remove */ }
+}
 export async function savePhotos(id: SpaceId, p: SpacePhotos) {
   try { await AsyncStorage.setItem(key(id), JSON.stringify(p)); } catch { /* photos are a bonus; the words are kept */ }
 }

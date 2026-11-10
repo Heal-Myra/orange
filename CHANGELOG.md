@@ -1,5 +1,8 @@
 # Changelog
 
+## 10 Nov 2026 — Spaces: Remove all photos
+- Founder: at the bottom of Spaces, "Remove all photos" takes every space photo off this phone after one "Yes, remove". Scores, Myra's changes and your ticks stay.
+
 ## 10 Nov 2026 — 30-day test moves to My goals
 - Founder: it does not belong on Today. The 30-day test now sits in Profile › My goals, under Where you are.
 
