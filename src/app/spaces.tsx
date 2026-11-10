@@ -15,7 +15,7 @@ import { formatDay, todayISO } from '../lib/dates';
 import { tr } from '../lib/i18n';
 import { captureSpace, hasSpaceCamera, keepCopy } from '../lib/spaceCapture';
 import {
-  CHECKS, CHECK_MAX, SPACES, afterDue, spacesScore, afterPhoto, againOn, doneCount, latestPhoto, loadPhotos, nextPhotos, nextSpace, savePhotos, statusOf,
+  CHECKS, CHECK_MAX, SPACES, afterDue, scoreOf, spacesScore, afterPhoto, againOn, doneCount, latestPhoto, loadPhotos, nextPhotos, nextSpace, savePhotos, statusOf,
   type SpaceChange, type SpaceId, type SpacePhoto, type SpacePhotos, type SpacesState,
 } from '../lib/spaces';
 import { useHeal } from '../lib/store';
@@ -63,12 +63,14 @@ function List({ all }: { all: SpacesState }) {
   return (
     <Screen>
       <Note>{tr('Your home, set up to help you.')}</Note>
-      {spacesScore(all) != null ? (
-        <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 8 }}>
-          <Text style={{ fontSize: 34, fontWeight: '800', color: colors.insight }}>{spacesScore(all)}</Text>
-          <Text style={{ fontSize: 14, color: colors.muted }}>{tr('Spaces score, out of 100')}</Text>
-        </View>
-      ) : null}
+      {/* The Spaces score on the front page (founder, 10 Nov 2026): one ring per space, the score in the middle (decision 0037). */}
+      <Card>
+        <Text style={{ fontSize: 13, color: colors.muted, fontWeight: '600' }}>{tr('Spaces score')}</Text>
+        <RingPanel items={SPACES.map((x, i) => {
+          const sc = scoreOf(all[x.id]);
+          return { id: x.id, color: SPACE_RING[i], label: tr(x.name), value: (sc ?? 0) / 100, ...(sc == null ? { keyText: '–' } : {}) };
+        })} score={spacesScore(all)} max={100} sub={tr('of 100')} />
+      </Card>
       {next ? (
         <Card>
           <MyraSays text={next.due ? tr('A week has passed. Snap your {space} again.', { space: nameOf(next.id).toLowerCase() })
@@ -233,6 +235,7 @@ function OneSpace({ id, all, save }: { id: SpaceId; all: SpacesState; save: (s: 
 }
 
 const RING = [PASTEL.peach, PASTEL.teal, PASTEL.sky, PASTEL.sage, PASTEL.lavender];
+const SPACE_RING = [PASTEL.peach, PASTEL.lavender, PASTEL.sand, PASTEL.sky, PASTEL.teal, PASTEL.sage];
 
 /** The Space score (founder, 10 Nov 2026): five checks as rings (decision 0037), the score in the middle, and what the
  *  three changes would bring it to. Kept on its own; not part of My day. */

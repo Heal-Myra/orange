@@ -15,7 +15,7 @@ export const PASTEL = {
   peach: '#EBA987', lavender: '#9C95D0', teal: '#6FB7BD', sky: '#86B4DE', sand: '#E3B873', rose: '#D9A7BD', sage: '#9CC08E',
 } as const;
 
-export interface RingItem { id: string; color: string; label: string; value: number /* 0..1 */; text?: string; sub?: string }
+export interface RingItem { id: string; color: string; label: string; value: number /* 0..1 */; text?: string; sub?: string; keyText?: string /* replaces the % in the key, e.g. '–' for nothing yet */ }
 /** Inside cards every part shows as a percentage (founder, 4 Nov 2026); only the card's own score stays in points. */
 export const pct = (v: number) => `${Math.round((Number.isFinite(v) ? Math.max(0, v) : 0) * 100)}%`;
 
@@ -63,7 +63,7 @@ export function RingKey({ items }: { items: RingItem[] }) {
             <Text style={{ color: colors.ink, fontSize: 13 }} numberOfLines={2}>{k.label}</Text>
             {k.sub ? <Text style={{ color: colors.muted, fontSize: 11.5 }} numberOfLines={1}>{k.sub}</Text> : null}
           </View>
-          <Text style={{ color: colors.muted, fontWeight: '600', fontSize: 12.5 }}>{pct(k.value)}</Text>
+          <Text style={{ color: colors.muted, fontWeight: '600', fontSize: 12.5 }}>{k.keyText ?? pct(k.value)}</Text>
         </View>
       ))}
     </View>

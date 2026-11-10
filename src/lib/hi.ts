@@ -1761,4 +1761,5 @@ export const HI: Record<string, string> = {
   'Soft light': 'हल्की रोशनी',
   'Journal or book at hand': 'डायरी या किताब पास में',
   'Away from screens': 'स्क्रीन से दूर',
+  'Spaces score': 'जगहों का स्कोर',
 };

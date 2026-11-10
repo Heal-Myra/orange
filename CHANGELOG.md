@@ -1,5 +1,8 @@
 # Changelog
 
+## 10 Nov 2026 — Spaces score rings on the Spaces page
+- Founder: the Spaces page now opens with the Spaces score as concentric rings, one per space, the score in the middle (the same look as every scored card). Spaces not yet snapped show "–".
+
 ## 10 Nov 2026 — Space score and weekend / Friday nudges (decision 0057)
 - Every space now has a **score out of 100**: five checks Myra marks from your photo, 20 points each, shown as rings with the score in the middle and what it would be after her 3 changes. The Spaces score (average of the spaces you've snapped) shows in Spaces and in Profile. It is not part of My day.
 - **Saturday and Sunday:** a card on Today for one home space worth improving, and a 10 am phone note on Saturday. **Friday:** a card and a 4 pm note to snap your work desk before you leave. "Not now" hides the card for the day.
