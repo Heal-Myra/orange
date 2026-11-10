@@ -24,3 +24,10 @@ bed costs sleep. Photo in, three small changes out keeps to "always less effort 
 
 ## Not yet
 More spaces of the person's own (balcony, a child's room), family members' spaces, and a points share in a pillar.
+
+## Update, 10 Nov 2026: no outside picture-making AI
+The founder asked for a picture of the space "with the changes made". Claude reads photos but does not make images, and an
+image service from another company (e.g. Google) would mean sending people's home photos there. **Founder's decision: no
+user data goes to another AI company.** Instead, Myra marks the spots on the person's own photo (numbered pins drawn by
+the app on the phone), with each change's details below. A walk-round **video** is planned for build 14 (still frames are
+taken on the phone; the video itself never leaves it).
