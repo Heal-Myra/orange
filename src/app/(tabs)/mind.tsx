@@ -8,15 +8,13 @@ import { ClassifyHelper } from '../../components/AiBits';
 import { ScreenTimeCard, phoneDayFor, usePhoneUpdate } from '../../components/ScreenTimeCard';
 import { emptyDay, type DayLog } from '../../lib/types';
 import { MeditationTimer } from '../../components/MeditationTimer';
-import { FeelingCard } from '../../components/FeelingCard';
-import { HabitsBar, TasksCard } from '../../components/TasksCard';
+import { TasksCard } from '../../components/TasksCard';
 import { Anchor, Button, Card, Expandable, Heading, Note, NumberField, Screen, Score, s, useKeepVisible } from '../../components/ui';
 import { CONTENT_CATEGORIES, mindScore } from '../../lib/scoring';
 import { useHeal } from '../../lib/store';
 import type { ContentCategoryId } from '../../lib/types';
 import { colors } from '../../theme';
 import { tr } from '../../lib/i18n';
-import { todayISO } from '../../lib/dates';
 
 const PLATFORMS = ['Instagram', 'YouTube', 'WhatsApp', 'Facebook', 'X', 'LinkedIn', 'Other'];
 
@@ -45,9 +43,8 @@ export default function Mind() {
     <Screen feedback="Mind">
       {/* The score sits in the title bar now (founder, 4 Nov 2026). */}
 
-      {/* How I feel today, first on Mind (founder, 31 Oct 2026); Myra fits every suggestion to it. */}
-      {date === todayISO() ? <Anchor id="feel"><FeelingCard /></Anchor> : null}
-      <Anchor id="habits"><HabitsBar /></Anchor>
+      {/* "How do you feel today?" and the Habits card were removed (founder, 10 Nov 2026); habits due today now sit
+          inside Clear your mind. */}
       <Anchor id="tasks"><TasksCard /></Anchor>
 
       {/* Breathing & meditation moved here from Soul; Tao moved to Soul (founder, 24 Oct 2026). */}

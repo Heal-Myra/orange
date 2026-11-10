@@ -103,18 +103,18 @@ export function TasksCard() {
   );
 }
 
-/** Making a habit (founder, 26 Oct 2026): for its first 21 days a habit sits here, inside Clear your mind, with its day
- *  count; after that it moves to the Habits card. */
+/** Habits inside Clear your mind (founder, 26 Oct 2026): for its first 21 days a habit shows its day count. Since
+ *  10 Nov 2026 the separate Habits card is gone, so every habit due today sits here, monthly reminders included. */
 function MakingAHabit() {
   const { habits, tickHabit, removeHabit } = useTasks();
   const { day, days, date } = useHeal();
   const [y, m, d] = date.split('-').map(Number);
-  const list = habitsToday(habits, new Date(y, m - 1, d)).filter(h => forming(h, date));
+  const list = habitsToday(habits, new Date(y, m - 1, d));
   if (!list.length) return null;
   const done = day.habitsDone ?? [];
   return (
     <View style={{ gap: 8, borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 10 }}>
-      <Text style={{ fontWeight: '700', color: colors.ink }}>{tr('Making a habit')}</Text>
+      <Text style={{ fontWeight: '700', color: colors.ink }}>{list.every(h => forming(h, date)) ? tr('Making a habit') : tr('Habits')}</Text>
       {list.map(h => {
         const on = done.includes(h.id);
         return (
@@ -124,7 +124,7 @@ function MakingAHabit() {
             </Pressable>
             <View style={{ flex: 1 }}>
               <Text style={{ color: colors.ink, textDecorationLine: on ? 'line-through' : 'none' }}>{h.at ? `${h.at} · ` : ''}{h.title}</Text>
-              <Text style={{ color: colors.muted, fontSize: 12 }}>{tr('Day {n} of {total} · done {times} times', { n: habitDay(h, date), total: FORMING_DAYS, times: timesDone(h, days) })}</Text>
+              <Text style={{ color: colors.muted, fontSize: 12 }}>{forming(h, date) ? tr('Day {n} of {total} · done {times} times', { n: habitDay(h, date), total: FORMING_DAYS, times: timesDone(h, days) }) : tr(repeatName(h.repeat)) + (h.repeat === "monthly" && h.dayOfMonth ? ` · ${h.dayOfMonth}` : "")}</Text>
             </View>
             <Pressable onPress={() => removeHabit(h.id)} hitSlop={8} accessibilityLabel={tr('Stop this habit')}>
               <Ionicons name="close" size={18} color={colors.muted} />

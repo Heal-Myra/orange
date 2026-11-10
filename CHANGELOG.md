@@ -1,5 +1,8 @@
 # Changelog
 
+## 10 Nov 2026 — Mind: "How do you feel today?" and the Habits card removed
+- Founder: both cards are gone from Mind. Habits and monthly reminders (like the Tata Play payment) due today now sit inside Clear your mind, with the same tick; new habits still show their 21-day count. Earlier feelings stay in your history.
+
 ## 10 Nov 2026 — Myra becomes like you, and tries something new now and then
 - Myra mirrors how you talk: your length, tone, humour, emoji and language mix (Hinglish too). She keeps a short note of how you talk, kept with About you (no health details), and every Myra line uses it.
 - About one reply in five she nudges you to try something different, in how she talks or a small new thing to do. What you enjoy she offers more often; what you ignore she drops.
