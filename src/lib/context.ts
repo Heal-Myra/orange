@@ -1,7 +1,7 @@
 // A plain-text summary of the person's targets, today and the last 7 days, sent to the AI
 // (daily guidance and Myra) so its answers are about this person. Built on the device; only what is needed is sent.
 
-import { FAST_FROM, fastHabit, fastHoursOf } from './fasting';
+import { FAST_FROM, fastHabit, fastHoursOf , saidFast } from './fasting';
 import { feelingMix, feelingsLine } from './feelings';
 import { taoStudied } from './scoring';
 import { aboutLine, fibreTarget } from './targets';
@@ -43,7 +43,7 @@ export function buildContext(day: DayLog, days: Record<string, DayLog>, date: st
     (() => { const y = days[shiftISO(date, -1)]; const f = day.infoFast && !day.infoFast.ended && Date.parse(day.infoFast.until) > Date.now() ? { until: new Date(day.infoFast.until).toTimeString().slice(0, 5) } : null; return feelingsLine(y ? feelingMix(y.media ?? [], y.watched ?? []) : null, f); })(),
     (() => { const r = latestReading(days, date); return r ? faceLine(r.face, r.date === date ? 'today' : r.date) : ''; })(),
     `Fasting today: ${day.fasting ? 'yes (declared fast: water, black tea, black coffee)' : 'no'}.`,
-    (() => { const h = date >= FAST_FROM ? fastHabit(profile.me) : null; if (!h) return ''; const f = fastHoursOf(day, h); return `Fasts by choice: ${h.hours} hours (last meal usually ${h.lastMeal}). ${f.ongoing ? `Now ${Math.round(f.hours * 10) / 10} h into the fast; do not suggest food before ${h.hours} h.` : `Today's fast: ${Math.round(f.hours * 10) / 10} h.`}`; })(),
+    (() => { const h0 = date >= FAST_FROM ? fastHabit(profile.me) : null; const h = h0 && saidFast(day, h0) ? h0 : null; if (!h) return ''; /* only a fast the person ticked (11 Nov 2026) */ const f = fastHoursOf(day, h); return `Fasts by choice: ${h.hours} hours (last meal usually ${h.lastMeal}). ${f.ongoing ? `Now ${Math.round(f.hours * 10) / 10} h into the fast; do not suggest food before ${h.hours} h.` : `Today's fast: ${Math.round(f.hours * 10) / 10} h.`}`; })(),
     `Food: ${day.meals.map(m => m.name).join(', ') || 'nothing logged'}; totals ${Math.round(t.kcal)} kcal, protein ${Math.round(t.p)} g, carbs ${Math.round(t.c)} g, fat ${Math.round(t.f)} g, fibre ${Math.round(t.fib)} g (target ${fibreTarget(profile.kcal)} g).`,
     `Mind: focus tasks done today ${day.mind.focusDone ?? 0} of up to 2; breathing and meditation ${day.mind.meditationMin ?? 'not done yet'} min; phone yesterday (counted today) ${(day.phoneFrom ?? day).noMedia ? 'no social media' : (day.phoneFrom ?? day).media.filter(m => !m.notMe && m.group !== 'tool').map(m => `${m.minutes} min ${m.app || m.platform} (${m.group === 'learning' ? 'learning/AI tool' : m.category})`).join('; ') || 'not logged'}.`,
     // NeoSapien (decision 0050): only the tone of the day, never what was said.

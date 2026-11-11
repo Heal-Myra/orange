@@ -2,7 +2,7 @@
 // and the part of the day with the most points still to win, with how many points it can add. The points come from the
 // same scoring as the cards (src/lib/scoring.ts), so the "+N" is worked out, never guessed.
 
-import { FAST_FROM, fastHabit, fastHoursOf } from './fasting';
+import { FAST_FROM, fastHabit, fastHoursOf , saidFast } from './fasting';
 import { FOCUS_EACH, JOURNAL_FROM, journalParts, LEARN_SHARE, POINTS, SECTIONS_FROM, SECTION_AREAS, lived, taoStudied, wisdomStudied, type WellBeing } from './scoring';
 import type { DayLog, Profile } from './types';
 
@@ -49,7 +49,8 @@ export function candidates(d: DayLog, P: Profile, w: WellBeing, hour: number): S
     add({ id: 'movement', pillar: 'body', card: 'movement', minutes: 20, gain });
   }
   // Mid-fast (fasting by choice, decision 0044): no meal nudges until the fast reaches its target.
-  const habit = (d.date ?? '') >= FAST_FROM ? fastHabit(P.me) : null;
+  const h0 = (d.date ?? '') >= FAST_FROM ? fastHabit(P.me) : null;
+  const habit = h0 && saidFast(d, h0) ? h0 : null; // only a fast the person ticked (11 Nov 2026)
   const [y, mo, da] = (d.date ?? '2000-01-01').split('-').map(Number);
   const fasting = habit && !d.meals.length && fastHoursOf(d, habit, new Date(y, mo - 1, da, Math.floor(hour), Math.round((hour % 1) * 60))).hours < habit.hours;
   if (hour >= 7 && !d.fasting && !fasting) {

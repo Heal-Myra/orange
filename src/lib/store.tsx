@@ -4,7 +4,7 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppState, Platform } from 'react-native';
-import { carriedFastFrom, fastHabit } from './fasting';
+import { carriedFastFrom } from './fasting';
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useAuth } from './auth';
 import { shiftISO, todayISO } from './dates';
@@ -201,7 +201,7 @@ export function HealProvider({ children }: { children: ReactNode }) {
     if (!ready) return;
     // Only for a fast the person said (founder, 9 Nov 2026): a day with no meals logged is usually a forgotten photo.
     const today = todayISO(), from = carriedFastFrom(days, today);
-    if (from && (days[today]?.fasting || fastHabit(profile.me))) updateOn(today, d => { if (!d.fastFrom) d.fastFrom = from; });
+    if (from && days[today]?.fasting) updateOn(today, d => { if (!d.fastFrom) d.fastFrom = from; });
   }, [ready, days, updateOn, profile.me]);
 
 

@@ -3,7 +3,7 @@
 // A working model to help people understand themselves, not a medical measure
 // (The Orange Book, Chapter 2). Weights are documented in docs/scoring.md.
 
-import { FAST_FROM, FOOD_V3_FROM, fastCurve, MEAL_SHARE, aimShares, fastHabit, fastHoursOf, fastPoints, foodV3 } from './fasting';
+import { FAST_FROM, FOOD_V3_FROM, fastCurve, MEAL_SHARE, aimShares, fastHabit, fastHoursOf, fastPoints, foodV3, saidFast } from './fasting';
 import { DEFAULT_PROFILE, type ContentCategoryId, type DayLog, type Meal, type MediaSession, type PracticeId, type Profile } from './types';
 
 export const CONTENT_CATEGORIES: { id: ContentCategoryId; name: string; weight: number }[] = [
@@ -105,7 +105,7 @@ export function bodyScore(d: DayLog, P: Profile, now: Date = new Date()): BodySc
     // From 6 Nov 2026: the higher of the usual Food and the points for the hours fasted (longer fasts rise faster).
     // Only for people who fast on purpose (a fasting habit, or "I'm fasting today"), so a day with meals not yet
     // logged never looks like a long fast.
-    const fasts = !!habit || !!d.fasting || !!fastHabit(P.me);
+    const fasts = saidFast(d, habit || fastHabit(P.me));
     nutrition = fasts && (d.date ?? '') >= FAST_CURVE_FROM ? Math.max(v.total, fastCurve(v.fastHours)) : v.total;
   }
   else if (habit) {

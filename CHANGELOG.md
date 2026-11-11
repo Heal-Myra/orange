@@ -1,5 +1,8 @@
 # Changelog
 
+## 11 Nov 2026 — Fasting hours only when "I'm fasting today" is ticked
+- Founder: Food still showed "Fast kept: 17½ h" on a morning with no photo, because a fasting habit in About you counted as saying so. From today only the daily tick counts: without it there are no fasting hours, no fast carried over, and Myra never says "you're 12 hours into your fast". A dinner-time line more than 6 h before sleep (usually a dinner not logged) is not shown. Earlier days keep their scores.
+
 ## 10 Nov 2026 — Spaces: Remove all photos
 - Founder: at the bottom of Spaces, "Remove all photos" takes every space photo off this phone after one "Yes, remove". Scores, Myra's changes and your ticks stay.
 

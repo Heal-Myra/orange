@@ -65,6 +65,11 @@ const c01 = (x: number) => Math.max(0, Math.min(1, x));
  *  habit in About you (founder: people often forget to log a meal, so the gap looked like a fast). Otherwise Food is
  *  dinner time 8 + meals 32. */
 export const FAST_ASK_FROM = '2026-11-09';
+/** From 11 Nov 2026 only the daily tick counts (founder: a fasting habit in About you still turned a missed photo
+ *  into fasting hours). The habit still sets the target hours once the tick is on. */
+export const FAST_TICK_ONLY_FROM = '2026-11-11';
+export const saidFast = (d: DayLog, habit: unknown) =>
+  !!d.fasting || ((d.date ?? '') < FAST_TICK_ONLY_FROM && !!habit);
 
 export interface FoodV3 { asked: boolean; fasting: number; fastHours: number; fastTarget: number; ongoing: boolean; since: Date;
   dinner: number; dinnerGap: number | null; meals: number; penalty: number; carbOver: number; fatOver: number; total: number }
@@ -86,7 +91,7 @@ export function foodV3(d: DayLog, me: AboutMe | undefined, mealScore40: number |
   const u = usual(me);
   const target = habit?.hours ?? DEFAULT_FAST_HOURS;
   const f = fastHoursOf(d, { hours: target, lastMeal: habit?.lastMeal ?? u.lastMeal }, now);
-  const asked = (d.date ?? '') < FAST_ASK_FROM || !!d.fasting || !!habit;
+  const asked = (d.date ?? '') < FAST_ASK_FROM || saidFast(d, habit);
   const fasting = asked ? FOOD_PARTS.fasting * c01(f.hours / target) : 0;
   // Dinner at least 3 hours before sleep: full at 3 h or more, nothing at 1 h or less (founder, 3 Nov 2026).
   const dinnerAt = f.since;

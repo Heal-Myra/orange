@@ -2,7 +2,7 @@
 // at the bottom Myra recommends"). When Myra's latest recommendation is about this card, her line is shown; otherwise a
 // short, ready-made next step from the card's own numbers (no extra AI request). One line, at most 10 words.
 
-import { FAST_FROM, fastHabit, fastHoursOf, fmtHours } from '../lib/fasting';
+import { FAST_FROM, fastHabit, fastHoursOf, fmtHours , saidFast } from '../lib/fasting';
 import { Text, View } from 'react-native';
 import { oneLine } from '../lib/ai';
 import { tr } from '../lib/i18n';
@@ -77,7 +77,8 @@ export function MyraLine({ card, phone }: { card: CardId; phone?: { minutes: num
   const { day, profile } = useHeal();
   const g = day.guidance, p = PILLAR[card];
   // Mid-fast by choice (decision 0044): never a meal nudge, only how far along the fast is.
-  const habit = card === 'food' && day.date >= FAST_FROM ? fastHabit(profile.me) : null;
+  const h0 = card === 'food' && day.date >= FAST_FROM ? fastHabit(profile.me) : null;
+  const habit = h0 && saidFast(day, h0) ? h0 : null; // only a fast the person ticked (11 Nov 2026)
   const f = habit && !day.meals.length ? fastHoursOf(day, habit) : null;
   const midFast = f && f.ongoing && f.hours < habit!.hours;
   const hers = !midFast && g && p && g.cards?.[p] === card ? g[p]?.[0] : undefined;

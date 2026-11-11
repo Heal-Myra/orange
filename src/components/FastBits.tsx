@@ -64,7 +64,8 @@ export function FastStatus({ dinnerGap }: { dinnerGap?: number | null } = {}) {
   const f = useFast();
   if (!f) return null;
   // No fast said (decision 0047, 9 Nov 2026): no fasting hours, only the dinner-time line.
-  if (!f.asked) return dinnerGap == null ? null : (
+  // A "dinner" more than 6 h before sleep is usually a dinner not logged yet: say nothing rather than guess.
+  if (!f.asked) return dinnerGap == null || dinnerGap > 6 ? null : (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10, paddingHorizontal: 12, borderRadius: 14, backgroundColor: PASTEL.sky + '22' }}>
       <Ionicons name="moon-outline" size={18} color={SKY_INK} />
       <Text style={{ flex: 1, color: SKY_INK, fontSize: 14.5 }}>{tr('Dinner {h} h before sleep (aim 3 h)', { h: fmtHours(Math.max(0, dinnerGap)) })}</Text>
