@@ -7,13 +7,16 @@ import { Card, Note, Screen } from '../components/ui';
 import { todayISO } from '../lib/dates';
 import { tr } from '../lib/i18n';
 import { findRecords } from '../lib/records';
+import { runRecords } from '../lib/runRecords';
+import { useRuns } from '../lib/useRuns';
 import { useHeal } from '../lib/store';
 import { colors } from '../theme';
 
 export default function Records() {
   const { days, profile } = useHeal();
   const today = todayISO();
-  const recs = useMemo(() => findRecords(days, profile, today), [days, profile, today]);
+  const runs = useRuns();
+  const recs = useMemo(() => [...runRecords(runs, today), ...findRecords(days, profile, today)].sort((a, b) => (a.isNew === b.isNew ? b.end.localeCompare(a.end) : a.isNew ? -1 : 1)), [runs, days, profile, today]);
   return (
     <Screen noBanner>
       <Card style={{ gap: 0 }}>

@@ -1,5 +1,8 @@
 # Changelog
 
+## 11 Nov 2026 — Running bests in Top of My Game
+- Founder: the Apple Watch showed "fastest 5 km" but Top of My Game did not. Happy Orange now reads every run in Apple Health (last 5 years) and finds your fastest 5 km, fastest 10 km (at the run's average pace, for runs at least that long) and longest run. A new best shows first on Today for 7 days; All lists them with what they beat.
+
 ## 11 Nov 2026 — Edit a to-do
 - Founder: "Make it smaller" had no way to change the words. Now tap a to-do and choose ✎ Edit (or long-press it, or tap "✎ Edit" on the "Moved N times" line): the words become editable, Save keeps them, and the moved count starts again. The message after adding a repeating to-do no longer says "Making a habit".
 

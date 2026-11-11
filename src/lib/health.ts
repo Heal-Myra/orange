@@ -14,3 +14,6 @@ export const HEALTH_READ_VERSION = 2;
 export const healthAvailable = (): boolean => false;
 export async function connectHealth(): Promise<boolean> { return false; }
 export async function readHealthDay(_iso: string): Promise<HealthDay> { return {}; }
+/** Every run in Apple Health (founder, 11 Nov 2026: "fastest 5 km" on the Watch was missing from Top of My Game). */
+export interface Run { at: string; km: number; secs: number }
+export async function readRuns(): Promise<Run[]> { return []; }

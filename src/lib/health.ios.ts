@@ -12,7 +12,7 @@ import {
   requestAuthorization,
   WorkoutActivityType,
 } from '@kingstinct/react-native-healthkit';
-import type { HealthDay } from './health';
+import type { HealthDay, Run } from './health';
 
 export type { HealthDay } from './health';
 
@@ -157,4 +157,23 @@ export async function readHealthDay(iso: string): Promise<HealthDay> {
     mindfulMin: mindful,
     workouts,
   };
+}
+
+/** Every run of the last 5 years with its distance and time (founder, 11 Nov 2026: Top of My Game missed the Watch's
+ *  "fastest 5 km"). Read straight from Apple Health, so runs from before Happy Orange count too. */
+export async function readRuns(): Promise<Run[]> {
+  const end = new Date(), start = new Date(end.getTime() - 5 * 365 * DAY);
+  const list = await queryWorkoutSamples({ limit: 0, ...range(start, end) } as never).catch(() => []);
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return list.flatMap(w => {
+    const raw = (WorkoutActivityType as unknown as Record<number, string>)[w.workoutActivityType as unknown as number] ?? '';
+    if (raw !== 'running') return [];
+    const dist = (w as unknown as { totalDistance?: { quantity: number; unit: string } }).totalDistance;
+    if (!dist) return [];
+    const km = dist.unit === 'km' ? dist.quantity : dist.unit === 'mi' ? dist.quantity * 1.609344 : dist.quantity / 1000;
+    const d = w.duration as unknown as { quantity: number; unit: string } | number;
+    const secs = typeof d === 'number' ? d : d.unit === 'min' ? d.quantity * 60 : d.unit === 'hr' ? d.quantity * 3600 : d.quantity;
+    const t = new Date(w.startDate);
+    return km > 0.5 && secs > 60 ? [{ at: `${t.getFullYear()}-${pad(t.getMonth() + 1)}-${pad(t.getDate())}`, km, secs }] : [];
+  });
 }

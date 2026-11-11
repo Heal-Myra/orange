@@ -144,7 +144,7 @@ function windowValue(def: RecDef, days: Record<string, DayLog>, P: Profile, end:
 }
 
 const KIND_RANK: Record<RecKind, number> = { day: 1, week: 2, month: 3, streak: 4 };
-export const recRank = (r: Pick<Rec, 'kind' | 'title'>) => (/^Highest/.test(r.title) ? 0 : KIND_RANK[r.kind]);
+export const recRank = (r: Pick<Rec, 'kind' | 'title'>) => (/^(Highest|Fastest|Longest run)/.test(r.title) ? 0 : KIND_RANK[r.kind]);
 
 export function freshRecords(daysIn: Record<string, DayLog>, P: Profile, today: string): Rec[] {
   // Each day's value is worked out once per kind of record (windows reuse the same days many times).
