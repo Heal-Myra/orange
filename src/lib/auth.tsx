@@ -162,6 +162,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await supabase.from('ai_access').delete().eq('user_id', uid);
       await supabase.from('tasks').delete().eq('user_id', uid); // to-do list (migration 0005)
       await AsyncStorage.removeItem('heal.tasks.v1').catch(() => {});
+      // The health vault (migration 0010) and meal checks (0009) go too.
+      for (const t of ['health_daily', 'health_workouts', 'health_events', 'meal_checks']) await supabase.from(t).delete().eq('user_id', uid).then(() => {}, () => {});
+      await AsyncStorage.removeItem(`heal.vault.${uid}`).catch(() => {});
       await supabase.auth.updateUser({ data: { tradition: null } }).catch(() => {});
       await AsyncStorage.removeItem(TRADITION_KEY).catch(() => {});
       const b = await supabase.from('profiles').delete().eq('user_id', uid);

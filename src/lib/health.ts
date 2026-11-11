@@ -10,10 +10,18 @@ export interface HealthDay {
   sleepStages?: { deep?: number; core?: number; rem?: number; awake?: number };
 }
 
-export const HEALTH_READ_VERSION = 2;
+export const HEALTH_READ_VERSION = 3;
 export const healthAvailable = (): boolean => false;
 export async function connectHealth(): Promise<boolean> { return false; }
 export async function readHealthDay(_iso: string): Promise<HealthDay> { return {}; }
 /** Every run in Apple Health (founder, 11 Nov 2026: "fastest 5 km" on the Watch was missing from Top of My Game). */
 export interface Run { at: string; km: number; secs: number }
 export async function readRuns(): Promise<Run[]> { return []; }
+
+// The health vault (11 Nov 2026): Apple Health only, so empty here.
+export interface VaultDaily { date: string; metric: string; unit: string; sum: number | null; avg: number | null; min: number | null; max: number | null }
+export interface VaultWorkout { id: string; type: string; start_at: string; end_at: string; minutes: number; km: number | null; kcal: number | null; source: string | null; meta: unknown }
+export interface VaultEvent { id: string; kind: string; value: number | null; start_at: string; end_at: string; source: string | null }
+export async function vaultDaily(_from: string, _to: string): Promise<VaultDaily[]> { return []; }
+export async function vaultWorkouts(_from: string, _to: string): Promise<VaultWorkout[]> { return []; }
+export async function vaultEvents(_from: string, _to: string): Promise<VaultEvent[]> { return []; }

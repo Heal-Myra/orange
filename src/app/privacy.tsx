@@ -45,7 +45,7 @@ export default function Privacy() {
         <Heading>{tr('Permissions')}</Heading>
         <Note>{tr('What Happy Orange may use on this phone. You can change any of them at any time.')}</Note>
         <View style={{ height: 8 }} />
-        <Line icon="heart-outline" title="Apple Health" line={tr('Steps, sleep, weight, heart, mindful minutes (read only)')}
+        <Line icon="heart-outline" title="Apple Health" line={tr('Everything Health shares, from your Watch and other devices (read only). Kept in your account for Myra to learn from.')}
           right={health.connected ? link(tr('Change'), settings) : link(tr('Connect'), () => router.push('/connect-health'))} />
         <Line icon="notifications-outline" title={tr('Notifications')} line={tr("Myra's reminders at the right time of day")} right={link(tr('Change'), settings)} />
         <Line icon="camera-outline" title={tr('Camera and photos')} line={tr('Meal photos, screenshots, selfies for Face & beauty')} right={link(tr('Change'), settings)} />

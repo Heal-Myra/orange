@@ -1,5 +1,8 @@
 # Changelog
 
+## 11 Nov 2026 — The health vault (decision 0055)
+- Founder: stop picking Apple Health data selectively. Happy Orange now reads everything Health offers (about 60 measures: steps, distances, energy, heart rate, HRV, breathing, oxygen, temperature, weight and body measures, blood pressure and glucose, walking and running form, noise, daylight, water and nutrients), every workout, and every sleep stage, mindful session, stand hour and heart alert, and keeps it in your own rows on our server for the learning engine to come. The first time it goes back two years, quietly. Apple's permission sheet shows once more for the new items. Delete my data removes it too.
+
 ## 11 Nov 2026 — Running bests in Top of My Game
 - Founder: the Apple Watch showed "fastest 5 km" but Top of My Game did not. Happy Orange now reads every run in Apple Health (last 5 years) and finds your fastest 5 km, fastest 10 km (at the run's average pace, for runs at least that long) and longest run. A new best shows first on Today for 7 days; All lists them with what they beat.
 

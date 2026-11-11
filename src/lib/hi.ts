@@ -335,6 +335,7 @@ export const HI: Record<string, string> = {
   'Fastest 5 km run': 'सबसे तेज़ 5 किमी दौड़',
   'Fastest 10 km run': 'सबसे तेज़ 10 किमी दौड़',
   'Longest run': 'सबसे लंबी दौड़',
+  'Everything Health shares, from your Watch and other devices (read only). Kept in your account for Myra to learn from.': 'Health जो कुछ साझा करता है, आपकी वॉच और दूसरे उपकरणों से (सिर्फ़ पढ़ना)। मायरा के सीखने के लिए आपके खाते में रखा जाता है।',
   'Could not reach the AI just now. Check your connection and try again.': 'अभी AI से जुड़ नहीं सके। कनेक्शन जाँचें और फिर कोशिश करें।',
   'Could not reach the internet. Check your connection and try again.': 'इंटरनेट से जुड़ नहीं सके। कनेक्शन जाँचें और फिर कोशिश करें।',
   'Online accounts are not set up in this version.': 'इस संस्करण में ऑनलाइन खाते उपलब्ध नहीं हैं।',

@@ -9,6 +9,7 @@ import { AppState, Platform, Text, View } from 'react-native';
 import { todayISO } from '../lib/dates';
 import { connectHealth, healthAvailable, HEALTH_READ_VERSION, readHealthDay } from '../lib/health';
 import { planFor } from '../lib/targets';
+import { syncVault } from '../lib/healthVault';
 import { tr } from '../lib/i18n';
 import { useHeal } from '../lib/store';
 import { colors } from '../theme';
@@ -73,6 +74,8 @@ export function HealthProvider({ children }: { children: ReactNode }) {
       setProfile({ ...profile, kcal: p.kcal, protein: p.protein, steps: p.steps, active: p.active, me: next });
     }
     setLastSync(new Date());
+    // Everything Apple Health has goes to the person's health vault too, for the learning engine (11 Nov 2026).
+    syncVault().catch(() => {});
   }, [available, connected, ready, updateOn, profile, setProfile]);
 
   const connect = useCallback(async () => {
