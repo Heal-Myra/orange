@@ -330,6 +330,8 @@ export const HI: Record<string, string> = {
   'Remove all photos': 'सारी फ़ोटो हटाएँ',
   "Remove every space photo from this phone? Your scores and Myra's changes stay.": 'इस फ़ोन से हर जगह की फ़ोटो हटाएँ? आपके स्कोर और मायरा के बदलाव बने रहेंगे।',
   'Yes, remove': 'हाँ, हटाएँ',
+  'Moved {n} times. Make it smaller, or let it go?': '{n} बार आगे बढ़ाया। इसे छोटा करें, या छोड़ दें?',
+  'Added: it comes back every day{at}. 21 days to make it stick.': 'जोड़ा गया: यह हर दिन लौटेगा{at}। पक्का होने में 21 दिन।',
   'Could not reach the AI just now. Check your connection and try again.': 'अभी AI से जुड़ नहीं सके। कनेक्शन जाँचें और फिर कोशिश करें।',
   'Could not reach the internet. Check your connection and try again.': 'इंटरनेट से जुड़ नहीं सके। कनेक्शन जाँचें और फिर कोशिश करें।',
   'Online accounts are not set up in this version.': 'इस संस्करण में ऑनलाइन खाते उपलब्ध नहीं हैं।',

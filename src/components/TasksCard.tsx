@@ -160,7 +160,7 @@ function AddTask({ area }: { area: Area }) {
       const dom = rep === 'monthly' ? (picked ? Number(picked.slice(8, 10)) : read.dayOfMonth ?? new Date().getDate()) : undefined;
       addHabit({ title, area, repeat: rep, at: read.at, weekday: rep === 'weekly' ? read.weekday ?? new Date().getDay() : undefined, dayOfMonth: dom });
       setNote(rep === 'monthly' ? tr('Added: every month on day {d}{at}. Myra reminds you that morning.', { d: dom ?? 1, at: read.at ? ` · ${read.at}` : '' })
-        : tr('Added to Making a habit{at}: on Myra recommends every day, 21 days to make it stick.', { at: read.at ? ` · ${read.at}` : '' }));
+        : tr('Added: it comes back every day{at}. 21 days to make it stick.', { at: read.at ? ` · ${read.at}` : '' }));
     } else {
       const asked = picked ?? (days == null ? undefined : shiftISO(todayISO(), days));
       const placed = add(title, area, asked);
@@ -269,8 +269,10 @@ function AddTask({ area }: { area: Area }) {
 }
 
 function TaskRow({ t, inFocus }: { t: Task; inFocus: boolean }) {
-  const { complete, reopen, moveTo, remove, addHabit } = useTasks();
+  const { complete, reopen, moveTo, remove, addHabit, rename } = useTasks();
   const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState<string | null>(null); // the words being edited (founder, 11 Nov 2026)
+  const saveEdit = () => { if (editing?.trim()) rename(t.id, editing); setEditing(null); setOpen(false); };
   const done = !!t.doneAt;
   const [cal, setCal] = useState(false);
   const { tasks } = useTasks();
@@ -279,8 +281,11 @@ function TaskRow({ t, inFocus }: { t: Task; inFocus: boolean }) {
     <View style={{ gap: 6, borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 8 }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
         {/* Tap or long-press the words for the dates menu (the calendar icon made way for the switch). */}
-        <Pressable style={{ flex: 1 }} onPress={() => !done && setOpen(o => !o)} onLongPress={() => !done && setOpen(o => !o)}>
-          <Text style={{ color: done ? colors.muted : colors.ink, fontSize: 15, textDecorationLine: done ? 'line-through' : 'none' }}>{t.title}</Text>
+        <Pressable style={{ flex: 1 }} onPress={() => !done && editing == null && setOpen(o => !o)} onLongPress={() => !done && setEditing(t.title)}>
+          {editing != null ? (
+            <TextInput value={editing} onChangeText={setEditing} autoFocus onSubmitEditing={saveEdit} returnKeyType="done" maxLength={200}
+              style={{ color: colors.ink, fontSize: 15, borderWidth: 1, borderColor: colors.accent, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 6, backgroundColor: colors.surface }} />
+          ) : <Text style={{ color: done ? colors.muted : colors.ink, fontSize: 15, textDecorationLine: done ? 'line-through' : 'none' }}>{t.title}</Text>}
           {!done ? (
             <Text style={{ fontSize: 12, color: inFocus ? colors.insight : colors.muted }}>
               {inFocus ? tr('In today’s focus') : t.due ? shortDate(t.due) : tr('Myra will choose a day')}
@@ -294,11 +299,27 @@ function TaskRow({ t, inFocus }: { t: Task; inFocus: boolean }) {
           <Text style={{ fontSize: 13, color: colors.insight }}>{tr('This repeats. Set it to repeat')} →</Text>
         </Pressable>
       ) : null}
-      {t.moved >= 3 ? (
-        <Text style={{ fontSize: 13, color: colors.insight }}>Moved {t.moved} times. Make it smaller, or let it go?</Text>
+      {editing != null ? (
+        <View style={{ flexDirection: 'row', gap: 6 }}>
+          <Pressable onPress={saveEdit} style={{ paddingVertical: 6, paddingHorizontal: 14, borderRadius: 99, backgroundColor: colors.accent }}>
+            <Text style={{ fontSize: 13, color: '#fff', fontWeight: '600' }}>{tr('Save')}</Text>
+          </Pressable>
+          <Pressable onPress={() => setEditing(null)} style={{ paddingVertical: 6, paddingHorizontal: 12 }}>
+            <Text style={{ fontSize: 13, color: colors.muted }}>{tr('Cancel')}</Text>
+          </Pressable>
+        </View>
+      ) : null}
+      {t.moved >= 3 && !done && editing == null ? (
+        <Pressable onPress={() => setEditing(t.title)} accessibilityRole="button" hitSlop={4}>
+          <Text style={{ fontSize: 13, color: colors.insight }}>{tr('Moved {n} times. Make it smaller, or let it go?', { n: t.moved })} <Text style={{ fontWeight: '700' }}>✎ {tr('Edit')}</Text></Text>
+        </Pressable>
       ) : null}
       {open ? (
         <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap', paddingLeft: 34 }}>
+          <Pressable onPress={() => setEditing(t.title)} style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingVertical: 6, paddingHorizontal: 12, borderRadius: 99, borderWidth: 1, borderColor: colors.line }}>
+            <Ionicons name="create-outline" size={14} color={colors.ink} />
+            <Text style={{ fontSize: 13, color: colors.ink }}>{tr('Edit')}</Text>
+          </Pressable>
           {[[tr('Tomorrow'), 1], [tr('In 3 days'), 3], [tr('Next week'), 7]].map(([label, n]) => (
             <Pressable key={label} onPress={() => { moveTo(t.id, shiftISO(today, n as number)); setOpen(false); }}
               style={{ paddingVertical: 6, paddingHorizontal: 12, borderRadius: 99, borderWidth: 1, borderColor: colors.line }}>

@@ -1,5 +1,8 @@
 # Changelog
 
+## 11 Nov 2026 — Edit a to-do
+- Founder: "Make it smaller" had no way to change the words. Now tap a to-do and choose ✎ Edit (or long-press it, or tap "✎ Edit" on the "Moved N times" line): the words become editable, Save keeps them, and the moved count starts again. The message after adding a repeating to-do no longer says "Making a habit".
+
 ## 11 Nov 2026 — Fasting hours only when "I'm fasting today" is ticked
 - Founder: Food still showed "Fast kept: 17½ h" on a morning with no photo, because a fasting habit in About you counted as saying so. From today only the daily tick counts: without it there are no fasting hours, no fast carried over, and Myra never says "you're 12 hours into your fast". A dinner-time line more than 6 h before sleep (usually a dinner not logged) is not shown. Earlier days keep their scores.
 
