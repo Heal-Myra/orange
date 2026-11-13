@@ -108,7 +108,8 @@ export function FaceCard() {
               </Pressable>
               {more ? (
                 <View style={{ gap: 8, borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 10 }}>
-                  {SKIN.filter(k => f.skin[k.id]).map(k => <Legend key={k.id} small color={colorOf(k.id)} label={tr(k.label)} value={pointScore(f.skin[k.id])!} />)}
+                  {SKIN.filter(k => f.skin[k.id] && f.skin[k.id] !== 'unclear').map(k => <Legend key={k.id} small color={colorOf(k.id)} label={tr(k.label)} value={pointScore(f.skin[k.id])!} />)}
+                  {SKIN.some(k => f.skin[k.id] === 'unclear') ? <Note>{tr("Can't tell from this photo: {list}. A close selfie in daylight helps.", { list: SKIN.filter(k => f.skin[k.id] === 'unclear').map(k => tr(k.label).toLowerCase()).join(', ') })}</Note> : null}
                 </View>
               ) : null}
               <Note>{tr('Everyday skin care, not medical advice.')}</Note>

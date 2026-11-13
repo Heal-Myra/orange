@@ -357,15 +357,16 @@ If this is not a Screen Time screenshot: {"sessions":[],"period":"unclear","date
 Rules:
 - Only what is visible. Never guess or mention mental health, emotions beyond how the face looks right now, age, weight, attractiveness, ethnicity, religion or gender.
 - No medical names or diagnoses (not "acne vulgaris", "melasma", "rosacea", "eczema"). Everyday words only.
-- Lighting, makeup and camera filters change how skin looks; when unsure, choose the milder level.
+- Lighting, makeup and camera filters change how skin looks. Look closely and honestly (a tester rightly said 100% everywhere was not believable): most adult faces show at least mild signs somewhere, such as fine lines, uneven tone, dullness from city dust and pollution, or slight dark circles.
+- Use "none" only when that area is clearly visible and truly shows nothing. When the photo is too far, dark, blurry, filtered or covered to judge an area, use "unclear" for it, never "none".
 Give:
 - "isFace": true only if one person's face is clearly visible; otherwise false and say why in "note".
-- "skin": for each of dryness, darkCircles, puffiness, redness, breakouts, tan, lips (lips = dry lips): "none", "mild" or "noticeable".
+- "skin": for each of dryness, darkCircles, puffiness, redness, breakouts, tan, lips (lips = dry lips), lines (fine lines and wrinkles), tone (uneven tone, spots or dullness): "none", "mild", "noticeable" or "unclear".
 - "looks": how the face looks right now, one of "great","good","okay","low","unwell" ("low" = looks tired or sleepy; "unwell" only for clear signs like a red, runny nose). "looksNote": 2 to 5 everyday words, e.g. "fresh and smiling", "a little tired".
 - "hints": [] or any of "tired","sleepless" if the face clearly looks it.
 - "tips": 2 or 3 simple care tips for what you saw, at most 12 words each, natural first (water, sleep, sunscreen, aloe, coconut oil, ghee on lips, cold spoon for puffy eyes). If all is clear, tips to keep it so.
 - "witty": two or three warm, playful words about how they look today, kind even on a tired day (e.g. "Sunny and rested", "Bright-eyed go-getter", "Needs chai & sleep"). Never mocking, never about looks or body shape.
-Reply with JSON only: {"isFace":true|false,"skin":{"dryness":"none"|"mild"|"noticeable","darkCircles":"…","puffiness":"…","redness":"…","breakouts":"…","tan":"…","lips":"…"},"looks":"…","looksNote":"…","hints":[],"tips":["…"],"witty":"…","note":"one short sentence"}`,
+Reply with JSON only: {"isFace":true|false,"skin":{"dryness":"none"|"mild"|"noticeable"|"unclear","darkCircles":"…","puffiness":"…","redness":"…","breakouts":"…","tan":"…","lips":"…","lines":"…","tone":"…"},"looks":"…","looksNote":"…","hints":[],"tips":["…"],"witty":"…","note":"one short sentence"}`,
         { media_type: String(p.media_type ?? 'image/jpeg'), data: String(p.image_base64 ?? '') });
     }
     case 'space_read': {

@@ -31,8 +31,11 @@ describe('Face & beauty', () => {
     expect(line).toContain('iron-rich food');
   });
   it('scores the skin out of 100 and uses a recent selfie', () => {
-    // weighted: dryness 15 × 100, dark circles 15 × 60, pimples 20 × 20 → 2800 / 50
-    expect(skinScore(cleanReading({ skin: { dryness: 'none', darkCircles: 'mild', breakouts: 'noticeable' } }, 'x'))).toBe(56);
+    // weighted (13 Nov 2026): dryness 10 × 100, dark circles 15 × 60, pimples 15 × 20 → 2200 / 40
+    expect(skinScore(cleanReading({ skin: { dryness: 'none', darkCircles: 'mild', breakouts: 'noticeable' } }, 'x'))).toBe(55);
+    // a point the photo could not show is left out, never counted as clear
+    expect(skinScore(cleanReading({ skin: { dryness: 'unclear', lines: 'mild' } }, 'x'))).toBe(60);
+    expect(skinScore(cleanReading({ skin: { tone: 'unclear' } }, 'x'))).toBeNull();
     expect(skinScore(cleanReading({}, 'x'))).toBeNull();
     const f = cleanReading({ witty: 'Fresh' }, 'x');
     expect(latestReading({ '2026-10-28': { face: f } }, '2026-10-31')?.date).toBe('2026-10-28');

@@ -5,8 +5,9 @@
 
 import type { Mood, Symptom } from './feeling';
 
-export type SkinKey = 'dryness' | 'darkCircles' | 'puffiness' | 'redness' | 'breakouts' | 'tan' | 'lips';
-export type SkinLevel = 'none' | 'mild' | 'noticeable';
+export type SkinKey = 'dryness' | 'darkCircles' | 'puffiness' | 'redness' | 'breakouts' | 'tan' | 'lips' | 'lines' | 'tone';
+// 'unclear' (13 Nov 2026): the photo did not show enough to judge; never counted as clear (a tester saw 100% everywhere).
+export type SkinLevel = 'none' | 'mild' | 'noticeable' | 'unclear';
 
 export interface FaceReading {
   at: string;
@@ -26,10 +27,12 @@ export const SKIN: { id: SkinKey; label: string }[] = [
   { id: 'breakouts', label: 'Pimples' },
   { id: 'tan', label: 'Sun tan' },
   { id: 'lips', label: 'Dry lips' },
+  { id: 'lines', label: 'Fine lines' },
+  { id: 'tone', label: 'Uneven tone, dullness' },
 ];
 
-export const LEVELS: Record<SkinLevel, string> = { none: 'Clear', mild: 'Mild', noticeable: 'Noticeable' };
-const RANK: Record<SkinLevel, number> = { none: 0, mild: 1, noticeable: 2 };
+export const LEVELS: Record<SkinLevel, string> = { none: 'Clear', mild: 'Mild', noticeable: 'Noticeable', unclear: "Can't tell from this photo" };
+const RANK: Record<Exclude<SkinLevel, 'unclear'>, number> = { none: 0, mild: 1, noticeable: 2 };
 
 const MOOD_OK: Mood[] = ['great', 'good', 'okay', 'low', 'unwell'];
 const SKIN_IDS = SKIN.map(s => s.id);
@@ -38,7 +41,7 @@ const SKIN_IDS = SKIN.map(s => s.id);
 export function cleanReading(r: Partial<FaceReading> & { skin?: Record<string, unknown> }, at = new Date().toISOString()): FaceReading {
   const skin: FaceReading['skin'] = {};
   for (const [k, v] of Object.entries(r.skin ?? {})) {
-    if (SKIN_IDS.includes(k as SkinKey) && (v === 'none' || v === 'mild' || v === 'noticeable')) skin[k as SkinKey] = v;
+    if (SKIN_IDS.includes(k as SkinKey) && (v === 'none' || v === 'mild' || v === 'noticeable' || v === 'unclear')) skin[k as SkinKey] = v;
   }
   return {
     at,
@@ -53,7 +56,7 @@ export function cleanReading(r: Partial<FaceReading> & { skin?: Record<string, u
 
 /** Better, same or worse than an earlier reading, for one skin point. */
 export function skinChange(now?: SkinLevel, before?: SkinLevel): 'better' | 'same' | 'worse' | null {
-  if (!now || !before) return null;
+  if (!now || !before || now === 'unclear' || before === 'unclear') return null;
   return RANK[now] < RANK[before] ? 'better' : RANK[now] > RANK[before] ? 'worse' : 'same';
 }
 
@@ -67,14 +70,15 @@ export function earlierReading(days: Record<string, { face?: FaceReading }>, dat
 }
 
 // ---------- Skin score (founder, 31 Oct 2026: "a score displayed as a visual" instead of words) ----------
-const POINT: Record<SkinLevel, number> = { none: 100, mild: 60, noticeable: 20 };
-/** One skin point out of 100 (clear 100, mild 60, noticeable 20). */
-export const pointScore = (l?: SkinLevel) => (l ? POINT[l] : null);
+const POINT: Record<Exclude<SkinLevel, 'unclear'>, number> = { none: 100, mild: 60, noticeable: 20 };
+/** One skin point out of 100 (clear 100, mild 60, noticeable 20); null when the photo could not show it. */
+export const pointScore = (l?: SkinLevel) => (l && l !== 'unclear' ? POINT[l] : null);
+const judged = (f: FaceReading | undefined, k: SkinKey) => { const l = f?.skin[k]; return l && l !== 'unclear' ? l : null; };
 /** How much each point counts in the skin score (adds up to 100; founder, 31 Oct 2026: "a weightage"). */
-export const WEIGHT: Record<SkinKey, number> = { breakouts: 20, darkCircles: 15, dryness: 15, redness: 15, tan: 15, puffiness: 10, lips: 10 };
+export const WEIGHT: Record<SkinKey, number> = { breakouts: 15, darkCircles: 15, lines: 15, dryness: 10, redness: 10, tan: 10, tone: 10, puffiness: 10, lips: 5 };
 /** The skin score out of 100: the weighted average of the points read. Not part of the Body score. */
 export function skinScore(f?: FaceReading): number | null {
-  const e = (Object.entries(f?.skin ?? {}) as [SkinKey, SkinLevel][]);
+  const e = (Object.keys(f?.skin ?? {}) as SkinKey[]).map(k => [k, judged(f, k)] as const).filter((x): x is [SkinKey, Exclude<SkinLevel, 'unclear'>] => x[1] != null);
   const w = e.reduce((a, [k]) => a + WEIGHT[k], 0);
   return w ? Math.round(e.reduce((a, [k, l]) => a + WEIGHT[k] * POINT[l], 0) / w) : null;
 }
@@ -88,6 +92,8 @@ const REMEDY: Record<SkinKey, string> = {
   breakouts: 'pimples: less sugar, fried food and dairy sweets; more fruit, vegetables and water; exercise to sweat, then wash the face',
   tan: 'sun tan: sunscreen and shade at midday, tomatoes, carrots and citrus fruit, walk early morning or evening',
   lips: 'dry lips: water through the day, a little ghee on the lips at night',
+  lines: 'fine lines: sleep, water, sunscreen every day, colourful fruit and vegetables, aloe or coconut oil at night',
+  tone: 'uneven tone or dullness: wash off city dust and pollution at night, sunscreen, amla and citrus fruit, enough water and sleep',
 };
 
 /** The latest reading on or before `date`, within 7 days (a selfie is not needed every day). */
@@ -100,7 +106,7 @@ export function latestReading(days: Record<string, { face?: FaceReading }>, date
 /** One line for Myra. */
 export function faceLine(f?: FaceReading, when?: string): string {
   if (!f) return '';
-  const pts = (Object.entries(f.skin) as [SkinKey, SkinLevel][]).filter(([, v]) => v !== 'none');
+  const pts = (Object.entries(f.skin) as [SkinKey, SkinLevel][]).filter(([, v]) => v === 'mild' || v === 'noticeable');
   const remedies = pts.map(([k]) => REMEDY[k]).join('; ');
   return `Face & skin from a selfie${when ? ` (${when})` : ''}, skin care only, not a diagnosis: skin score ${skinScore(f) ?? '-'}/100; ${pts.map(([k, v]) => `${k} ${v}`).join(', ') || 'skin looks clear'}${f.looksNote ? `; looks ${f.looksNote}` : ''}.` +
     (remedies ? ` Remedies to weave into food and movement suggestions: ${remedies}.` : '');
@@ -111,16 +117,16 @@ export interface SkinGroup { id: 'eyes' | 'clear' | 'moisture' | 'sun'; label: s
 export const GROUPS: SkinGroup[] = [
   { id: 'eyes', label: 'Eyes', color: '#9C95D0', parts: ['darkCircles', 'puffiness'], tip: 'Rest a cold spoon under each eye for a minute.' },
   { id: 'clear', label: 'Clear skin', color: '#D9A7BD', parts: ['redness', 'breakouts'], tip: 'Wash gently twice a day and leave spots alone.' },
-  { id: 'moisture', label: 'Moisture', color: '#6FB7BD', parts: ['dryness', 'lips'], tip: 'Sip water through the day; a little ghee on the lips.' },
-  { id: 'sun', label: 'Sun', color: '#E3B873', parts: ['tan'], tip: 'Sunscreen before you step out, even on cloudy days.' },
+  { id: 'moisture', label: 'Moisture & lines', color: '#6FB7BD', parts: ['dryness', 'lips', 'lines'], tip: 'Sip water through the day; a little ghee on the lips.' },
+  { id: 'sun', label: 'Sun & tone', color: '#E3B873', parts: ['tan', 'tone'], tip: 'Wash off the day\'s dust at night; sunscreen before you step out.' },
 ];
 
 /** Each group's score: the weighted average of its points that were read (null when none were). */
 export function groupScores(f?: FaceReading): (SkinGroup & { v: number })[] {
   return GROUPS.map(g => {
-    const read = g.parts.filter(k => f?.skin[k]);
+    const read = g.parts.filter(k => judged(f, k));
     const w = read.reduce((a, k) => a + WEIGHT[k], 0);
-    return w ? { ...g, v: Math.round(read.reduce((a, k) => a + WEIGHT[k] * POINT[f!.skin[k]!], 0) / w) } : null;
+    return w ? { ...g, v: Math.round(read.reduce((a, k) => a + WEIGHT[k] * POINT[judged(f, k)!], 0) / w) } : null;
   }).filter((x): x is SkinGroup & { v: number } => x != null);
 }
 
