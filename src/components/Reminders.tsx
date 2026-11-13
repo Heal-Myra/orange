@@ -16,6 +16,7 @@ import { todayISO } from '../lib/dates';
 import { optional } from '../lib/native';
 import { WEIGHT_NUDGE, usesScale, weighedOn } from '../lib/weightNudge';
 import { SLOTS, needsNudge, type Slot } from '../lib/missedMeal';
+import { measureDue } from '../lib/measure';
 import { SPACES, againOn } from '../lib/spaces';
 
 // Arrived with build 7; older installed builds simply schedule nothing.
@@ -57,6 +58,7 @@ export function ReminderScheduler() {
   // Missed-meal nudges (10 Nov 2026): today's, only for a meal still not logged or skipped; tomorrow's always planned.
   const todayLog = days[todayISO()];
   const mealsToday = (['lunch', 'dinner'] as Slot[]).filter(s => needsNudge(todayLog, s)).join(',');
+  const measureToday = measureDue(days, todayISO()); // Measure day, the 1st of the month at 9 am (13 Nov 2026)
   // Spaces (decision 0055): at 10 am on the day an after photo is due, one gentle nudge.
   const spaces = profile.me?.spaces ?? {};
   const spacesOn = !!profile.me; // Spaces lives with About you
@@ -85,6 +87,16 @@ export function ReminderScheduler() {
       }
       for (const offset of [0, 1]) {
         const day = new Date(); day.setDate(day.getDate() + offset);
+        if (day.getDate() === 1 && (offset === 1 || measureToday)) {
+          const when = new Date(day); when.setHours(9, 0, 0, 0);
+          if (when.getTime() > now + 30_000 && when.getTime() <= horizon) {
+            await Notif.scheduleNotificationAsync({
+              content: { title: 'Happy Orange', body: tr('Measure day: waist and hips, one minute with a tape.'), data: { kind: 'measure', lang: lang() } },
+              trigger: { type: Notif.SchedulableTriggerInputTypes.DATE, date: when },
+            });
+            if (cancelled) return;
+          }
+        }
         for (const slot of ['lunch', 'dinner'] as Slot[]) {
           if (offset === 0 && !mealsToday.split(',').includes(slot)) continue;
           const [h, m] = SLOTS[slot].nudge.split(':').map(Number);
@@ -161,6 +173,7 @@ export function ReminderScheduler() {
       tap = Notif.addNotificationResponseReceivedListener(r => {
         const kind = (r.notification.request.content.data as { kind?: string } | undefined)?.kind;
         if (kind === 'sleep') router.push('/yoga-nidra');
+        else if (kind === 'measure') router.navigate({ pathname: '/body', params: { card: 'body', at: String(Date.now()) } });
         else if (kind === 'meal-missed') router.navigate({ pathname: '/body', params: { card: 'food', at: String(Date.now()) } });
         else if (kind === 'space') router.push({ pathname: '/spaces', params: { id: String((r.notification.request.content.data as { id?: string }).id ?? '') } });
         else if (kind === 'weight') router.navigate({ pathname: '/body', params: { card: 'body', at: String(Date.now()) } });
@@ -168,7 +181,7 @@ export function ReminderScheduler() {
     } catch { tap = null; }
     const sub = AppState.addEventListener('change', s => { if (s === 'active') plan().catch(() => {}); });
     return () => { cancelled = true; sub.remove(); tap?.remove(); };
-  }, [routine, open, fastingToday, habits, doneKey, weighed, scale, fastUntil, mealsToday, spacesDue, spacesOn]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [routine, open, fastingToday, habits, doneKey, weighed, scale, fastUntil, mealsToday, spacesDue, spacesOn, measureToday]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return null;
 }

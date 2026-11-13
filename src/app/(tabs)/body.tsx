@@ -11,6 +11,7 @@ import { MacroMix, NutritionTable, aimMix } from '../../components/MacroMix';
 import { bmiOf, fibreTarget, planFor } from '../../lib/targets';
 import { CheckLine, MealPhoto } from '../../components/MealPhoto';
 import { MissedMeal } from '../../components/MissedMeal';
+import { MeasureDay } from '../../components/MeasureDay';
 import { ProteinTopUp } from '../../components/ProteinTopUp';
 import { FoodPlanRow } from '../../components/FoodPlan';
 import { MealRow } from '../../components/MealRow';
@@ -167,6 +168,7 @@ export default function Body() {
             {h?.bodyFatPct != null ? <StatRow label={tr('Body fat')} value={h.bodyFatPct} unit="%" /> : null}
             {profile.me ? <StatRow label="BMI" value={Math.round(bmiOf(h?.weightKg ?? profile.me.weightKg, profile.me.heightCm) * 10) / 10} /> : null}
           </Rows>
+          <MeasureDay />
         </Card></Anchor>
       ) : null}
 

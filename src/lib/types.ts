@@ -90,6 +90,7 @@ export interface DayLog {
   tao?: { done?: boolean; note?: string; lived?: string }; // lived: how I used it today (26 Oct 2026)
   // Read from Apple Health (20 Oct 2026). Body measures are the latest reading; the rest are for this day.
   health?: {
+    waistCm?: number; hipsCm?: number; // Measure day, 1st of the month (13 Nov 2026)
     weightKg?: number; weightAt?: number; weightTyped?: boolean; weightTypedAt?: number; bodyFatPct?: number; restingHr?: number; hrv?: number; vo2max?: number;
     activeKcal?: number; mindfulMin?: number;
     workouts?: { type: string; min: number; kcal?: number }[];
