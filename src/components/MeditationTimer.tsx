@@ -128,10 +128,10 @@ export function MeditationTimer() {
           </View>
           {way !== 'dhamma' && aim ? <Recommend aim={aim} pick={pick} onPick={setPick} gentle={path.gentle} length={length} gLang={gLang} onGuided={guided} onSelf={start} /> : null}
           <Text style={lab}>{tr('CHOOSE YOUR WAY')}</Text>
-          <View style={{ flexDirection: 'row', gap: 8 }}>
-            {([['dhamma', '🪷', 'Dhamma path', '10 days, one step a day'], ['guided', '🎧', 'Guided', "Myra's voice leads you"], ['self', '⏱', 'On my own', 'A quiet timer and bell']] as const).map(([id, icon, name, line]) => (
-              <Pressable key={id} onPress={() => { if (id === 'dhamma') { lastAim = null; setAimState(null); } setWay(w => (w === id ? null : id)); }} accessibilityRole="radio" accessibilityState={{ selected: way === id }}
-                style={{ flex: 1, borderWidth: way === id ? 1.5 : 1, borderColor: way === id ? colors.accent : colors.line, backgroundColor: way === id ? colors.accent + '0D' : colors.surface, borderRadius: 16, paddingVertical: 10, paddingHorizontal: 6, alignItems: 'center', gap: 3 }}>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+            {([['dhamma', '🪷', 'Dhamma path', '10 days, one step a day'], ['guided', '🎧', 'Guided', "Myra's voice leads you"], ['self', '⏱', 'On my own', 'A quiet timer and bell'], ['sound', '🥣', 'Sound bath', 'Bowls, bells, rain']] as const).map(([id, icon, name, line]) => (
+              <Pressable key={id} onPress={() => { if (id === 'sound') { router.push('/sound-bath'); return; } if (id === 'dhamma') { lastAim = null; setAimState(null); } setWay(w => (w === id ? null : id)); }} accessibilityRole="radio" accessibilityState={{ selected: way === id }}
+                style={{ width: '48%', flexGrow: 1, borderWidth: way === id ? 1.5 : 1, borderColor: way === id ? colors.accent : colors.line, backgroundColor: way === id ? colors.accent + '0D' : colors.surface, borderRadius: 16, paddingVertical: 10, paddingHorizontal: 6, alignItems: 'center', gap: 3 }}>
                 <Text style={{ fontSize: 22 }}>{icon}</Text>
                 <Text style={{ fontSize: 14, fontWeight: '700', color: colors.ink, textAlign: 'center' }}>{tr(name)}</Text>
                 <Text style={{ fontSize: 11.5, color: colors.muted, textAlign: 'center', lineHeight: 15 }}>{tr(line)}</Text>
@@ -414,7 +414,7 @@ function TodaySessions() {
   if (!done) return null;
   const list = day.mind.medSessions ?? [];
   const other = unlisted(day);
-  const icon = { dhamma: '🪷', guided: '🎧', nidra: '🌙', self: '⏱' } as const;
+  const icon = { dhamma: '🪷', guided: '🎧', nidra: '🌙', self: '⏱', sound: '🥣' } as const;
   const name = (k: typeof list[number]) => k.kind === 'dhamma' ? (Number(k.name) > STEPS ? tr('Dhamma path, daily sitting') : tr('Dhamma path, Day {n}', { n: k.name })) : tr(k.name);
   const at = (iso: string) => new Date(iso).toLocaleTimeString(locale(), { hour: 'numeric', minute: '2-digit' });
   const n = list.length + (other ? 1 : 0);

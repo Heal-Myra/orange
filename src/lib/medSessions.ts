@@ -3,7 +3,7 @@
 
 import type { DayLog } from './types';
 
-export type SessionKind = 'dhamma' | 'guided' | 'nidra' | 'self';
+export type SessionKind = 'dhamma' | 'guided' | 'nidra' | 'self' | 'sound';
 export interface MedSession { kind: SessionKind; name: string; min: number; at: string }
 
 /** Add minutes to the day and remember the session. */

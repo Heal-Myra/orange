@@ -2,7 +2,7 @@
 // Milestone 3 replaces typing steps and sleep with automatic HealthKit / Health Connect sync.
 
 import { useState } from 'react';
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable, Text, View } from 'react-native';
 import { HealthLine, useHealth } from '../../components/HealthSync';
@@ -117,7 +117,16 @@ export default function Body() {
         ]} />
         <CareNote part="rest" />
         {/* Details and typing fold away once there is data (decision 0037); open while something is missing. */}
-        <Expandable key={date + 'sleepd'} icon="list-outline" title={tr('Details')} status={tr('Sleep stages, hours and quality')} defaultOpen={day.sleep.hours == null || !day.sleep.quality}>
+        {/* Sound bath to fall asleep (founder, 13 Nov 2026): from 8 pm, rain and "until I sleep" chosen. */}
+          {date === todayISO() && new Date().getHours() >= 20 ? (
+            <Pressable onPress={() => router.push({ pathname: '/sound-bath', params: { sleep: '1' } })} accessibilityRole="button"
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10 }}>
+              <Text style={{ fontSize: 18 }}>🥣</Text>
+              <Text style={{ flex: 1, color: colors.ink, fontSize: 15 }}>{tr('Sound bath to fall asleep')}</Text>
+              <Text style={{ color: colors.accent, fontWeight: '600' }}>{tr('Begin')} ›</Text>
+            </Pressable>
+          ) : null}
+          <Expandable key={date + 'sleepd'} icon="list-outline" title={tr('Details')} status={tr('Sleep stages, hours and quality')} defaultOpen={day.sleep.hours == null || !day.sleep.quality}>
         <Rows>
           <StatRow first label={tr('Hours slept')} value={day.sleep.hours} unit="h" decimal key={date + 'sleep'}
             onEdit={v => update(d => { d.sleep.hours = v; d.sleep.source = v == null ? undefined : 'Typed in'; })} />
