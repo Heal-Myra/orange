@@ -2,13 +2,17 @@
 // Uses the heal-ai server function (needs sign-in; counts towards the daily AI cap).
 // 21 Oct 2026 (founder): the typing box stays above the keyboard, a photo or document (PDF, text) can be attached,
 // and there is a Speak button.
+// 13 Nov 2026 (founder: "make Myra like Claude"): a quiet opening with a greeting, ☰ past chats, 👻 private chat (not
+// saved, not learned from), ✎ new chat, a rounded bar with ＋ · "Type or hold to talk" · 🎙 · voice mode (Send when
+// typing), and ＋ opening Camera · Photos · Files plus Myra's shortcuts.
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import { router, useLocalSearchParams } from 'expo-router';
+import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { Image, Keyboard, Platform, Pressable, ScrollView, Text, TextInput, View, type ScrollViewInstance } from 'react-native';
+import { Image, Keyboard, Modal, Platform, Pressable, ScrollView, Text, TextInput, View, type ScrollViewInstance } from 'react-native';
+import { MyraVoice } from '../components/MyraVoice';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { shrink, speechRecognition } from '../components/MealPhoto';
 import { Button, Note, s } from '../components/ui';
@@ -30,7 +34,16 @@ import Constants from 'expo-constants';
 let DocumentPicker: typeof import('expo-document-picker') | null = null;
 DocumentPicker = optional(['ExpoDocumentPicker'], () => require('expo-document-picker'));
 
-const KEY = 'heal.myra';
+const KEY = 'heal.myra'; // the old single chat, moved into the chat list once
+const CHATS = 'heal.myra.chats';
+interface Chat { id: string; at: string; title: string; messages: ChatMessage[] }
+const newId = () => `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
+/** The opening line, by the time of day (founder, 13 Nov 2026: like Claude's "What's cooking?"). */
+const greeting = (name?: string) => {
+  const h = new Date().getHours(), n = name?.split(' ')[0];
+  const line = h < 5 ? 'Up late{n}?' : h < 11 ? 'Good morning{n}' : h < 15 ? "What's on your plate{n}?" : h < 19 ? 'How is the day going{n}?' : 'Winding down{n}?';
+  return tr(line, { n: n ? `, ${n}` : '' });
+};
 const MAX_FILE_MB = 4;
 const HELLO: ChatMessage = { role: 'myra', text: "Hello, I'm Myra. I can help you find your way around Happy Orange, explain your scores, or look at how your week is going. What would you like?" };
 
@@ -64,7 +77,12 @@ export default function Myra() {
   const { day, days, date, profile, setProfile } = useHeal();
   const { open } = useTasks();
   const insets = useSafeAreaInsets();
-  const [messages, setMessages] = useState<ChatMessage[]>([HELLO]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [chats, setChats] = useState<Chat[]>([]);
+  const [chatId, setChatId] = useState(newId);
+  const [privateChat, setPrivateChat] = useState(false);
+  const [history, setHistory] = useState(false);
+  const [voice, setVoice] = useState(false);
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
   const [file, setFile] = useState<(AttachmentData & { uri?: string }) | null>(null);
@@ -79,7 +97,18 @@ export default function Myra() {
   const hint = useRotatingHint(!!text || !!file);
 
   useEffect(() => {
-    AsyncStorage.getItem(KEY).then(v => { if (v) setMessages(JSON.parse(v)); }).catch(() => {}).finally(() => setLoaded(true));
+    (async () => {
+      let list: Chat[] = JSON.parse((await AsyncStorage.getItem(CHATS).catch(() => null)) ?? '[]');
+      // The single chat from before 13 Nov 2026 becomes the first chat in the list.
+      const old = await AsyncStorage.getItem(KEY).catch(() => null);
+      if (old) {
+        const m = (JSON.parse(old) as ChatMessage[]).filter(x => x.text !== HELLO.text);
+        if (m.length) list = [{ id: newId(), at: new Date().toISOString(), title: m.find(x => x.role === 'user')?.text.slice(0, 60) ?? 'Myra', messages: m }, ...list];
+        AsyncStorage.removeItem(KEY).catch(() => {});
+        AsyncStorage.setItem(CHATS, JSON.stringify(list)).catch(() => {});
+      }
+      setChats(list);
+    })().catch(() => {}).finally(() => setLoaded(true));
   }, []);
 
   // Keep the typing box above the keyboard. iPhone: lift by the keyboard's height (this screen is a sheet that reaches
@@ -91,11 +120,23 @@ export default function Myra() {
     return () => { show.remove(); hide.remove(); };
   }, []);
 
-  const save = (m: ChatMessage[]) => AsyncStorage.setItem(KEY, JSON.stringify(m.slice(-40))).catch(() => {});
+  // Each chat is kept (the last 40 messages, the latest 30 chats); a private chat is never saved.
+  const save = (m: ChatMessage[]) => {
+    if (privateChat || !m.length) return;
+    setChats(list => {
+      const title = m.find(x => x.role === 'user')?.text.slice(0, 60) ?? 'Myra';
+      const next = [{ id: chatId, at: new Date().toISOString(), title, messages: m.slice(-40) }, ...list.filter(c => c.id !== chatId)].slice(0, 30);
+      AsyncStorage.setItem(CHATS, JSON.stringify(next)).catch(() => {});
+      return next;
+    });
+  };
+  const startNew = (priv = false) => { setMessages([]); setChatId(newId()); setPrivateChat(priv); setFile(null); setText(''); setNote(null); setHistory(false); };
+  const openChat = (c: Chat) => { setMessages(c.messages); setChatId(c.id); setPrivateChat(false); setHistory(false); };
+  const removeChat = (id: string) => setChats(list => { const next = list.filter(c => c.id !== id); AsyncStorage.setItem(CHATS, JSON.stringify(next)).catch(() => {}); if (id === chatId) startNew(); return next; });
 
-  const send = async (q: string) => {
+  const send = async (q: string): Promise<string> => {
     const question = q.trim() || (file ? tr('Please look at this.') : '');
-    if (!question || busy) return;
+    if (!question || busy) return '';
     const attach: ChatAttachment | undefined = file ? { kind: file.kind, name: file.name, uri: file.kind === 'image' ? file.uri : undefined } : undefined;
     const next: ChatMessage[] = [...messages, { role: 'user', text: question, attach }];
     const sending = file;
@@ -108,32 +149,35 @@ export default function Myra() {
         if (offer) {
           const done: ChatMessage[] = [...next, { role: 'myra', text: tr('Here is what I found. Shall I add it?'), offer }];
           setMessages(done); save(done); setBusy(false);
-          return;
+          return done[done.length - 1].text;
         }
       } catch (e) {
         // No answer from the AI at all: say so now rather than wait another minute for the chat reply (tester, 9 Nov 2026).
         if (e instanceof Error && e.name === 'AiUnreachable') {
           const done: ChatMessage[] = [...next, { role: 'myra', text: e.message }];
           setMessages(done); save(done); setBusy(false);
-          return;
+          return e.message;
         }
         /* otherwise fall back to talking about it */
       }
     }
     try {
-      const r = await askMyra(next.filter(m => m !== HELLO), buildContext(day, days, date, profile, tasksForAI(open, todayISO()), tradition), page,
+      const r = await askMyra(next, buildContext(day, days, date, profile, tasksForAI(open, todayISO()), tradition), page,
         sending ? { kind: sending.kind, name: sending.name, media_type: sending.media_type, data: sending.data, text: sending.text } : undefined, profile.me?.style);
       const done: ChatMessage[] = [...next, { role: 'myra', text: r.text }];
       setMessages(done); save(done);
       // What Myra has learned about how the person talks (founder, 10 Nov 2026), kept with About you so it syncs.
-      if (r.style && profile.me && r.style !== profile.me.style) setProfile({ ...profile, me: { ...profile.me, style: r.style } });
+      if (!privateChat && r.style && profile.me && r.style !== profile.me.style) setProfile({ ...profile, me: { ...profile.me, style: r.style } });
       // Feedback told to Myra goes to the team (founder, 31 Oct 2026): Admin › Feedback, area "Myra chat".
       if (r.feedback && supabase && session) {
         supabase.from('feedback').insert({ email: session.user.email, area: 'Myra chat', rating: null, message: r.feedback,
           app_version: Constants.expoConfig?.version ?? 'web' }).then(() => {}, () => {});
       }
+      return r.text;
     } catch (e) {
-      setMessages([...next, { role: 'myra', text: e instanceof Error ? e.message : tr('Something went wrong. Please try again.') }]);
+      const t = e instanceof Error ? e.message : tr('Something went wrong. Please try again.');
+      setMessages([...next, { role: 'myra', text: t }]);
+      return t;
     } finally { setBusy(false); }
   };
 
@@ -203,25 +247,72 @@ export default function Myra() {
   };
   speakRef.current = speak;
 
-  const clear = () => { setMessages([HELLO]); AsyncStorage.removeItem(KEY).catch(() => {}); };
 
-  const iconBtn = (name: React.ComponentProps<typeof Ionicons>['name'], label: string, onPress: () => void, on = false) => (
-    <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} hitSlop={6} disabled={busy}
-      style={{ width: 42, height: 42, borderRadius: 21, alignItems: 'center', justifyContent: 'center',
-        backgroundColor: on ? colors.insight : colors.field, borderWidth: 1, borderColor: on ? colors.insight : colors.line }}>
-      <Ionicons name={name} size={22} color={on ? colors.onInsight : colors.ink} />
+  const round = (name: React.ComponentProps<typeof Ionicons>['name'], label: string, onPress: () => void, bg: string = colors.field, fg: string = colors.ink, onLongPress?: () => void, onPressOut?: () => void) => (
+    <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} onLongPress={onLongPress} onPressOut={onPressOut} hitSlop={6} disabled={busy && name !== 'stop'}
+      style={{ width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', backgroundColor: bg }}>
+      <Ionicons name={name} size={21} color={fg} />
     </Pressable>
   );
+  const topBtn = (name: React.ComponentProps<typeof Ionicons>['name'], label: string, onPress: () => void, on = false) => (
+    <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} hitSlop={8}
+      style={{ width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', backgroundColor: on ? colors.ink : colors.surface,
+        shadowColor: '#000', shadowOpacity: 0.07, shadowRadius: 8, shadowOffset: { width: 0, height: 2 }, elevation: 2 }}>
+      <Ionicons name={name} size={21} color={on ? '#fff' : colors.ink} />
+    </Pressable>
+  );
+  const empty = messages.length === 0;
+  const typing = !!text.trim() || !!file;
+  // Hold the microphone to talk, let go to stop (founder: "Type or hold to talk", like Claude).
+  const holding = useRef(false);
+  const plus = (label: string, icon: React.ComponentProps<typeof Ionicons>['name'], onPress: () => void) => (
+    <Pressable key={label} onPress={onPress} accessibilityRole="button" style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, borderTopWidth: 1, borderTopColor: colors.line }}>
+      <Ionicons name={icon} size={20} color={colors.ink} /><Text style={{ color: colors.ink, fontSize: 15.5 }}>{label}</Text>
+    </Pressable>
+  );
+  const tile = (label: string, icon: React.ComponentProps<typeof Ionicons>['name'], onPress: () => void) => (
+    <Pressable key={label} onPress={onPress} accessibilityRole="button" style={{ flex: 1, alignItems: 'center', gap: 6, paddingVertical: 14, borderRadius: 14, backgroundColor: colors.bg }}>
+      <Ionicons name={icon} size={24} color={colors.ink} /><Text style={{ color: colors.ink, fontSize: 13 }}>{label}</Text>
+    </Pressable>
+  );
+  const goBody = () => { setMenu(false); router.back(); setTimeout(() => router.navigate({ pathname: '/body', params: { snap: String(Date.now()) } }), 50); };
 
   return (
-    <SafeAreaView style={[s.safe]} edges={['bottom']}>
+    <SafeAreaView style={[s.safe, { backgroundColor: colors.bg }]} edges={['top', 'bottom']}>
+      <Stack.Screen options={{ headerShown: false }} />
       <View style={{ flex: 1, paddingBottom: kb ? Math.max(0, kb - insets.bottom) : 0 }}>
-        <ScrollView ref={scroll} keyboardShouldPersistTaps="handled" contentContainerStyle={{ padding: 16, gap: 10 }}
-          onContentSizeChange={() => scroll.current?.scrollToEnd({ animated: true })}>
-          {messages.map((m, i) => (
+        {/* Top: ☰ past chats · title · 👻 private chat (empty) or ✎ new chat */}
+        <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingTop: 6, paddingBottom: 4 }}>
+          {topBtn('menu-outline', tr('Past chats'), () => setHistory(true))}
+          <View style={{ flex: 1, alignItems: 'center' }}>
+            {!empty ? <Text style={{ color: colors.ink, fontWeight: '600', fontSize: 16 }}>{privateChat ? tr('Private chat') : tr('Myra')}</Text> : null}
+          </View>
+          {empty ? topBtn('eye-off-outline', privateChat ? tr('Private chat is on') : tr('Private chat'), () => setPrivateChat(p => !p), privateChat)
+            : topBtn('create-outline', tr('New chat'), () => startNew())}
+        </View>
+
+        <ScrollView ref={scroll} keyboardShouldPersistTaps="handled" contentContainerStyle={{ padding: 16, gap: 10, flexGrow: 1 }}
+          onContentSizeChange={() => !empty && scroll.current?.scrollToEnd({ animated: true })}>
+          {empty ? (
+            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 16, paddingBottom: 40 }}>
+              <View style={{ width: 46, height: 46, borderRadius: 23, backgroundColor: '#E8833F' }} />
+              <Text style={{ fontFamily: Platform.select({ ios: 'Georgia', default: 'serif' }), fontSize: 27, color: colors.ink, textAlign: 'center' }}>{greeting(profile.me?.name)}</Text>
+              {privateChat ? <Text style={{ color: colors.muted, fontSize: 13, textAlign: 'center' }}>{tr('Private chat: not saved, and Myra does not learn from it.')}</Text> : null}
+              {session && !busy ? (
+                <View style={{ gap: 8, alignItems: 'center', marginTop: 8 }}>
+                  {SUGGESTIONS[page].map(q => (
+                    <Pressable key={q} onPress={() => send(tr(q))} style={{ paddingVertical: 8, paddingHorizontal: 14, borderRadius: 99, borderWidth: 1, borderColor: colors.line, backgroundColor: colors.surface }}>
+                      <Text style={{ color: colors.ink }}>{tr(q)}</Text>
+                    </Pressable>
+                  ))}
+                </View>
+              ) : null}
+            </View>
+          ) : messages.map((m, i) => (
             <View key={i} style={{
-              alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start', maxWidth: '86%', padding: 12, borderRadius: 16, gap: 8,
-              backgroundColor: m.role === 'user' ? colors.accent : colors.surface, borderWidth: m.role === 'user' ? 0 : 1, borderColor: colors.line,
+              alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start', maxWidth: '86%', padding: 12, borderRadius: 18, gap: 8,
+              backgroundColor: m.role === 'user' ? colors.accent : colors.surface,
+              borderBottomRightRadius: m.role === 'user' ? 6 : 18, borderBottomLeftRadius: m.role === 'user' ? 18 : 6,
             }}>
               {m.attach?.uri ? <Image source={{ uri: m.attach.uri }} style={{ width: 180, height: 135, borderRadius: 10 }} resizeMode="cover" /> : null}
               {m.attach && !m.attach.uri ? (
@@ -248,27 +339,11 @@ export default function Myra() {
             </View>
           ))}
           {busy ? <Note>{tr('Myra is thinking…')}</Note> : null}
-          {session && messages.length <= 2 && !busy && (
-            <View style={{ gap: 8, paddingTop: 4 }}>
-              {SUGGESTIONS[page].map(q => (
-                <Pressable key={q} onPress={() => send(tr(q))} style={{ alignSelf: 'flex-start', paddingVertical: 8, paddingHorizontal: 12, borderRadius: 99, borderWidth: 1, borderColor: colors.insight, backgroundColor: colors.surface }}>
-                  <Text style={{ color: colors.insight, fontWeight: '600' }}>{tr(q)}</Text>
-                </Pressable>
-              ))}
-            </View>
-          )}
         </ScrollView>
 
-        <View style={{ padding: 12, gap: 8, borderTopWidth: 1, borderTopColor: colors.line, backgroundColor: colors.bg }}>
+        <View style={{ paddingHorizontal: 12, paddingBottom: 6, gap: 6 }}>
           {session ? (
             <>
-              {menu ? (
-                <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
-                  {Platform.OS !== 'web' ? <Button kind="plain" title={tr('Camera')} onPress={() => pickPhoto(true)} /> : null}
-                  <Button kind="plain" title={tr('Photo')} onPress={() => pickPhoto(false)} />
-                  <Button kind="plain" title={tr('Document')} onPress={pickDocument} />
-                </View>
-              ) : null}
               {file ? (
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, padding: 8, borderRadius: 12, backgroundColor: colors.tint }}>
                   {file.uri ? <Image source={{ uri: file.uri }} style={{ width: 40, height: 40, borderRadius: 6 }} /> : <Ionicons name="document-text-outline" size={24} color={colors.accent} />}
@@ -276,30 +351,66 @@ export default function Myra() {
                   <Pressable onPress={() => setFile(null)} hitSlop={8} accessibilityLabel={tr('Remove')}><Ionicons name="close" size={20} color={colors.muted} /></Pressable>
                 </View>
               ) : null}
-              {listening ? <Text style={{ color: colors.insight, fontWeight: '600' }}>{tr('Listening… tap the microphone again when you finish.')}</Text> : null}
-              {note ? <Text style={{ color: colors.muted }}>{note}</Text> : null}
-              <View style={{ flexDirection: 'row', gap: 8, alignItems: 'flex-end' }}>
-                {iconBtn('add', tr('Attach a photo or document'), () => setMenu(x => !x), menu)}
-                <TextInput style={[s.input, { flex: 1, maxHeight: 120 }]} value={text} onChangeText={setText} placeholder={hint}
-                  placeholderTextColor={colors.muted} multiline onFocus={() => setTimeout(() => scroll.current?.scrollToEnd({ animated: true }), 300)} />
-                {iconBtn(listening ? 'stop' : 'mic-outline', tr('Speak'), speak, listening)}
-                <Button kind="insight" title={tr('Send')} onPress={() => send(text)} disabled={(!text.trim() && !file) || busy} />
+              {listening ? <Text style={{ color: colors.insight, fontWeight: '600', paddingHorizontal: 6 }}>{tr('Listening… tap the microphone again when you finish.')}</Text> : null}
+              {note ? <Text style={{ color: colors.muted, paddingHorizontal: 6 }}>{note}</Text> : null}
+              {/* The bar, like Claude's: ＋ · type or hold to talk · 🎙 · voice mode (Send ↑ once something is typed) */}
+              <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 6, padding: 7, borderRadius: 26, backgroundColor: colors.surface,
+                shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 10, shadowOffset: { width: 0, height: 2 }, elevation: 3 }}>
+                {round('add', tr('Attach a photo or document'), () => setMenu(true))}
+                <TextInput style={{ flex: 1, maxHeight: 120, fontSize: 16, color: colors.ink, paddingHorizontal: 6, paddingVertical: 9 }} value={text} onChangeText={setText}
+                  placeholder={empty ? tr('Type or hold to talk') : hint} placeholderTextColor={colors.muted} multiline
+                  onFocus={() => setTimeout(() => scroll.current?.scrollToEnd({ animated: true }), 300)} />
+                {round(listening ? 'stop' : 'mic-outline', tr('Speak'), () => { if (!holding.current) speak(); }, listening ? colors.insight : colors.field, listening ? colors.onInsight : colors.ink,
+                  () => { holding.current = true; if (!listening) speak(); },
+                  () => { if (holding.current) { holding.current = false; setTimeout(() => speak(), 250); } })}
+                {typing ? round('arrow-up', tr('Send'), () => send(text), colors.accent, '#fff')
+                  : round('pulse-outline', tr('Talk with Myra'), () => setVoice(true), colors.ink, '#fff')}
               </View>
-              {!kb ? (
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                  <Note>{tr('Myra can make mistakes. Not medical advice.')}</Note>
-                  <View style={{ flexDirection: 'row', gap: 14 }}>
-                    <Pressable onPress={() => router.push({ pathname: '/feedback', params: { from: page } })}>
-                      <Text style={{ color: colors.accent, fontWeight: '600', fontSize: 13 }}>{tr('Feedback')}</Text>
-                    </Pressable>
-                    {messages.length > 1 ? <Pressable onPress={clear}><Text style={{ color: colors.accent, fontWeight: '600', fontSize: 13 }}>{tr('Clear chat')}</Text></Pressable> : null}
-                  </View>
-                </View>
-              ) : null}
+              {!kb ? <Text style={{ color: colors.muted, fontSize: 11.5, textAlign: 'center' }}>{tr('Myra can make mistakes. Not medical advice.')}</Text> : null}
             </>
           ) : <Note>{tr('Sign in to talk to Myra (Profile, top right of Today → Sign in).')}</Note>}
         </View>
       </View>
+
+      {/* ＋ : Camera · Photos · Files, then Myra's shortcuts */}
+      <Modal visible={menu} transparent animationType="slide" onRequestClose={() => setMenu(false)}>
+        <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.25)' }} onPress={() => setMenu(false)} />
+        <View style={{ backgroundColor: colors.surface, borderTopLeftRadius: 22, borderTopRightRadius: 22, padding: 16, paddingBottom: 16 + insets.bottom, gap: 4 }}>
+          <View style={{ flexDirection: 'row', gap: 8, marginBottom: 6 }}>
+            {Platform.OS !== 'web' ? tile(tr('Camera'), 'camera-outline', () => pickPhoto(true)) : null}
+            {tile(tr('Photos'), 'image-outline', () => pickPhoto(false))}
+            {tile(tr('Files'), 'document-outline', pickDocument)}
+          </View>
+          {plus(tr('Snap a meal'), 'restaurant-outline', goBody)}
+          {plus(tr('Handwritten to-do list'), 'list-outline', () => { setText(tr('Add these to my to-dos')); pickPhoto(true); })}
+          {plus(tr('Lab report'), 'flask-outline', () => { setText(tr('Please read my lab report simply.')); pickDocument(); })}
+          {plus(tr('Send feedback to the team'), 'chatbubble-ellipses-outline', () => { setMenu(false); router.push({ pathname: '/feedback', params: { from: page } }); })}
+        </View>
+      </Modal>
+
+      {/* ☰ : past chats */}
+      <Modal visible={history} transparent animationType="slide" onRequestClose={() => setHistory(false)}>
+        <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.25)' }} onPress={() => setHistory(false)} />
+        <View style={{ maxHeight: '75%', backgroundColor: colors.surface, borderTopLeftRadius: 22, borderTopRightRadius: 22, padding: 16, paddingBottom: 16 + insets.bottom }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+            <Text style={{ flex: 1, color: colors.ink, fontSize: 18, fontWeight: '700' }}>{tr('Chats')}</Text>
+            <Pressable onPress={() => startNew()} hitSlop={8}><Text style={{ color: colors.accent, fontWeight: '600' }}>✎ {tr('New chat')}</Text></Pressable>
+          </View>
+          <ScrollView>
+            {chats.length ? chats.map(c => (
+              <View key={c.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 11, borderTopWidth: 1, borderTopColor: colors.line }}>
+                <Pressable style={{ flex: 1 }} onPress={() => openChat(c)}>
+                  <Text numberOfLines={1} style={{ color: colors.ink, fontSize: 15, fontWeight: c.id === chatId ? '700' : '400' }}>{c.title}</Text>
+                  <Text style={{ color: colors.muted, fontSize: 12 }}>{new Date(c.at).toLocaleDateString(lang() === 'hi' ? 'hi-IN' : 'en-IN', { day: 'numeric', month: 'short' })}</Text>
+                </Pressable>
+                <Pressable onPress={() => removeChat(c.id)} hitSlop={8} accessibilityLabel={tr('Delete')}><Ionicons name="trash-outline" size={18} color={colors.muted} /></Pressable>
+              </View>
+            )) : <Note>{tr('No chats yet.')}</Note>}
+          </ScrollView>
+        </View>
+      </Modal>
+
+      <MyraVoice open={voice} onClose={() => setVoice(false)} ask={q => send(q)} />
     </SafeAreaView>
   );
 }

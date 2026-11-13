@@ -1,5 +1,11 @@
 # Changelog
 
+## 13 Nov 2026 — Myra like Claude, Sound bath, Measure day, honest skin check (decision 0056)
+- **Myra** looks and works like Claude: a calm opening with a greeting, ☰ past chats, a private-chat button, ✎ new chat, and the bar ＋ · Type or hold to talk · 🎙 · voice mode (Send when typing). ＋ offers Camera, Photos, Files, Snap a meal, Handwritten to-do list, Lab report and Send feedback. Voice mode is a spoken back-and-forth with Myra in her own voice.
+- **Sound bath** in Mind › Meditation (and in Sleep from 8 pm): singing bowls, temple bells, rain on a tin roof, ceiling fan, sea at night or an Om drone, two at a time, for 10, 20, 45 minutes or until you sleep; fades out gently; counts as meditation. Sounds are made in code, so there is nothing to license.
+- **Measure day** in Body: on the 1st, waist and hips with a tape, compared with last month and your weight; a 9 am reminder.
+- **Face & beauty**: no more 100% for "nothing seen". Areas the photo can't show say so; fine lines and uneven tone (city dust and pollution) are now read.
+
 ## 11 Nov 2026 — The health vault (decision 0055)
 - Founder: stop picking Apple Health data selectively. Happy Orange now reads everything Health offers (about 60 measures: steps, distances, energy, heart rate, HRV, breathing, oxygen, temperature, weight and body measures, blood pressure and glucose, walking and running form, noise, daylight, water and nutrients), every workout, and every sleep stage, mindful session, stand hour and heart alert, and keeps it in your own rows on our server for the learning engine to come. The first time it goes back two years, quietly. Apple's permission sheet shows once more for the new items. Delete my data removes it too.
 
