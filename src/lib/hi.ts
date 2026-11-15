@@ -412,6 +412,7 @@ export const HI: Record<string, string> = {
   'Let it go, without regret? Not every task needs doing.': 'बिना पछतावे के छोड़ दें? हर काम करना ज़रूरी नहीं।',
   'Yes, let go': 'हाँ, छोड़ दें',
   'Check it is done: {task}': 'पूरा हुआ या नहीं, देखें: {task}',
+  'Repeat': 'दोहराएँ',
   'Could not reach the AI just now. Check your connection and try again.': 'अभी AI से जुड़ नहीं सके। कनेक्शन जाँचें और फिर कोशिश करें।',
   'Could not reach the internet. Check your connection and try again.': 'इंटरनेट से जुड़ नहीं सके। कनेक्शन जाँचें और फिर कोशिश करें।',
   'Online accounts are not set up in this version.': 'इस संस्करण में ऑनलाइन खाते उपलब्ध नहीं हैं।',

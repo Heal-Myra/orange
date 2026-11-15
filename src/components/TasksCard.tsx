@@ -271,6 +271,7 @@ function AddTask({ area }: { area: Area }) {
 function TaskRow({ t, inFocus }: { t: Task; inFocus: boolean }) {
   const { complete, reopen, moveTo, remove, addHabit, rename, later } = useTasks();
   const [letGo, setLetGo] = useState(false);
+  const [rep, setRep] = useState(false);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<string | null>(null); // the words being edited (founder, 11 Nov 2026)
   const saveEdit = () => { if (editing?.trim()) rename(t.id, editing); setEditing(null); setOpen(false); };
@@ -350,6 +351,12 @@ function TaskRow({ t, inFocus }: { t: Task; inFocus: boolean }) {
             <Ionicons name="create-outline" size={14} color={colors.ink} />
             <Text style={{ fontSize: 13, color: colors.ink }}>{tr('Edit')}</Text>
           </Pressable>
+          {/* Repeat (founder, 15 Nov 2026: "Tao book 1 chapter" should come back daily): the to-do becomes one that
+              comes back, in the same group, and leaves the one-off list. */}
+          <Pressable onPress={() => setRep(r => !r)} style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingVertical: 6, paddingHorizontal: 12, borderRadius: 99, borderWidth: 1, borderColor: rep ? colors.accent : colors.line }}>
+            <Ionicons name="repeat-outline" size={14} color={colors.ink} />
+            <Text style={{ fontSize: 13, color: colors.ink }}>{tr('Repeat')}</Text>
+          </Pressable>
           {[[tr('Tomorrow'), 1], [tr('In 3 days'), 3], [tr('Next week'), 7]].map(([label, n]) => (
             <Pressable key={label} onPress={() => { moveTo(t.id, shiftISO(today, n as number)); setOpen(false); }}
               style={{ paddingVertical: 6, paddingHorizontal: 12, borderRadius: 99, borderWidth: 1, borderColor: colors.line }}>
@@ -363,6 +370,20 @@ function TaskRow({ t, inFocus }: { t: Task; inFocus: boolean }) {
           <Pressable onPress={() => remove(t.id)} style={{ paddingVertical: 6, paddingHorizontal: 12 }}>
             <Text style={{ fontSize: 13, color: colors.bad }}>{tr('Remove')}</Text>
           </Pressable>
+        </View>
+      ) : null}
+      {open && rep ? (
+        <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap', paddingLeft: 34 }}>
+          {REPEATS.filter(r => r.id !== 'once').map(r => (
+            <Pressable key={r.id} onPress={() => {
+              const [y, m, d] = (t.due ?? today).split('-').map(Number);
+              const on = new Date(y, m - 1, d);
+              addHabit({ title: t.title, area: t.area, repeat: r.id as Repeat, weekday: on.getDay(), dayOfMonth: on.getDate() });
+              remove(t.id);
+            }} style={{ paddingVertical: 6, paddingHorizontal: 12, borderRadius: 99, backgroundColor: colors.tint }}>
+              <Text style={{ fontSize: 13, color: colors.ink, fontWeight: '600' }}>↻ {tr(r.label)}</Text>
+            </Pressable>
+          ))}
         </View>
       ) : null}
       {open && cal ? <View style={{ paddingLeft: 34 }}><DatePicker value={t.due} full={d => d !== t.due && loadOn(tasks, t.area, d) >= PER_AREA_DAY} onPick={d => { moveTo(t.id, d); setCal(false); setOpen(false); }} /></View> : null}

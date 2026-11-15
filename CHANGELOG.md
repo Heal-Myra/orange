@@ -1,5 +1,8 @@
 # Changelog
 
+## 15 Nov 2026 — Any to-do can repeat
+- Founder: "Tao book 1 chapter" should come back daily. Tap a to-do, choose ↻ Repeat, then Daily, Weekdays, Weekly or Monthly: it becomes a to-do that comes back in the same group (weekly on that weekday, monthly on that date).
+
 ## 15 Nov 2026 — A to-do moved 3 times: Delegate · Next month · Let it go · Make it smaller
 - Founder: after 3 or 4 moves, the to-do now offers four ways out. 🤝 **Delegate** sends it to someone (WhatsApp or any app) and turns it into "Check it is done: …" 3 days later. 📅 **Next month** moves it a month ahead with a fresh start. 🕊 **Let it go** closes it without regret, after one "Yes". ✎ **Make it smaller** edits the words (now on more than one line).
 
