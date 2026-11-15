@@ -402,6 +402,7 @@ export const HI: Record<string, string> = {
   "What's on your plate{n}?": 'आज थाली में क्या है{n}?',
   'How is the day going{n}?': 'दिन कैसा जा रहा है{n}?',
   'Winding down{n}?': 'दिन ख़त्म हो रहा है{n}?',
+  'From {source}. One device per night, never added together.': '{source} से। हर रात एक ही उपकरण, कभी जोड़ा नहीं जाता।',
   'Could not reach the AI just now. Check your connection and try again.': 'अभी AI से जुड़ नहीं सके। कनेक्शन जाँचें और फिर कोशिश करें।',
   'Could not reach the internet. Check your connection and try again.': 'इंटरनेट से जुड़ नहीं सके। कनेक्शन जाँचें और फिर कोशिश करें।',
   'Online accounts are not set up in this version.': 'इस संस्करण में ऑनलाइन खाते उपलब्ध नहीं हैं।',

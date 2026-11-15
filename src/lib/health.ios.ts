@@ -72,23 +72,40 @@ async function sleepOf(iso: string) {
   const end = new Date(dayStart(iso).getTime() + 12 * 3600 * 1000);
   const samples = await queryCategorySamples('HKCategoryTypeIdentifierSleepAnalysis', { limit: 0, ...range(start, end) } as never);
   // 0 in bed, 1 asleep (unspecified), 2 awake, 3 core, 4 deep, 5 REM
-  const bySource: Record<string, { asleep: number; deep: number; core: number; rem: number; awake: number; bed?: number }> = {};
+  // The same source can write the same stretch twice (a re-sync, or two of its devices): count overlapping time once,
+  // per stage (founder, 15 Nov 2026: 7-8 hours slept showed as 13.1, with 4.1 h deep).
+  type Span = [number, number];
+  const names: Record<string, string> = {};
+  const bySpans: Record<string, Record<'asleep' | 'deep' | 'core' | 'rem' | 'awake', Span[]>> = {};
   for (const s of samples) {
     const v = Number(s.value);
-    const ms = new Date(s.endDate as unknown as string).getTime() - new Date(s.startDate as unknown as string).getTime();
+    const a = new Date(s.startDate as unknown as string).getTime(), b = new Date(s.endDate as unknown as string).getTime();
+    if (!(b > a)) continue;
     const key = s.sourceRevision?.source?.bundleIdentifier ?? 'unknown';
-    const b = (bySource[key] ??= { asleep: 0, deep: 0, core: 0, rem: 0, awake: 0 });
-    if (v === 2) b.awake += ms;
-    if (v === 1 || v >= 3) { b.asleep += ms; const t0 = new Date(s.startDate as unknown as string).getTime(); if (!b.bed || t0 < b.bed) b.bed = t0; } // first fell asleep
-    if (v === 3) b.core += ms;
-    if (v === 4) b.deep += ms;
-    if (v === 5) b.rem += ms;
+    names[key] ??= s.sourceRevision?.source?.name ?? key;
+    const g = (bySpans[key] ??= { asleep: [], deep: [], core: [], rem: [], awake: [] });
+    if (v === 2) g.awake.push([a, b]);
+    if (v === 1 || v >= 3) g.asleep.push([a, b]);
+    if (v === 3) g.core.push([a, b]);
+    if (v === 4) g.deep.push([a, b]);
+    if (v === 5) g.rem.push([a, b]);
   }
-  const best = Object.values(bySource).sort((a, b) => b.asleep - a.asleep)[0];
+  const union = (xs: Span[]) => { let ms = 0, upTo = -Infinity; for (const [a, b] of [...xs].sort((x, y) => x[0] - y[0])) { if (b <= upTo) continue; ms += b - Math.max(a, upTo); upTo = b; } return ms; };
+  const bySource: Record<string, { asleep: number; deep: number; core: number; rem: number; awake: number; bed?: number }> = {};
+  for (const [key, g] of Object.entries(bySpans)) {
+    bySource[key] = { asleep: union(g.asleep), deep: union(g.deep), core: union(g.core), rem: union(g.rem), awake: union(g.awake),
+      bed: g.asleep.length ? Math.min(...g.asleep.map(x => x[0])) : undefined }; // first fell asleep
+  }
+  // One device per night, never added together: an Oura ring when it recorded the night (bought for sleep, worn all
+  // night), otherwise the device that recorded the most sleep (founder, 15 Nov 2026).
+  const keys = Object.keys(bySource).filter(k => bySource[k].asleep > 0);
+  const oura = keys.find(k => /oura/i.test(k) || /oura/i.test(names[k] ?? ''));
+  const pick = oura ?? keys.sort((a, b) => bySource[b].asleep - bySource[a].asleep)[0];
+  const best = pick ? bySource[pick] : undefined;
   if (!best || best.asleep <= 0) return { hours: undefined, stages: undefined };
   const h = (ms: number) => (ms > 0 ? r1(ms / 3600000) : undefined);
   const staged = best.deep + best.core + best.rem > 0;
-  return { hours: h(best.asleep), bed: best.bed ? new Date(best.bed).toISOString() : undefined, stages: staged ? { deep: h(best.deep), core: h(best.core), rem: h(best.rem), awake: h(best.awake) } : undefined };
+  return { from: names[pick!] ?? undefined, hours: h(best.asleep), bed: best.bed ? new Date(best.bed).toISOString() : undefined, stages: staged ? { deep: h(best.deep), core: h(best.core), rem: h(best.rem), awake: h(best.awake) } : undefined };
 }
 
 async function mindfulMinutes(start: Date, end: Date) {
@@ -147,6 +164,7 @@ export async function readHealthDay(iso: string): Promise<HealthDay> {
     activeMin: activeMin != null ? Math.round(activeMin) : undefined,
     sleepHours: sleep?.hours,
     sleepBed: sleep?.bed,
+    sleepFrom: sleep?.from,
     sleepStages: sleep?.stages,
     activeKcal: activeKcal != null ? Math.round(activeKcal) : undefined,
     weightKg: weight != null ? r1(weight.value) : undefined,

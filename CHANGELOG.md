@@ -1,5 +1,8 @@
 # Changelog
 
+## 15 Nov 2026 — Sleep: one device per night, overlaps counted once
+- Founder slept 7–8 hours but saw 13.1 h (4.1 h deep) on the first night with his new Oura ring. Sleep now comes from one device per night (the Oura ring when it recorded the night, otherwise the device with the most sleep), and any stretch written twice is counted once, per stage. Sleep › Details says which device it came from.
+
 ## 13 Nov 2026 — Myra like Claude, Sound bath, Measure day, honest skin check (decision 0056)
 - **Myra** looks and works like Claude: a calm opening with a greeting, ☰ past chats, a private-chat button, ✎ new chat, and the bar ＋ · Type or hold to talk · 🎙 · voice mode (Send when typing). ＋ offers Camera, Photos, Files, Snap a meal, Handwritten to-do list, Lab report and Send feedback. Voice mode is a spoken back-and-forth with Myra in her own voice.
 - **Sound bath** in Mind › Meditation (and in Sleep from 8 pm): singing bowls, temple bells, rain on a tin roof, ceiling fan, sea at night or an Om drone, two at a time, for 10, 20, 45 minutes or until you sleep; fades out gently; counts as meditation. Sounds are made in code, so there is nothing to license.

@@ -136,6 +136,7 @@ export default function Body() {
           {st ? <StatRow label={tr('Awake')} value={st.awake} unit="h" /> : null}
           <StatRow label={tr('Sleep quality')} value={undefined}
             right={<Dots value={day.sleep.quality} onChange={q => update(d => { d.sleep.quality = q; })} />} />
+          {day.sleep.source && day.sleep.source !== 'Typed in' ? <Note>{tr('From {source}. One device per night, never added together.', { source: day.sleep.source })}</Note> : null}
         </Rows>
         </Expandable>
         <MyraLine card="sleep" />
