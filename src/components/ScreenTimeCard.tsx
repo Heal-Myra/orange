@@ -121,23 +121,25 @@ export function ScreenTimeCard({ children }: { children?: ReactNode }) {
     try {
       const img = await get();
       const r = await readScreenTime(img.data, img.type, todayISO());
-      setRows(r.sessions.map(x => ({ platform: x.platform, app: x.app, minutes: Math.round(x.minutes), category: x.category, group: x.group ?? 'social', source: 'screen' as const })));
-      setShotDate(r.date && /^\d{4}-\d{2}-\d{2}$/.test(r.date) && r.date <= todayISO() ? r.date : null);
-      setMessage(r.sessions.length ? `${r.period === 'daily average' ? tr('Using the daily average. ') : ''}${tr('Check the minutes and the kind of content, then add.')}` : r.note);
+      // Added straight away (founder, 16 Nov 2026: no "Add to my day" or "Discard"); change or remove in Show details.
+      const got = r.sessions.map(x => ({ platform: x.platform, app: x.app, minutes: Math.round(x.minutes), category: x.category, group: x.group ?? 'social', source: 'screen' as const }));
+      const day = r.date && /^\d{4}-\d{2}-\d{2}$/.test(r.date) && r.date <= todayISO() ? r.date : null;
+      if (got.length) add(got, day, r.period === 'daily average');
+      else setMessage(r.note);
     } catch (e) { setMessage(e instanceof Error ? e.message : tr('Something went wrong. Try again.')); }
     finally { setBusy(false); setPreview(null); }
   };
 
-  const add = () => {
-    if (!rows?.length) return;
+  const add = (list: MediaSession[], shot: string | null, average = false) => {
     // The day the screenshot shows (e.g. Saturday), else the day on screen.
-    const target = shotDate ?? phoneDate;
+    const target = shot ?? phoneDate;
     updatePhoneOn(target, d => {
       d.noMedia = false;
-      d.media = [...d.media.filter(m => m.source !== 'screen'), ...rows.filter(r => r.minutes > 0)];
+      d.media = [...d.media.filter(m => m.source !== 'screen'), ...list.filter(r => r.minutes > 0)];
     });
     setRows(null);
-    setMessage(target === phoneDate ? null : tr('Added to {day}, the day the screenshot shows.', { day: new Date(target + 'T12:00:00').toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'short' }) }));
+    const where = target === phoneDate ? '' : ` ${tr('Added to {day}, the day the screenshot shows.', { day: new Date(target + 'T12:00:00').toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'short' }) })}`;
+    setMessage(`${average ? tr('Using the daily average. ') : ''}${tr('Added. Change or remove any app in Show details.')}${where}`);
   };
   const setRow = (i: number, change: Partial<MediaSession>) => setRows(list => list && list.map((x, n) => (n === i ? { ...x, ...change } : x)));
   const toolRows = rows?.filter(r => r.group === 'tool') ?? [];
@@ -225,12 +227,6 @@ export function ScreenTimeCard({ children }: { children?: ReactNode }) {
       ))}
       {toolRows.length ? <Note>{tr('Everyday tools, not scored: {list}', { list: toolRows.map(t => `${t.app || t.platform} ${t.minutes}`).join(' · ') + ' ' + tr('min') })}</Note> : null}
       {rows?.length && shotDate && shotDate !== phoneDate ? <Note>{tr('This screenshot is from {day}; it will be added to that day.', { day: new Date(shotDate + 'T12:00:00').toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'short' }) })}</Note> : null}
-      {rows?.length ? (
-        <View style={s.row}>
-          <Button title={tr('Add to my day')} onPress={add} />
-          <Button kind="plain" title={tr('Discard')} onPress={() => { setRows(null); setMessage(null); }} />
-        </View>
-      ) : null}
       <Pressable onPress={() => setDetails(x => !x)} hitSlop={8} accessibilityRole="button" style={{ alignSelf: 'center', paddingVertical: 2 }}>
         <Text style={{ color: colors.muted, fontWeight: '600', fontSize: 13.5 }}>{details ? tr('Hide details') : tr('Show details')} {details ? '˄' : '˅'}</Text>
       </Pressable>

@@ -1,5 +1,8 @@
 # Changelog
 
+## 16 Nov 2026 — Meal and Screen Time readings are added straight away
+- Founder: no "Add to my day" or "Discard". A meal photo (or typed or spoken meal) and a Screen Time screenshot are added the moment Myra has read them. To change or remove: Body › Food › See details, or Mind › Phone activity › Show details. The careful IFCT check still runs in the background and quietly corrects a photo's numbers.
+
 ## 16 Nov 2026 — Ten small practices (decision 0059) and Delegate on every to-do
 - **Personal-best ladder:** Top of My Game shows the next rung under your record; All › shows the fastest 5 km and 10 km ladders (bests reached, next step, later steps) with one tip, and the next rung for your other bests.
 - **Running cadence coach:** after a run, steps a minute (from the Watch's steps during the run), your last few runs and one tip.

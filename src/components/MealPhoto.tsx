@@ -79,14 +79,13 @@ export function MealPhoto({ right, top, children, snap, typeIt }: { right?: Reac
       });
       if (!r) r = { ...(await analyseMeal(img.data, img.type, hint)) };
       const list = withMyDishes(r.items, dishes);
-      setItems(list); setNamed({});
-      if (list.length && list.every(it => it.basis === 'mine')) setCheck({ state: 'usual' });
-      else if (list.length && list.some(it => it.basis !== 'IFCT')) {
-        startMealCheck(img.data, img.type, hint, dishes.slice(0, 60).map(d => d.name)).then(c => setCheck(now => (now ? now : { state: 'checking', id: c.id }))).catch(() => {});
-      }
       setInsight(r.insight);
-      setNote([r.confidence && `Confidence: ${r.confidence}.`, r.note].filter(Boolean).join(' '));
-      setMessage(r.items.length ? tr('Check the numbers, change anything that looks off, then add.') : (r.note || tr('No food found in the photo.')));
+      if (!list.length) { setMessage(r.note || tr('No food found in the photo.')); return; }
+      // Added straight away (founder, 16 Nov 2026: no "Add to my day" or "Discard"; change or remove in See details).
+      // The careful IFCT check still runs on the server and quietly replaces the numbers when it is ready (decision 0053).
+      const c = list.every(it => it.basis === 'mine') || !list.some(it => it.basis !== 'IFCT') ? null
+        : await startMealCheck(img.data, img.type, hint, dishes.slice(0, 60).map(d => d.name)).catch(() => null);
+      addNow(list, 'photo', c?.id ?? null);
     } catch (e) {
       setMessage(e instanceof Error ? e.message : tr('Something went wrong. Try again.'));
     } finally { setBusy(false); }
@@ -133,10 +132,9 @@ export function MealPhoto({ right, top, children, snap, typeIt }: { right?: Reac
     try {
       // One quiet second try: the AI occasionally sends a reply that cannot be read (founder, 20 Oct 2026).
       const r = await analyseMealText(text).catch(e => { if (aiUnavailable(e)) throw e; return analyseMealText(text); });
-      setItems(r.items); setNamed({});
       setInsight(r.insight);
-      setNote([r.confidence && `Confidence: ${r.confidence}.`, r.note].filter(Boolean).join(' '));
-      setMessage(r.items.length ? tr('Check the numbers, change anything that looks off, then add.') : (r.note || tr('No food found in that description.')));
+      if (r.items.length) addNow(r.items, 'words', null);
+      else setMessage(r.note || tr('No food found in that description.'));
     } catch (e) {
       if (aiUnavailable(e)) {
         // AI not available (key, limit, offline): search IFCT 2017 instead, in the same box.
@@ -218,19 +216,16 @@ export function MealPhoto({ right, top, children, snap, typeIt }: { right?: Reac
     } finally { setFixing(null); }
   };
 
-  const add = () => {
-    if (!items?.length) return;
-    const pendingId = check?.state === 'checking' && !touched.current ? check.id : null;
+  /** Log a reading at once (16 Nov 2026). `checkId`: the careful check still running, which replaces these numbers. */
+  const addNow = (list: MealItem[], from: 'photo' | 'words', checkId: string | null) => {
     const until = new Date(Date.now() + 10 * 60_000).toISOString();
-    logMeals(items.map(it => ({
+    logMeals(list.map(it => ({
       name: it.name, grams: it.grams, kcal: it.kcal, p: it.protein_g, c: it.carbs_g, f: it.fat_g, fib: it.fibre_g ?? 0,
-      source: source === 'words' ? (it.basis === 'IFCT' ? 'words+ifct' : 'words') : (it.basis === 'IFCT' ? 'photo+ifct' : it.basis === 'mine' ? 'photo+mine' : 'photo'),
-      ...(it.edited ? { edited: true } : {}),
-      ...(pendingId ? { check: { id: pendingId, until } } : it.basis === 'mine' ? { checked: 'usual' as const } : check?.state === 'done' && !touched.current && it.basis === 'IFCT' ? { checked: 'ifct' as const, checkedAt: new Date().toISOString() } : {}),
+      source: from === 'words' ? (it.basis === 'IFCT' ? 'words+ifct' : 'words') : (it.basis === 'IFCT' ? 'photo+ifct' : it.basis === 'mine' ? 'photo+mine' : 'photo'),
+      ...(checkId ? { check: { id: checkId, until } } : it.basis === 'mine' ? { checked: 'usual' as const } : {}),
     })));
-    setCheck(null);
-    setMessage(`Added ${items.length} item${items.length > 1 ? 's' : ''} to your day.`);
-    setItems(null); setUri(null); setInsight(''); setWords(''); setMode(null);
+    setItems(null); setCheck(null); setWords(''); setMode(null); setUri(null);
+    setMessage(tr('Added {n} to your day. Change or remove in See details.', { n: list.map(it => it.name).join(', ') }));
   };
 
   return (
@@ -309,12 +304,6 @@ export function MealPhoto({ right, top, children, snap, typeIt }: { right?: Reac
       ))}
       {note && items?.length ? <Note>{note}</Note> : null}
       {items?.length && check ? <CheckLine kind={check.state === 'checking' ? (touched.current ? null : 'checking') : check.state === 'done' ? 'ifct' : 'usual'} /> : null}
-      {items?.length ? (
-        <View style={s.row}>
-          <Button title={tr('Add to my day')} onPress={add} disabled={fixing != null} />
-          <Button kind="plain" title={tr('Discard')} onPress={() => { setItems(null); setUri(null); setMessage(null); setInsight(''); setCheck(null); }} />
-        </View>
-      ) : null}
       {children}
     </Card>
   );
