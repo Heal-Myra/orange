@@ -144,3 +144,6 @@ export const readSpace = (images: { data: string; media_type: string }[], space:
   call<SpaceReading>('space_read', images.length === 1
     ? { image_base64: images[0].data, media_type: images[0].media_type, space, before, checks }
     : { images, space, before, checks });
+
+/** Sunday voice reflection (founder, 15 Nov 2026 idea 5): the person's spoken week, into three short journal lines. */
+export const weekReflect = (text: string) => call<{ proud: string; hard: string; next: string }>('week_reflect', { text });

@@ -1,5 +1,18 @@
 # Changelog
 
+## 16 Nov 2026 — Ten small practices (decision 0059) and Delegate on every to-do
+- **Personal-best ladder:** Top of My Game shows the next rung under your record; All › shows the fastest 5 km and 10 km ladders (bests reached, next step, later steps) with one tip, and the next rung for your other bests.
+- **Running cadence coach:** after a run, steps a minute (from the Watch's steps during the run), your last few runs and one tip.
+- **Monthly fitness test:** push-ups, plank, sit-to-stand in 30 seconds and sit and reach, on the 1st with Measure day; last month against this month, new bests in green.
+- **Focus check:** a 2-minute weekly game on Mind (tap only the orange lights); score 0–100 and the trend.
+- **Know your nature (prakriti):** 12 questions in My profile; the result guides the Food master's tips. Not a diagnosis.
+- **Cool room for deep sleep:** Sleep › Details compares deep sleep on cooler and warmer nights (night temperature from the Watch or ring), with a tip and a "How was the room?" tap.
+- **Walk after dinner:** 10 minutes of walking within 45 minutes of dinner, seen from steps, adds 2 to Movement; a gentle nudge 15–45 minutes after dinner.
+- **Calm-down button:** "Feeling overwhelmed?" on Mind and in Myra's ＋: a voiced 2-minute 5-4-3-2-1 grounding.
+- **Sunday voice reflection:** on Sunday evening and Monday, speak about your week; Myra writes three lines (proud of, hard, next week). The recording is not kept.
+- **Letting go:** a 5-minute guided forgiveness practice once a week on Soul, +5 Soul.
+- **Delegate on every to-do** (founder): tap a to-do, 🤝 Delegate, share it on WhatsApp or any app; it comes back in 3 days as "Check it is done: …". Remove still deletes a to-do.
+
 ## 16 Nov 2026 — Top of My Game shows the newest record
 - Founder: Today still showed the fastest 5 km from 11 Nov although a newer best had been made. A running best stayed first for 7 days and hid newer records. Now the newest record always shows (a best made yesterday comes before an older running best); All › still lists every record.
 

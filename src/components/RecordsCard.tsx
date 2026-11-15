@@ -9,6 +9,7 @@ import { shiftISO, todayISO } from '../lib/dates';
 import { locale, tr } from '../lib/i18n';
 import { closeToRecord, freshRecords, latestRecord, type Rec } from '../lib/records';
 import { runRecords } from '../lib/runRecords';
+import { nextFor } from '../lib/ladder';
 import { useRuns } from '../lib/useRuns';
 import { useHeal } from '../lib/store';
 import { colors } from '../theme';
@@ -44,7 +45,13 @@ export function RecordsCard() {
         <Text style={{ fontSize: 18, fontWeight: '700', color: colors.ink }}>{tr('Top of My Game')}</Text>
         <Pressable onPress={() => router.push('/records')} hitSlop={10} accessibilityRole="button"><Text style={{ color: colors.accent, fontWeight: '600', fontSize: 13 }}>{tr('All')} ›</Text></Pressable>
       </View>
-      {r ? <RecordRow r={r} today={today} /> : (
+      {r ? (
+        <View style={{ gap: 2 }}>
+          <RecordRow r={r} today={today} />
+          {/* The next rung (founder, 16 Nov 2026: personal-best ladder). */}
+          <Text style={{ marginLeft: 38, color: colors.insight, fontSize: 13, fontWeight: '600' }}>{tr('Next: {v}', { v: r.kind === 'streak' ? tr('{n} days', { n: nextFor(r) }) : nextFor(r) })}</Text>
+        </View>
+      ) : (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
           <Trophy />
           <Text style={{ flex: 1, color: colors.ink, fontSize: 14, lineHeight: 19 }} numberOfLines={2}>

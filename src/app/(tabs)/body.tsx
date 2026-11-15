@@ -12,6 +12,9 @@ import { bmiOf, fibreTarget, planFor } from '../../lib/targets';
 import { CheckLine, MealPhoto } from '../../components/MealPhoto';
 import { MissedMeal } from '../../components/MissedMeal';
 import { MeasureDay } from '../../components/MeasureDay';
+import { FitnessTestCard } from '../../components/FitnessTestCard';
+import { CadenceCoach, DinnerWalk } from '../../components/MoveExtras';
+import { CoolRoom } from '../../components/CoolRoom';
 import { ProteinTopUp } from '../../components/ProteinTopUp';
 import { FoodPlanRow } from '../../components/FoodPlan';
 import { MealRow } from '../../components/MealRow';
@@ -142,6 +145,7 @@ export default function Body() {
             right={<Dots value={day.sleep.quality} onChange={q => update(d => { d.sleep.quality = q; })} />} /> : null}
           {day.sleep.source && day.sleep.source !== 'Typed in' ? <Note>{tr('From {source}. One device per night, never added together.', { source: day.sleep.source })}</Note> : null}
         </Rows>
+        <CoolRoom />
         </Expandable>
         <MyraLine card="sleep" />
       </Card></Anchor>
@@ -154,6 +158,8 @@ export default function Body() {
           ...(h?.activeKcal != null ? [{ id: 'energy', color: PASTEL.peach, label: tr('Active energy'), value: h.activeKcal / 400, text: `${Math.round(h.activeKcal)} kcal` }] : []),
         ]} />
         <CareNote part="move" />
+        <DinnerWalk />
+        <CadenceCoach />
         <Expandable key={date + 'moved'} icon="list-outline" title={tr('Details')} status={tr('Steps, minutes and workouts')} defaultOpen={day.activity.steps == null && day.activity.activeMin == null}>
         <Rows>
           <StatRow first label={tr('Steps')} value={day.activity.steps} target={profile.steps} key={date + 'steps'}
@@ -183,6 +189,7 @@ export default function Body() {
             {profile.me ? <StatRow label="BMI" value={Math.round(bmiOf(h?.weightKg ?? profile.me.weightKg, profile.me.heightCm) * 10) / 10} /> : null}
           </Rows>
           <MeasureDay />
+          <FitnessTestCard />
         </Card></Anchor>
       ) : null}
 

@@ -75,6 +75,10 @@ export const FAST_KCAL = 60; // black tea and coffee through a day stay under th
  *  them and is not asked. 1–5 from restorative sleep (deep + REM, aim 40 % of sleep) and how little of the night was
  *  spent awake (aim 95 % asleep). */
 export const DEVICE_QUALITY_FROM = '2026-11-15';
+/** From 16 Nov 2026 (founder): a walk of 10 minutes or more within 45 minutes of dinner adds 2 to Movement (still at
+ *  most 30), and the weekly forgiveness practice adds 5 to Soul (still at most 100). */
+export const EXTRAS_FROM = '2026-11-16';
+export const DINNER_WALK_MIN = 10, DINNER_WALK_PTS = 2, FORGIVE_PTS = 5;
 export function deviceQuality(st: { deep?: number; rem?: number; awake?: number } | undefined, hours?: number): number | null {
   if (!st || st.deep == null || st.rem == null || !hours) return null;
   const restorative = Math.min(1, (st.deep + st.rem) / hours / 0.4);
@@ -96,7 +100,8 @@ export function bodyScore(d: DayLog, P: Profile, now: Date = new Date()): BodySc
   if (!hasAct && !hasSleep && !hasFood) return null;
 
   // Body = Food 40 + Sleep 30 + Movement 30 (founder, 24 Oct 2026).
-  const movement = hasAct ? 15 * c01((a.steps ?? 0) / P.steps) + 15 * c01((a.activeMin ?? 0) / P.active) : 0;
+  const walked = (d.date ?? '') >= EXTRAS_FROM && (a.dinnerWalk ?? 0) >= DINNER_WALK_MIN ? DINNER_WALK_PTS : 0;
+  const movement = hasAct ? Math.min(30, 15 * c01((a.steps ?? 0) / P.steps) + 15 * c01((a.activeMin ?? 0) / P.active) + walked) : 0;
 
   let sleep = 0;
   if (hasSleep) {
@@ -254,8 +259,9 @@ export function soulScore(d: DayLog, _P: Profile = DEFAULT_PROFILE): SoulScore |
   const verse = (wisdomStudied(so) ? LEARN_SHARE * POINTS.wisdom : 0) + (lived(so.verseLived) ? (1 - LEARN_SHARE) * POINTS.wisdom : 0);
   const tao = (taoStudied(d.tao) ? LEARN_SHARE * POINTS.tao : 0) + (lived(d.tao?.lived) ? (1 - LEARN_SHARE) * POINTS.tao : 0);
   const love = journal ? jp.kind + (v2 ? jp.best : 0) : lovePoints(d);
-  if (!gratitude && !verse && !tao && !love) return null;
-  return { total: Math.min(100, gratitude + verse + tao + love), gratitude, verse, tao, love };
+  const forgave = (d.date ?? '') >= EXTRAS_FROM && so.forgave ? FORGIVE_PTS : 0;
+  if (!gratitude && !verse && !tao && !love && !forgave) return null;
+  return { total: Math.min(100, gratitude + verse + tao + love + forgave), gratitude, verse, tao, love };
 }
 
 export interface WellBeing { body: BodyScore | null; mind: MindScore | null; soul: SoulScore | null; total: number; logged: number }

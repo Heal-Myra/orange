@@ -666,6 +666,16 @@ Do not judge the person. Reply with JSON only:
  "alignment":integer from -2 (clearly against dharma) to 2 (clearly in line),
  "reflection":"ONE kind line of at most 10 words; if it fell short, one way to do better"}`));
     }
+    case 'week_reflect': {
+      // Sunday voice reflection (founder, 15 Nov 2026 idea 5): the person spoke about their week; three short lines for
+      // their journal, in their own words as far as possible. The recording itself never leaves the phone; only the text.
+      const said = String(p.text ?? '').slice(0, 4000);
+      return await askJson(ask, 'quick', ORANGE_BOOK,
+`The person spoke about their week (speech to text, may have small errors):
+"${said}"
+Write three short journal lines from it, each at most 8 words, in the person's own words and language as far as possible (Hindi if they spoke Hindi). Never add what they did not say; leave a line empty if they did not mention it.
+Reply with JSON only: {"proud":"what went well or they are proud of","hard":"what was hard","next":"what they want next week"}`);
+    }
     case 'myra': {
       const page = String(p.page ?? 'today').slice(0, 40);
       const history = (Array.isArray(p.messages) ? p.messages : []).slice(-12)

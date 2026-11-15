@@ -108,6 +108,16 @@ async function sleepOf(iso: string) {
   return { from: names[pick!] ?? undefined, hours: h(best.asleep), bed: best.bed ? new Date(best.bed).toISOString() : undefined, stages: staged ? { deep: h(best.deep), core: h(best.core), rem: h(best.rem), awake: h(best.awake) } : undefined };
 }
 
+/** The night's temperature (16 Nov 2026, cool room for deep sleep): the Watch's sleeping wrist temperature, else a
+ *  body temperature written in the night (an Oura ring or another app through Health), 6 pm to noon. */
+async function nightTemp(iso: string) {
+  const start = new Date(dayStart(iso).getTime() - 6 * 3600 * 1000), end = new Date(dayStart(iso).getTime() + 12 * 3600 * 1000);
+  const w = await stat('HKQuantityTypeIdentifierAppleSleepingWristTemperature', 'discreteAverage', 'degC', start, end).catch(() => undefined);
+  if (w != null) return Math.round(w * 100) / 100;
+  const b = await stat('HKQuantityTypeIdentifierBodyTemperature', 'discreteAverage', 'degC', start, end).catch(() => undefined);
+  return b != null ? Math.round(b * 100) / 100 : undefined;
+}
+
 async function mindfulMinutes(start: Date, end: Date) {
   const samples = await queryCategorySamples('HKCategoryTypeIdentifierMindfulSession', { limit: 0, ...range(start, end) } as never);
   // Two apps (or the Watch and an app) can log the same minutes: count overlapping time once (5 Nov 2026).
@@ -145,7 +155,7 @@ const safe = <T,>(p: Promise<T>) => p.catch(() => undefined);
 export async function readHealthDay(iso: string): Promise<HealthDay> {
   const start = dayStart(iso), end = new Date(start.getTime() + DAY);
   const now = new Date(Math.min(Date.now(), end.getTime()));
-  const [steps, activeMin, activeKcal, sleep, weight, fat, rhr, hrv, vo2, mindful, workouts] = await Promise.all([
+  const [steps, activeMin, activeKcal, sleep, weight, fat, rhr, hrv, vo2, mindful, workouts, temp] = await Promise.all([
     safe(stat('HKQuantityTypeIdentifierStepCount', 'cumulativeSum', 'count', start, end)),
     safe(stat('HKQuantityTypeIdentifierAppleExerciseTime', 'cumulativeSum', 'min', start, end)),
     safe(stat('HKQuantityTypeIdentifierActiveEnergyBurned', 'cumulativeSum', 'kcal', start, end)),
@@ -158,6 +168,7 @@ export async function readHealthDay(iso: string): Promise<HealthDay> {
     safe(latest('HKQuantityTypeIdentifierVO2Max', 'ml/(kg*min)', 60, now)),
     safe(mindfulMinutes(start, end)),
     safe(workoutsOf(start, end)),
+    safe(nightTemp(iso)),
   ]);
   return {
     steps: steps != null ? Math.round(steps) : undefined,
@@ -174,8 +185,15 @@ export async function readHealthDay(iso: string): Promise<HealthDay> {
     hrv: hrv != null ? Math.round(hrv) : undefined,
     vo2max: vo2 != null ? r1(vo2) : undefined,
     mindfulMin: mindful,
+    nightTempC: temp,
     workouts,
   };
+}
+
+/** Steps between two moments (walk after dinner, 16 Nov 2026). */
+export async function stepsBetween(a: Date, b: Date): Promise<number | undefined> {
+  const n = await safe(stat('HKQuantityTypeIdentifierStepCount', 'cumulativeSum', 'count', a, b));
+  return n != null ? Math.round(n) : undefined;
 }
 
 /** Every run of the last 5 years with its distance and time (founder, 11 Nov 2026: Top of My Game missed the Watch's
@@ -184,7 +202,7 @@ export async function readRuns(): Promise<Run[]> {
   const end = new Date(), start = new Date(end.getTime() - 5 * 365 * DAY);
   const list = await queryWorkoutSamples({ limit: 0, ...range(start, end) } as never).catch(() => []);
   const pad = (n: number) => String(n).padStart(2, '0');
-  return list.flatMap(w => {
+  const runs = list.flatMap(w => {
     const raw = (WorkoutActivityType as unknown as Record<number, string>)[w.workoutActivityType as unknown as number] ?? '';
     if (raw !== 'running') return [];
     const dist = (w as unknown as { totalDistance?: { quantity: number; unit: string } }).totalDistance;
@@ -192,9 +210,13 @@ export async function readRuns(): Promise<Run[]> {
     const km = dist.unit === 'km' ? dist.quantity : dist.unit === 'mi' ? dist.quantity * 1.609344 : dist.quantity / 1000;
     const d = w.duration as unknown as { quantity: number; unit: string } | number;
     const secs = typeof d === 'number' ? d : d.unit === 'min' ? d.quantity * 60 : d.unit === 'hr' ? d.quantity * 3600 : d.quantity;
-    const t = new Date(w.startDate);
-    return km > 0.5 && secs > 60 ? [{ at: `${t.getFullYear()}-${pad(t.getMonth() + 1)}-${pad(t.getDate())}`, km, secs }] : [];
+    const t = new Date(w.startDate), e = new Date(w.endDate);
+    return km > 0.5 && secs > 60 ? [{ at: `${t.getFullYear()}-${pad(t.getMonth() + 1)}-${pad(t.getDate())}`, km, secs, start: t, end: e }] : [];
   });
+  // Steps during the last 10 runs of the last 60 days, for cadence (16 Nov 2026).
+  const recent = runs.filter(r => r.start.getTime() > end.getTime() - 60 * DAY).sort((a, b) => b.start.getTime() - a.start.getTime()).slice(0, 10);
+  const steps = new Map(await Promise.all(recent.map(async r => [r.start.getTime(), await safe(stat('HKQuantityTypeIdentifierStepCount', 'cumulativeSum', 'count', r.start, r.end))] as const)));
+  return runs.map(({ at, km, secs, start: t0 }) => { const s = steps.get(t0.getTime()); return s ? { at, km, secs, steps: Math.round(s) } : { at, km, secs }; });
 }
 
 // ---- The health vault (founder, 11 Nov 2026): everything Apple Health has, kept for the future learning engine ----

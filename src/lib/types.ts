@@ -66,8 +66,8 @@ export interface DayLog {
   phoneFrom?: { date: string; media: MediaSession[]; noMedia?: boolean };
   fromDay?: import('./neosapien').FromDay; // NeoSapien suggestions for this day and what was said yes/no to (decision 0050)
   savedAt?: string; // when this day was last changed (ISO); the newer copy wins between phone and account
-  activity: { steps?: number; activeMin?: number; source?: string; stepsTyped?: boolean; activeTyped?: boolean }; // *Typed: the person's own number wins over Apple Health
-  sleep: { hours?: number; quality?: 1 | 2 | 3 | 4 | 5; source?: string; bedAt?: string }; // bedAt: when sleep began (Apple Health), for dinner timing // source 'Typed in' = the person's own number wins over Apple Health
+  activity: { steps?: number; activeMin?: number; source?: string; stepsTyped?: boolean; activeTyped?: boolean; dinnerWalk?: number }; // dinnerWalk: minutes walked within 45 min of dinner (16 Nov 2026) // *Typed: the person's own number wins over Apple Health
+  sleep: { hours?: number; quality?: 1 | 2 | 3 | 4 | 5; source?: string; bedAt?: string; room?: 'warm' | 'ok' | 'cold' }; // room: how the room felt (16 Nov 2026) // bedAt: when sleep began (Apple Health), for dinner timing // source 'Typed in' = the person's own number wins over Apple Health
   meals: Meal[];
   fasting?: boolean;
   skipped?: ('lunch' | 'dinner')[]; // "Skipped" on the missed-meal row (founder, 10 Nov 2026): no nudge, no penalty
@@ -93,6 +93,7 @@ export interface DayLog {
     waistCm?: number; hipsCm?: number; // Measure day, 1st of the month (13 Nov 2026)
     weightKg?: number; weightAt?: number; weightTyped?: boolean; weightTypedAt?: number; bodyFatPct?: number; restingHr?: number; hrv?: number; vo2max?: number;
     activeKcal?: number; mindfulMin?: number;
+    nightTempC?: number; // the night's temperature from the ring or Watch (16 Nov 2026)
     workouts?: { type: string; min: number; kcal?: number }[];
     sleepStages?: { deep?: number; core?: number; rem?: number; awake?: number }; // hours
   }; // the day's Tao Te Ching practice (src/lib/tao.ts)
@@ -105,6 +106,8 @@ export interface DayLog {
     best?: string;          // Gratitude journal: the best part of my day
     gratitude?: string[];   // up to four things I am grateful for (10 points each)
     thought?: string;       // my thought for the day
+    forgave?: boolean;      // the weekly forgiveness practice, done today (+5 Soul; 16 Nov 2026)
+    reflection?: { proud?: string; hard?: string; next?: string }; // Sunday voice reflection, in Myra's words (16 Nov 2026)
   };
   // Myra recommends. part = part of the day it was made for; sig = fingerprint of the day's data it was made from.
   guidance?: { headline: string; body: string[]; mind: string[]; soul: string[]; focus?: string[]; cards?: { body?: string; mind?: string; soul?: string }; pick?: 'body' | 'mind' | 'soul'; at: string; part?: string; sig?: string; lang?: string; fasting?: boolean; feel?: string };

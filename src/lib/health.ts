@@ -5,7 +5,7 @@ export interface HealthDay {
   steps?: number; activeMin?: number; sleepHours?: number; sleepBed?: string; sleepFrom?: string; // sleepFrom: the device that recorded the night (15 Nov 2026) // sleepBed: when sleep began last night (ISO)
   // Added 20 Oct 2026 (founder): body measures (latest), heart and recovery, energy, mindful minutes, workouts, sleep stages.
   weightKg?: number; weightAt?: number; bodyFatPct?: number; restingHr?: number; hrv?: number; vo2max?: number;
-  activeKcal?: number; mindfulMin?: number;
+  activeKcal?: number; mindfulMin?: number; nightTempC?: number; // ring or Watch, the night ending this day (16 Nov 2026)
   workouts?: { type: string; min: number; kcal?: number }[];
   sleepStages?: { deep?: number; core?: number; rem?: number; awake?: number };
 }
@@ -15,8 +15,10 @@ export const healthAvailable = (): boolean => false;
 export async function connectHealth(): Promise<boolean> { return false; }
 export async function readHealthDay(_iso: string): Promise<HealthDay> { return {}; }
 /** Every run in Apple Health (founder, 11 Nov 2026: "fastest 5 km" on the Watch was missing from Top of My Game). */
-export interface Run { at: string; km: number; secs: number }
+export interface Run { at: string; km: number; secs: number; steps?: number } // steps during the run: cadence (16 Nov 2026)
 export async function readRuns(): Promise<Run[]> { return []; }
+/** Steps between two moments (walk after dinner, 16 Nov 2026). */
+export async function stepsBetween(_a: Date, _b: Date): Promise<number | undefined> { return undefined; }
 
 // The health vault (11 Nov 2026): Apple Health only, so empty here.
 export interface VaultDaily { date: string; metric: string; unit: string; sum: number | null; avg: number | null; min: number | null; max: number | null }

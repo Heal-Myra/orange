@@ -5,6 +5,7 @@ import { FAST_FROM, fastHabit, fastHoursOf , saidFast } from './fasting';
 import { feelingMix, feelingsLine } from './feelings';
 import { taoStudied } from './scoring';
 import { aboutLine, fibreTarget } from './targets';
+import { prakritiLine } from './prakriti';
 import { momentLine } from './routine';
 import { shiftISO, todayISO } from './dates';
 import { verseOfDay } from './gita';
@@ -34,6 +35,7 @@ export function buildContext(day: DayLog, days: Record<string, DayLog>, date: st
     `Targets: ${profile.kcal} kcal, ${profile.protein} g protein, ${profile.steps} steps, ${profile.active} active min, ${profile.meditation} min meditation, social media ≤ ${profile.mediaLimit} min.`,
     `Today (${date}): steps ${day.activity.steps ?? 'not logged'}, active ${day.activity.activeMin ?? 'not logged'} min${day.activity.source ? ` (from ${day.activity.source})` : ''}, sleep ${day.sleep.hours ?? 'not logged'} h (quality ${day.sleep.quality ?? '-'}/5).`,
     aboutLine(profile.me),
+    prakritiLine(profile.me?.prakriti),
     // Myra mirrors the person (founder, 10 Nov 2026): every prompt that speaks as Myra matches how they talk.
     profile.me?.style ? `How they talk (Myra mirrors this: length, tone, humour, emoji, language mix): ${profile.me.style}` : '',
     momentLine(profile.me?.routine),

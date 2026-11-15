@@ -72,6 +72,12 @@ function Gate() {
           <Stack.Screen options> inside a modal re-set the header on every render and froze the screen (15 Nov 2026). */}
       <Stack.Screen name="myra" options={{ headerShown: false, presentation: 'modal' }} />
       <Stack.Screen name="sound-bath" options={{ headerShown: true, title: tr('Sound bath'), presentation: 'modal', headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
+      <Stack.Screen name="calm" options={{ presentation: 'fullScreenModal', contentStyle: { backgroundColor: '#DDEAF4' } }} />
+      <Stack.Screen name="forgive" options={{ presentation: 'fullScreenModal', contentStyle: { backgroundColor: '#F7F1E8' } }} />
+      <Stack.Screen name="focus" options={{ presentation: 'fullScreenModal', contentStyle: { backgroundColor: '#1F2A30' } }} />
+      <Stack.Screen name="fitness-test" options={{ headerShown: true, title: tr('Fitness test'), headerBackTitle: tr('Back'), headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
+      <Stack.Screen name="reflect" options={{ headerShown: true, title: tr('Your week'), presentation: 'modal', headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
+      <Stack.Screen name="prakriti" options={{ headerShown: true, title: tr('Your nature'), headerBackTitle: tr('Back'), headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
       <Stack.Screen name="records" options={{ headerShown: true, title: tr('Top of My Game'), headerBackTitle: tr('Back'), headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
       <Stack.Screen name="privacy" options={{ headerShown: true, title: tr('Privacy and permissions'), headerBackTitle: tr('Back'), headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
       <Stack.Screen name="spaces" options={{ headerShown: true, title: tr('Spaces'), headerBackTitle: tr('Back'), headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />

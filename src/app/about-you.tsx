@@ -188,6 +188,17 @@ export default function AboutYou() {
         </View>
       </Card>
 
+      {/* Know your nature, prakriti (founder, 16 Nov 2026 idea 9): 12 questions once; the Food master leans on it. */}
+      {me ? <Pressable onPress={() => router.push('/prakriti')} accessibilityRole="button">
+        <Card>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+            <Text style={{ flex: 1, fontSize: 18, fontWeight: '700', color: colors.ink }}>{tr('Your nature (prakriti)')}</Text>
+            <Text style={{ color: me.prakriti ? colors.insight : colors.accent, fontWeight: '700' }}>{me.prakriti ? me.prakriti.result : tr('12 questions')} ›</Text>
+          </View>
+          <Note>{tr('From the Ayurveda tradition; shapes the Food master\'s tips. Not a diagnosis.')}</Note>
+        </Card>
+      </Pressable> : null}
+
       </> : null}
 
       {showGoals ? <Card>

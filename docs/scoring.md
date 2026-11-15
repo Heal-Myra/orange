@@ -65,3 +65,7 @@ spaces snapped. Not part of Body, Mind, Soul or My day until the wholesome scori
 
 ## Sleep quality from a tracker (15 Nov 2026)
 When a ring or watch records the sleep stages, quality is not asked. Quality (1–5) = 5 × (0.6 × restorative + 0.4 × settled), at least 1: restorative = (deep + REM) ÷ hours slept ÷ 0.4 (capped at 1); settled = (share of the night asleep − 0.75) ÷ 0.2, from 0 to 1. The Sleep score's quality part (10) uses it. Without stages, the 1–5 tap stays.
+
+## Small extras (16 Nov 2026)
+- **Walk after dinner:** 10 minutes or more of walking (about 1,000 steps, from Apple Health) within 45 minutes of dinner adds **2** to Movement. Movement stays at most 30.
+- **Forgiveness practice:** once a week, the 5-minute guided letting-go adds **5** to Soul that day. Soul stays at most 100.

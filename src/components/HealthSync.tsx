@@ -55,7 +55,7 @@ export function HealthProvider({ children }: { children: ReactNode }) {
       // A weighing newer than the typed weight wins (founder, 23 Oct 2026: the Withings reading did not show).
       // Older typed weights have no time: then any weighing from today wins.
       if (health.weightTyped && h.weightAt != null && h.weightAt > (health.weightTypedAt ?? dayStartMs(iso))) { health.weightTyped = false; health.weightTypedAt = undefined; }
-      for (const k of ['weightKg', 'bodyFatPct', 'restingHr', 'hrv', 'vo2max', 'activeKcal', 'mindfulMin', 'workouts', 'sleepStages'] as const) {
+      for (const k of ['weightKg', 'bodyFatPct', 'restingHr', 'hrv', 'vo2max', 'activeKcal', 'mindfulMin', 'nightTempC', 'workouts', 'sleepStages'] as const) {
         if (h[k] != null && !(k === 'weightKg' && health.weightTyped)) (health as Record<string, unknown>)[k] = h[k];
       }
       // When the scale's weighing was taken, so the 3 pm "no weight yet" nudge knows whether today has one (25 Oct 2026).

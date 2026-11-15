@@ -19,6 +19,9 @@ export interface AboutMe {
   foodPrefs?: string;
   oneChange?: { change: string; start: string; ended?: string };
   spaces?: import('./spaces').SpacesState; // Spaces (decision 0055): Myra's lines and the ticks; photos stay on the phone
+  fitness?: import('./fitnessTest').FitnessResult[]; // monthly fitness test (16 Nov 2026)
+  focus?: import('./focusGame').FocusResult[];       // weekly focus check (16 Nov 2026)
+  prakriti?: import('./prakriti').Prakriti;          // know your nature (16 Nov 2026)
   style?: string; // how the person talks, as Myra has come to understand it (founder, 10 Nov 2026); Myra mirrors it // the 30-day one-change test (founder, 10 Nov 2026)
   guideLang?: string; // language of guided sessions (en, hi or a regional code; 24 Oct 2026)
   saved?: { url: string; title: string; note?: string; at: string }[]; // shared to Happy Orange: "Save to my journey" (24 Oct 2026)

@@ -7,6 +7,7 @@ import { LoveCard } from '../../components/LoveCard';
 import { Anchor, Card, Heading, Screen, Score } from '../../components/ui';
 import { JOURNAL_FROM, soulScore } from '../../lib/scoring';
 import { GratitudeJournal } from '../../components/GratitudeJournal';
+import { SoulExtras } from '../../components/SoulExtras';
 import { useHeal } from '../../lib/store';
 import { tr } from '../../lib/i18n';
 
@@ -19,6 +20,7 @@ export default function Soul() {
       {/* The score sits in the title bar now (founder, 4 Nov 2026: "Soul" and "Soul today" said the same thing). */}
       {/* Gratitude journal (27 Oct 2026) replaces the Gratitude and Love cards; older days keep them. */}
       {journal ? <Anchor id="gratitude"><GratitudeJournal /></Anchor> : <Anchor id="gratitude"><GratitudeCard /></Anchor>}
+      {journal ? <Anchor id="letgo"><SoulExtras /></Anchor> : null}
       <Anchor id="tao"><TaoCard on="soul" /></Anchor>
       {journal ? null : <Anchor id="love"><LoveCard /></Anchor>}
       <Anchor id="wisdom"><VerseStudyCard /></Anchor>

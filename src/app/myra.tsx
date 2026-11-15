@@ -382,6 +382,7 @@ export default function Myra() {
           </View>
           {plus(tr('Snap a meal'), 'restaurant-outline', goBody)}
           {plus(tr('Handwritten to-do list'), 'list-outline', () => { setText(tr('Add these to my to-dos')); pickPhoto(true); })}
+          {plus(tr('Calm down, 2 minutes'), 'leaf-outline', () => { setMenu(false); router.push('/calm'); })}
           {plus(tr('Lab report'), 'flask-outline', () => { setText(tr('Please read my lab report simply.')); pickDocument(); })}
           {plus(tr('Send feedback to the team'), 'chatbubble-ellipses-outline', () => { setMenu(false); router.push({ pathname: '/feedback', params: { from: page } }); })}
         </View>

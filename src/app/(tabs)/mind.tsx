@@ -9,6 +9,7 @@ import { ScreenTimeCard, phoneDayFor, usePhoneUpdate } from '../../components/Sc
 import { emptyDay, type DayLog } from '../../lib/types';
 import { MeditationTimer } from '../../components/MeditationTimer';
 import { TasksCard } from '../../components/TasksCard';
+import { CalmButton, FocusRow } from '../../components/MindExtras';
 import { Anchor, Button, Card, Expandable, Heading, Note, NumberField, Screen, Score, s, useKeepVisible } from '../../components/ui';
 import { CONTENT_CATEGORIES, mindScore } from '../../lib/scoring';
 import { useHeal } from '../../lib/store';
@@ -48,7 +49,9 @@ export default function Mind() {
       <Anchor id="tasks"><TasksCard /></Anchor>
 
       {/* Breathing & meditation moved here from Soul; Tao moved to Soul (founder, 24 Oct 2026). */}
+      <CalmButton />
       <Anchor id="meditation"><MeditationTimer /></Anchor>
+      <Anchor id="focus"><FocusRow /></Anchor>
 
       <Anchor id="phone"><ScreenTimeCard>
         {/* Each session can be corrected (founder, 26 Oct 2026: 6 hours of YouTube was the TV): tap to change the minutes or

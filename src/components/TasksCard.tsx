@@ -271,6 +271,14 @@ function AddTask({ area }: { area: Area }) {
 function TaskRow({ t, inFocus }: { t: Task; inFocus: boolean }) {
   const { complete, reopen, moveTo, remove, addHabit, rename, later } = useTasks();
   const [letGo, setLetGo] = useState(false);
+  // Delegate (founder, 15 Nov 2026; any to-do from 16 Nov: "to reduce the load of all pending tasks"): hand it over
+  // through WhatsApp or any app; it is not finished, so it comes back in 3 days as a check that it got done.
+  const delegate = () => { Share.share({ message: tr('Could you please take this on: {task}? Thank you 🙏', { task: t.title }) }).then(r => {
+    if (r.action !== Share.sharedAction) return;
+    rename(t.id, tr('Check it is done: {task}', { task: t.title.replace(/^(Check it is done: |पूरा हुआ या नहीं, देखें: )/, '') }));
+    later(t.id, shiftISO(today, 3));
+    setOpen(false);
+  }).catch(() => {}); };
   const [rep, setRep] = useState(false);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<string | null>(null); // the words being edited (founder, 11 Nov 2026)
@@ -318,12 +326,7 @@ function TaskRow({ t, inFocus }: { t: Task; inFocus: boolean }) {
           <Text style={{ fontSize: 13, color: colors.insight }}>{tr('Moved {n} times. What now?', { n: t.moved })}</Text>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
             {([
-              ['🤝', tr('Delegate'), () => { Share.share({ message: tr('Could you please take this on: {task}? Thank you 🙏', { task: t.title }) }).then(r => {
-                // Handed over, not finished: it comes back in 3 days as a check that it got done (founder, 15 Nov 2026).
-                if (r.action !== Share.sharedAction) return;
-                rename(t.id, tr('Check it is done: {task}', { task: t.title.replace(/^(Check it is done: |पूरा हुआ या नहीं, देखें: )/, '') }));
-                later(t.id, shiftISO(today, 3));
-              }).catch(() => {}); }],
+              ['🤝', tr('Delegate'), delegate],
               ['📅', tr('Next month'), () => { const [y, m, d] = today.split('-').map(Number); const n = new Date(y, m, Math.min(d, new Date(y, m + 1, 0).getDate())); later(t.id, `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, '0')}-${String(n.getDate()).padStart(2, '0')}`); }],
               ['🕊', tr('Let it go'), () => setLetGo(true)],
               ['✎', tr('Make it smaller'), () => setEditing(t.title)],
@@ -356,6 +359,9 @@ function TaskRow({ t, inFocus }: { t: Task; inFocus: boolean }) {
           <Pressable onPress={() => setRep(r => !r)} style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingVertical: 6, paddingHorizontal: 12, borderRadius: 99, borderWidth: 1, borderColor: rep ? colors.accent : colors.line }}>
             <Ionicons name="repeat-outline" size={14} color={colors.ink} />
             <Text style={{ fontSize: 13, color: colors.ink }}>{tr('Repeat')}</Text>
+          </Pressable>
+          <Pressable onPress={delegate} style={{ paddingVertical: 6, paddingHorizontal: 12, borderRadius: 99, borderWidth: 1, borderColor: colors.line }}>
+            <Text style={{ fontSize: 13, color: colors.ink }}>🤝 {tr('Delegate')}</Text>
           </Pressable>
           {[[tr('Tomorrow'), 1], [tr('In 3 days'), 3], [tr('Next week'), 7]].map(([label, n]) => (
             <Pressable key={label} onPress={() => { moveTo(t.id, shiftISO(today, n as number)); setOpen(false); }}
