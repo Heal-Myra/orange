@@ -32,7 +32,8 @@ interface TasksState {
   complete: (id: string) => void;
   reopen: (id: string) => void; // slide back to "To do"
   moveTo: (id: string, due: string) => void;
-  rename: (id: string, title: string) => void; // edit the words, e.g. to make it smaller (founder, 11 Nov 2026)
+  rename: (id: string, title: string) => void;
+  later: (id: string, due: string) => void; // a fresh start on a date far off: the moved count starts again (15 Nov 2026) // edit the words, e.g. to make it smaller (founder, 11 Nov 2026)
   remove: (id: string) => void;
   setFocus: (ids: string[]) => void; // Myra's pick for today
   cloudReady: boolean; // false until migration 0005 has been run
@@ -191,6 +192,8 @@ export function TasksProvider({ children }: { children: ReactNode }) {
         change(ts => ts.map(x => x.id === id ? { ...x, doneAt: undefined } : x));
       },
       rename: (id, title) => { const v = title.trim().slice(0, 200); if (v) change(ts => ts.map(t => t.id === id ? { ...t, title: v, moved: 0 } : t)); },
+      later: (id, due) => change(ts => ts.map(t => t.id === id ? { ...t, due, moved: 0 } : t),
+        focusRec.ids.includes(id) ? { date: focusRec.date, ids: focusRec.ids.filter(x => x !== id) } : undefined),
       moveTo: (id, due) => change(ts => ts.map(t => t.id === id ? { ...t, due, moved: t.moved + 1 } : t),
         focusRec.ids.includes(id) ? { date: focusRec.date, ids: focusRec.ids.filter(x => x !== id) } : undefined),
       remove: id => {

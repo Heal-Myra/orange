@@ -7,7 +7,7 @@ import { MyraLine } from './MyraLine';
 import { PASTEL, RingPanel } from './Rings';
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
-import { Pressable, Text, TextInput, View } from 'react-native';
+import { Share, Pressable, Text, TextInput, View } from 'react-native';
 import { shiftISO, todayISO } from '../lib/dates';
 import { AREAS, areaName, useTasks, type Area, type Task } from '../lib/tasks';
 import { FORMING_DAYS, forming, habitDay, habitsToday, readHabit, repeatName, timesDone, type Habit, type Repeat } from '../lib/habits';
@@ -269,7 +269,8 @@ function AddTask({ area }: { area: Area }) {
 }
 
 function TaskRow({ t, inFocus }: { t: Task; inFocus: boolean }) {
-  const { complete, reopen, moveTo, remove, addHabit, rename } = useTasks();
+  const { complete, reopen, moveTo, remove, addHabit, rename, later } = useTasks();
+  const [letGo, setLetGo] = useState(false);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<string | null>(null); // the words being edited (founder, 11 Nov 2026)
   const saveEdit = () => { if (editing?.trim()) rename(t.id, editing); setEditing(null); setOpen(false); };
@@ -283,7 +284,7 @@ function TaskRow({ t, inFocus }: { t: Task; inFocus: boolean }) {
         {/* Tap or long-press the words for the dates menu (the calendar icon made way for the switch). */}
         <Pressable style={{ flex: 1 }} onPress={() => !done && editing == null && setOpen(o => !o)} onLongPress={() => !done && setEditing(t.title)}>
           {editing != null ? (
-            <TextInput value={editing} onChangeText={setEditing} autoFocus onSubmitEditing={saveEdit} returnKeyType="done" maxLength={200}
+            <TextInput value={editing} onChangeText={setEditing} autoFocus onSubmitEditing={saveEdit} returnKeyType="done" maxLength={200} multiline blurOnSubmit
               style={{ color: colors.ink, fontSize: 15, borderWidth: 1, borderColor: colors.accent, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 6, backgroundColor: colors.surface }} />
           ) : <Text style={{ color: done ? colors.muted : colors.ink, fontSize: 15, textDecorationLine: done ? 'line-through' : 'none' }}>{t.title}</Text>}
           {!done ? (
@@ -309,14 +310,43 @@ function TaskRow({ t, inFocus }: { t: Task; inFocus: boolean }) {
           </Pressable>
         </View>
       ) : null}
+      {/* Moved 3 times or more (founder, 15 Nov 2026): hand it over, give it a month, let it go without regret, or make
+          it smaller. */}
       {t.moved >= 3 && !done && editing == null ? (
-        <Pressable onPress={() => setEditing(t.title)} accessibilityRole="button" hitSlop={4}>
-          <Text style={{ fontSize: 13, color: colors.insight }}>{tr('Moved {n} times. Make it smaller, or let it go?', { n: t.moved })} <Text style={{ fontWeight: '700' }}>✎ {tr('Edit')}</Text></Text>
-        </Pressable>
+        <View style={{ gap: 6 }}>
+          <Text style={{ fontSize: 13, color: colors.insight }}>{tr('Moved {n} times. What now?', { n: t.moved })}</Text>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+            {([
+              ['🤝', tr('Delegate'), () => { Share.share({ message: tr('Could you please take this on: {task}? Thank you 🙏', { task: t.title }) }).then(r => {
+                // Handed over, not finished: it comes back in 3 days as a check that it got done (founder, 15 Nov 2026).
+                if (r.action !== Share.sharedAction) return;
+                rename(t.id, tr('Check it is done: {task}', { task: t.title.replace(/^(Check it is done: |पूरा हुआ या नहीं, देखें: )/, '') }));
+                later(t.id, shiftISO(today, 3));
+              }).catch(() => {}); }],
+              ['📅', tr('Next month'), () => { const [y, m, d] = today.split('-').map(Number); const n = new Date(y, m, Math.min(d, new Date(y, m + 1, 0).getDate())); later(t.id, `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, '0')}-${String(n.getDate()).padStart(2, '0')}`); }],
+              ['🕊', tr('Let it go'), () => setLetGo(true)],
+              ['✎', tr('Make it smaller'), () => setEditing(t.title)],
+            ] as const).map(([icon, label, onPress]) => (
+              <Pressable key={label} onPress={onPress} accessibilityRole="button"
+                style={{ paddingVertical: 6, paddingHorizontal: 11, borderRadius: 99, borderWidth: 1, borderColor: colors.line, backgroundColor: colors.surface }}>
+                <Text style={{ fontSize: 13, color: colors.ink }}>{icon} {label}</Text>
+              </Pressable>
+            ))}
+          </View>
+          {letGo ? (
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+              <Text style={{ flex: 1, fontSize: 13, color: colors.muted }}>{tr('Let it go, without regret? Not every task needs doing.')}</Text>
+              <Pressable onPress={() => remove(t.id)} style={{ paddingVertical: 6, paddingHorizontal: 12, borderRadius: 99, backgroundColor: colors.accent }}>
+                <Text style={{ fontSize: 13, color: '#fff', fontWeight: '600' }}>{tr('Yes, let go')}</Text>
+              </Pressable>
+              <Pressable onPress={() => setLetGo(false)} hitSlop={6}><Text style={{ fontSize: 13, color: colors.muted }}>{tr('Cancel')}</Text></Pressable>
+            </View>
+          ) : null}
+        </View>
       ) : null}
       {open ? (
         <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap', paddingLeft: 34 }}>
-          <Pressable onPress={() => setEditing(t.title)} style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingVertical: 6, paddingHorizontal: 12, borderRadius: 99, borderWidth: 1, borderColor: colors.line }}>
+          <Pressable onPress={() => { setEditing(t.title); setOpen(false); }} style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingVertical: 6, paddingHorizontal: 12, borderRadius: 99, borderWidth: 1, borderColor: colors.line }}>
             <Ionicons name="create-outline" size={14} color={colors.ink} />
             <Text style={{ fontSize: 13, color: colors.ink }}>{tr('Edit')}</Text>
           </Pressable>

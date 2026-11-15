@@ -1,5 +1,8 @@
 # Changelog
 
+## 15 Nov 2026 — A to-do moved 3 times: Delegate · Next month · Let it go · Make it smaller
+- Founder: after 3 or 4 moves, the to-do now offers four ways out. 🤝 **Delegate** sends it to someone (WhatsApp or any app) and turns it into "Check it is done: …" 3 days later. 📅 **Next month** moves it a month ahead with a fresh start. 🕊 **Let it go** closes it without regret, after one "Yes". ✎ **Make it smaller** edits the words (now on more than one line).
+
 ## 15 Nov 2026 — Myra screen no longer freezes
 - Founder: the new Myra screen froze and no button answered, and the old "Myra" title bar still showed above it. The screen was asking the app to hide that title bar on every redraw, while the app kept showing it, so it never stopped redrawing. Now the setting lives once in the app layout (Myra and Sound bath), and Myra's ＋, chats and voice sheets are only created when opened.
 
