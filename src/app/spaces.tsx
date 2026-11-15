@@ -53,10 +53,10 @@ export default function Spaces() {
     );
   }
   const space = SPACES.find(x => x.id === id)?.id;
-  return space ? <OneSpace id={space} all={all} save={save} /> : <List all={all} />;
+  return space ? <OneSpace id={space} all={all} save={save} /> : <List all={all} save={save} />;
 }
 
-function List({ all }: { all: SpacesState }) {
+function List({ all, save }: { all: SpacesState; save: (s: SpacesState) => void }) {
   const today = todayISO();
   const open = (id: SpaceId) => router.push({ pathname: '/spaces', params: { id } });
   const total = spacesScore(all);
@@ -108,7 +108,7 @@ function List({ all }: { all: SpacesState }) {
         })}
       </View>
       <Text style={{ color: colors.muted, fontSize: 12, textAlign: 'center' }}>{tr('Photos of your home stay on this phone.')}</Text>
-      <RemovePhotos />
+      <RemovePhotos fresh={() => save({})} />
     </Screen>
   );
 }
@@ -173,11 +173,15 @@ function OneSpace({ id, all, save }: { id: SpaceId; all: SpacesState; save: (s: 
     save({ ...all, [id]: { ...s, round: { ...s.round, changes } } });
   };
 
-  const snapButtons = (first: boolean) => (
+  // Photo and video side by side, always (founder, 15 Nov 2026): the photo for Myra's exact changes, a walk-round video
+  // so she sees the whole space, not only what one frame holds.
+  const snapButtons = (first: boolean, plain = false) => (
     <View style={{ gap: 8 }}>
-      {video ? <Button title={tr('Record a walk-round video')} onPress={() => snap('video')} disabled={busy} /> : null}
-      <Button kind={video ? 'plain' : 'primary'} title={first ? tr('Snap my {space}', { space: name }) : tr('Snap the after photo')} onPress={() => snap('photo')} disabled={busy} />
-      <Button kind="plain" title={video ? tr('Choose a video or photo') : tr('Choose a photo')} onPress={() => snap('library')} disabled={busy} />
+      <View style={{ flexDirection: 'row', gap: 8 }}>
+        <View style={{ flex: 1 }}><Button kind={plain ? 'plain' : 'primary'} title={first ? tr('Take a photo') : tr('After photo')} onPress={() => snap('photo')} disabled={busy} /></View>
+        <View style={{ flex: 1 }}><Button kind={plain ? 'plain' : 'primary'} title={tr('Record a video')} onPress={() => snap('video')} disabled={busy} /></View>
+      </View>
+      <Button kind="plain" title={tr('Choose from my gallery')} onPress={() => snap('library')} disabled={busy} />
     </View>
   );
   const reading = busy ? (
@@ -198,7 +202,7 @@ function OneSpace({ id, all, save }: { id: SpaceId; all: SpacesState; save: (s: 
       {!s ? (
         <Card>
           <Photo label={tr('Your {space} photo', { space: name })} />
-          <MyraSays text={video ? tr('Walk me round, slowly. One full turn.') : tr('Snap it as it is. No tidying first.')} />
+          <MyraSays text={tr('Snap it as it is, or walk me round slowly.')} />
           {reading ?? snapButtons(true)}
           {message ? <Note>{message}</Note> : null}
           <Text style={{ color: colors.muted, fontSize: 12 }}>{privacy}</Text>
@@ -236,7 +240,7 @@ function OneSpace({ id, all, save }: { id: SpaceId; all: SpacesState; save: (s: 
               : (
                 <>
                   <Note>{tr('Snap it again on {day} to see what changed.', { day: formatDay(againOn(s)) })}</Note>
-                  <Button kind="plain" title={tr('Snap again now')} onPress={() => snap(video ? 'video' : 'photo')} />
+                  {snapButtons(false, true)}
                 </>
               ))}
             {message ? <Note>{message}</Note> : null}
@@ -266,22 +270,25 @@ function ScoreCard({ id, checks, potential }: { id: SpaceId; checks: number[]; p
   );
 }
 
-/** Remove all photos (founder, 10 Nov 2026), asked once more before it happens. Scores and Myra's changes stay. */
-function RemovePhotos() {
-  const [ask, setAsk] = useState<'no' | 'ask' | 'done'>('no');
-  if (ask === 'done') return <Text style={{ color: colors.muted, fontSize: 13, textAlign: 'center' }}>{tr('All photos removed from this phone.')}</Text>;
+/** Remove all photos (founder, 10 Nov 2026), or start afresh (founder, 15 Nov 2026): photos and Myra's changes, scores
+ *  and ticks all cleared, every space back to the start. Asked once more before it happens. */
+function RemovePhotos({ fresh }: { fresh: () => void }) {
+  const [ask, setAsk] = useState<'no' | 'ask' | 'photos' | 'fresh'>('no');
+  if (ask === 'photos') return <Text style={{ color: colors.muted, fontSize: 13, textAlign: 'center' }}>{tr('All photos removed from this phone.')}</Text>;
+  if (ask === 'fresh') return <Text style={{ color: colors.muted, fontSize: 13, textAlign: 'center' }}>{tr('All cleared. Snap a space to begin again.')}</Text>;
   if (ask === 'no') return (
     <Pressable onPress={() => setAsk('ask')} accessibilityRole="button" style={{ alignItems: 'center', padding: 8 }}>
-      <Text style={{ color: colors.accent, fontSize: 14, fontWeight: '600' }}>{tr('Remove all photos')}</Text>
+      <Text style={{ color: colors.accent, fontSize: 14, fontWeight: '600' }}>{tr('Remove photos or start afresh')}</Text>
     </Pressable>
   );
   return (
     <Card style={{ gap: 10 }}>
-      <Text style={{ color: colors.ink, fontSize: 15 }}>{tr('Remove every space photo from this phone? Your scores and Myra\'s changes stay.')}</Text>
-      <View style={{ flexDirection: 'row', gap: 10 }}>
-        <View style={{ flex: 1 }}><Button title={tr('Yes, remove')} onPress={() => { removeAllPhotos().then(() => setAsk('done')); }} /></View>
-        <View style={{ flex: 1 }}><Button kind="plain" title={tr('Cancel')} onPress={() => setAsk('no')} /></View>
-      </View>
+      <Text style={{ color: colors.ink, fontSize: 15, fontWeight: '600' }}>{tr('What would you like to clear?')}</Text>
+      <Button kind="plain" title={tr('Photos only')} onPress={() => { removeAllPhotos().then(() => setAsk('photos')); }} />
+      <Text style={{ color: colors.muted, fontSize: 12.5 }}>{tr("Scores and Myra's changes stay.")}</Text>
+      <Button title={tr('Start afresh')} onPress={() => { removeAllPhotos().then(() => { fresh(); setAsk('fresh'); }); }} />
+      <Text style={{ color: colors.muted, fontSize: 12.5 }}>{tr("Every photo, score and change from Myra is cleared.")}</Text>
+      <Button kind="plain" title={tr('Cancel')} onPress={() => setAsk('no')} />
     </Card>
   );
 }

@@ -387,14 +387,14 @@ Reply with JSON only: {"isFace":true|false,"skin":{"dryness":"none"|"mild"|"noti
 - Use what they already have: move, hide, put out, put away. Nothing to buy, no renovation.
 - "seen": what you notice that matters most for this space, one line of at most 10 words, warm, a touch witty (e.g. "Biscuits are closer to your hand than fruit.").
 - "changes": exactly 3, the most helpful first. "text": a direct instruction of at most 10 words (e.g. "Fruit bowl on the counter, at eye level."). "why": at most 15 words, the reason in everyday words, no medical claims.`;
-      // A photo, or up to 4 still frames from a walk-round video (decision 0055, build 14).
-      const frames = (Array.isArray(p.images) ? p.images : []).slice(0, 4)
+      // A photo, or up to 6 still frames from a walk-round video (decision 0055, build 14).
+      const frames = (Array.isArray(p.images) ? p.images : []).slice(0, 6)
         .map(x => ({ media_type: String((x as Record<string, unknown>)?.media_type ?? 'image/jpeg'), data: String((x as Record<string, unknown>)?.data ?? '') }))
         .filter(x => x.data);
       const image = frames.length ? frames : { media_type: String(p.media_type ?? 'image/jpeg'), data: String(p.image_base64 ?? '') };
       const many = frames.length > 1;
       const seeing = many
-        ? `These are ${frames.length} still frames (numbered 0 to ${frames.length - 1}, in order) from a short video walking round the person's ${space}. Together they show the whole space.`
+        ? `These are ${frames.length} still frames (numbered 0 to ${frames.length - 1}, in order) from a short video walking round the person's ${space}. Together they show the whole space: read all of it, including what is outside any one frame.`
         : `This is a photo of the person's ${space}.`;
       const spots = `- "frame": ${many ? 'the number of the frame that shows the most of the space; the app shows that one' : '0'}.
 - For each change, "spot": where it goes on that frame, as {"x":0.0-1.0 from the left edge,"y":0.0-1.0 from the top edge}, at the exact place (e.g. the bare stretch of counter for a fruit bowl). Use null if the place is not in that frame.

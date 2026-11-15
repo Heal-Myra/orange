@@ -10,7 +10,7 @@ import { shrink } from './photo';
 /** The phone can read videos and blur faces (build 14 and later). */
 export const hasSpaceCamera = () => !!SpaceCamera;
 
-export const FRAMES = 4;
+export const FRAMES = 6; // founder, 15 Nov 2026: a video should show the whole space
 
 export interface Prepared { data: string; type: string; local: string; ratio?: number } // local: blurred file on the phone
 export interface Capture { images: Prepared[]; faces: number }
@@ -29,6 +29,8 @@ async function prepare(uri: string, base64: string | null | undefined, mime: str
 /** Ask the person for a photo or video. `from`: the camera for a photo, the camera for a video, or their library. */
 export async function captureSpace(from: 'photo' | 'video' | 'library'): Promise<Capture | null | { error: string }> {
   const video = hasSpaceCamera();
+  // Say so before the person films anything (older builds cannot read videos).
+  if (from === 'video' && !video) return { error: tr('Videos come with the next app version. A photo works now.') };
   const opts: ImagePicker.ImagePickerOptions = {
     mediaTypes: from === 'video' ? ['videos'] : from === 'library' && video ? ['images', 'videos'] : ['images'],
     quality: 0.7, base64: from === 'photo' || (from === 'library' && !video), videoMaxDuration: 30,

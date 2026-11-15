@@ -1,5 +1,9 @@
 # Changelog
 
+## 15 Nov 2026 — Spaces: start afresh; photo and video side by side
+- Founder: removing photos kept Myra's old changes. Spaces › "Remove photos or start afresh" now asks what to clear: **Photos only** (scores and changes stay) or **Start afresh** (every photo, score and change from Myra cleared; each space back to the start).
+- Founder: photo and video both, always. Every space shows **Take a photo** (After photo) and **Record a video** side by side, plus Choose from my gallery; Myra's changes come from the photo, the video lets her see the whole space. A video now gives Myra 6 frames (was 4) and she is told to read all of it. On app versions before build 14 the video button says so straight away instead of filming first.
+
 ## 15 Nov 2026 — Myra's team: every specialist a master; masters speak when asked (decision 0058)
 - Founder: each specialist is a master of its field (the master of nourishment, the master coach, the master of rest, the monk, the sage, the master analyst), carrying the best of the highest achievers, broken into simple steps, helping each person beat their own best.
 - Founder: like a Guru, a master speaks to you directly when you ask ("talk to the monk"); day to day, directions come through Myra, the disciple. Plan only: see docs/agents.md.
