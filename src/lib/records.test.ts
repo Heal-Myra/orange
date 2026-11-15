@@ -74,3 +74,15 @@ describe('which fresh record shows first (6 Nov 2026)', async () => {
     expect([...list].sort((a, b) => recRank(a) - recRank(b)).map(x => x.title)).toEqual(['Highest Mind score', 'Best day ever', 'Best week ever', 'Best month ever', 'Longest gratitude streak']);
   });
 });
+
+import { latestRecord as latestRec } from './records';
+describe('Top of My Game shows the newest record (founder, 16 Nov 2026)', () => {
+  const rec = (key: string, end: string) => ({ key, end, start: end } as unknown as import('./records').Rec);
+  it('a best from yesterday wins over an older running best', () => {
+    expect(latestRec([rec('run5', '2026-11-11')], [rec('steps.day', '2026-11-15')])?.key).toBe('steps.day');
+  });
+  it('on the same day, the first list keeps its place', () => {
+    expect(latestRec([rec('run5', '2026-11-15')], [rec('steps.day', '2026-11-15')])?.key).toBe('run5');
+    expect(latestRec([], [])).toBeUndefined();
+  });
+});

@@ -7,7 +7,7 @@ import { router } from 'expo-router';
 import { Pressable, Text, View } from 'react-native';
 import { shiftISO, todayISO } from '../lib/dates';
 import { locale, tr } from '../lib/i18n';
-import { closeToRecord, freshRecords, type Rec } from '../lib/records';
+import { closeToRecord, freshRecords, latestRecord, type Rec } from '../lib/records';
 import { runRecords } from '../lib/runRecords';
 import { useRuns } from '../lib/useRuns';
 import { useHeal } from '../lib/store';
@@ -31,10 +31,11 @@ export function when(r: Rec, today: string): string {
 export function RecordsCard() {
   const { days, profile } = useHeal();
   const today = todayISO();
-  // Only a best that yesterday completed (founder, 4 Nov 2026: never a stale record).
-  // A running best from Apple Health (fastest 5 km, 10 km, longest run; 11 Nov 2026) shows first while it is new.
+  // Only a best that yesterday completed (founder, 4 Nov 2026: never a stale record), plus running bests from Apple Health
+  // while new (11 Nov 2026). The newest one always shows (founder, 16 Nov 2026: a record made yesterday must not stay
+  // hidden behind an older running best).
   const runs = useRuns();
-  const r = useMemo(() => runRecords(runs, today).find(x => x.isNew) ?? freshRecords(days, profile, today)[0], [runs, days, profile, today]);
+  const r = useMemo(() => latestRecord(runRecords(runs, today).filter(x => x.isNew), freshRecords(days, profile, today)), [runs, days, profile, today]);
   const close = useMemo(() => (r ? null : closeToRecord(days, profile, today)), [r, days, profile, today]);
   // Founder, 1 Nov 2026: a card named "Top of My Game", a gold trophy (option 2) and one line (option 8).
   return (

@@ -185,3 +185,9 @@ export function freshRecords(daysIn: Record<string, DayLog>, P: Profile, today: 
   // monthly; streaks last. So a highest-ever day beats a best week.
   return out.sort((a, b) => recRank(a) - recRank(b));
 }
+
+/** The newest record: the latest end date wins; on the same day, the order the lists already give (Myra's own ranking). */
+export function latestRecord(...lists: Rec[][]): Rec | undefined {
+  const all = lists.flat();
+  return all.reduce<Rec | undefined>((a, b) => (!a || b.end > a.end ? b : a), undefined);
+}

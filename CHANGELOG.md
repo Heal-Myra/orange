@@ -1,5 +1,8 @@
 # Changelog
 
+## 16 Nov 2026 — Top of My Game shows the newest record
+- Founder: Today still showed the fastest 5 km from 11 Nov although a newer best had been made. A running best stayed first for 7 days and hid newer records. Now the newest record always shows (a best made yesterday comes before an older running best); All › still lists every record.
+
 ## 15 Nov 2026 — Spaces: start afresh; photo and video side by side
 - Founder: removing photos kept Myra's old changes. Spaces › "Remove photos or start afresh" now asks what to clear: **Photos only** (scores and changes stay) or **Start afresh** (every photo, score and change from Myra cleared; each space back to the start).
 - Founder: photo and video both, always. Every space shows **Take a photo** (After photo) and **Record a video** side by side, plus Choose from my gallery; Myra's changes come from the photo, the video lets her see the whole space. A video now gives Myra 6 frames (was 4) and she is told to read all of it. On app versions before build 14 the video button says so straight away instead of filming first.
