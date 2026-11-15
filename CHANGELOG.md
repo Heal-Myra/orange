@@ -1,5 +1,9 @@
 # Changelog
 
+## 15 Nov 2026 — Myra's team: every specialist a master; masters speak when asked (decision 0058)
+- Founder: each specialist is a master of its field (the master of nourishment, the master coach, the master of rest, the monk, the sage, the master analyst), carrying the best of the highest achievers, broken into simple steps, helping each person beat their own best.
+- Founder: like a Guru, a master speaks to you directly when you ask ("talk to the monk"); day to day, directions come through Myra, the disciple. Plan only: see docs/agents.md.
+
 ## 15 Nov 2026 — Sleep quality comes from the ring
 - Founder: when the Oura ring (or a watch) records the night, the 1–5 sleep-quality tap is gone; quality is worked out from deep and REM sleep and how little of the night was awake (last night: 4.5 / 5). People without a sleep tracker still tap 1–5.
 
