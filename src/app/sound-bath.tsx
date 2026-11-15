@@ -2,7 +2,7 @@
 // bowl. The minutes count as meditation. Opened from Mind › Meditation and from the Sleep card at night
 // (?sleep=1: rain and "until I sleep" chosen for you).
 
-import { router, Stack, useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams, useNavigation } from 'expo-router';
 import { useKeepAwake } from 'expo-keep-awake';
 import { useEffect, useRef, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
@@ -25,7 +25,6 @@ export default function SoundBathScreen() {
   if (playing) return <Playing ids={picked} minutes={len || SLEEP_MAX} onIds={setPicked} />;
   return (
     <ScrollView style={{ flex: 1, backgroundColor: colors.bg }} contentContainerStyle={{ padding: 16, gap: 12 }}>
-      <Stack.Screen options={{ title: tr('Sound bath') }} />
       <Card style={{ gap: 12 }}>
         <Note>{tr('Lie down, close your eyes, let the sound wash over you.')}</Note>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
@@ -53,6 +52,9 @@ export default function SoundBathScreen() {
 
 function Playing({ ids, minutes, onIds }: { ids: SoundId[]; minutes: number; onIds: (ids: SoundId[]) => void }) {
   useKeepAwake();
+  const nav = useNavigation();
+  // Hide the header once while playing (set once, never on every render).
+  useEffect(() => { nav.setOptions({ headerShown: false }); return () => nav.setOptions({ headerShown: true }); }, [nav]);
   const { update } = useHeal();
   const [left, setLeft] = useState(minutes * 60);
   const [paused, setPaused] = useState(false);
@@ -77,7 +79,6 @@ function Playing({ ids, minutes, onIds }: { ids: SoundId[]; minutes: number; onI
   );
   return (
     <View style={{ flex: 1, backgroundColor: '#1F2A30', alignItems: 'center', justifyContent: 'center', padding: 24, gap: 10 }}>
-      <Stack.Screen options={{ headerShown: false }} />
       <View style={{ width: 180, height: 180, borderRadius: 90, backgroundColor: '#E9A15A', opacity: paused ? 0.35 : 0.8, shadowColor: '#F0A060', shadowOpacity: 0.9, shadowRadius: 50 }} />
       <Text style={{ color: '#fff', fontSize: 20, fontWeight: '600', marginTop: 18 }}>{name}</Text>
       <Text style={{ color: '#9aa4a8' }}>{tr('{t} left · fades out at the end', { t: mm })}</Text>

@@ -68,7 +68,10 @@ function Gate() {
       <Stack.Screen name="breathe" options={{ presentation: 'fullScreenModal', contentStyle: { backgroundColor: '#C4E4F8' } }} />
       <Stack.Screen name="sit" options={{ presentation: 'fullScreenModal', contentStyle: { backgroundColor: '#1E2A3A' } }} />
       <Stack.Screen name="shared" options={{ headerShown: true, title: tr('Shared'), presentation: 'modal', headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
-      <Stack.Screen name="myra" options={{ headerShown: true, title: tr('Myra'), presentation: 'modal', headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
+      {/* Myra draws her own top bar (☰ · title · 👁/✎, 13 Nov 2026). Options live here, not in the screen: a
+          <Stack.Screen options> inside a modal re-set the header on every render and froze the screen (15 Nov 2026). */}
+      <Stack.Screen name="myra" options={{ headerShown: false, presentation: 'modal' }} />
+      <Stack.Screen name="sound-bath" options={{ headerShown: true, title: tr('Sound bath'), presentation: 'modal', headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
       <Stack.Screen name="records" options={{ headerShown: true, title: tr('Top of My Game'), headerBackTitle: tr('Back'), headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
       <Stack.Screen name="privacy" options={{ headerShown: true, title: tr('Privacy and permissions'), headerBackTitle: tr('Back'), headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
       <Stack.Screen name="spaces" options={{ headerShown: true, title: tr('Spaces'), headerBackTitle: tr('Back'), headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />

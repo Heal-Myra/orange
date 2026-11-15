@@ -9,7 +9,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import { router, Stack, useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { Image, Keyboard, Modal, Platform, Pressable, ScrollView, Text, TextInput, View, type ScrollViewInstance } from 'react-native';
 import { MyraVoice } from '../components/MyraVoice';
@@ -279,7 +279,6 @@ export default function Myra() {
 
   return (
     <SafeAreaView style={[s.safe, { backgroundColor: colors.bg }]} edges={['top', 'bottom']}>
-      <Stack.Screen options={{ headerShown: false }} />
       <View style={{ flex: 1, paddingBottom: kb ? Math.max(0, kb - insets.bottom) : 0 }}>
         {/* Top: ☰ past chats · title · 👻 private chat (empty) or ✎ new chat */}
         <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingTop: 6, paddingBottom: 4 }}>
@@ -373,7 +372,7 @@ export default function Myra() {
       </View>
 
       {/* ＋ : Camera · Photos · Files, then Myra's shortcuts */}
-      <Modal visible={menu} transparent animationType="slide" onRequestClose={() => setMenu(false)}>
+      {menu ? <Modal visible transparent animationType="slide" onRequestClose={() => setMenu(false)}>
         <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.25)' }} onPress={() => setMenu(false)} />
         <View style={{ backgroundColor: colors.surface, borderTopLeftRadius: 22, borderTopRightRadius: 22, padding: 16, paddingBottom: 16 + insets.bottom, gap: 4 }}>
           <View style={{ flexDirection: 'row', gap: 8, marginBottom: 6 }}>
@@ -386,10 +385,10 @@ export default function Myra() {
           {plus(tr('Lab report'), 'flask-outline', () => { setText(tr('Please read my lab report simply.')); pickDocument(); })}
           {plus(tr('Send feedback to the team'), 'chatbubble-ellipses-outline', () => { setMenu(false); router.push({ pathname: '/feedback', params: { from: page } }); })}
         </View>
-      </Modal>
+      </Modal> : null}
 
       {/* ☰ : past chats */}
-      <Modal visible={history} transparent animationType="slide" onRequestClose={() => setHistory(false)}>
+      {history ? <Modal visible transparent animationType="slide" onRequestClose={() => setHistory(false)}>
         <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.25)' }} onPress={() => setHistory(false)} />
         <View style={{ maxHeight: '75%', backgroundColor: colors.surface, borderTopLeftRadius: 22, borderTopRightRadius: 22, padding: 16, paddingBottom: 16 + insets.bottom }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
@@ -408,9 +407,9 @@ export default function Myra() {
             )) : <Note>{tr('No chats yet.')}</Note>}
           </ScrollView>
         </View>
-      </Modal>
+      </Modal> : null}
 
-      <MyraVoice open={voice} onClose={() => setVoice(false)} ask={q => send(q)} />
+      {voice ? <MyraVoice open onClose={() => setVoice(false)} ask={q => send(q)} /> : null}
     </SafeAreaView>
   );
 }

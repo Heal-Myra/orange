@@ -1,5 +1,8 @@
 # Changelog
 
+## 15 Nov 2026 — Myra screen no longer freezes
+- Founder: the new Myra screen froze and no button answered, and the old "Myra" title bar still showed above it. The screen was asking the app to hide that title bar on every redraw, while the app kept showing it, so it never stopped redrawing. Now the setting lives once in the app layout (Myra and Sound bath), and Myra's ＋, chats and voice sheets are only created when opened.
+
 ## 15 Nov 2026 — Sleep: one device per night, overlaps counted once
 - Founder slept 7–8 hours but saw 13.1 h (4.1 h deep) on the first night with his new Oura ring. Sleep now comes from one device per night (the Oura ring when it recorded the night, otherwise the device with the most sleep), and any stretch written twice is counted once, per stage. Sleep › Details says which device it came from.
 
