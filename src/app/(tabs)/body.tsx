@@ -22,7 +22,7 @@ import { PASTEL, RingPanel } from '../../components/Rings';
 import { MyraLine } from '../../components/MyraLine';
 import { todayISO } from '../../lib/dates';
 import { Anchor, Card, Expandable, Heading, Note, Screen, Score, s } from '../../components/ui';
-import { FAST_KCAL, bodyScore, mealTotals } from '../../lib/scoring';
+import { DEVICE_QUALITY_FROM, FAST_KCAL, bodyScore, deviceQuality, mealTotals } from '../../lib/scoring';
 import { useHeal } from '../../lib/store';
 import { colors } from '../../theme';
 import { tr } from '../../lib/i18n';
@@ -44,6 +44,7 @@ export default function Body() {
   const auto = connected; // Apple Health fills sleep and movement; typing is only for phones without it
   const h = day.health;
   const st = h?.sleepStages;
+  const dq = date >= DEVICE_QUALITY_FROM ? deviceQuality(st, day.sleep.hours) : null; // from the ring or watch (15 Nov 2026)
 
   return (
     <Screen feedback="Body">
@@ -113,7 +114,9 @@ export default function Body() {
         <RingPanel trend="sleep" score={score?.sleep} max={30} items={[
           { id: 'hours', color: PASTEL.lavender, label: tr('Hours slept'), value: (day.sleep.hours ?? 0) / 8, text: day.sleep.hours != null ? `${Math.round(day.sleep.hours * 10) / 10} / 8 h` : '–' },
           ...(st?.deep != null ? [{ id: 'deep', color: PASTEL.sky, label: tr('Deep sleep'), value: st.deep / 1.5, text: `${Math.round(st.deep * 10) / 10} / 1.5 h` }] : []),
-          { id: 'quality', color: PASTEL.sand, label: tr('Sleep quality'), value: (day.sleep.quality ?? 0) / 5, text: day.sleep.quality ? `${day.sleep.quality} / 5` : '–' },
+          dq != null
+            ? { id: 'quality', color: PASTEL.sand, label: tr('Sleep quality'), value: dq / 5, text: `${dq} / 5` }
+            : { id: 'quality', color: PASTEL.sand, label: tr('Sleep quality'), value: (day.sleep.quality ?? 0) / 5, text: day.sleep.quality ? `${day.sleep.quality} / 5` : '–' },
         ]} />
         <CareNote part="rest" />
         {/* Details and typing fold away once there is data (decision 0037); open while something is missing. */}
@@ -126,7 +129,7 @@ export default function Body() {
               <Text style={{ color: colors.accent, fontWeight: '600' }}>{tr('Begin')} ›</Text>
             </Pressable>
           ) : null}
-          <Expandable key={date + 'sleepd'} icon="list-outline" title={tr('Details')} status={tr('Sleep stages, hours and quality')} defaultOpen={day.sleep.hours == null || !day.sleep.quality}>
+          <Expandable key={date + 'sleepd'} icon="list-outline" title={tr('Details')} status={tr('Sleep stages, hours and quality')} defaultOpen={day.sleep.hours == null || (dq == null && !day.sleep.quality)}>
         <Rows>
           <StatRow first label={tr('Hours slept')} value={day.sleep.hours} unit="h" decimal key={date + 'sleep'}
             onEdit={v => update(d => { d.sleep.hours = v; d.sleep.source = v == null ? undefined : 'Typed in'; })} />
@@ -134,8 +137,9 @@ export default function Body() {
           {st ? <StatRow label={tr('Core sleep')} value={st.core} unit="h" /> : null}
           {st ? <StatRow label={tr('REM sleep')} value={st.rem} unit="h" /> : null}
           {st ? <StatRow label={tr('Awake')} value={st.awake} unit="h" /> : null}
-          <StatRow label={tr('Sleep quality')} value={undefined}
-            right={<Dots value={day.sleep.quality} onChange={q => update(d => { d.sleep.quality = q; })} />} />
+          {/* Asked only when no ring or watch recorded the night (founder, 15 Nov 2026). */}
+          {dq == null ? <StatRow label={tr('Sleep quality')} value={undefined}
+            right={<Dots value={day.sleep.quality} onChange={q => update(d => { d.sleep.quality = q; })} />} /> : null}
           {day.sleep.source && day.sleep.source !== 'Typed in' ? <Note>{tr('From {source}. One device per night, never added together.', { source: day.sleep.source })}</Note> : null}
         </Rows>
         </Expandable>

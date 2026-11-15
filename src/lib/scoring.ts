@@ -71,6 +71,18 @@ export const FAST_CURVE_FROM = '2026-11-05'; // the founder's Wednesday–Friday
 export const FAST_KCAL = 60; // black tea and coffee through a day stay under this
 
 /** Body: food 40, sleep 30, movement 30 (founder, 24 Oct 2026). Returns null when nothing is logged. */
+/** Sleep quality from the tracker (founder, 15 Nov 2026): when a ring or watch records the stages, quality comes from
+ *  them and is not asked. 1–5 from restorative sleep (deep + REM, aim 40 % of sleep) and how little of the night was
+ *  spent awake (aim 95 % asleep). */
+export const DEVICE_QUALITY_FROM = '2026-11-15';
+export function deviceQuality(st: { deep?: number; rem?: number; awake?: number } | undefined, hours?: number): number | null {
+  if (!st || st.deep == null || st.rem == null || !hours) return null;
+  const restorative = Math.min(1, (st.deep + st.rem) / hours / 0.4);
+  const asleep = hours / (hours + (st.awake ?? 0));
+  const settled = Math.max(0, Math.min(1, (asleep - 0.75) / 0.2));
+  return Math.round(Math.max(1, 5 * (0.6 * restorative + 0.4 * settled)) * 10) / 10;
+}
+
 export function bodyScore(d: DayLog, P: Profile, now: Date = new Date()): BodyScore | null {
   const a = d.activity, s = d.sleep;
   const hasAct = a.steps != null || a.activeMin != null;
@@ -90,7 +102,8 @@ export function bodyScore(d: DayLog, P: Profile, now: Date = new Date()): BodySc
   if (hasSleep) {
     const h = s.hours as number;
     const hoursPts = h >= 7 && h <= 9 ? 20 : h < 7 ? 20 * c01((h - 3) / 4) : 20 * c01(1 - (h - 9) / 3);
-    const qualityPts = s.quality ? (10 * s.quality) / 5 : hoursPts / 2;
+    const dq = (d.date ?? '') >= DEVICE_QUALITY_FROM ? deviceQuality(d.health?.sleepStages, h) : null;
+    const qualityPts = dq != null ? (10 * dq) / 5 : s.quality ? (10 * s.quality) / 5 : hoursPts / 2;
     sleep = hoursPts + qualityPts;
   }
 

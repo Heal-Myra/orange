@@ -62,3 +62,6 @@ If the person switches on "I'm fasting today" on the Food card and the day's foo
 ## Spaces (separate, not in My day; decision 0057)
 Each space: five fixed checks × 20 points = 100, marked by Myra from the photo (0 / 10 / 20). Spaces score = average of the
 spaces snapped. Not part of Body, Mind, Soul or My day until the wholesome scoring system is designed.
+
+## Sleep quality from a tracker (15 Nov 2026)
+When a ring or watch records the sleep stages, quality is not asked. Quality (1–5) = 5 × (0.6 × restorative + 0.4 × settled), at least 1: restorative = (deep + REM) ÷ hours slept ÷ 0.4 (capped at 1); settled = (share of the night asleep − 0.75) ÷ 0.2, from 0 to 1. The Sleep score's quality part (10) uses it. Without stages, the 1–5 tap stays.

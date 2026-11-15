@@ -1,5 +1,8 @@
 # Changelog
 
+## 15 Nov 2026 — Sleep quality comes from the ring
+- Founder: when the Oura ring (or a watch) records the night, the 1–5 sleep-quality tap is gone; quality is worked out from deep and REM sleep and how little of the night was awake (last night: 4.5 / 5). People without a sleep tracker still tap 1–5.
+
 ## 15 Nov 2026 — Any to-do can repeat
 - Founder: "Tao book 1 chapter" should come back daily. Tap a to-do, choose ↻ Repeat, then Daily, Weekdays, Weekly or Monthly: it becomes a to-do that comes back in the same group (weekly on that weekday, monthly on that date).
 
