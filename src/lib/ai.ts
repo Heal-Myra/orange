@@ -147,3 +147,6 @@ export const readSpace = (images: { data: string; media_type: string }[], space:
 
 /** Sunday voice reflection (founder, 15 Nov 2026 idea 5): the person's spoken week, into three short journal lines. */
 export const weekReflect = (text: string) => call<{ proud: string; hard: string; next: string }>('week_reflect', { text });
+
+/** How deeply a teaching was lived (16 Nov 2026): Myra's subjective reading, level 0-3 and one warm line. */
+export const rateLived = (teaching: string, text: string) => call<{ level: number; line: string }>('rate_lived', { teaching, text });

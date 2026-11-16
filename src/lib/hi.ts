@@ -2055,4 +2055,9 @@ export const HI: Record<string, string> = {
   "Lighter dinner, a little ginger or pepper.": "हल्का डिनर, थोड़ा अदरक या काली मिर्च।",
   "Added {n} to your day. Change or remove in See details.": "{n} आपके दिन में जोड़ दिया। बदलना या हटाना हो तो “विवरण देखें” में।",
   "Added. Change or remove any app in Show details.": "जोड़ दिया। किसी ऐप को बदलना या हटाना हो तो “विवरण दिखाएँ” में।",
+  "Listening… say how you lived it today": "सुन रही हूँ… बताइए आज इसे कैसे जिया",
+  "Myra is reading it…": "मायरा पढ़ रही है…",
+  "Not lived yet": "अभी जिया नहीं",
+  "An intention": "एक इरादा",
+  "Lived deeply": "गहराई से जिया",
 };

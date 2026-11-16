@@ -1,5 +1,9 @@
 # Changelog
 
+## 16 Nov 2026 — Soul: living the wisdom counts most
+- Founder: the Gratitude journal raised Soul too easily. From today Soul = Gratitude journal 20 + Daily Wisdom (Bhagavad Gita) 40 + Tao 40; for Gita and Tao, 10 for learning and 30 for living it. Earlier days keep their scores.
+- Founder: living it is judged, not counted. Speak (🎙 beside the box) or write how you lived it; Myra reads how deeply it was lived: an intention 10, a real act 20, a real act that took effort or changed something 30. Her one line shows under the box.
+
 ## 16 Nov 2026 — Meal and Screen Time readings are added straight away
 - Founder: no "Add to my day" or "Discard". A meal photo (or typed or spoken meal) and a Screen Time screenshot are added the moment Myra has read them. To change or remove: Body › Food › See details, or Mind › Phone activity › Show details. The careful IFCT check still runs in the background and quietly corrects a photo's numbers.
 

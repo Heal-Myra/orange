@@ -6,10 +6,11 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { useHeal } from '../lib/store';
-import { LEARN_SHARE, lived, taoStudied } from '../lib/scoring';
+import { LEARN_SHARE, livedShare, soulWeights, taoStudied } from '../lib/scoring';
+import { LivedBox } from './LivedBox';
 import { EntryHead, PASTEL, RingTop, pts } from './Rings';
 import { MyraLine } from './MyraLine';
-import { TAO_CORE, TAO_POINTS, TAO_WEEK, WEEK_REVIEW, mondayOf, taoForDate } from '../lib/tao';
+import { TAO_CORE, TAO_WEEK, WEEK_REVIEW, mondayOf, taoForDate } from '../lib/tao';
 import { colors } from '../theme';
 import { Card, Check, Expandable, Heading, Label, Note, Score, TextField } from './ui';
 import { tr } from '../lib/i18n';
@@ -36,7 +37,8 @@ export function TaoCard({ on }: { on: 'mind' | 'soul' }) {
   }
 
   const monday = mondayOf(date);
-  const taoStudy = taoStudied(day.tao) ? LEARN_SHARE * TAO_POINTS : 0, taoLived = lived(day.tao?.lived) ? (1 - LEARN_SHARE) * TAO_POINTS : 0;
+  const TAO_POINTS = soulWeights(date).tao; // 40 from 16 Nov 2026 (was 20)
+  const taoStudy = taoStudied(day.tao) ? LEARN_SHARE * TAO_POINTS : 0, taoLived = livedShare(day.tao?.lived, day.tao?.livedRate, date) * (1 - LEARN_SHARE) * TAO_POINTS;
   const mondayNote = monday !== date ? days[monday]?.tao?.note : undefined;
 
   // Compact (founder, 21 Oct 2026): about the size of "Clear your mind". One-sentence practice, the note and the tick;
@@ -47,7 +49,7 @@ export function TaoCard({ on }: { on: 'mind' | 'soul' }) {
       <Heading right={<Score value={taoStudy + taoLived} max={TAO_POINTS} />}>{tr(t.title)}</Heading>
       <RingTop trend="tao" score={taoStudy + taoLived} max={TAO_POINTS} items={[
         { id: 'study', color: PASTEL.sand, label: tr('What it means to me'), value: taoStudy ? 1 : 0 },
-        { id: 'lived', color: PASTEL.sage, label: tr('Lived'), value: taoLived ? 1 : 0 },
+        { id: 'lived', color: PASTEL.sage, label: tr('Lived'), value: taoLived / ((1 - LEARN_SHARE) * TAO_POINTS) },
       ]} />
       <Text style={{ color: colors.ink, lineHeight: 22 }}>{tr(t.short)}</Text>
       {t.weekday === 3 && mondayNote ? <Note>{tr('Your Monday note: {note}', { note: mondayNote })}</Note> : null}
@@ -58,8 +60,9 @@ export function TaoCard({ on }: { on: 'mind' | 'soul' }) {
         onChangeText={v => update(d => { d.tao = { ...d.tao, note: v }; })} placeholder={tr(t.notePrompt)} />
       {/* Living it earns the other 75 % (founder, 26 Oct 2026). */}
       <EntryHead color={PASTEL.sage} title={tr('How I lived it today')} points={pts(taoLived, (1 - LEARN_SHARE) * TAO_POINTS)} />
-      <TextField key={date + 'taolived'} label="" value={day.tao?.lived ?? ''} multiline
-        onChangeText={v => update(d => { d.tao = { ...d.tao, lived: v }; })} placeholder={tr('e.g. I let go of being right in a family discussion.')} />
+      <LivedBox key={date + 'taolived'} value={day.tao?.lived ?? ''} rate={day.tao?.livedRate} teaching={`${t.title}: ${t.short}`}
+        onText={v => update(d => { d.tao = { ...d.tao, lived: v }; })} onRate={r => update(d => { d.tao = { ...d.tao, livedRate: r }; })}
+        placeholder={tr('e.g. I let go of being right in a family discussion.')} />
 
       <Pressable onPress={() => setMore(m => !m)} hitSlop={6}>
         <Text style={{ color: colors.accent, fontWeight: '600' }}>{more ? tr('Show less') : tr('Read the full practice')}</Text>

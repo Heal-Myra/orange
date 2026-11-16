@@ -4,7 +4,7 @@
 // I was kind to 30 %, made me laugh 30 % (src/lib/scoring.ts journalParts).
 import { Pressable, TextInput, Text, View } from 'react-native';
 import { tr } from '../lib/i18n';
-import { filledText, journalParts, soulScore } from '../lib/scoring';
+import { filledText, journalParts, soulScore, soulWeights } from '../lib/scoring';
 import { applyJournal, pending } from '../lib/neosapien';
 import { NS_GREEN } from './FromYourDay';
 import { EntryHead, PASTEL, RingTop, pts } from './Rings';
@@ -76,8 +76,8 @@ export function GratitudeJournal() {
   const soft = { borderWidth: 1, borderColor: colors.line, backgroundColor: '#F8FAFB', borderRadius: 12, paddingHorizontal: 10 } as const;
   return (
     <Card style={{ gap: 10 }}>
-      <Heading right={<Score value={(score?.gratitude ?? 0) + (score?.love ?? 0)} max={60} />}>{tr('Gratitude journal')}</Heading>
-      <RingTop trend="gratitude" score={(score?.gratitude ?? 0) + (score?.love ?? 0)} max={60} items={[
+      <Heading right={<Score value={(score?.gratitude ?? 0) + (score?.love ?? 0)} max={soulWeights(date).journal} />}>{tr('Gratitude journal')}</Heading>
+      <RingTop trend="gratitude" score={(score?.gratitude ?? 0) + (score?.love ?? 0)} max={soulWeights(date).journal} items={[
         { id: 'thanks', color: RING.thanks, label: tr('I\'m thankful for'), value: nThanks / 3 },
         { id: 'laugh', color: RING.laugh, label: tr('Made me laugh'), value: laughOk ? 1 : 0 },
         { id: 'kind', color: RING.kind, label: tr('I was kind to'), value: kindOk ? 1 : 0 },
@@ -89,7 +89,7 @@ export function GratitudeJournal() {
       </View>
       {attach.status}
 
-      <EntryHead color={RING.thanks} title={tr('I\'m thankful for')} points={pts(jp.of.thanks, 60)} />
+      <EntryHead color={RING.thanks} title={tr('I\'m thankful for')} points={pts(jp.of.thanks, soulWeights(date).journal)} />
       <View style={soft}>
         {[0, 1, 2].map(i => (
           <View key={date + 't' + i} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, borderBottomWidth: i < 2 ? 1 : 0, borderBottomColor: colors.line, borderStyle: 'dashed' }}>
@@ -103,17 +103,17 @@ export function GratitudeJournal() {
 
       {hint('thankful', nThanks < 3)}
 
-      <EntryHead color={RING.laugh} title={tr('Made me laugh')} points={pts(jp.of.laugh, 60)} />
+      <EntryHead color={RING.laugh} title={tr('Made me laugh')} points={pts(jp.of.laugh, soulWeights(date).journal)} />
       <View style={soft}>{box(so.laugh ?? '', t => update(d => { d.soul = { ...d.soul, laugh: t }; }), tr('Write here'), 'laugh', 2)}</View>
 
       {hint('laugh', !laughOk)}
 
-      <EntryHead color={RING.kind} title={tr('I was kind to')} points={pts(jp.of.kind, 60)} />
+      <EntryHead color={RING.kind} title={tr('I was kind to')} points={pts(jp.of.kind, soulWeights(date).journal)} />
       <View style={soft}>{box(day.love?.kindTo ?? '', t => update(d => { d.love = { ...(d.love ?? {}), kindTo: t }; }), tr('Someone, and how'), 'kind', 2)}</View>
 
       {hint('kind', !kindOk)}
 
-      <EntryHead color={RING.best} title={tr('Best part of my day')} points={pts(jp.of.best, 60)} />
+      <EntryHead color={RING.best} title={tr('Best part of my day')} points={pts(jp.of.best, soulWeights(date).journal)} />
       <View style={soft}>{box(so.best ?? '', t => update(d => { d.soul = { ...d.soul, best: t }; }), tr('Write here'), 'best', 2)}</View>
 
       {hint('best', !bestOk)}

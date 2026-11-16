@@ -69,3 +69,6 @@ When a ring or watch records the sleep stages, quality is not asked. Quality (1â
 ## Small extras (16 Nov 2026)
 - **Walk after dinner:** 10 minutes or more of walking (about 1,000 steps, from Apple Health) within 45 minutes of dinner adds **2** to Movement. Movement stays at most 30.
 - **Forgiveness practice:** once a week, the 5-minute guided letting-go adds **5** to Soul that day. Soul stays at most 100.
+
+## Soul from 16 Nov 2026 (founder)
+The Gratitude journal filled Soul too easily. From 16 Nov 2026 Soul = **Gratitude journal 20** (thankful for three things 4, made me laugh 6, I was kind to 6, best part of my day 4) + **Daily Wisdom 40** (Bhagavad Gita or the chosen tradition) + **Tao 40**. For Daily Wisdom and Tao, learning (reading it, a line on what it means) earns **10** and living it earns up to **30**: Myra (the Soul master) reads the person's own words, written or spoken, and judges how deeply it was lived â€” a thought or intention 10, a real act 20, a real act that took effort or changed something 30, off topic 0. While her reading is on its way (or offline) a line of three words or more earns 15. Letting go adds 5 once a week; Soul stays at most 100. Earlier days keep their old weights.

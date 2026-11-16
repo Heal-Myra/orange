@@ -110,3 +110,20 @@ describe('walk after dinner', () => {
     expect(soulScore({ ...emptyDay('2026-11-16'), soul: { forgave: true } })!.total).toBe(5);
   });
 });
+
+describe('Soul from 16 Nov 2026', () => {
+  it('journal 20, Gita 40, Tao 40 (10 learn, 30 live)', () => {
+    const full = { ...emptyDay('2026-11-16'), soul: { gratitude: ['a', 'b', 'c'], laugh: 'yes', best: 'walk', verseStudied: true, verseLived: 'was patient at work', verseLivedRate: { of: 'was patient at work', level: 3, line: '' } }, love: { kindTo: 'my mother' }, tao: { done: true, lived: 'let go of control', livedRate: { of: 'let go of control', level: 3, line: '' } } } as DayLog;
+    const s = soulScore(full)!;
+    expect(s.gratitude + s.love).toBe(20);
+    expect(s.verse).toBe(40);
+    expect(s.tao).toBe(40);
+    expect(s.total).toBe(100);
+    expect(soulScore({ ...emptyDay('2026-11-16'), tao: { done: true } } as DayLog)!.tao).toBe(10);
+    expect(soulScore({ ...full, date: '2026-11-15' })!.verse).toBe(20);
+    // Myra's reading sets the living points: an intention a third, waiting for her half, a changed line read again.
+    expect(soulScore({ ...full, soul: { ...full.soul, verseLivedRate: { of: 'was patient at work', level: 1, line: '' } } })!.verse).toBe(20);
+    expect(soulScore({ ...full, soul: { ...full.soul, verseLivedRate: undefined } })!.verse).toBe(25);
+    expect(soulScore({ ...full, soul: { ...full.soul, verseLived: 'was patient at home today' } })!.verse).toBe(25);
+  });
+});

@@ -23,9 +23,9 @@ export function dayParts(w: WellBeing): Part[] {
     { id: 'tasks', label: 'To-dos', got: m?.practices ?? 0, of: POINTS.focus, color: PASTEL.teal, tab: 'mind', card: 'tasks' },
     { id: 'meditation', label: 'Breathing', got: m?.meditation ?? 0, of: POINTS.meditation, color: PASTEL.sky, tab: 'mind', card: 'meditation' },
     { id: 'phone', label: 'Phone', got: m?.content ?? 0, of: POINTS.phone, color: PASTEL.sand, tab: 'mind', card: 'phone' },
-    { id: 'gratitude', label: 'Gratitude', got: (s?.gratitude ?? 0) + (s?.love ?? 0), of: POINTS.gratitude + POINTS.love, color: PASTEL.rose, tab: 'soul', card: 'gratitude' },
-    { id: 'wisdom', label: 'Daily Wisdom', got: s?.verse ?? 0, of: POINTS.wisdom, color: PASTEL.sand, tab: 'soul', card: 'wisdom' },
-    { id: 'tao', label: 'Tao', got: s?.tao ?? 0, of: POINTS.tao, color: PASTEL.sage, tab: 'soul', card: 'tao' },
+    { id: 'gratitude', label: 'Gratitude', got: (s?.gratitude ?? 0) + (s?.love ?? 0), of: s?.of?.journal ?? POINTS.gratitude + POINTS.love, color: PASTEL.rose, tab: 'soul', card: 'gratitude' },
+    { id: 'wisdom', label: 'Daily Wisdom', got: s?.verse ?? 0, of: s?.of?.wisdom ?? POINTS.wisdom, color: PASTEL.sand, tab: 'soul', card: 'wisdom' },
+    { id: 'tao', label: 'Tao', got: s?.tao ?? 0, of: s?.of?.tao ?? POINTS.tao, color: PASTEL.sage, tab: 'soul', card: 'tao' },
   ];
 }
 

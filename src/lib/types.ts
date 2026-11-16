@@ -4,6 +4,11 @@ import type { AboutMe } from './targets';
 
 export type MealSource = 'manual' | 'ifct' | 'photo' | 'photo+ifct' | 'photo+mine' | 'words' | 'words+ifct';
 
+/** Myra's own reading of how deeply a teaching was lived (founder, 16 Nov 2026: a subjective assessment, not a word
+ *  count). level 0 not lived yet, 1 a thought or intention, 2 a real act, 3 a real act that took effort or changed
+ *  something. `of` is the text it read, so a changed line is read again. */
+export interface LivedRate { of: string; level: 0 | 1 | 2 | 3; line: string }
+
 export interface Meal {
   name: string;
   grams?: number;
@@ -87,7 +92,7 @@ export interface DayLog {
   mind: { meditationMin?: number; attention?: boolean; learning?: boolean; focusDone?: number; sections?: Record<'family' | 'work' | 'self', [number, number]>; learned?: { text?: string; link?: string; by?: 'myra' }; dhamma?: import('./dhamma').DhammaDay; medSessions?: import('./medSessions').MedSession[] }; // focusDone: Myra's focus tasks ticked off today (attention/learning: older days only)
   dharma: Partial<Record<PracticeId, boolean>>;
   actions: ReflectedAction[];
-  tao?: { done?: boolean; note?: string; lived?: string }; // lived: how I used it today (26 Oct 2026)
+  tao?: { done?: boolean; note?: string; lived?: string; livedRate?: LivedRate }; // lived: how I used it today (26 Oct 2026)
   // Read from Apple Health (20 Oct 2026). Body measures are the latest reading; the rest are for this day.
   health?: {
     waistCm?: number; hipsCm?: number; // Measure day, 1st of the month (13 Nov 2026)
@@ -102,6 +107,7 @@ export interface DayLog {
     verseStudied?: boolean; // studied the Gita verse of the day
     verseNote?: string;     // what the verse means to me
     verseLived?: string;    // how I lived today's wisdom (founder, 26 Oct 2026: living it earns 75%)
+    verseLivedRate?: LivedRate; // Myra's reading of how deeply it was lived (16 Nov 2026)
     laugh?: string;         // Gratitude journal: something made me laugh today (27 Oct 2026)
     best?: string;          // Gratitude journal: the best part of my day
     gratitude?: string[];   // up to four things I am grateful for (10 points each)

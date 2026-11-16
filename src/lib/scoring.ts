@@ -157,15 +157,29 @@ export const filledText = (t?: string) => !!t && t.trim().length >= 2;
  *  of my day 20 %, I was kind to 30 %, made me laugh 30 %. Kept as Gratitude (thanks + laugh) and Love (kind + best). */
 export const JOURNAL_V2_FROM = '2026-11-05';
 export const JOURNAL_PARTS = { thanks: 12, best: 12, kind: 18, laugh: 18 } as const;
+/** Soul from 16 Nov 2026 (founder: the journal filled the score too easily): Gratitude journal 20, Daily Wisdom
+ *  (Bhagavad Gita or the chosen tradition) 40 and Tao 40, each 10 for learning and 30 for living it. */
+export const SOUL_V3_FROM = '2026-11-16';
+export const JOURNAL_PARTS_V3 = { thanks: 4, best: 4, kind: 6, laugh: 6 } as const;
+export const soulWeights = (date?: string) => ((date ?? '') >= SOUL_V3_FROM ? { journal: 20, wisdom: 40, tao: 40 } : { journal: 60, wisdom: POINTS.wisdom, tao: POINTS.tao });
 /** Points of each journal part for the day (days 27 Oct – 4 Nov keep the first journal's weights). */
 export function journalParts(d: DayLog) {
   const so = d.soul ?? {};
   const n = Math.min(3, countGratitude(so.gratitude)), laugh = filledText(so.laugh), best = filledText(so.best), kind = filledText(d.love?.kindTo);
   if ((d.date ?? '') >= JOURNAL_V2_FROM) {
-    const W = JOURNAL_PARTS;
+    const W = (d.date ?? '') >= SOUL_V3_FROM ? JOURNAL_PARTS_V3 : JOURNAL_PARTS;
     return { thanks: (W.thanks * n) / 3, laugh: laugh ? W.laugh : 0, kind: kind ? W.kind : 0, best: best ? W.best : 0, of: W };
   }
   return { thanks: n * 5, laugh: laugh ? 7.5 : 0, kind: kind ? 30 : 0, best: best ? 7.5 : 0, of: { thanks: 15, laugh: 7.5, kind: 30, best: 7.5 } };
+}
+/** How much of the "living it" points a line earns. Before 16 Nov 2026: any line of three words or more. From then
+ *  (founder: "a subjective assessment of the achievement"), Myra reads it: level 1 a third, 2 two thirds, 3 all;
+ *  while her reading is on its way (or offline), half. */
+export function livedShare(text: string | undefined, rate: import('./types').LivedRate | undefined, date?: string): number {
+  if (!lived(text)) return 0;
+  if ((date ?? '') < SOUL_V3_FROM) return 1;
+  if (rate && rate.of === (text ?? '').trim()) return rate.level / 3;
+  return 0.5;
 }
 /** A line on how the learning was lived: at least three words. */
 export const lived = (text?: string) => (text ?? '').trim().split(/\s+/).filter(Boolean).length >= 3;
@@ -232,6 +246,7 @@ export interface SoulScore {
   verse: number;     // /30 Daily Wisdom studied
   tao: number;       // /20 the day's Tao practice done
   love: number;      // /30: whom I love today 12, how I love myself 12, one of them done 6
+  of?: { journal: number; wisdom: number; tao: number }; // the day's maximums (Soul v3 from 16 Nov 2026)
 }
 
 /** Love points (founder, 24 Oct 2026). */
@@ -256,12 +271,13 @@ export function soulScore(d: DayLog, _P: Profile = DEFAULT_PROFILE): SoulScore |
   const jp = journalParts(d), v2 = (d.date ?? '') >= JOURNAL_V2_FROM;
   const gratitude = journal ? jp.thanks + jp.laugh + (v2 ? 0 : jp.best) : Math.min(4, countGratitude(so.gratitude)) * GRATITUDE_EACH;
   // Learning earns 25 %, living it during the day earns 75 % (founder, 26 Oct 2026).
-  const verse = (wisdomStudied(so) ? LEARN_SHARE * POINTS.wisdom : 0) + (lived(so.verseLived) ? (1 - LEARN_SHARE) * POINTS.wisdom : 0);
-  const tao = (taoStudied(d.tao) ? LEARN_SHARE * POINTS.tao : 0) + (lived(d.tao?.lived) ? (1 - LEARN_SHARE) * POINTS.tao : 0);
+  const sw = soulWeights(d.date);
+  const verse = (wisdomStudied(so) ? LEARN_SHARE * sw.wisdom : 0) + livedShare(so.verseLived, so.verseLivedRate, d.date) * (1 - LEARN_SHARE) * sw.wisdom;
+  const tao = (taoStudied(d.tao) ? LEARN_SHARE * sw.tao : 0) + livedShare(d.tao?.lived, d.tao?.livedRate, d.date) * (1 - LEARN_SHARE) * sw.tao;
   const love = journal ? jp.kind + (v2 ? jp.best : 0) : lovePoints(d);
   const forgave = (d.date ?? '') >= EXTRAS_FROM && so.forgave ? FORGIVE_PTS : 0;
   if (!gratitude && !verse && !tao && !love && !forgave) return null;
-  return { total: Math.min(100, gratitude + verse + tao + love + forgave), gratitude, verse, tao, love };
+  return { total: Math.min(100, gratitude + verse + tao + love + forgave), gratitude, verse, tao, love, of: sw };
 }
 
 export interface WellBeing { body: BodyScore | null; mind: MindScore | null; soul: SoulScore | null; total: number; logged: number }

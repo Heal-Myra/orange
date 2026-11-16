@@ -3,7 +3,7 @@
 // same scoring as the cards (src/lib/scoring.ts), so the "+N" is worked out, never guessed.
 
 import { FAST_FROM, fastHabit, fastHoursOf , saidFast } from './fasting';
-import { FOCUS_EACH, JOURNAL_FROM, journalParts, LEARN_SHARE, POINTS, SECTIONS_FROM, SECTION_AREAS, lived, taoStudied, wisdomStudied, type WellBeing } from './scoring';
+import { FOCUS_EACH, JOURNAL_FROM, journalParts, LEARN_SHARE, POINTS, soulWeights, SECTIONS_FROM, SECTION_AREAS, lived, taoStudied, wisdomStudied, type WellBeing } from './scoring';
 import type { DayLog, Profile } from './types';
 
 export type StepId = 'sleep' | 'meditation' | 'nidra' | 'movement' | 'food' | 'tasks' | 'gratitude' | 'kind' | 'wisdom' | 'wisdomLive' | 'tao' | 'taoLive';
@@ -69,10 +69,10 @@ export function candidates(d: DayLog, P: Profile, w: WellBeing, hour: number): S
   // Wisdom and Tao (founder, 4 Nov 2026): reading is a quarter of the points, living it is the rest. Myra suggests
   // reading first; once read, she suggests living it (writing one line on how), which is the bigger win. Living it is a
   // way of life, not a task to tick off in the morning, so that suggestion waits until 3 pm (founder, 4 Nov 2026).
-  if (!wisdomStudied(d.soul)) add({ id: 'wisdom', pillar: 'soul', card: 'wisdom', gain: LEARN_SHARE * POINTS.wisdom });
-  else if (hour >= 15 && !lived(d.soul?.verseLived)) add({ id: 'wisdomLive', pillar: 'soul', card: 'wisdom', gain: (1 - LEARN_SHARE) * POINTS.wisdom });
-  if (!taoStudied(d.tao)) add({ id: 'tao', pillar: 'soul', card: 'tao', gain: LEARN_SHARE * POINTS.tao });
-  else if (hour >= 15 && !lived(d.tao?.lived)) add({ id: 'taoLive', pillar: 'soul', card: 'tao', gain: (1 - LEARN_SHARE) * POINTS.tao });
+  if (!wisdomStudied(d.soul)) add({ id: 'wisdom', pillar: 'soul', card: 'wisdom', gain: LEARN_SHARE * soulWeights(d.date).wisdom });
+  else if (hour >= 15 && !lived(d.soul?.verseLived)) add({ id: 'wisdomLive', pillar: 'soul', card: 'wisdom', gain: (1 - LEARN_SHARE) * soulWeights(d.date).wisdom });
+  if (!taoStudied(d.tao)) add({ id: 'tao', pillar: 'soul', card: 'tao', gain: LEARN_SHARE * soulWeights(d.date).tao });
+  else if (hour >= 15 && !lived(d.tao?.lived)) add({ id: 'taoLive', pillar: 'soul', card: 'tao', gain: (1 - LEARN_SHARE) * soulWeights(d.date).tao });
   return out;
 }
 

@@ -5,7 +5,8 @@ import { Pressable, Text, TextInput, View } from 'react-native';
 import { useAuth } from '../lib/auth';
 import { verseOfDay } from '../lib/gita';
 import { passageOfDay, sourceOf, traditionName } from '../lib/wisdom';
-import { LEARN_SHARE, POINTS, PRACTICES, lived, wisdomStudied } from '../lib/scoring';
+import { LEARN_SHARE, POINTS, PRACTICES, livedShare, soulWeights, wisdomStudied } from '../lib/scoring';
+import { LivedBox } from './LivedBox';
 import { EntryHead, PASTEL, RingTop, pts } from './Rings';
 import { MyraLine } from './MyraLine';
 import { useHeal } from '../lib/store';
@@ -24,13 +25,13 @@ export function VerseStudyCard() {
   const v = verseOfDay(date);
   const so = day.soul ?? {};
   // Rings on top (studied, lived), the writing below with each ring's dot; Myra's line at the bottom (decision 0037).
-  const W = POINTS.wisdom, studyPts = wisdomStudied(so) ? LEARN_SHARE * W : 0, livedPts = lived(so.verseLived) ? (1 - LEARN_SHARE) * W : 0;
+  const W = soulWeights(date).wisdom, studyPts = wisdomStudied(so) ? LEARN_SHARE * W : 0, livedPts = livedShare(so.verseLived, so.verseLivedRate, date) * (1 - LEARN_SHARE) * W;
   return (
     <Card>
       <Heading right={<Score value={studyPts + livedPts} max={W} />}>{tr('Daily Wisdom')}</Heading>
       <RingTop trend="wisdom" score={studyPts + livedPts} max={W} items={[
         { id: 'study', color: PASTEL.sand, label: tr('What it means to me'), value: studyPts ? 1 : 0 },
-        { id: 'lived', color: PASTEL.peach, label: tr('Lived'), value: livedPts ? 1 : 0 },
+        { id: 'lived', color: PASTEL.peach, label: tr('Lived'), value: livedPts / ((1 - LEARN_SHARE) * W) },
       ]} />
       {p ? (
         <>
@@ -59,8 +60,10 @@ export function VerseStudyCard() {
         onChangeText={t => update(d => { d.soul = { ...d.soul, verseNote: t }; })} placeholder={tr('One line is enough')} />
       {/* Living it earns the other 75 % (founder, 26 Oct 2026). Usually written later in the day. */}
       <EntryHead color={PASTEL.peach} title={tr('How I lived it today')} points={pts(livedPts, (1 - LEARN_SHARE) * W)} />
-      <TextField key={date + 'lived'} label="" value={so.verseLived ?? ''} multiline
-        onChangeText={t => update(d => { d.soul = { ...d.soul, verseLived: t }; })} placeholder={tr('e.g. I paused and took three breaths before replying in anger.')} />
+      {/* Speak or write it; Myra reads how deeply it was lived (founder, 16 Nov 2026). */}
+      <LivedBox key={date + 'lived'} value={so.verseLived ?? ''} rate={so.verseLivedRate} teaching={p?.english ?? p?.original ?? `${tr('Bhagavad Gita')} ${v.chapter}.${v.verse}: ${v.transliteration}`}
+        onText={t => update(d => { d.soul = { ...d.soul, verseLived: t }; })} onRate={r => update(d => { d.soul = { ...d.soul, verseLivedRate: r }; })}
+        placeholder={tr('e.g. I paused and took three breaths before replying in anger.')} />
       <MyraLine card="wisdom" />
     </Card>
   );
