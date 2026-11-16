@@ -14,6 +14,7 @@ export function FocusRow() {
   const all = [...(profile.me?.focus ?? [])].sort((a, b) => a.date.localeCompare(b.date));
   const last = all[all.length - 1], best = all.length ? Math.max(...all.map(r => r.score)) : null;
   const due = focusDue(all, todayISO());
+  if (!due) return null; // done this week: out of sight until next week (founder, 16 Nov 2026)
   return (
     <Pressable onPress={() => router.push('/focus')} accessibilityRole="button"
       style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: colors.surface, borderRadius: 22, paddingHorizontal: 16, paddingVertical: 14, opacity: pressed ? 0.85 : 1 })}>

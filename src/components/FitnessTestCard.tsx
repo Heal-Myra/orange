@@ -17,6 +17,8 @@ export function FitnessTestCard() {
   const due = date === today && testDue(all, today);
   const { now, was, bests } = lastTwo(all);
   const fresh = now && now.date.slice(0, 7) === today.slice(0, 7);
+  // Done this month: the results show on the day of the test only, then wait for the 1st (founder, 16 Nov 2026).
+  if (now && !due && now.date !== today) return null;
   const start = (
     <Pressable onPress={() => router.push('/fitness-test')} accessibilityRole="button"
       style={{ marginTop: 6, borderRadius: 12, paddingVertical: 11, alignItems: 'center', backgroundColor: colors.accent }}>

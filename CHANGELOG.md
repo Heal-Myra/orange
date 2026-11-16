@@ -1,5 +1,8 @@
 # Changelog
 
+## 16 Nov 2026 — Weekly items stay out of sight once done
+- Founder: once done, Letting go, the Sunday voice reflection and the Focus check disappear until the next week; the monthly fitness test shows its results on the day it was taken, then waits for the 1st. The reflection stays saved with the day.
+
 ## 16 Nov 2026 — Letting go and Calm-down: Myra's own voice, steps you can see moving
 - Founder: the steps did not seem to move and the voice was not Myra's. Myra's natural voice is now made ready before Begin ("Getting Myra's voice ready…"), spoken slowly with longer pauses; each step shows a quiet bar and the seconds left and moves on by itself; in Letting go Myra speaks again halfway through each minute.
 
