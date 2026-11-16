@@ -2060,4 +2060,13 @@ export const HI: Record<string, string> = {
   "Not lived yet": "अभी जिया नहीं",
   "An intention": "एक इरादा",
   "Lived deeply": "गहराई से जिया",
+  "Getting Myra's voice ready…": "मायरा की आवाज़ तैयार हो रही है…",
+  "Breathe in. And slowly out.": "साँस अंदर लें। और धीरे से बाहर।",
+  "Where do you feel it in the body? Breathe there.": "शरीर में यह कहाँ महसूस होता है? वहीं साँस लें।",
+  "See it from their side. What were they carrying?": "इसे उनकी तरफ़ से देखें। वे क्या ढो रहे थे?",
+  "Now see your own side, kindly.": "अब अपनी तरफ़ को प्यार से देखें।",
+  "Say quietly: I let this go, for my peace.": "धीरे से कहें: मैं इसे छोड़ता हूँ, अपनी शांति के लिए।",
+  "Once more. I let this go, for my peace.": "एक बार और। मैं इसे छोड़ता हूँ, अपनी शांति के लिए।",
+  "Wish them well.": "उनका भला चाहें।",
+  "Now wish yourself well. When you are ready, open your eyes.": "अब अपना भला चाहें। जब तैयार हों, आँखें खोलें।",
 };
