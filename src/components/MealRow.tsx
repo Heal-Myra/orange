@@ -41,7 +41,7 @@ export function MealRow({ m, i }: { m: Meal; i: number }) {
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 52 }}>
         {/* Two lines (founder, 21 Oct 2026): the dish, then its calories, protein, fat and fibre. Tap to correct it. */}
         <Pressable style={{ flex: 1, paddingVertical: 8, gap: 2 }} onPress={() => setOpen(o => !o)} accessibilityRole="button" accessibilityHint={tr('Correct this dish')}>
-          <Text numberOfLines={1} style={{ fontSize: 16, color: colors.ink }}>{m.name}{m.grams ? <Text style={{ color: colors.muted, fontSize: 14 }}> · {m.grams} g</Text> : null}</Text>
+          <Text numberOfLines={1} style={{ fontSize: 16, color: colors.ink }}>{m.name}{m.grams ? <Text style={{ color: colors.muted, fontSize: 14 }}> · {m.grams} g</Text> : null}{m.neo ? <Text style={{ color: '#3C8C5A', fontSize: 12, fontWeight: '700' }}>  ● NeoSapien</Text> : null}</Text>
           <Text style={{ fontSize: 13, color: colors.muted, fontVariant: ['tabular-nums'] }}>
             {Math.round(m.kcal)} kcal · {tr('Protein')} {Math.round(m.p)} g · {tr('Fat')} {Math.round(m.f)} g{m.fib ? ` · ${tr('Fibre')} ${Math.round(m.fib)} g` : ''}
           </Text>

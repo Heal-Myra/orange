@@ -1,5 +1,8 @@
 # Changelog
 
+## 18 Nov 2026 — NeoSapien fills the day (decision 0060)
+- Founder: no manual entry except phone usage and the face photo. What you say to Neo 1 is added straight away, tagged ● NeoSapien: journal lines, to-dos, meals ("Happy Orange, lunch was dal rice and salad"), a fast, how you lived the Gita and Tao (Myra judges how deeply), waist and hips, and fitness test numbers. The From your day card shows what was added; change or remove anything in details. Transcripts are read only around food and number words and never kept.
+
 ## 18 Nov 2026 — Next goals are round numbers
 - Founder: "Next" goals are now easy-to-remember round numbers: a best week of 90,553 steps → next **1 lakh**; 15,230 → 20,000; a 12-day streak → 15. Running times go to the half-minute just below the best (27:23 → 27:00, then 26:30).
 

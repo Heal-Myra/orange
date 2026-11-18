@@ -21,3 +21,13 @@ describe('NeoSapien suggestions (decision 0050)', () => {
     expect(d.love?.kindTo).toBe('Mithul');
   });
 });
+
+import { extras } from './neosapien';
+describe('NeoSapien fills the day (decision 0060)', () => {
+  it('lists meals, fast, lived lines and numbers not yet added', () => {
+    const f = { date: '2026-11-18', fetchedAt: '', meals: [{ when: 'lunch' as const, text: 'dal rice', at: '13:10' }], fasting: true as const,
+      lived: { gita: 'Stayed calm in the review', tao: null }, measure: { waist: 88, hips: null }, fitness: null, decided: { fasting: 'yes' as const } };
+    expect(extras(f).map(x => x.key)).toEqual(['meal.0', 'lived.gita', 'measure']);
+    expect(extras(undefined)).toEqual([]);
+  });
+});

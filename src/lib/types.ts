@@ -24,6 +24,7 @@ export interface Meal {
   checked?: 'ifct' | 'usual'; // how the numbers were confirmed: the careful IFCT check, or the person's own usual dish
   checkedAt?: string;
   edited?: boolean; // the person changed a number: theirs always stays
+  neo?: boolean; // said aloud to NeoSapien and added by Myra (decision 0060)
 }
 
 export type ContentCategoryId =

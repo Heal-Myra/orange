@@ -2070,4 +2070,13 @@ export const HI: Record<string, string> = {
   "Wish them well.": "उनका भला चाहें।",
   "Now wish yourself well. When you are ready, open your eyes.": "अब अपना भला चाहें। जब तैयार हों, आँखें खोलें।",
   "lakh": "लाख",
+  "{n} meals": "{n} भोजन",
+  "{n} journal lines": "डायरी की {n} पंक्तियाँ",
+  "how you lived the wisdom": "ज्ञान को आपने कैसे जिया",
+  "your fast": "आपका उपवास",
+  "your measures": "आपके माप",
+  "your fitness test": "आपका फ़िटनेस टेस्ट",
+  "Added:": "जोड़ा गया:",
+  "Nothing to add yet. Say \"Happy Orange, lunch was…\" to Neo.": "अभी जोड़ने को कुछ नहीं। Neo से कहें: “Happy Orange, लंच में था…”",
+  "Change or remove any of it in details.": "कुछ भी बदलना या हटाना हो तो विवरण में करें।",
 };

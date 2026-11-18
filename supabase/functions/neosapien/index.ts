@@ -136,21 +136,28 @@ function toneOf(mems: Mem[]) {
   return { talkMin: Math.round(talk), workMin: Math.round(work), tense, tenseLate, calm, count: mems.length };
 }
 
-async function suggest(mems: Mem[], reminders: { task_name?: string; owner?: string }[], summary: unknown, name: string, hindi: boolean) {
+async function suggest(mems: Mem[], reminders: { task_name?: string; owner?: string }[], summary: unknown, name: string, hindi: boolean, heard: { at?: string; text: string }[] = [], teach: { gita?: string; tao?: string } = {}) {
   if (!ANTHROPIC_KEY) return null;
   const brief = mems.slice(0, 40).map(m => ({ at: m.started_at?.slice(11, 16), title: m.title, summary: (m.summary ?? '').slice(0, 400), emotions: m.emotions, people: m.mentioned_entities?.slice(0, 12) }));
-  const system = `You are Myra in the Happy Orange well-being app. From a person's own recorded conversations of one day, suggest short, warm lines for their evening gratitude journal and the to-dos that are theirs. Never invent: use only what the data shows; leave a field null when nothing fits. Keep each line at most 8 words. Never include money figures, deal terms, company secrets or anything embarrassing; name people only by first name. Write about the person in the first person ("Vikas, for sorting the vehicle").${hindi ? ' Write every line in simple Hindi (Devanagari); keep JSON keys in English.' : ''}`;
+  const system = `You are Myra in the Happy Orange well-being app. From a person's own recorded conversations of one day, fill in their day for them: short, warm lines for their evening gratitude journal, the to-dos that are theirs, what they ate, and the few numbers they said aloud. Never invent: use only what the data shows; leave a field null when nothing fits. Keep each line at most 8 words. Never include money figures, deal terms, company secrets or anything embarrassing; name people only by first name. Write about the person in the first person ("Vikas, for sorting the vehicle").${hindi ? ' Write every line in simple Hindi (Devanagari); keep JSON keys in English.' : ''}`;
   const text = `The person's name: ${name || 'unknown'} (in older data they may appear as "NeoSapien").
 Conversations today (newest first): ${JSON.stringify(brief)}
 NeoSapien's end-of-day summary (may be empty): ${JSON.stringify(summary ?? null).slice(0, 3000)}
 Open reminders from today's conversations (owner = who should do it): ${JSON.stringify(reminders.slice(0, 30).map(r => ({ task: r.task_name, owner: r.owner })))}
+Short parts of today's transcripts where food, drink, fasting, body measures or exercise counts came up (may be empty; the person often starts with "Happy Orange" when telling the app something): ${JSON.stringify(heard).slice(0, 9000)}
+Today's teachings: Bhagavad Gita: ${JSON.stringify(teach.gita ?? '')}; Tao practice: ${JSON.stringify(teach.tao ?? '')}
 Reply with JSON only:
 {"thankful":[{"text":"who, and for what"}],  // up to 3 people who helped, supported, were honest or kind to the person
  "laugh":{"text":"..."}|null,               // a light or funny moment, only if the data shows one
  "kind":{"text":"..."}|null,                // a moment the person was kind, patient or helpful to someone
  "best":{"text":"..."}|null,                // the best part of the day, positive only
  "todos":[{"title":"verb first, at most 8 words","area":"work"|"family"|"self"}], // up to 5, only tasks the person must do themselves (owner is them, "NeoSapien", or unassigned and clearly theirs)
- "toneLine":"one calm sentence on how the day felt, at most 14 words, no judgement"}`;
+ "toneLine":"one calm sentence on how the day felt, at most 14 words, no judgement",
+ "meals":[{"when":"breakfast"|"lunch"|"dinner"|"snack","text":"what THEY ate (lines spoken by the person, labelled with their name), with amounts if said, e.g. 2 idli, sambar, 1 cup chai","at":"HH:MM"}], // only food the person themselves said they ate or are eating today (not plans, not others' food, not food only discussed); [] if none
+ "fasting":true|null,                       // true only if the person said they are fasting today
+ "lived":{"gita":"..."|null,"tao":"..."|null}, // one first-person line (at most 14 words) on a real moment today that fits each teaching, only if the data clearly shows one
+ "measure":{"waist":number|null,"hips":number|null}|null, // centimetres, only if the person said their own measurements today
+ "fitness":{"pushups":number|null,"plank":number|null,"sitStand":number|null,"reach":number|null}|null} // their own monthly test numbers if said today (plank in seconds, reach in cm)`;
   const r = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: { 'x-api-key': ANTHROPIC_KEY, 'anthropic-version': '2023-06-01', 'content-type': 'application/json',
     ...(ANTHROPIC_WORKSPACE ? { 'anthropic-workspace-id': ANTHROPIC_WORKSPACE } : {}) }, body: JSON.stringify({ model: MODEL, max_tokens: 4000, system, messages: [{ role: 'user', content: text }] }) });
   const d = await r.json();
@@ -160,7 +167,22 @@ Reply with JSON only:
   return m ? JSON.parse(m[0]) : null;
 }
 
-async function day(userId: string, name: string, date: string, hindi: boolean) {
+/** Transcript segments as "Speaker: words" lines, whatever shape NeoSapien sends (a list, or one under a key, or text). */
+function transcriptLines(t: unknown): string[] {
+  const segs = Array.isArray(t) ? t : t && typeof t === 'object'
+    ? (Object.values(t as Record<string, unknown>).find(v => Array.isArray(v)) as unknown[] | undefined) ?? null : null;
+  if (segs) return segs.map(x => {
+    if (typeof x === 'string') return x;
+    const o = x as Record<string, unknown>;
+    const who = o.speaker ?? o.speaker_name ?? o.name ?? '', said = o.text ?? o.content ?? o.transcript ?? '';
+    return `${who ? `${who}: ` : ''}${said}`;
+  });
+  return String(typeof t === 'string' ? t : '').split(/\n|(?<=[.!?])\s+/);
+}
+
+const num = (v: unknown, lo: number, hi: number) => { const n = Number(v); return v != null && Number.isFinite(n) && n >= lo && n <= hi ? Math.round(n) : null; };
+
+async function day(userId: string, name: string, date: string, hindi: boolean, teach: { gita?: string; tao?: string } = {}) {
   const { data: cached } = await admin.from('neosapien_days').select('result, fetched_at').eq('user_id', userId).eq('day', date).maybeSingle();
   if (cached && Date.now() - Date.parse(cached.fetched_at) < 30 * 60_000) return cached.result;
   const token = await accessToken(userId);
@@ -180,11 +202,30 @@ async function day(userId: string, name: string, date: string, hindi: boolean) {
   const summary = await call('get_daily_summary', { date }).catch(() => null);
   const ids = mems.map(m => (m as { _id?: string })._id).filter(Boolean);
   const rem = await call('get_reminders', { memory_ids: ids.slice(0, 100), limit: 50 }).catch(() => null);
-  const s = await suggest(mems, rem?.items ?? [], (summary as { summary?: unknown } | null)?.summary, name, hindi);
+  // Founder, 18 Nov 2026 (decision 0060): NeoSapien fills the day, food included. Only conversations whose title or summary
+  // touch food, drink, fasting, measures or exercise counts are opened, and only the lines around those words are read;
+  // the transcripts are never kept, only what Myra makes of them.
+  const CUE = /happy orange|myra|breakfast|lunch|dinner|snack|\bate\b|eating|meal|food|khana|nashta|roti|rice|dal|chai|coffee|tea|water|fast(ing)?\b|upvas|vrat|waist|hips|push-?ups?|plank|squat/i;
+  const heard: { at?: string; text: string }[] = [];
+  for (const m of mems.filter(m => CUE.test(`${m.title ?? ''} ${m.summary ?? ''}`)).slice(0, 8)) {
+    const id = (m as { _id?: string })._id;
+    if (!id) continue;
+    const t = await call('get_memory_transcript', { memory_id: id }).catch(() => null);
+    const lines = transcriptLines(t);
+    const keep = lines.flatMap((l, i) => (CUE.test(l) ? lines.slice(Math.max(0, i - 1), i + 2) : [])).join(' ').slice(0, 1500);
+    if (keep) heard.push({ at: m.started_at?.slice(11, 16), text: keep });
+  }
+  const s = await suggest(mems, rem?.items ?? [], (summary as { summary?: unknown } | null)?.summary, name, hindi, heard, teach);
   // Only these short lines leave NeoSapien; no summaries, transcripts or business details are kept.
   const result = { connected: true, date, tone: { ...toneOf(mems), line: s?.toneLine ?? '' },
     journal: { thankful: (s?.thankful ?? []).slice(0, 3).map((x: { text: string }) => x.text).filter(Boolean), laugh: s?.laugh?.text ?? null, kind: s?.kind?.text ?? null, best: s?.best?.text ?? null },
-    todos: (s?.todos ?? []).slice(0, 5).filter((x: { title?: string }) => x.title).map((x: { title: string; area?: string }) => ({ title: x.title.slice(0, 120), area: ['work', 'family', 'self'].includes(String(x.area)) ? x.area : 'work' })) };
+    todos: (s?.todos ?? []).slice(0, 5).filter((x: { title?: string }) => x.title).map((x: { title: string; area?: string }) => ({ title: x.title.slice(0, 120), area: ['work', 'family', 'self'].includes(String(x.area)) ? x.area : 'work' })),
+    meals: (Array.isArray(s?.meals) ? s.meals : []).slice(0, 8).filter((x: { text?: string }) => x?.text).map((x: { when?: string; text: string; at?: string }) => ({ when: ['breakfast', 'lunch', 'dinner', 'snack'].includes(String(x.when)) ? x.when : 'snack', text: String(x.text).slice(0, 200), at: /^\d{2}:\d{2}$/.test(String(x.at)) ? x.at : null })),
+    fasting: s?.fasting === true ? true : null,
+    lived: { gita: s?.lived?.gita ? String(s.lived.gita).slice(0, 200) : null, tao: s?.lived?.tao ? String(s.lived.tao).slice(0, 200) : null },
+    measure: num(s?.measure?.waist, 40, 200) || num(s?.measure?.hips, 50, 220) ? { waist: num(s?.measure?.waist, 40, 200), hips: num(s?.measure?.hips, 50, 220) } : null,
+    fitness: s?.fitness && ['pushups', 'plank', 'sitStand', 'reach'].some(k => num(s.fitness[k], -40, 1000) != null)
+      ? { pushups: num(s.fitness.pushups, 0, 500), plank: num(s.fitness.plank, 0, 1000), sitStand: num(s.fitness.sitStand, 0, 100), reach: num(s.fitness.reach, -40, 60) } : null };
   await admin.from('neosapien_days').upsert({ user_id: userId, day: date, result, fetched_at: new Date().toISOString() });
   return result;
 }
@@ -208,7 +249,7 @@ Deno.serve(async req => {
     try {
       const t = await tokenRequest(await client(), { grant_type: 'authorization_code', code, redirect_uri: CALLBACK, code_verifier: row.pending.verifier, resource: MCP });
       await admin.from('neosapien_links').update({ ...t, pending: null, connected_at: new Date().toISOString() }).eq('user_id', row.user_id);
-      return page('NeoSapien connected', 'Myra can now read your day from Neo 1 and suggest your journal and to-dos. Nothing is added without your yes.');
+      return page('NeoSapien connected', 'Myra can now fill your day from Neo 1: journal, to-dos, meals and the numbers you say. Change or remove anything in details.');
     } catch (e) {
       return page('Not connected', `Something went wrong: ${e instanceof Error ? e.message : 'unknown'}. Please try again.`);
     }
@@ -219,7 +260,7 @@ Deno.serve(async req => {
   const { data: u } = await admin.auth.getUser(jwt);
   const user = u?.user;
   if (!user) return json({ error: 'Please sign in.' }, 401);
-  let body: { action?: string; date?: string; uiLang?: string; name?: string } = {};
+  let body: { action?: string; date?: string; uiLang?: string; name?: string; teach?: { gita?: string; tao?: string } } = {};
   try { body = await req.json(); } catch { /* empty */ }
   try {
     switch (body.action) {
@@ -241,7 +282,8 @@ Deno.serve(async req => {
         return json({ connected: false });
       case 'day': {
         const date = /^\d{4}-\d{2}-\d{2}$/.test(String(body.date)) ? String(body.date) : new Date().toISOString().slice(0, 10);
-        return json(await day(user.id, String(body.name ?? ''), date, body.uiLang === 'hi'));
+        const teach = { gita: String(body.teach?.gita ?? '').slice(0, 600), tao: String(body.teach?.tao ?? '').slice(0, 300) };
+        return json(await day(user.id, String(body.name ?? ''), date, body.uiLang === 'hi', teach));
       }
       default:
         return json({ error: 'Unknown request.' }, 400);
