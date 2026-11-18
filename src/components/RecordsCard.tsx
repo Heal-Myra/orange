@@ -49,7 +49,7 @@ export function RecordsCard() {
         <View style={{ gap: 2 }}>
           <RecordRow r={r} today={today} />
           {/* The next rung (founder, 16 Nov 2026: personal-best ladder). */}
-          <Text style={{ marginLeft: 38, color: colors.insight, fontSize: 13, fontWeight: '600' }}>{tr('Next: {v}', { v: r.kind === 'streak' ? tr('{n} days', { n: nextFor(r) }) : nextFor(r) })}</Text>
+          <Text style={{ marginLeft: 38, color: colors.insight, fontSize: 13, fontWeight: '600' }}>{tr('Next: {v}', { v: r.kind === 'streak' ? tr('{n} days', { n: nextFor(r) }) : nextFor(r, tr('lakh')) })}</Text>
         </View>
       ) : (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>

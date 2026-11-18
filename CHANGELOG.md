@@ -1,5 +1,8 @@
 # Changelog
 
+## 18 Nov 2026 — Next goals are round numbers
+- Founder: "Next" goals are now easy-to-remember round numbers: a best week of 90,553 steps → next **1 lakh**; 15,230 → 20,000; a 12-day streak → 15. Running times go to the half-minute just below the best (27:23 → 27:00, then 26:30).
+
 ## 16 Nov 2026 — Weekly items stay out of sight once done
 - Founder: once done, Letting go, the Sunday voice reflection and the Focus check disappear until the next week; the monthly fitness test shows its results on the day it was taken, then waits for the 1st. The reflection stays saved with the day.
 

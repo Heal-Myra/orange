@@ -2069,4 +2069,5 @@ export const HI: Record<string, string> = {
   "Once more. I let this go, for my peace.": "एक बार और। मैं इसे छोड़ता हूँ, अपनी शांति के लिए।",
   "Wish them well.": "उनका भला चाहें।",
   "Now wish yourself well. When you are ready, open your eyes.": "अब अपना भला चाहें। जब तैयार हों, आँखें खोलें।",
+  "lakh": "लाख",
 };

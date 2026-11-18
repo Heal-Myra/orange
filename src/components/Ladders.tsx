@@ -47,7 +47,7 @@ export function NextRungs({ recs, today }: { recs: Rec[]; today: string }) {
       {picks.map((r, i) => (
         <View key={r.key} style={{ paddingVertical: 10, borderTopWidth: i ? 1 : 0, borderTopColor: colors.line, gap: 2 }}>
           <RecordRow r={r} today={today} />
-          <Text style={{ marginLeft: 38, color: colors.insight, fontSize: 13, fontWeight: '600' }}>{tr('Next: {v}', { v: r.kind === 'streak' ? tr('{n} days', { n: nextFor(r) }) : nextFor(r) })}</Text>
+          <Text style={{ marginLeft: 38, color: colors.insight, fontSize: 13, fontWeight: '600' }}>{tr('Next: {v}', { v: r.kind === 'streak' ? tr('{n} days', { n: nextFor(r) }) : nextFor(r, tr('lakh')) })}</Text>
         </View>
       ))}
     </View>

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { nextTime, runLadder, nextValue, paceText } from './ladder';
+import { lakhs, nextTime, runLadder, nextValue, paceText } from './ladder';
 import { cadenceCoach } from './cadence';
 import { lastTwo, testDue, fitnessLine } from './fitnessTest';
 import { focusScore, focusDue, focusLine, makeRound } from './focusGame';
@@ -11,19 +11,25 @@ import { DEFAULT_PROFILE, emptyDay, type DayLog } from './types';
 
 describe('personal-best ladder', () => {
   it('next rung is a small step faster, on a 10-second mark', () => {
-    expect(nextTime(27 * 60 + 23)).toBe(26 * 60 + 50);
-    expect(nextTime(42 * 60 + 26)).toBe(41 * 60 + 40);
+    expect(nextTime(27 * 60 + 23)).toBe(27 * 60);
+    expect(nextTime(27 * 60)).toBe(26 * 60 + 30);
+    expect(nextTime(42 * 60 + 26)).toBe(42 * 60);
   });
   it('reached bests in order, newest first', () => {
     const l = runLadder([{ at: '2026-11-02', km: 5, secs: 28 * 60 + 10 }, { at: '2026-11-08', km: 5.2, secs: 30 * 60 }, { at: '2026-11-14', km: 5, secs: 27 * 60 + 23 }], 5)!;
     expect(l.best).toBe(27 * 60 + 23);
     expect(l.reached.map(r => r.at)).toEqual(['2026-11-14', '2026-11-02']);
-    expect(paceText(l.pace)).toBe('5:22');
+    expect(paceText(l.pace)).toBe('5:24');
   });
   it('a little more for other bests', () => {
-    expect(nextValue({ kind: 'day', value: 15230 })).toBe(16000);
-    expect(nextValue({ kind: 'streak', value: 8 })).toBe(10);
+    expect(nextValue({ kind: 'week', value: 90553 })).toBe(100000);
+    expect(nextValue({ kind: 'day', value: 15230 })).toBe(20000);
+    expect(nextValue({ kind: 'day', value: 11200 })).toBe(12000);
+    expect(nextValue({ kind: 'streak', value: 8 })).toBe(9);
+    expect(nextValue({ kind: 'streak', value: 12 })).toBe(15);
     expect(nextValue({ kind: 'day', value: 7 })).toBe(8);
+    expect(lakhs(100000, String)).toBe('1 lakh');
+    expect(lakhs(150000, String)).toBe('1.5 lakh');
   });
 });
 

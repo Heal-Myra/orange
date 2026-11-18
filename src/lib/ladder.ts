@@ -7,10 +7,10 @@ import type { Rec } from './records';
 export interface Rung { value: number; at?: string } // at: when it was reached
 export interface RunLadder { k: number; best: number; bestAt: string; reached: Rung[]; next: number; later: number[]; pace: number }
 
-/** A small step down in time: about 1.5%, at least 10 seconds, on a 10-second mark. */
+/** The next time to beat: a round, easy-to-remember mark (founder, 18 Nov 2026), the half-minute just below the best
+ *  (27:23 → 27:00, 27:00 → 26:30). */
 export function nextTime(t: number): number {
-  const step = Math.max(10, t * 0.015);
-  return Math.floor((t - step) / 10) * 10;
+  return Math.ceil(t / 30) * 30 - 30;
 }
 
 /** The fastest-k-km ladder from every run at least k km long: the bests in the order they were reached. */
@@ -24,21 +24,29 @@ export function runLadder(runs: Run[], k: number): RunLadder | null {
   return { k, best: top.value, bestAt: top.at!, reached: reached.slice(-3).reverse(), next, later, pace: next / k };
 }
 
-/** A round number a little above a best (about 5%), or for a streak a few more days. */
+/** Round numbers people remember (founder, 18 Nov 2026: "1 lakh kadam week", not 96,000). */
+const NICE = [1, 1.2, 1.5, 2, 2.5, 3, 4, 5, 6, 7, 7.5, 8, 9, 10];
+
+/** The first round number above a best: 90,553 steps → 1,00,000; 15,230 → 20,000; a streak of 8 days → 10. */
 export function nextValue(r: Pick<Rec, 'kind' | 'value'>): number {
   const v = r.value;
-  if (r.kind === 'streak') return v + Math.max(1, Math.round(v * 0.2));
   if (v <= 0) return 1;
-  if (v < 20) return Math.floor(v) + 1;
-  const step = Math.pow(10, Math.floor(Math.log10(v)) - 1);
-  return Math.ceil((v * 1.05) / step) * step;
+  if (v < 10) return Math.floor(v) + 1;
+  const mag = Math.pow(10, Math.floor(Math.log10(v)));
+  for (const n of NICE) { const x = Math.round(n * mag); if (x > v) return x; }
+  return 10 * mag;
+}
+
+/** "1 lakh", "1.5 lakh" for big round numbers, as people in India say them; else the usual format. */
+export function lakhs(v: number, fmt: (n: number) => string, word = 'lakh'): string {
+  return v >= 100000 && v % 50000 === 0 ? `${v / 100000} ${word}` : fmt(v);
 }
 
 /** The next rung for a record as text: a faster time for a running best, else a little more. */
-export function nextFor(r: Rec): string {
+export function nextFor(r: Rec, lakhWord = 'lakh'): string {
   if (r.key === 'run5' || r.key === 'run10') return r.def.fmt(nextTime(r.value));
   if (r.key === 'runLong') return r.def.fmt(Math.floor(r.value) + 1);
-  return r.kind === 'streak' ? String(nextValue(r)) : r.def.fmt(nextValue(r));
+  return r.kind === 'streak' ? String(nextValue(r)) : lakhs(nextValue(r), r.def.fmt, lakhWord);
 }
 
 /** The most recent records worth climbing, one per measure, newest first (at most n). */
