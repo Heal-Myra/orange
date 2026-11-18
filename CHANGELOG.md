@@ -1,5 +1,8 @@
 # Changelog
 
+## 18 Nov 2026 — Myra's mix rebuilt (decision 0061)
+- Founder approved the new script from the Hatha Yoga Pradipika and the Ayush Common Yoga Protocol: Arrive → Bhastrika → Kapalbhati → Anulom Vilom → Bhramari → Om → Stillness. Myra speaks only at the edges of each round, a soft tick keeps the quick breaths, a chime marks each nostril switch, a tanpura plays underneath, and each step shows its source. Daytime Myra's mix; Sit, Yoga Nidra and the single practices come next.
+
 ## 18 Nov 2026 — NeoSapien fills the day (decision 0060)
 - Founder: no manual entry except phone usage and the face photo. What you say to Neo 1 is added straight away, tagged ● NeoSapien: journal lines, to-dos, meals ("Happy Orange, lunch was dal rice and salad"), a fast, how you lived the Gita and Tao (Myra judges how deeply), waist and hips, and fitness test numbers. The From your day card shows what was added; change or remove anything in details. Transcripts are read only around food and number words and never kept.
 

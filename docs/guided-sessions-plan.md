@@ -26,4 +26,4 @@ Founder, 18 Nov 2026: Breathe, Sit and Yoga Nidra are "not at all up to mark". E
 3. **Explainer videos:** one short clip per practice, made with an AI video tool or a filmed teacher, in the Fitbit Air / Google Health coach style.
 4. **Camera coach**, like Exercite: the phone camera checks posture on the phone itself (spine, head, hands) and later the breath rhythm. This needs a new App Store build.
 
-Status: plan sent to the founder on 18 Nov 2026; waiting for go on phase 1.
+Status: phase 1 (Myra's mix) built and shipped on 18 Nov 2026 (decision 0061). Next: phase 2, Sit and Yoga Nidra.

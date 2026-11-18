@@ -20,6 +20,7 @@ import { hasVoice, speak, voiceLang } from '../lib/voice';
 import { useServerVoice } from '../lib/serverVoice';
 import { hasGuide, sessionStep } from '../lib/practiceGuide';
 import { GuideFigure } from '../components/GuideFigure';
+import { MixSession } from '../components/MixSession';
 
 const Awake = optional(['ExpoKeepAwake'], () => require('expo-keep-awake') as typeof import('expo-keep-awake'));
 // Sky blue with black text (founder's choice, 25 Oct 2026).
@@ -28,7 +29,19 @@ const QUICK = (ph: Phase) => ph.seconds < 2;
 
 interface Step { seg: number; phase: Phase; intro?: string; rep?: number } // rep: how many times this cue came before in the part
 
+/** Daytime Myra's mix plays the rebuilt, scripted session (decision 0061); night, unwell days, care plans and single
+ *  practices keep this player. */
 export default function Breathe() {
+  const { practice: pid, minutes, lang: gl } = useLocalSearchParams<{ practice?: string; minutes?: string; lang?: string }>();
+  const { days } = useHeal();
+  const feel = days[todayISO()]?.feeling;
+  const h = new Date().getHours();
+  const scripted = (pid ?? 'mix') === 'mix' && h >= 5 && h < 20 && !gentleToday(feel) && !(carePlan(feel?.symptoms ?? [])?.breath.length);
+  if (scripted) return <MixSession minutes={Math.max(5, Math.min(15, Number(minutes) || 10))} gLang={gl || lang()} />;
+  return <ClassicBreathe />;
+}
+
+function ClassicBreathe() {
   const { practice: pid, minutes, lang: gl } = useLocalSearchParams<{ practice?: string; minutes?: string; lang?: string }>();
   const gLang: string = gl || lang();
   const { update } = useHeal();
