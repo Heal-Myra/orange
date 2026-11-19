@@ -1,5 +1,8 @@
 # Changelog
 
+## 19 Nov 2026 — Oura-like redesign, step 1 (decision 0063)
+- Founder chose all ten changes. Step 1: a floating tab bar with Myra's ✦ button beside it, one card header everywhere (icon, name, coloured band word), thin white scores, cards that run the full width of the screen with their own soft colour wash, a glass Profile button and HAPPY ORANGE in spaced letters. Next: the new Today screen.
+
 ## 19 Nov 2026 — New look: Ganga Dusk glass (decision 0062)
 - Founder chose design 2. An evening river sky behind every screen, smoked see-through cards, all text white like Oura, glass buttons, and only the result word on My day in colour (green, teal, amber, soft coral). The real frosted blur comes with the next App Store build.
 
