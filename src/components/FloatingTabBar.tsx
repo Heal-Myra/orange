@@ -9,6 +9,7 @@ import { Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { tr } from '../lib/i18n';
 import { colors } from '../theme';
+import { PillarIcon } from './PillarIcon';
 
 const ICONS: Record<string, [keyof typeof Ionicons.glyphMap, keyof typeof Ionicons.glyphMap]> = {
   index: ['sunny-outline', 'sunny'], body: ['leaf-outline', 'leaf'], mind: ['bulb-outline', 'bulb'], soul: ['flame-outline', 'flame'],
@@ -32,7 +33,9 @@ export function FloatingTabBar({ state, descriptors, navigateToTab }: BottomTabB
                 if (!on) navigateToTab(r.key);
               }}
               style={{ alignItems: 'center', gap: 2, minWidth: 56 }}>
-              <Ionicons name={on ? onIcon : off} size={22} color={on ? colors.ink : colors.muted} />
+              {r.name === 'body' || r.name === 'mind' || r.name === 'soul'
+                ? <PillarIcon pillar={r.name} size={24} color={on ? colors.ink : colors.muted} width={on ? 2 : 1.6} />
+                : <Ionicons name={on ? onIcon : off} size={22} color={on ? colors.ink : colors.muted} />}
               <Text style={{ fontSize: 11, fontWeight: on ? '600' : '500', color: on ? colors.ink : colors.muted }} numberOfLines={1}>{label}</Text>
             </Pressable>
           );

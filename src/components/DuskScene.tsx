@@ -20,7 +20,7 @@ const GLOW: Record<Phase, string> = { dawn: '#FFD3A0', day: '#FFF4D6', dusk: '#F
 export function DuskScene({ height, hour, width }: { height: number; hour: number; width: number }) {
   const p = phaseAt(hour);
   const [a, b, c, d] = SKY[p];
-  const H = 620, horizon = 470; // the horizon sits low, under Myra's line, so the words stay on open sky
+  const H = 620, horizon = 500; // the horizon sits low, under Myra's line, so the words stay on open sky
   const sunX = 70 + Math.max(0, Math.min(1, (hour - 5) / 15)) * 250; // the light travels across the sky with the day
   const lamps = p === 'dusk' || p === 'night';
   return (

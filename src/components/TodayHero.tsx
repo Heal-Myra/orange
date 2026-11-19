@@ -3,7 +3,7 @@
 
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Pressable, Text, View, useWindowDimensions } from 'react-native';
+import { Platform, Pressable, Text, View, useWindowDimensions } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { useAuth } from '../lib/auth';
 import { todayISO } from '../lib/dates';
@@ -17,6 +17,8 @@ import { colors, font, space, statusColor } from '../theme';
 import { DuskScene } from './DuskScene';
 import { emailName, start, what } from './MyraPick';
 import { Serif } from './ui';
+import { PillarIcon } from './PillarIcon';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const SCENE = 620;
 const PILLARS = [
@@ -25,20 +27,18 @@ const PILLARS = [
   { tab: 'soul', name: 'Soul', color: colors.soul },
 ] as const;
 
-/** A thin score circle with the number inside (Oura's top row). */
-function Chip({ value, color, label, onPress }: { value: number | null; color: string; label: string; onPress: () => void }) {
-  const D = 68, r = 31, C = 2 * Math.PI * r;
-  const v = value == null ? 0 : Math.max(0, Math.min(1, value / 100));
+/** A score circle like Oura's top row: soft glass, the pillar's mark above a thin number, the name below. No coloured ring:
+ *  it blends into the scene (founder, 19 Nov 2026). */
+function Chip({ pillar, value, label, onPress }: { pillar: 'body' | 'mind' | 'soul'; value: number | null; label: string; onPress: () => void }) {
+  const D = 74;
   return (
-    <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={`${label}: ${value == null ? '–' : Math.round(value)}/100`} style={{ alignItems: 'center', gap: 6, flex: 1 }}>
-      <View style={{ width: D, height: D, borderRadius: D / 2, backgroundColor: 'rgba(255,255,255,0.08)', alignItems: 'center', justifyContent: 'center' }}>
-        <Svg width={D} height={D} style={{ position: 'absolute' }}>
-          <Circle cx={D / 2} cy={D / 2} r={r} stroke="rgba(255,255,255,0.12)" strokeWidth={2} fill="none" />
-          {v > 0 ? <Circle cx={D / 2} cy={D / 2} r={r} stroke={color} strokeWidth={2.5} fill="none" strokeLinecap="round" strokeDasharray={`${C * v} ${C}`} transform={`rotate(-90 ${D / 2} ${D / 2})`} /> : null}
-        </Svg>
-        <Text style={{ fontSize: 24, fontWeight: font.light, color: colors.ink, fontVariant: ['tabular-nums'] }}>{value == null ? '–' : Math.round(value)}</Text>
+    <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={`${label}: ${value == null ? '–' : Math.round(value)}/100`}
+      style={({ pressed }) => ({ alignItems: 'center', gap: 10, flex: 1, opacity: pressed ? 0.8 : 1 })}>
+      <View style={{ width: D, height: D, borderRadius: D / 2, backgroundColor: 'rgba(255,255,255,0.09)', borderWidth: 0.5, borderColor: 'rgba(255,255,255,0.14)', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
+        <PillarIcon pillar={pillar} size={19} />
+        <Text style={{ fontSize: 25, fontWeight: font.light, color: colors.ink, fontVariant: ['tabular-nums'], lineHeight: 29 }}>{value == null ? '–' : Math.round(value)}</Text>
       </View>
-      <Text style={{ fontSize: 14, color: 'rgba(255,255,255,0.9)' }}>{label}</Text>
+      <Text style={{ fontSize: 15, color: 'rgba(255,255,255,0.88)', letterSpacing: 0.3 }}>{label}</Text>
     </Pressable>
   );
 }
@@ -65,6 +65,8 @@ export function TodayHero({ w }: { w: WellBeing }) {
   const { day, date, profile } = useHeal();
   const { habits, tickHabit } = useTasks();
   const { width } = useWindowDimensions();
+  // The header is see-through on Today (its standard height: 44 on iPhone, 56 on Android, 64 on the web).
+  const headerH = useSafeAreaInsets().top + (Platform.OS === 'ios' ? 44 : Platform.OS === 'android' ? 56 : 64);
   const [, tick] = useState(0);
   useEffect(() => { const t = setInterval(() => tick(x => x + 1), 60_000); return () => clearInterval(t); }, []);
   const now = new Date();
@@ -81,10 +83,10 @@ export function TodayHero({ w }: { w: WellBeing }) {
   const word = w.logged ? tr(band(w.total)) : tr('Fresh start');
 
   return (
-    <View style={{ marginHorizontal: -space.lg, marginTop: -space.md, minHeight: SCENE - 40 }}>
-      <View pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, top: 0 }}><DuskScene height={SCENE} hour={hour} width={width} /></View>
-      <View style={{ flexDirection: 'row', paddingHorizontal: space.lg, paddingTop: space.lg + 4 }}>
-        {PILLARS.map(p => <Chip key={p.tab} value={score(p.tab)} color={p.color} label={tr(p.name)} onPress={() => router.navigate(`/${p.tab}`)} />)}
+    <View style={{ marginHorizontal: -space.lg, marginTop: -space.md, minHeight: headerH + SCENE - 70 }}>
+      <View pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, top: 0 }}><DuskScene height={headerH + SCENE} hour={hour} width={width} /></View>
+      <View style={{ flexDirection: 'row', paddingHorizontal: space.md, paddingTop: headerH + 6 }}>
+        {PILLARS.map(p => <Chip key={p.tab} pillar={p.tab} value={score(p.tab)} label={tr(p.name)} onPress={() => router.navigate(`/${p.tab}`)} />)}
       </View>
       <View style={{ alignItems: 'center', marginTop: 28, paddingHorizontal: space.xl, gap: 6 }}>
         <Pressable onPress={() => router.push({ pathname: '/trend', params: { card: 'today' } })} accessibilityRole="button" style={{ alignItems: 'center' }}>
@@ -99,12 +101,12 @@ export function TodayHero({ w }: { w: WellBeing }) {
         <View style={{ flexDirection: 'row', gap: 10, marginTop: 10 }}>
           {habit || step ? (
             <Pressable onPress={() => (habit ? tickHabit(habit.id) : start(step!))} accessibilityRole="button"
-              style={({ pressed }) => ({ backgroundColor: 'rgba(255,255,255,0.14)', borderRadius: 99, paddingVertical: 14, paddingHorizontal: 26, opacity: pressed ? 0.8 : 1 })}>
+              style={({ pressed }) => ({ backgroundColor: 'rgba(18,16,22,0.38)', borderRadius: 99, paddingVertical: 15, paddingHorizontal: 30, opacity: pressed ? 0.8 : 1 })}>
               <Text style={{ color: colors.ink, fontSize: 16, fontWeight: '600' }}>{habit ? tr('Done') : tr('Start now')}</Text>
             </Pressable>
           ) : null}
           <Pressable onPress={() => router.push({ pathname: '/myra', params: { from: 'today', q: tr('Why this next step?') } })} accessibilityRole="button"
-            style={({ pressed }) => ({ borderRadius: 99, paddingVertical: 14, paddingHorizontal: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.22)', opacity: pressed ? 0.8 : 1 })}>
+            style={({ pressed }) => ({ backgroundColor: 'rgba(18,16,22,0.38)', borderRadius: 99, paddingVertical: 15, paddingHorizontal: 26, opacity: pressed ? 0.8 : 1 })}>
             <Text style={{ color: colors.ink, fontSize: 16, fontWeight: '600' }}>{tr('Why, Myra?')}</Text>
           </Pressable>
         </View>
