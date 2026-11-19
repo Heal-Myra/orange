@@ -12,7 +12,7 @@ import { useHeal } from '../lib/store';
 import { FeedbackBox } from './FeedbackBox';
 import type { Pillar } from '../lib/trends';
 import { GlassBackdrop } from './GlassBackdrop';
-import { colors, radius, shadow, space } from '../theme';
+import { colors, isGlass, radius, shadow, space } from '../theme';
 import { tr } from '../lib/i18n';
 
 // Jump to a card: Today's "Myra recommends" opens a tab with ?card=<id> and the screen scrolls to that card and
@@ -264,7 +264,7 @@ export function Button({ title, onPress, kind = 'primary', disabled }: { title: 
   return (
     <Pressable accessibilityRole="button" onPress={onPress} disabled={disabled}
       style={({ pressed }) => [s.btn, kind === 'primary' ? s.btnPrimary : kind === 'insight' ? s.btnInsight : s.btnPlain, (pressed || disabled) && { opacity: 0.6 }]}>
-      <Text style={[s.btnText, kind !== 'plain' && { color: colors.onAccent }]}>{title}</Text>
+      <Text style={[s.btnText, kind !== 'plain' && { color: isGlass ? colors.ink : colors.onAccent }]}>{title}</Text>
     </Pressable>
   );
 }
@@ -307,8 +307,9 @@ export const s = StyleSheet.create({
   tag: { fontSize: 11, fontWeight: '700' },
   points: { fontSize: 14, color: colors.muted, fontVariant: ['tabular-nums'] },
   btn: { borderRadius: 99, paddingVertical: 11, paddingHorizontal: 16, alignItems: 'center' },
-  btnPrimary: { backgroundColor: colors.accent },
-  btnInsight: { backgroundColor: colors.insight }, // suggestions and analytics
+  // Ganga Dusk: buttons are glass pills with white words, like Oura's "View details" (founder, 19 Nov 2026).
+  btnPrimary: isGlass ? { backgroundColor: 'rgba(255,255,255,0.16)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.28)' } : { backgroundColor: colors.accent },
+  btnInsight: isGlass ? { backgroundColor: 'rgba(255,255,255,0.16)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.28)' } : { backgroundColor: colors.insight }, // suggestions and analytics
   btnPlain: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.line },
   btnText: { fontSize: 15, fontWeight: '600', color: colors.ink },
   seg: { flexDirection: 'row', borderWidth: 1, borderColor: colors.line, borderRadius: radius.sm, overflow: 'hidden', alignSelf: 'flex-start' },

@@ -14,7 +14,7 @@ import { nextStep, type Step, type StepId } from '../lib/nextStep';
 import type { WellBeing } from '../lib/scoring';
 import { useHeal } from '../lib/store';
 import { useTasks } from '../lib/tasks';
-import { colors } from '../theme';
+import { colors , isGlass } from '../theme';
 import { HandLine } from './HandLine';
 
 // The big number takes a deeper shade of its pillar's ring colour so it reads well (never red).
@@ -100,7 +100,7 @@ export function MyraPick({ w }: { w: WellBeing }) {
   const p = PILLAR[s.pillar];
   return (
     <View style={{ flex: 1, gap: 2 }}>
-      <Text style={{ color: p.ink, fontSize: 40, fontWeight: '800', lineHeight: 44 }}>+{Math.max(1, Math.round(s.gain / 3))}</Text>
+      <Text style={{ color: isGlass ? colors.ink : p.ink, fontSize: 40, fontWeight: '800', lineHeight: 44 }}>+{Math.max(1, Math.round(s.gain / 3))}</Text>
       <Text style={{ color: colors.muted, fontSize: 13, fontWeight: '600' }}>{tr(p.points)}</Text>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 8 }}>
         {/* Written by a quill, then the start arrow appears (founder, 31 Oct 2026). */}

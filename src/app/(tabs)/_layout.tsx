@@ -6,7 +6,7 @@ import { MyraButton } from '../../components/MyraButton';
 import { TabRing } from '../../components/TabRing';
 import type { ComponentProps } from 'react';
 import type { ColorValue } from 'react-native';
-import { colors } from '../../theme';
+import { colors , isGlass } from '../../theme';
 import { tr } from '../../lib/i18n';
 import { usePendingRequests } from '../../lib/adminAlerts';
 import { useHeal } from '../../lib/store';
@@ -18,7 +18,7 @@ type IconName = ComponentProps<typeof Ionicons>['name'];
 
 const tab = (title: string, icon: IconName, tint: string) => ({
   title,
-  tabBarActiveTintColor: tint,
+  tabBarActiveTintColor: isGlass ? colors.ink : tint,
   tabBarIcon: ({ color }: { color: ColorValue }) => <Ionicons name={icon} size={28} color={color as string} />,
 });
 
@@ -32,7 +32,7 @@ function PillarScore({ pillar }: { pillar: 'body' | 'mind' | 'soul' }) {
 const ringTab = (title: string, pillar: 'body' | 'mind' | 'soul', icon: IconName, tint: string) => ({
   title,
   headerRight: () => <PillarScore pillar={pillar} />,
-  tabBarActiveTintColor: tint,
+  tabBarActiveTintColor: isGlass ? colors.ink : tint,
   tabBarIcon: ({ color }: { color: ColorValue }) => <TabRing pillar={pillar} icon={icon} color={color as string} />,
 });
 

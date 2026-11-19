@@ -6,7 +6,7 @@ import { router } from 'expo-router';
 import { Pressable, Text, View } from 'react-native';
 import { tr } from '../lib/i18n';
 import { band, POINTS, type WellBeing } from '../lib/scoring';
-import { colors } from '../theme';
+import { colors , statusColor } from '../theme';
 import { MyraPick } from './MyraPick';
 import { PASTEL, RingStack, RingTap, fmt, type RingItem } from './Rings';
 import { Card } from './ui';
@@ -51,7 +51,7 @@ export function TodayRings({ w }: { w: WellBeing }) {
     <Card style={{ gap: 12, flexGrow: 1 }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
         <Text style={{ fontSize: 18, fontWeight: '700', color: colors.ink }}>{tr('My day')}</Text>
-        <Text style={{ fontSize: 13, fontWeight: '600', color: colors.muted }}>{w.logged ? tr(band(w.total)) : tr('Nothing logged yet')}</Text>
+        <Text style={{ fontSize: 13, fontWeight: '600', color: w.logged ? statusColor(band(w.total)) : colors.muted }}>{w.logged ? tr(band(w.total)) : tr('Nothing logged yet')}</Text>
       </View>
       <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 14 }}>
         <RingTap trend="today"><RingStack items={items} center={fmt(w.total)} sub={tr('of {n}', { n: 100 })} size={156} /></RingTap>

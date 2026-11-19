@@ -35,21 +35,23 @@ const GANGA_DUSK: typeof CALM_TEAL = {
   surface: 'rgba(24,22,32,0.66)',
   field: 'rgba(255,255,255,0.08)',
   sunk: 'rgba(255,255,255,0.14)',
-  ink: '#F6F1EA',
-  muted: '#C9C2B8',
-  line: 'rgba(255,255,255,0.16)',
+  // Founder, 19 Nov 2026 (Oura as the reference): all text white; only a result word (Flourishing, Balanced, Needs
+  // care…) carries a colour, from statusColor() below.
+  ink: '#FFFFFF',
+  muted: 'rgba(255,255,255,0.74)',
+  line: 'rgba(255,255,255,0.18)',
   body: '#A8D07A',
   mind: '#7FCFD6',
   soul: '#F3A37A',
-  tint: 'rgba(255,255,255,0.08)',
-  accent: '#F0A35E',
+  tint: 'rgba(255,255,255,0.10)',
+  accent: '#FFFFFF',
   onAccent: '#1B1A22',
-  insight: '#F4B183',
+  insight: '#FFFFFF',
   onInsight: '#1B1A22',
-  brand: '#F4B183',
-  good: '#A8D07A',
-  warn: '#F2C46B',
-  bad: '#F29A8A',
+  brand: '#FFFFFF',
+  good: '#FFFFFF',
+  warn: '#FFFFFF',
+  bad: '#FFFFFF',
 };
 
 export const LOOK: 'calm' | 'ganga' = 'ganga';
@@ -61,3 +63,9 @@ export const shadow = LOOK === 'ganga' ? 'inset 0 1px 0 rgba(255,255,255,0.18)' 
 
 export const space = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24 };
 export const radius = { sm: 8, md: 12, lg: 16 };
+
+/** The one coloured word: a result band (Ganga Dusk; in Calm Teal results stay muted as before). */
+export function statusColor(band: string): string {
+  if (LOOK !== 'ganga') return CALM_TEAL.muted;
+  return band === 'Flourishing' ? '#A8D07A' : band === 'Balanced' ? '#7FCFD6' : band === 'Finding your footing' ? '#F2C46B' : band === 'Needs care' ? '#F4B183' : 'rgba(255,255,255,0.74)';
+}
