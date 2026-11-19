@@ -1,5 +1,8 @@
 # Changelog
 
+## 19 Nov 2026 — Oura-like redesign, step 2: the new Today (decision 0063)
+- The Ganga at the top of Today, its sky following the hour (dawn, day, dusk with floating diyas, night). Body, Mind and Soul as three thin score circles; My day as one big number under an arc, its word in serif, Myra's one line with Start now and Why, Myra?. Below, Your day: Snap a meal, Tell Myra, Add, and everything the day picked up in time order with where it came from.
+
 ## 19 Nov 2026 — Oura-like redesign, step 1 (decision 0063)
 - Founder chose all ten changes. Step 1: a floating tab bar with Myra's ✦ button beside it, one card header everywhere (icon, name, coloured band word), thin white scores, cards that run the full width of the screen with their own soft colour wash, a glass Profile button and HAPPY ORANGE in spaced letters. Next: the new Today screen.
 

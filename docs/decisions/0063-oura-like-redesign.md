@@ -21,3 +21,8 @@ Fonts loaded; `Serif`, `BigNum`, `CardHead`, `Tile` in ui.tsx; scored cards' `He
 glass look (icon from the card's anchor, band word from its score); thin scores without the pill; floating tab bar
 (src/components/FloatingTabBar.tsx) with Myra's ✦; glass Profile button; "HAPPY ORANGE" spaced title; top-level cards run edge
 to edge (founder: "no space left on left and right side"); light status bar text. Includes the per-card colour wash preview.
+
+## Step 2 (shipped 19 Nov 2026)
+src/components/DuskScene.tsx (the scene, by hour), TodayHero.tsx (circles, arc hero, Myra's line), YourDay.tsx (timeline).
+The hero is the My day score rather than steps: steps need Apple Health, My day always has a number. The rings cards stay
+for the Calm Teal look only.
