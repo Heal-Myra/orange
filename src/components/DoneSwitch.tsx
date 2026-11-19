@@ -32,10 +32,10 @@ export function DoneSwitch({ done, onDone, onUndo, label }: { done: boolean; onD
   return (
     <Pressable ref={ref} onPress={press} accessibilityRole="switch" accessibilityState={{ checked: done }} accessibilityLabel={label} hitSlop={8}>
       <Animated.View style={{ width: W, height: H, borderRadius: H / 2, backgroundColor: bg, justifyContent: 'center' }}>
-        <Text style={{ position: 'absolute', fontSize: 12, fontWeight: '700', ...(done ? { left: 11, color: '#fff' } : { right: 11, color: colors.muted }) }}>
+        <Text style={{ position: 'absolute', fontSize: 12, fontWeight: '700', ...(done ? { left: 11, color: colors.onAccent } : { right: 11, color: colors.muted }) }}>
           {done ? tr('Done') : tr('To do')}
         </Text>
-        <Animated.View style={{ position: 'absolute', left, width: KNOB, height: KNOB, borderRadius: KNOB / 2, backgroundColor: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,0.2)' }} />
+        <Animated.View style={{ position: 'absolute', left, width: KNOB, height: KNOB, borderRadius: KNOB / 2, backgroundColor: colors.onAccent, boxShadow: '0 1px 4px rgba(0,0,0,0.2)' }} />
       </Animated.View>
     </Pressable>
   );

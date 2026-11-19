@@ -312,7 +312,7 @@ function TaskRow({ t, inFocus }: { t: Task; inFocus: boolean }) {
       {editing != null ? (
         <View style={{ flexDirection: 'row', gap: 6 }}>
           <Pressable onPress={saveEdit} style={{ paddingVertical: 6, paddingHorizontal: 14, borderRadius: 99, backgroundColor: colors.accent }}>
-            <Text style={{ fontSize: 13, color: '#fff', fontWeight: '600' }}>{tr('Save')}</Text>
+            <Text style={{ fontSize: 13, color: colors.onAccent, fontWeight: '600' }}>{tr('Save')}</Text>
           </Pressable>
           <Pressable onPress={() => setEditing(null)} style={{ paddingVertical: 6, paddingHorizontal: 12 }}>
             <Text style={{ fontSize: 13, color: colors.muted }}>{tr('Cancel')}</Text>
@@ -341,7 +341,7 @@ function TaskRow({ t, inFocus }: { t: Task; inFocus: boolean }) {
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
               <Text style={{ flex: 1, fontSize: 13, color: colors.muted }}>{tr('Let it go, without regret? Not every task needs doing.')}</Text>
               <Pressable onPress={() => remove(t.id)} style={{ paddingVertical: 6, paddingHorizontal: 12, borderRadius: 99, backgroundColor: colors.accent }}>
-                <Text style={{ fontSize: 13, color: '#fff', fontWeight: '600' }}>{tr('Yes, let go')}</Text>
+                <Text style={{ fontSize: 13, color: colors.onAccent, fontWeight: '600' }}>{tr('Yes, let go')}</Text>
               </Pressable>
               <Pressable onPress={() => setLetGo(false)} hitSlop={6}><Text style={{ fontSize: 13, color: colors.muted }}>{tr('Cancel')}</Text></Pressable>
             </View>

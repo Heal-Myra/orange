@@ -59,7 +59,7 @@ export function LivedBox({ value, rate, teaching, placeholder, onText, onRate }:
         {Speech ? (
           <Pressable onPress={speak} accessibilityRole="button" accessibilityLabel={listening ? tr('Stop') : tr('Speak')}
             style={{ width: 44, height: 44, borderRadius: 22, marginTop: 4, alignItems: 'center', justifyContent: 'center', backgroundColor: listening ? colors.insight : colors.insight + '14' }}>
-            <Ionicons name={listening ? 'stop' : 'mic'} size={20} color={listening ? '#fff' : colors.insight} />
+            <Ionicons name={listening ? 'stop' : 'mic'} size={20} color={listening ? colors.onAccent : colors.insight} />
           </Pressable>
         ) : null}
       </View>

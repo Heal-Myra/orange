@@ -208,7 +208,7 @@ function Recommend({ aim, pick, onPick, gentle, length, gLang, onGuided, onSelf 
       {pr.caution ? <Text style={{ color: colors.warn, fontSize: 13, lineHeight: 18 }}>{tr(pr.caution)}</Text> : null}
       <View style={{ flexDirection: 'row', gap: 8, marginTop: 6 }}>
         <Pressable onPress={() => onGuided(id)} accessibilityRole="button" style={{ backgroundColor: colors.accent, borderRadius: 99, paddingVertical: 9, paddingHorizontal: 16 }}>
-          <Text style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>{tr('Start · guided')}</Text>
+          <Text style={{ color: colors.onAccent, fontWeight: '700', fontSize: 14 }}>{tr('Start · guided')}</Text>
         </Pressable>
         {id !== 'nidra' ? (
           <Pressable onPress={onSelf} accessibilityRole="button" style={{ borderWidth: 1, borderColor: colors.line, borderRadius: 99, paddingVertical: 9, paddingHorizontal: 16 }}>
@@ -241,7 +241,7 @@ function Dots({ path }: { path: PathState }) {
           const n = k + 1, c = STAGE_COLOR[stageOf(n)], done = path.done.includes(n), now = n === current && !done;
           return (
             <View key={n} style={{ width: 26, height: 26, borderRadius: 13, alignItems: 'center', justifyContent: 'center', borderWidth: now ? 2 : 1, borderColor: c, backgroundColor: done ? c : now ? c + '22' : colors.surface }}>
-              <Text style={{ fontSize: 11, fontWeight: '700', color: done ? '#fff' : colors.ink }}>{done ? '✓' : n}</Text>
+              <Text style={{ fontSize: 11, fontWeight: '700', color: done ? colors.onAccent : colors.ink }}>{done ? '✓' : n}</Text>
             </View>
           );
         })}

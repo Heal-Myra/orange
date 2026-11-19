@@ -124,7 +124,7 @@ function Photo({ photo, label, pins, small }: { photo?: SpacePhoto; label: strin
           {(pins ?? []).map((c, i) => (c.spot ? (
             <View key={i} accessibilityLabel={tr('Change {n}', { n: i + 1 })}
               style={{ position: 'absolute', left: `${c.spot.x * 100}%`, top: `${c.spot.y * 100}%`, marginLeft: -size / 2, marginTop: -size / 2, width: size, height: size, borderRadius: size / 2, backgroundColor: colors.insight, borderWidth: 2, borderColor: '#fff', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 6px rgba(0,0,0,0.3)' }}>
-              <Text style={{ color: '#fff', fontWeight: '800', fontSize: small ? 12 : 15 }}>{i + 1}</Text>
+              <Text style={{ color: colors.onAccent, fontWeight: '800', fontSize: small ? 12 : 15 }}>{i + 1}</Text>
             </View>
           ) : null))}
         </View>

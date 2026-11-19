@@ -14,7 +14,7 @@ import { Button, Card, Expandable } from './ui';
 const chip = (label: string, onPress: () => void, on = false) => (
   <Pressable key={label} onPress={onPress} accessibilityRole="button"
     style={{ paddingVertical: 7, paddingHorizontal: 13, borderRadius: 99, borderWidth: 1, borderColor: on ? colors.accent : colors.line, backgroundColor: on ? colors.accent : colors.surface }}>
-    <Text style={{ color: on ? '#fff' : colors.ink, fontWeight: '600', fontSize: 13.5 }}>{label}</Text>
+    <Text style={{ color: on ? colors.onAccent : colors.ink, fontWeight: '600', fontSize: 13.5 }}>{label}</Text>
   </Pressable>
 );
 

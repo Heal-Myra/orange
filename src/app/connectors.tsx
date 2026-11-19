@@ -31,7 +31,7 @@ const On = () => <Text style={{ fontSize: 12, fontWeight: '700', color: GREEN }}
 const Soon = () => <Text style={{ fontSize: 12, color: colors.muted, borderWidth: 1, borderColor: colors.line, borderRadius: 99, paddingHorizontal: 10, paddingVertical: 4 }}>{tr('Soon')}</Text>;
 const Connect = ({ onPress }: { onPress: () => void }) => (
   <Pressable onPress={onPress} style={{ backgroundColor: colors.accent, borderRadius: 99, paddingHorizontal: 12, paddingVertical: 7 }} accessibilityRole="button">
-    <Text style={{ color: '#fff', fontWeight: '700', fontSize: 13 }}>{tr('Connect')}</Text>
+    <Text style={{ color: colors.onAccent, fontWeight: '700', fontSize: 13 }}>{tr('Connect')}</Text>
   </Pressable>
 );
 

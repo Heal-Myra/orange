@@ -30,7 +30,7 @@ export default function SoundBathScreen() {
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
           {SOUNDS.map(s => (
             <Pressable key={s.id} onPress={() => toggle(s.id)} style={chip(picked.includes(s.id))} accessibilityRole="checkbox" accessibilityState={{ checked: picked.includes(s.id) }}>
-              <Text style={{ color: picked.includes(s.id) ? '#fff' : colors.ink, fontWeight: '600' }}>{s.icon} {tr(s.name)}</Text>
+              <Text style={{ color: picked.includes(s.id) ? colors.onAccent : colors.ink, fontWeight: '600' }}>{s.icon} {tr(s.name)}</Text>
             </Pressable>
           ))}
         </View>
@@ -39,7 +39,7 @@ export default function SoundBathScreen() {
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
           {LENGTHS.map(n => (
             <Pressable key={n} onPress={() => setLen(n)} style={chip(len === n)}>
-              <Text style={{ color: len === n ? '#fff' : colors.ink, fontWeight: '600' }}>{n ? tr('{n} min', { n }) : tr('Until I sleep')}</Text>
+              <Text style={{ color: len === n ? colors.onAccent : colors.ink, fontWeight: '600' }}>{n ? tr('{n} min', { n }) : tr('Until I sleep')}</Text>
             </Pressable>
           ))}
         </View>

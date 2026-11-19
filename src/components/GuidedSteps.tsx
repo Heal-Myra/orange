@@ -56,7 +56,7 @@ export function GuidedSteps({ steps, heading, bg = '#DDEAF4', onDone, doneLine }
           <>
             <Text style={{ fontSize: 26, fontWeight: '700', color: colors.ink, textAlign: 'center' }}>{heading}</Text>
             <Pressable onPress={() => setI(0)} disabled={preparing} accessibilityRole="button" style={{ backgroundColor: preparing ? colors.line : colors.accent, borderRadius: 14, paddingVertical: 14, paddingHorizontal: 48, marginTop: 10 }}>
-              <Text style={{ color: '#fff', fontWeight: '700', fontSize: 17 }}>{tr('Begin')}</Text>
+              <Text style={{ color: colors.onAccent, fontWeight: '700', fontSize: 17 }}>{tr('Begin')}</Text>
             </Pressable>
             {preparing ? <Text style={{ color: colors.muted, fontSize: 14 }}>{tr("Getting Myra's voice ready…")}</Text> : null}
           </>
@@ -64,7 +64,7 @@ export function GuidedSteps({ steps, heading, bg = '#DDEAF4', onDone, doneLine }
           <>
             <Text style={{ fontSize: 22, fontWeight: '700', color: colors.insight, textAlign: 'center' }}>✦ {doneLine}</Text>
             <Pressable onPress={() => router.back()} accessibilityRole="button" style={{ backgroundColor: colors.accent, borderRadius: 14, paddingVertical: 13, paddingHorizontal: 44, marginTop: 10 }}>
-              <Text style={{ color: '#fff', fontWeight: '700', fontSize: 16 }}>{tr('Done')}</Text>
+              <Text style={{ color: colors.onAccent, fontWeight: '700', fontSize: 16 }}>{tr('Done')}</Text>
             </Pressable>
           </>
         ) : (

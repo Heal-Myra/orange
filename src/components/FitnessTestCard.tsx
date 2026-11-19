@@ -22,7 +22,7 @@ export function FitnessTestCard() {
   const start = (
     <Pressable onPress={() => router.push('/fitness-test')} accessibilityRole="button"
       style={{ marginTop: 6, borderRadius: 12, paddingVertical: 11, alignItems: 'center', backgroundColor: colors.accent }}>
-      <Text style={{ color: '#fff', fontWeight: '600' }}>{tr("Start this month's test")}</Text>
+      <Text style={{ color: colors.onAccent, fontWeight: '600' }}>{tr("Start this month's test")}</Text>
     </Pressable>
   );
   if (due) return (

@@ -69,7 +69,7 @@ export default function Focus() {
           <Text style={{ color: '#fff', fontSize: 26, fontWeight: '700' }}>{tr('Focus check')} 🎯</Text>
           <Text style={{ color: '#D6DBDD', fontSize: 17, lineHeight: 24 }}>{tr('Tap anywhere when the orange light appears. Let the grey ones pass. 2 minutes.')}</Text>
           <Pressable onPress={() => setPhase('play')} accessibilityRole="button" style={{ backgroundColor: colors.accent, borderRadius: 14, paddingVertical: 14, alignItems: 'center', marginTop: 10 }}>
-            <Text style={{ color: '#fff', fontWeight: '700', fontSize: 17 }}>{tr('Begin')}</Text>
+            <Text style={{ color: colors.onAccent, fontWeight: '700', fontSize: 17 }}>{tr('Begin')}</Text>
           </Pressable>
         </View>
       ) : phase === 'play' ? (
@@ -86,7 +86,7 @@ export default function Focus() {
           <Text style={{ color: '#fff', fontSize: 72, fontWeight: '800' }}>{score}</Text>
           <Text style={{ color: '#F0A060', fontSize: 17, fontWeight: '600', textAlign: 'center' }}>✦ {tr(...focusLine(all))}</Text>
           <Pressable onPress={() => router.back()} accessibilityRole="button" style={{ backgroundColor: colors.accent, borderRadius: 14, paddingVertical: 13, paddingHorizontal: 40, marginTop: 16 }}>
-            <Text style={{ color: '#fff', fontWeight: '700', fontSize: 16 }}>{tr('Done')}</Text>
+            <Text style={{ color: colors.onAccent, fontWeight: '700', fontSize: 16 }}>{tr('Done')}</Text>
           </Pressable>
         </View>
       )}

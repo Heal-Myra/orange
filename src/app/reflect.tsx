@@ -83,7 +83,7 @@ export default function Reflect() {
           {phase === 'writing' ? <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center', paddingVertical: 30 }}><ActivityIndicator color={colors.insight} /><Text style={{ color: colors.insight }}>{tr('Myra is writing…')}</Text></View> : (
             <Pressable onPress={phase === 'listening' ? stop : start} disabled={!Speech} accessibilityRole="button" accessibilityLabel={phase === 'listening' ? tr('Stop') : tr('Speak')}
               style={{ width: 84, height: 84, borderRadius: 42, backgroundColor: Speech ? (phase === 'listening' ? colors.insight : '#E8833F') : colors.line, alignItems: 'center', justifyContent: 'center', marginVertical: 12 }}>
-              <Text style={{ fontSize: 32, color: '#fff' }}>{phase === 'listening' ? '■' : '🎙'}</Text>
+              <Text style={{ fontSize: 32, color: colors.onAccent }}>{phase === 'listening' ? '■' : '🎙'}</Text>
             </Pressable>
           )}
           {phase === 'listening' ? <Text style={{ color: colors.muted }}>{Math.floor(secs / 60)}:{String(secs % 60).padStart(2, '0')} · {tr('tap to stop')}</Text> : null}

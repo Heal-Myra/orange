@@ -1,5 +1,8 @@
 # Changelog
 
+## 19 Nov 2026 — New look: Ganga Dusk glass (decision 0062)
+- Founder chose design 2. An evening river sky behind every screen, smoked see-through cards, all text white like Oura, glass buttons, and only the result word on My day in colour (green, teal, amber, soft coral). The real frosted blur comes with the next App Store build.
+
 ## 18 Nov 2026 — Myra's mix rebuilt (decision 0061)
 - Founder approved the new script from the Hatha Yoga Pradipika and the Ayush Common Yoga Protocol: Arrive → Bhastrika → Kapalbhati → Anulom Vilom → Bhramari → Om → Stillness. Myra speaks only at the edges of each round, a soft tick keeps the quick breaths, a chime marks each nostril switch, a tanpura plays underneath, and each step shows its source. Daytime Myra's mix; Sit, Yoga Nidra and the single practices come next.
 

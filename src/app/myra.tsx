@@ -258,7 +258,7 @@ export default function Myra() {
     <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} hitSlop={8}
       style={{ width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', backgroundColor: on ? colors.ink : colors.surface,
         shadowColor: '#000', shadowOpacity: 0.07, shadowRadius: 8, shadowOffset: { width: 0, height: 2 }, elevation: 2 }}>
-      <Ionicons name={name} size={21} color={on ? '#fff' : colors.ink} />
+      <Ionicons name={name} size={21} color={on ? colors.onAccent : colors.ink} />
     </Pressable>
   );
   const empty = messages.length === 0;
@@ -362,8 +362,8 @@ export default function Myra() {
                 {round(listening ? 'stop' : 'mic-outline', tr('Speak'), () => { if (!holding.current) speak(); }, listening ? colors.insight : colors.field, listening ? colors.onInsight : colors.ink,
                   () => { holding.current = true; if (!listening) speak(); },
                   () => { if (holding.current) { holding.current = false; setTimeout(() => speak(), 250); } })}
-                {typing ? round('arrow-up', tr('Send'), () => send(text), colors.accent, '#fff')
-                  : round('pulse-outline', tr('Talk with Myra'), () => setVoice(true), colors.ink, '#fff')}
+                {typing ? round('arrow-up', tr('Send'), () => send(text), colors.accent, colors.onAccent)
+                  : round('pulse-outline', tr('Talk with Myra'), () => setVoice(true), colors.ink, colors.onAccent)}
               </View>
               {!kb ? <Text style={{ color: colors.muted, fontSize: 11.5, textAlign: 'center' }}>{tr('Myra can make mistakes. Not medical advice.')}</Text> : null}
             </>

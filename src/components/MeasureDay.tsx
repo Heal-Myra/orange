@@ -56,7 +56,7 @@ export function MeasureDay() {
       {input(tr('Hips (widest part)'), hips, setHips)}
       <Pressable onPress={save} disabled={num(waist) == null} accessibilityRole="button"
         style={{ marginTop: 8, borderRadius: 12, paddingVertical: 11, alignItems: 'center', backgroundColor: num(waist) == null ? colors.line : colors.accent }}>
-        <Text style={{ color: '#fff', fontWeight: '600' }}>{tr('Save')}</Text>
+        <Text style={{ color: colors.onAccent, fontWeight: '600' }}>{tr('Save')}</Text>
       </Pressable>
     </View>
   );

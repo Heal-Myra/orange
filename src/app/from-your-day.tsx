@@ -55,7 +55,7 @@ export default function FromYourDayScreen() {
             </Pressable>
             <Pressable onPress={() => setPick(p => ({ ...p, [s.key]: true }))} accessibilityLabel={tr('Add')} hitSlop={6}
               style={{ width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center', backgroundColor: on ? colors.accent : colors.surface, borderWidth: on ? 0 : 1, borderColor: colors.line }}>
-              <Ionicons name="checkmark" size={17} color={on ? '#fff' : colors.muted} />
+              <Ionicons name="checkmark" size={17} color={on ? colors.onAccent : colors.muted} />
             </Pressable>
           </>
         )}

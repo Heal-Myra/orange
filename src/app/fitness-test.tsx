@@ -57,7 +57,7 @@ export default function FitnessTest() {
           <View style={{ alignItems: 'center', gap: 10, paddingVertical: 6 }}>
             <Text style={{ fontSize: 48, fontWeight: '800', color: colors.ink }}>{clockText}</Text>
             <Pressable onPress={startStop} accessibilityRole="button" style={{ borderRadius: 99, paddingHorizontal: 28, paddingVertical: 12, backgroundColor: running ? colors.insight : colors.accent }}>
-              <Text style={{ color: '#fff', fontWeight: '700', fontSize: 16 }}>{running ? tr('Stop') : tr('Start')}</Text>
+              <Text style={{ color: colors.onAccent, fontWeight: '700', fontSize: 16 }}>{running ? tr('Stop') : tr('Start')}</Text>
             </Pressable>
           </View>
         ) : null}
