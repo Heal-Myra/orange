@@ -1,5 +1,9 @@
 # Changelog
 
+## 19 Nov 2026 — Today's top, the Oura way; Body, Mind and Soul marks (decision 0063)
+- Body, Mind and Soul circles are faint glass discs with no outline, each with its own mark above a thin number: Body, a person rising like a sprouting plant; Mind, still water with two ripples; Soul, a diya. The same marks are in the tab bar.
+- The Ganga scene now runs up behind a see-through header; the profile button is a soft glass circle with your first initial; Start now and Why, Myra? are smoked pills that blend into the scene.
+
 ## 19 Nov 2026 — Redesign step 3, sleep in seven parts, no typing when a device feeds a card (decisions 0063, 0064)
 - Cards show one big thin score with "Details ›" and what made it as thin bars (coral only where it needs care); Myra's tip is a serif line. Details opens Oura's kind of page: the week's bars with your goal, the score and its word, Myra's line, what made the score, This week tiles, then trends.
 - Sleep from a ring or watch is scored on seven parts like Oura's (total sleep, efficiency, deep, REM, restfulness, falling asleep, timing); the night's heart rate, HRV, breathing rate and blood oxygen are kept and shown as Night vitals. Typed nights keep hours + quality.

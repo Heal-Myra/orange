@@ -31,3 +31,8 @@ for the Calm Teal look only.
 RingPanel/RingTop in glass: big thin score + Contributors bars (src/components/Rings.tsx); MyraLine in serif; the card's
 heading no longer repeats the score (except meditation, phone, love, which have no big score below); src/app/trend.tsx
 DetailPage. The card wash is drawn at the measured card size (a "100%" SVG left a dark strip on iPhone).
+
+## Today's top refined (shipped 19 Nov 2026)
+Founder: "the top panel … lacks that finesse"; "boundary … should be lighter so it seems more merged". Glass discs with no
+outline (radial 3.5–7.5 % white), pillar marks in src/components/PillarIcon.tsx (Body sprouting person, Mind ripples, Soul
+diya) also in the tab bar, see-through Today header, initial in the profile circle, smoked hero buttons.
