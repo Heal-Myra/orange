@@ -22,10 +22,11 @@ import { CareNote } from '../../components/CareCard';
 import { FaceCard } from '../../components/FaceCard';
 import { AirRow } from '../../components/AirLine';
 import { PASTEL, RingPanel } from '../../components/Rings';
+const SLEEP_COLORS = [PASTEL.lavender, PASTEL.sky, PASTEL.teal, PASTEL.sand, PASTEL.rose, PASTEL.sage, PASTEL.peach];
 import { MyraLine } from '../../components/MyraLine';
 import { todayISO } from '../../lib/dates';
 import { Anchor, Card, Expandable, Heading, Note, Screen, Score, s } from '../../components/ui';
-import { DEVICE_QUALITY_FROM, FAST_KCAL, bodyScore, deviceQuality, mealTotals } from '../../lib/scoring';
+import { DEVICE_QUALITY_FROM, FAST_KCAL, bodyScore, deviceQuality, mealTotals, sleepParts } from '../../lib/scoring';
 import { useHeal } from '../../lib/store';
 import { colors } from '../../theme';
 import { tr } from '../../lib/i18n';
@@ -48,6 +49,7 @@ export default function Body() {
   const h = day.health;
   const st = h?.sleepStages;
   // A device feeds a card → that card's typing boxes go away; its numbers show without boxes (founder, 19 Nov 2026).
+  const sleepV2 = sleepParts(day);
   const sleepDevice = !!day.sleep.source && day.sleep.source !== 'Typed in';
   const moveDevice = !!day.activity.source && !day.activity.stepsTyped && !day.activity.activeTyped;
   const weightDevice = h?.weightAt != null && !h?.weightTyped;
@@ -118,7 +120,8 @@ export default function Body() {
 
       <Anchor id="sleep"><Card>
         <Heading right={<Score value={score?.sleep} max={30} />}>{tr('Sleep')}</Heading>
-        <RingPanel trend="sleep" score={score?.sleep} max={30} items={[
+        {/* With a ring or watch: Oura's seven parts (decision 0064); typed nights: hours and quality. */}
+        <RingPanel trend="sleep" score={score?.sleep} max={30} items={sleepV2 ? sleepV2.map((p, i) => ({ id: p.id, color: SLEEP_COLORS[i % SLEEP_COLORS.length], label: tr(p.label), value: p.value, text: p.text })) : [
           { id: 'hours', color: PASTEL.lavender, label: tr('Hours slept'), value: (day.sleep.hours ?? 0) / 8, text: day.sleep.hours != null ? `${Math.round(day.sleep.hours * 10) / 10} / 8 h` : '–' },
           ...(st?.deep != null ? [{ id: 'deep', color: PASTEL.sky, label: tr('Deep sleep'), value: st.deep / 1.5, text: `${Math.round(st.deep * 10) / 10} / 1.5 h` }] : []),
           dq != null

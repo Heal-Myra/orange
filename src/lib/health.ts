@@ -8,7 +8,12 @@ export interface HealthDay {
   activeKcal?: number; mindfulMin?: number; nightTempC?: number; // ring or Watch, the night ending this day (16 Nov 2026)
   workouts?: { type: string; min: number; kcal?: number }[];
   sleepStages?: { deep?: number; core?: number; rem?: number; awake?: number };
+  /** Every detail of the night the device gives (founder, 19 Nov 2026: "as granular as we can get"; decision 0064).
+   *  inBed: hours from getting into bed to getting up; latencyMin: minutes to fall asleep; wakeUps: times woken; wakeAt:
+   *  when the night ended (ISO); the night's lowest and average heart rate, HRV, breathing rate and blood oxygen. */
+  sleepDetail?: SleepDetail;
 }
+export interface SleepDetail { inBed?: number; latencyMin?: number; wakeUps?: number; awakeMin?: number; wakeAt?: string; lowestHr?: number; avgHr?: number; hrvNight?: number; respRate?: number; spo2?: number }
 
 export const HEALTH_READ_VERSION = 3;
 export const healthAvailable = (): boolean => false;

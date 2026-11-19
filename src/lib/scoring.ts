@@ -87,6 +87,46 @@ export function deviceQuality(st: { deep?: number; rem?: number; awake?: number 
   return Math.round(Math.max(1, 5 * (0.6 * restorative + 0.4 * settled)) * 10) / 10;
 }
 
+/** Sleep from a ring or watch, from 19 Nov 2026 (founder: "all individual elements Oura uses"; decision 0064).
+ *  Seven parts out of 30: total sleep 10, efficiency 4, deep sleep 4, REM sleep 3, restfulness 3, falling asleep 3,
+ *  timing 3. A part the device did not give is left out and the rest share its points. Typed nights keep hours 20 +
+ *  quality 10. The night's vitals (lowest heart rate, HRV, breathing, oxygen) are kept but not scored here. */
+export const SLEEP_V2_FROM = '2026-11-19';
+export interface SleepPart { id: string; label: string; value: number; text: string; weight: number }
+
+const hhmm = (h: number) => { const m = Math.round(h * 60); return `${Math.floor(m / 60)}h ${String(m % 60).padStart(2, '0')}m`; };
+
+export function sleepParts(d: DayLog): SleepPart[] | null {
+  const s = d.sleep, st = d.health?.sleepStages, x = d.health?.sleepDetail;
+  if (s.hours == null || (d.date ?? '') < SLEEP_V2_FROM || !st || s.source === 'Typed in') return null;
+  const h = s.hours;
+  const parts: SleepPart[] = [];
+  parts.push({ id: 'total', label: 'Total sleep', weight: 10, text: hhmm(h), value: h >= 7 && h <= 9 ? 1 : h < 7 ? c01((h - 4) / 3) : c01(1 - (h - 9) / 3) });
+  const inBed = x?.inBed ?? (st.awake != null ? h + st.awake : undefined);
+  if (inBed) { const eff = Math.min(1, h / inBed); parts.push({ id: 'efficiency', label: 'Efficiency', weight: 4, text: `${Math.round(eff * 100)}%`, value: c01((eff - 0.7) / 0.2) }); }
+  if (st.deep != null) parts.push({ id: 'deep', label: 'Deep sleep', weight: 4, text: `${hhmm(st.deep)}, ${Math.round((st.deep / h) * 100)}%`, value: c01(st.deep / 1.5) });
+  if (st.rem != null) parts.push({ id: 'rem', label: 'REM sleep', weight: 3, text: `${hhmm(st.rem)}, ${Math.round((st.rem / h) * 100)}%`, value: c01(st.rem / Math.max(1.2, 0.2 * h)) });
+  const awakeMin = x?.awakeMin ?? (st.awake != null ? Math.round(st.awake * 60) : undefined);
+  if (x?.wakeUps != null || awakeMin != null) {
+    const w = x?.wakeUps, a = awakeMin ?? 0;
+    const v = (w == null ? 1 : c01(1 - Math.max(0, w - 2) / 6)) * c01(1 - Math.max(0, a - 20) / 60);
+    parts.push({ id: 'restful', label: 'Restfulness', weight: 3, text: w != null ? `${w}× · ${a} min` : `${a} min`, value: v });
+  }
+  if (x?.latencyMin != null) { const l = x.latencyMin; parts.push({ id: 'latency', label: 'Falling asleep', weight: 3, text: `${l} min`, value: l < 5 ? 0.7 : l <= 20 ? 1 : c01(1 - (l - 20) / 40) }); }
+  if (s.bedAt && x?.wakeAt) {
+    const a = new Date(s.bedAt).getTime(), b = new Date(x.wakeAt).getTime();
+    const mid = new Date((a + b) / 2); let mh = mid.getHours() + mid.getMinutes() / 60; if (mh > 12) mh -= 24; // hours after midnight
+    const off = mh < 0 ? -mh : mh > 3.5 ? mh - 3.5 : 0;
+    parts.push({ id: 'timing', label: 'Timing', weight: 3, text: `${new Date(a).toTimeString().slice(0, 5)}–${new Date(b).toTimeString().slice(0, 5)}`, value: c01(1 - off / 3) });
+  }
+  return parts;
+}
+
+export function sleepPoints(parts: SleepPart[]): number {
+  const w = parts.reduce((t, p) => t + p.weight, 0);
+  return w ? (30 * parts.reduce((t, p) => t + p.weight * p.value, 0)) / w : 0;
+}
+
 export function bodyScore(d: DayLog, P: Profile, now: Date = new Date()): BodyScore | null {
   const a = d.activity, s = d.sleep;
   const hasAct = a.steps != null || a.activeMin != null;
@@ -110,6 +150,8 @@ export function bodyScore(d: DayLog, P: Profile, now: Date = new Date()): BodySc
     const dq = (d.date ?? '') >= DEVICE_QUALITY_FROM ? deviceQuality(d.health?.sleepStages, h) : null;
     const qualityPts = dq != null ? (10 * dq) / 5 : s.quality ? (10 * s.quality) / 5 : hoursPts / 2;
     sleep = hoursPts + qualityPts;
+    const v2 = sleepParts(d);
+    if (v2) sleep = sleepPoints(v2);
   }
 
   const totals = mealTotals(d.meals);

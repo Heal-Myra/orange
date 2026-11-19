@@ -13,7 +13,7 @@ import {
   requestAuthorization,
   WorkoutActivityType,
 } from '@kingstinct/react-native-healthkit';
-import type { HealthDay, Run } from './health';
+import type { HealthDay, Run, SleepDetail } from './health';
 
 export type { HealthDay } from './health';
 
@@ -76,14 +76,15 @@ async function sleepOf(iso: string) {
   // per stage (founder, 15 Nov 2026: 7-8 hours slept showed as 13.1, with 4.1 h deep).
   type Span = [number, number];
   const names: Record<string, string> = {};
-  const bySpans: Record<string, Record<'asleep' | 'deep' | 'core' | 'rem' | 'awake', Span[]>> = {};
+  const bySpans: Record<string, Record<'asleep' | 'deep' | 'core' | 'rem' | 'awake' | 'inBed', Span[]>> = {};
   for (const s of samples) {
     const v = Number(s.value);
     const a = new Date(s.startDate as unknown as string).getTime(), b = new Date(s.endDate as unknown as string).getTime();
     if (!(b > a)) continue;
     const key = s.sourceRevision?.source?.bundleIdentifier ?? 'unknown';
     names[key] ??= s.sourceRevision?.source?.name ?? key;
-    const g = (bySpans[key] ??= { asleep: [], deep: [], core: [], rem: [], awake: [] });
+    const g = (bySpans[key] ??= { asleep: [], deep: [], core: [], rem: [], awake: [], inBed: [] });
+    if (v === 0) g.inBed.push([a, b]);
     if (v === 2) g.awake.push([a, b]);
     if (v === 1 || v >= 3) g.asleep.push([a, b]);
     if (v === 3) g.core.push([a, b]);
@@ -91,10 +92,15 @@ async function sleepOf(iso: string) {
     if (v === 5) g.rem.push([a, b]);
   }
   const union = (xs: Span[]) => { let ms = 0, upTo = -Infinity; for (const [a, b] of [...xs].sort((x, y) => x[0] - y[0])) { if (b <= upTo) continue; ms += b - Math.max(a, upTo); upTo = b; } return ms; };
-  const bySource: Record<string, { asleep: number; deep: number; core: number; rem: number; awake: number; bed?: number }> = {};
+  const bySource: Record<string, { asleep: number; deep: number; core: number; rem: number; awake: number; bed?: number; wake?: number; inBedFrom?: number; wakeUps: number }> = {};
   for (const [key, g] of Object.entries(bySpans)) {
-    bySource[key] = { asleep: union(g.asleep), deep: union(g.deep), core: union(g.core), rem: union(g.rem), awake: union(g.awake),
-      bed: g.asleep.length ? Math.min(...g.asleep.map(x => x[0])) : undefined }; // first fell asleep
+    const bed = g.asleep.length ? Math.min(...g.asleep.map(x => x[0])) : undefined; // first fell asleep
+    const wake = g.asleep.length ? Math.max(...g.asleep.map(x => x[1])) : undefined; // last woke up
+    // Times woken: separate awake stretches between falling asleep and the final waking (touching ones count once).
+    let wakeUps = 0, upTo = -Infinity;
+    for (const [a, b] of [...g.awake].sort((x, y) => x[0] - y[0])) { if (bed == null || wake == null || a <= bed || b >= wake) continue; if (a > upTo + 60000) wakeUps++; upTo = Math.max(upTo, b); }
+    bySource[key] = { asleep: union(g.asleep), deep: union(g.deep), core: union(g.core), rem: union(g.rem), awake: union(g.awake), bed, wake,
+      inBedFrom: g.inBed.length ? Math.min(...g.inBed.map(x => x[0])) : undefined, wakeUps };
   }
   // One device per night, never added together: an Oura ring when it recorded the night (bought for sleep, worn all
   // night), otherwise the device that recorded the most sleep (founder, 15 Nov 2026).
@@ -105,7 +111,31 @@ async function sleepOf(iso: string) {
   if (!best || best.asleep <= 0) return { hours: undefined, stages: undefined };
   const h = (ms: number) => (ms > 0 ? r1(ms / 3600000) : undefined);
   const staged = best.deep + best.core + best.rem > 0;
-  return { from: names[pick!] ?? undefined, hours: h(best.asleep), bed: best.bed ? new Date(best.bed).toISOString() : undefined, stages: staged ? { deep: h(best.deep), core: h(best.core), rem: h(best.rem), awake: h(best.awake) } : undefined };
+  // The rest of the night (decision 0064): time in bed, minutes to fall asleep, times woken, and the night's vitals.
+  const from = best.inBedFrom != null && best.bed != null && best.inBedFrom < best.bed ? best.inBedFrom : best.bed;
+  const latency = best.inBedFrom != null && best.bed != null && best.inBedFrom <= best.bed ? Math.round((best.bed - best.inBedFrom) / 60000) : undefined;
+  let vit: Partial<SleepDetail> = {};
+  if (best.bed != null && best.wake != null) {
+    const a = new Date(best.bed), b = new Date(best.wake);
+    const [lo, avg, hrv, rr, o2] = await Promise.all([
+      queryStatisticsForQuantity('HKQuantityTypeIdentifierHeartRate' as never, ['discreteMin'] as never, { ...range(a, b), unit: 'count/min' } as never).then(r => (r as { minimumQuantity?: { quantity: number } }).minimumQuantity?.quantity).catch(() => undefined),
+      stat('HKQuantityTypeIdentifierHeartRate', 'discreteAverage', 'count/min', a, b).catch(() => undefined),
+      stat('HKQuantityTypeIdentifierHeartRateVariabilitySDNN', 'discreteAverage', 'ms', a, b).catch(() => undefined),
+      stat('HKQuantityTypeIdentifierRespiratoryRate', 'discreteAverage', 'count/min', a, b).catch(() => undefined),
+      stat('HKQuantityTypeIdentifierOxygenSaturation', 'discreteAverage', '%', a, b).catch(() => undefined),
+    ]);
+    vit = { lowestHr: lo != null ? Math.round(lo) : undefined, avgHr: avg != null ? Math.round(avg) : undefined, hrvNight: hrv != null ? Math.round(hrv) : undefined,
+      respRate: rr != null ? r1(rr) : undefined, spo2: o2 != null ? r1(o2 <= 1 ? o2 * 100 : o2) : undefined };
+  }
+  const detail: SleepDetail = {
+    inBed: from != null && best.wake != null ? h(best.wake - from) : undefined,
+    latencyMin: latency != null && latency <= 180 ? latency : undefined,
+    wakeUps: staged || best.awake > 0 ? best.wakeUps : undefined,
+    awakeMin: best.awake > 0 ? Math.round(best.awake / 60000) : staged ? 0 : undefined,
+    wakeAt: best.wake ? new Date(best.wake).toISOString() : undefined,
+    ...vit,
+  };
+  return { from: names[pick!] ?? undefined, hours: h(best.asleep), bed: best.bed ? new Date(best.bed).toISOString() : undefined, stages: staged ? { deep: h(best.deep), core: h(best.core), rem: h(best.rem), awake: h(best.awake) } : undefined, detail };
 }
 
 /** The night's temperature (16 Nov 2026, cool room for deep sleep): the Watch's sleeping wrist temperature, else a
@@ -177,6 +207,7 @@ export async function readHealthDay(iso: string): Promise<HealthDay> {
     sleepBed: sleep?.bed,
     sleepFrom: sleep?.from,
     sleepStages: sleep?.stages,
+    sleepDetail: sleep?.detail,
     activeKcal: activeKcal != null ? Math.round(activeKcal) : undefined,
     weightKg: weight != null ? r1(weight.value) : undefined,
     weightAt: weight?.at,

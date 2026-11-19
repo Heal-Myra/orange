@@ -66,6 +66,21 @@ spaces snapped. Not part of Body, Mind, Soul or My day until the wholesome scori
 ## Sleep quality from a tracker (15 Nov 2026)
 When a ring or watch records the sleep stages, quality is not asked. Quality (1–5) = 5 × (0.6 × restorative + 0.4 × settled), at least 1: restorative = (deep + REM) ÷ hours slept ÷ 0.4 (capped at 1); settled = (share of the night asleep − 0.75) ÷ 0.2, from 0 to 1. The Sleep score's quality part (10) uses it. Without stages, the 1–5 tap stays.
 
+## Sleep from a ring or watch: seven parts (19 Nov 2026, decision 0064)
+Founder: "all individual elements Oura uses". When a ring or watch records the night (stages present, not typed), Sleep (30)
+= 30 × weighted share of seven parts; a part the device did not give is left out and the others share its points:
+| Part | Weight | Full marks | Falls to zero |
+|---|---|---|---|
+| Total sleep | 10 | 7–9 h | 4 h (or 12 h) |
+| Efficiency (asleep ÷ in bed) | 4 | 90 % | 70 % |
+| Deep sleep | 4 | 1.5 h | 0 |
+| REM sleep | 3 | 20 % of sleep (at least 1.2 h) | 0 |
+| Restfulness | 3 | woken ≤ 2 times and ≤ 20 min awake | 8 wake-ups / 80 min awake |
+| Falling asleep | 3 | 5–20 min (under 5: 70 %) | 60 min |
+| Timing (middle of the night's sleep) | 3 | 00:00–03:30 | 3 h outside |
+Typed nights keep 20 for hours + 10 for quality. The night's lowest and average heart rate, HRV, breathing rate and blood
+oxygen are read and kept (shown as Night vitals) but not scored yet; they are for the learning engine.
+
 ## Small extras (16 Nov 2026)
 - **Walk after dinner:** 10 minutes or more of walking (about 1,000 steps, from Apple Health) within 45 minutes of dinner adds **2** to Movement. Movement stays at most 30.
 - **Forgiveness practice:** once a week, the 5-minute guided letting-go adds **5** to Soul that day. Soul stays at most 100.

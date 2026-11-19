@@ -102,6 +102,7 @@ export interface DayLog {
     nightTempC?: number; // the night's temperature from the ring or Watch (16 Nov 2026)
     workouts?: { type: string; min: number; kcal?: number }[];
     sleepStages?: { deep?: number; core?: number; rem?: number; awake?: number }; // hours
+    sleepDetail?: import('./health').SleepDetail; // every detail of the night from the ring or Watch (decision 0064)
   }; // the day's Tao Te Ching practice (src/lib/tao.ts)
   soul?: {
     checked?: boolean;      // answered the eight-practices check today

@@ -10,7 +10,7 @@ import { Contributors } from '../components/Rings';
 import { MyraLine, type CardId } from '../components/MyraLine';
 import { dayParts } from '../components/TodayRings';
 import { Serif, Tile } from '../components/ui';
-import { band, wellBeing } from '../lib/scoring';
+import { band, sleepParts, wellBeing } from '../lib/scoring';
 import { colors, font, isGlass, statusColor } from '../theme';
 import { shiftISO } from '../lib/dates';
 import { PASTEL, RingKey, RingStack, type RingItem } from '../components/Rings';
@@ -104,6 +104,17 @@ function DetailPage({ cardId, items }: { cardId: string; items: RingItem[] }) {
   const show = (v: number) => (m?.decimals ? v.toFixed(m.decimals) : Math.round(v).toLocaleString('en-IN'));
   const unit = m && !m.unit.startsWith('of ') ? ` ${tr(m.unit)}` : '';
   const isToday = date === todayISO();
+  // Sleep from a ring or watch: Oura's seven parts and the night's vitals (decision 0064).
+  const sp = cardId === 'sleep' ? sleepParts(day) : null;
+  const x = day.health?.sleepDetail;
+  const vit = ([
+    ['Time in bed', x?.inBed != null ? `${Math.floor(x.inBed)}h ${String(Math.round((x.inBed % 1) * 60)).padStart(2, '0')}m` : null],
+    ['Lowest heart rate', x?.lowestHr != null ? `${x.lowestHr} bpm` : null],
+    ['Average heart rate', x?.avgHr != null ? `${x.avgHr} bpm` : null],
+    ['Heart rate variability', x?.hrvNight != null ? `${x.hrvNight} ms` : null],
+    ['Breathing rate', x?.respRate != null ? `${x.respRate} /min` : null],
+    ['Blood oxygen', x?.spo2 != null ? `${x.spo2}%` : null],
+  ] as [string, string | null][]).filter((r): r is [string, string] => r[1] != null);
   const W = 340, H = 150, bw = 30, gap = (W - bw * 7) / 6;
 
   return (
@@ -138,7 +149,13 @@ function DetailPage({ cardId, items }: { cardId: string; items: RingItem[] }) {
         ? <MyraLine card={cardId as CardId} />
         : <Serif size={28}>{b ? tr(b) : tr('Fresh start')}</Serif>}
       <Text style={{ fontSize: 24, color: colors.ink, marginTop: 8 }}>{tr('What made this score')}</Text>
-      <Contributors items={items} />
+      <Contributors items={sp ? sp.map(p => ({ id: p.id, color: '', label: tr(p.label), value: p.value, text: p.text })) : items} />
+      {cardId === 'sleep' && vit.length ? (
+        <>
+          <Text style={{ fontSize: 24, color: colors.ink, marginTop: 8 }}>{tr('Night vitals')}</Text>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>{vit.map(([l, v]) => <Tile key={l} label={tr(l)} value={v} />)}</View>
+        </>
+      ) : null}
       {m && got.length ? (
         <>
           <Text style={{ fontSize: 24, color: colors.ink, marginTop: 8 }}>{tr('This week')}</Text>

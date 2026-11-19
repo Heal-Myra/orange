@@ -133,3 +133,22 @@ describe('Soul from 16 Nov 2026', () => {
     expect(soulScore({ ...full, soul: { ...full.soul, verseLived: 'was patient at home today' } })!.verse).toBe(25);
   });
 });
+
+import { sleepParts, sleepPoints } from './scoring';
+describe('sleep from a ring: seven parts (decision 0064)', () => {
+  const base = { date: '2026-11-19', activity: {}, meals: [], media: [], mind: {}, dharma: {}, actions: [] } as never as import('./types').DayLog;
+  it('scores a full ring night out of 30 and leaves out what the device did not give', () => {
+    const d = { ...base, sleep: { hours: 7.5, source: 'Apple Health · Oura', bedAt: '2026-11-18T17:30:00.000Z' },
+      health: { sleepStages: { deep: 1.5, core: 4.2, rem: 1.8, awake: 0.3 }, sleepDetail: { inBed: 8, latencyMin: 12, wakeUps: 1, awakeMin: 18, wakeAt: '2026-11-19T01:30:00.000Z' } } } as never as import('./types').DayLog;
+    const p = sleepParts(d)!;
+    expect(p.map(x => x.id)).toEqual(['total', 'efficiency', 'deep', 'rem', 'restful', 'latency', 'timing']);
+    expect(sleepPoints(p)).toBeGreaterThan(27);
+    const short = { ...d, sleep: { ...d.sleep, hours: 5 }, health: { sleepStages: { deep: 0.5, rem: 0.6, awake: 1.2 } } } as never as import('./types').DayLog;
+    expect(sleepParts(short)!.length).toBe(5);
+    expect(sleepPoints(sleepParts(short)!)).toBeLessThan(15);
+  });
+  it('keeps typed nights and older days on hours and quality', () => {
+    expect(sleepParts({ ...base, sleep: { hours: 7, source: 'Typed in' } } as never)).toBeNull();
+    expect(sleepParts({ ...base, date: '2026-11-18', sleep: { hours: 7, source: 'Apple Health' }, health: { sleepStages: { deep: 1 } } } as never)).toBeNull();
+  });
+});
