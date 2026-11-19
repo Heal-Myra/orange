@@ -9,11 +9,11 @@ import { FAST_FROM, FOOD_PARTS, FOOD_V3_FROM, aimShares, fastHabit, fastHoursOf,
 import { foodScore, mealTotals } from '../lib/scoring';
 import { tr } from '../lib/i18n';
 import { useHeal } from '../lib/store';
-import { colors } from '../theme';
+import { colors, isGlass } from '../theme';
 import { PASTEL } from './Rings';
 import type { AboutMe } from '../lib/targets';
 
-const SKY_INK = '#2F567A';
+const SKY_INK = isGlass ? '#CFE3F5' : '#2F567A';
 
 /** The habit and today's fast, re-read every minute so the hours keep moving. From 3 Nov 2026 everyone has a fast
  *  (14 h unless they fast longer by choice). */

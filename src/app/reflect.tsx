@@ -62,7 +62,7 @@ export default function Reflect() {
     <View style={{ gap: 4 }}>
       <Text style={{ color: colors.muted, fontSize: 13, fontWeight: '600' }}>{label}</Text>
       <TextInput value={lines[k]} onChangeText={v => setLines(x => ({ ...x, [k]: v }))} multiline
-        style={{ backgroundColor: '#F7F3EA', borderRadius: 12, padding: 10, fontSize: 15, color: colors.ink, fontStyle: 'italic' }} />
+        style={{ backgroundColor: colors.field, borderRadius: 12, padding: 10, fontSize: 15, color: colors.ink, fontStyle: 'italic' }} />
     </View>
   );
   return (

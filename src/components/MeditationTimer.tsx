@@ -278,7 +278,7 @@ function DhammaStart({ gLang }: { gLang: string }) {
       <Text style={{ fontSize: 20, fontWeight: '800', color: colors.ink }}>{tr('The 10-day Dhamma path')}</Text>
       <Text style={{ fontSize: 14.5, color: colors.ink, lineHeight: 21 }}>{tr('Built like a Dhamma course: one simple step a day, always in order, one method only. Breath first, then the body, then kindness.')}</Text>
       <Dots path={{ active: false, gentle: false, next: 1, soft: false, done: [], finished: false }} />
-      <View style={{ backgroundColor: '#F3F6F7', borderRadius: 16, padding: 12, gap: 8 }}>
+      <View style={{ backgroundColor: colors.field, borderRadius: 16, padding: 12, gap: 8 }}>
         <Text style={{ fontWeight: '700', color: colors.ink }}>{tr('Before we start, a few gentle questions')}</Text>
         <Text style={{ color: colors.ink }}>{tr('Have you ever had panic attacks, trauma or serious low moods?')}</Text>
         {yesNo(panic, setPanic)}
@@ -314,7 +314,7 @@ function DhammaToday({ path, gLang }: { path: PathState; gLang: string }) {
             <Text style={{ color: colors.ink, fontWeight: '600' }}>{tr('How did it feel?')}</Text>
             <View style={{ flexDirection: 'row', gap: 8 }}>
               {([['calm', '😌', 'Calm'], ['restless', '🌀', 'Restless'], ['uneasy', '😟', 'Uneasy']] as const).map(([id, icon, name]) => (
-                <Pressable key={id} onPress={() => answer(id)} accessibilityRole="button" style={{ flex: 1, backgroundColor: '#F3F6F7', borderRadius: 14, paddingVertical: 10, alignItems: 'center' }}>
+                <Pressable key={id} onPress={() => answer(id)} accessibilityRole="button" style={{ flex: 1, backgroundColor: colors.field, borderRadius: 14, paddingVertical: 10, alignItems: 'center' }}>
                   <Text style={{ color: colors.ink, fontWeight: '600' }}>{icon} {tr(name)}</Text>
                 </Pressable>
               ))}

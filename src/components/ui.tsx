@@ -11,6 +11,7 @@ import { formatDay, todayISO } from '../lib/dates';
 import { useHeal } from '../lib/store';
 import { FeedbackBox } from './FeedbackBox';
 import type { Pillar } from '../lib/trends';
+import { GlassBackdrop } from './GlassBackdrop';
 import { colors, radius, shadow, space } from '../theme';
 import { tr } from '../lib/i18n';
 
@@ -58,6 +59,7 @@ export function Screen({ children, showDay = false, feedback, top, dayLabel, noB
   const ctx = useMemo(() => ({ register, lit, keepVisible }), [register, lit, keepVisible]);
   return (
     <SafeAreaView style={s.safe} edges={['left', 'right']}>
+      <GlassBackdrop />
       <AnchorCtx.Provider value={ctx}>
         <ScrollView ref={scroll} contentContainerStyle={fill ? [s.scroll, { flexGrow: 1, gap: space.md, paddingTop: space.md, paddingBottom: space.md }] : s.scroll} keyboardShouldPersistTaps="handled"
           automaticallyAdjustKeyboardInsets keyboardDismissMode="interactive" scrollEventThrottle={32}
@@ -167,7 +169,7 @@ export const Label = ({ children }: { children: ReactNode }) => <Text style={s.l
 export function Score({ value, max }: { value: number | null | undefined; max: number }) {
   const v = value == null ? '–' : Number.isInteger(value * 2) ? value : Math.round(value);
   return (
-    <View style={{ backgroundColor: '#F1F6F7', borderRadius: 99, paddingHorizontal: 10, paddingVertical: 4 }}>
+    <View style={{ backgroundColor: colors.tint, borderRadius: 99, paddingHorizontal: 10, paddingVertical: 4 }}>
       <Text style={s.score}>
         {v}
         <Text style={s.scoreMax}>/{max}</Text>

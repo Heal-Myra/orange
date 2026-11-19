@@ -13,7 +13,7 @@ import { colors } from '../theme';
 
 const dot = (kind: 'on' | 'next' | 'later') => (
   <View style={{ width: 14, height: 14, borderRadius: 7, borderWidth: 2, borderColor: kind === 'next' ? colors.insight : colors.accent,
-    backgroundColor: kind === 'on' ? colors.accent : kind === 'next' ? '#FFF4EE' : 'transparent' }} />
+    backgroundColor: kind === 'on' ? colors.accent : kind === 'next' ? colors.tint : 'transparent' }} />
 );
 
 export function RunLadderCard({ runs, k }: { runs: Run[]; k: number }) {

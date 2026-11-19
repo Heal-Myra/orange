@@ -35,7 +35,7 @@ export function FocusRow() {
 export function CalmButton() {
   return (
     <Pressable onPress={() => router.push('/calm')} accessibilityRole="button"
-      style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: '#FFF4EE', borderWidth: 1, borderColor: '#F3D5C7', borderRadius: 16, padding: 12, opacity: pressed ? 0.85 : 1 })}>
+      style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: colors.tint, borderWidth: 1, borderColor: colors.line, borderRadius: 16, padding: 12, opacity: pressed ? 0.85 : 1 })}>
       <Text style={{ fontSize: 18 }}>🫧</Text>
       <Text style={{ flex: 1, color: colors.ink, fontWeight: '600', fontSize: 15 }}>{tr('Feeling overwhelmed?')}</Text>
       <Text style={{ color: colors.insight, fontWeight: '700' }}>{tr('2 min')} ›</Text>

@@ -163,7 +163,7 @@ export function ScreenTimeCard({ children }: { children?: ReactNode }) {
       {/* A box like Ask Myra's (founder, 1 Nov 2026): + chooses a screenshot; Apple's own Paste button pastes one without
           the "Allow Paste" question every time. */}
       {session ? (
-        <View style={{ borderWidth: 1, borderColor: colors.line, backgroundColor: '#FFFFFF', borderRadius: 24, padding: 11, gap: 10, boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
+        <View style={{ borderWidth: 1, borderColor: colors.line, backgroundColor: colors.surface, borderRadius: 24, padding: 11, gap: 10, boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
           <Text style={{ fontSize: 16, color: colors.muted, paddingHorizontal: 4, paddingTop: 2 }}>{busy ? tr('Reading your Screen Time…') : tr("Add yesterday's Screen Time…")}</Text>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
             <Pressable onPress={pick} disabled={busy} accessibilityLabel={tr('Choose screenshot')}

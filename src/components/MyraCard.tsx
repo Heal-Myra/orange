@@ -29,7 +29,7 @@ export function MyraCard() {
           {/* Like Claude's message box (founder, 31 Oct 2026): the words on top; + on the left; microphone and a round
               dark button on the right (send when there are words, otherwise talk to Myra). */}
           {/* The same height as the Top of My Game card (founder, 1 Nov 2026); the spare space goes to Body, Mind and Soul. */}
-          <View style={{ borderWidth: 1, borderColor: colors.line, backgroundColor: '#FFFFFF', borderRadius: 24, paddingHorizontal: 12, paddingVertical: 10, gap: 6,
+          <View style={{ borderWidth: 1, borderColor: colors.line, backgroundColor: colors.surface, borderRadius: 24, paddingHorizontal: 12, paddingVertical: 10, gap: 6,
             boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
             <TextInput style={{ fontSize: 16, color: colors.ink, minHeight: 24, paddingHorizontal: 4, paddingVertical: 2 }} value={q} onChangeText={setQ}
               placeholder={hint} placeholderTextColor={colors.muted} multiline returnKeyType="send" blurOnSubmit onSubmitEditing={() => ask(q)} />

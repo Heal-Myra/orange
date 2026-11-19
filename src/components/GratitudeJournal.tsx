@@ -73,7 +73,7 @@ export function GratitudeJournal() {
       </View>
     );
   };
-  const soft = { borderWidth: 1, borderColor: colors.line, backgroundColor: '#F8FAFB', borderRadius: 12, paddingHorizontal: 10 } as const;
+  const soft = { borderWidth: 1, borderColor: colors.line, backgroundColor: colors.field, borderRadius: 12, paddingHorizontal: 10 } as const;
   return (
     <Card style={{ gap: 10 }}>
       <Heading right={<Score value={(score?.gratitude ?? 0) + (score?.love ?? 0)} max={soulWeights(date).journal} />}>{tr('Gratitude journal')}</Heading>
