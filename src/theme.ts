@@ -81,3 +81,11 @@ export const CARD_TINT: Record<string, string> = {
   gratitude: '#B5707F', love: '#B5707F', wisdom: '#B58A4C', tao: '#6E9A5C', letgo: '#8A7FB5',
 };
 export const DEFAULT_TINT = '#5E6B85';
+
+/** Oura-like type (redesign, 19 Nov 2026; decision 0063): three voices used the same way everywhere.
+ *  Thin large numbers, a serif for the human sentence (Myra's and the masters' words), small spaced capitals for labels. */
+export const font = {
+  serif: (lang: 'en' | 'hi') => (lang === 'hi' ? 'TiroDevanagariHindi_400Regular' : 'InstrumentSerif_400Regular'),
+  thin: '200' as const,
+  light: '300' as const,
+};

@@ -53,6 +53,8 @@ export const HI: Record<string, string> = {
   'Nothing logged yet': 'अभी कुछ दर्ज नहीं',
   'Flourishing': 'खिल रहे हैं',
   'Balanced': 'संतुलित',
+  'Not yet scored': 'अभी स्कोर नहीं',
+  'HAPPY ORANGE': 'HAPPY ORANGE',
   'Finding your footing': 'संभल रहे हैं',
   'Needs care': 'ध्यान चाहिए',
   'Well-being = Body + Mind + Soul, each out of 100. A working model, not a medical measure.': 'कुशलता = शरीर + मन + आत्मा, हर एक 100 में से। यह समझने का एक तरीका है, चिकित्सकीय माप नहीं।',

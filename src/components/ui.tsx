@@ -3,7 +3,7 @@
 import { useAttach, type Picked } from './AttachPlus';
 import { readNoteText } from '../lib/ai';
 import { Ionicons } from '@expo/vector-icons';
-import { createContext, useCallback, useContext, useEffect, useId, useMemo, useRef, useState, type ReactNode } from 'react';
+import { createContext, isValidElement, useCallback, useContext, useEffect, useId, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useLocalSearchParams } from 'expo-router';
 import { Keyboard, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View, type ScrollViewInstance, type StyleProp, type ViewStyle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -12,9 +12,9 @@ import { useHeal } from '../lib/store';
 import { FeedbackBox } from './FeedbackBox';
 import type { Pillar } from '../lib/trends';
 import { GlassBackdrop } from './GlassBackdrop';
-import { CARD_TINT, DEFAULT_TINT, colors, isGlass, radius, shadow, space } from '../theme';
+import { CARD_TINT, DEFAULT_TINT, colors, font, isGlass, radius, shadow, space, statusColor } from '../theme';
 import Svg, { Defs, LinearGradient as SvgLinearGradient, Rect, Stop } from 'react-native-svg';
-import { tr } from '../lib/i18n';
+import { lang, tr } from '../lib/i18n';
 
 // Jump to a card: Today's "Myra recommends" opens a tab with ?card=<id> and the screen scrolls to that card and
 // outlines it for a moment (founder, 21 Oct 2026). Cards opt in by being wrapped in <Anchor id="…">.
@@ -177,12 +177,71 @@ export function Card({ children, style, tint }: { children: ReactNode; style?: S
   );
 }
 
+/** Each section's icon in the one card header (decision 0063), keyed by the card's anchor id. */
+const CARD_ICON: Record<string, keyof typeof Ionicons.glyphMap> = {
+  food: 'restaurant-outline', sleep: 'moon-outline', movement: 'walk-outline', body: 'body-outline', tasks: 'checkmark-done-outline',
+  focus: 'eye-outline', meditation: 'flower-outline', phone: 'phone-portrait-outline', gratitude: 'heart-outline', love: 'heart-circle-outline',
+  wisdom: 'book-outline', tao: 'leaf-outline', letgo: 'cloud-outline',
+};
+
 export function Heading({ children, right }: { children: ReactNode; right?: ReactNode }) {
+  const anchor = useContext(TintCtx);
+  // Glass look: a scored card's heading becomes the one card header (icon, name, coloured band word, thin score).
+  if (isGlass && anchor && CARD_ICON[anchor]) {
+    const sc = isValidElement<{ value?: number | null; max: number }>(right) && right.type === Score ? right.props : null;
+    const pct = sc && sc.value != null && sc.max ? (sc.value / sc.max) * 100 : null;
+    const b = pct == null ? undefined : pct >= 80 ? 'Flourishing' : pct >= 60 ? 'Balanced' : pct >= 40 ? 'Finding your footing' : 'Needs care';
+    return <CardHead icon={CARD_ICON[anchor]} title={typeof children === 'string' ? children : String(children ?? '')} status={b ? tr(b) : sc ? tr('Not yet scored') : undefined} band={b} right={right} />;
+  }
   return (
     <View style={s.headingRow}>
       <Text style={s.heading}>{children}</Text>
       {right}
     </View>
+  );
+}
+
+/** The serif voice: Myra's and the masters' words, and the one band word (Oura-like redesign, decision 0063). */
+export function Serif({ children, size = 26, color = colors.ink, style, lines }: { children: ReactNode; size?: number; color?: string; style?: StyleProp<import('react-native').TextStyle>; lines?: number }) {
+  const hi = lang() === 'hi';
+  return <Text numberOfLines={lines} style={[{ fontFamily: isGlass ? font.serif(lang()) : undefined, fontSize: hi ? size * 0.82 : size, lineHeight: (hi ? size * 0.82 : size) * (hi ? 1.45 : 1.12), color }, style]}>{children}</Text>;
+}
+
+/** A big, thin number with an optional small unit (Oura's "78 bpm"). */
+export function BigNum({ value, unit, size = 40 }: { value: ReactNode; unit?: string; size?: number }) {
+  return (
+    <Text style={{ fontSize: size, fontWeight: isGlass ? font.thin : '700', color: colors.ink, fontVariant: ['tabular-nums'], lineHeight: size * 1.1 }}>
+      {value}{unit ? <Text style={{ fontSize: size * 0.4, fontWeight: font.light, color: colors.muted }}> {unit}</Text> : null}
+    </Text>
+  );
+}
+
+/** The one card header (decision 0063): icon in a soft circle, the name, the coloured status word in spaced capitals,
+ *  and a chevron when it opens something. `band` colours the status (statusColor); `status` alone stays muted. */
+export function CardHead({ icon, title, status, band, onPress, right }: {
+  icon?: keyof typeof Ionicons.glyphMap; title: string; status?: string; band?: string; onPress?: () => void; right?: ReactNode;
+}) {
+  const body = (
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+      {icon ? <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: colors.field, alignItems: 'center', justifyContent: 'center' }}><Ionicons name={icon} size={20} color={colors.ink} /></View> : null}
+      <View style={{ flex: 1, minWidth: 0 }}>
+        <Text style={{ fontSize: 18, fontWeight: '500', color: colors.ink }} numberOfLines={1}>{title}</Text>
+        {status ? <Text style={[s.status, { color: band ? statusColor(band) : colors.muted }]} numberOfLines={1}>{status}</Text> : null}
+      </View>
+      {right}
+      {onPress ? <Ionicons name="chevron-forward" size={20} color={colors.ink} /> : null}
+    </View>
+  );
+  return onPress ? <Pressable onPress={onPress} accessibilityRole="button" hitSlop={6}>{body}</Pressable> : body;
+}
+
+/** A small key-number tile (Oura's "Key metrics"): spaced-capital label above a light number. */
+export function Tile({ label, value, onPress }: { label: string; value: ReactNode; onPress?: () => void }) {
+  return (
+    <Pressable disabled={!onPress} onPress={onPress} style={{ flex: 1, minWidth: 130, backgroundColor: colors.field, borderRadius: 20, padding: 14, gap: 4 }}>
+      <Text style={s.label} numberOfLines={2}>{label}</Text>
+      <Text style={{ fontSize: 20, fontWeight: font.light, color: colors.ink }} numberOfLines={1}>{value}</Text>
+    </Pressable>
   );
 }
 
@@ -193,7 +252,7 @@ export const Label = ({ children }: { children: ReactNode }) => <Text style={s.l
 export function Score({ value, max }: { value: number | null | undefined; max: number }) {
   const v = value == null ? '–' : Number.isInteger(value * 2) ? value : Math.round(value);
   return (
-    <View style={{ backgroundColor: colors.tint, borderRadius: 99, paddingHorizontal: 10, paddingVertical: 4 }}>
+    <View style={isGlass ? { paddingHorizontal: 2 } : { backgroundColor: colors.tint, borderRadius: 99, paddingHorizontal: 10, paddingVertical: 4 }}>
       <Text style={s.score}>
         {v}
         <Text style={s.scoreMax}>/{max}</Text>
@@ -307,20 +366,21 @@ export function Segmented<T extends string | number>({ options, value, onChange 
 
 export const s = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.bg },
-  scroll: { padding: space.lg, gap: space.lg, paddingBottom: 120 }, // room for the Myra button
+  scroll: { padding: space.lg, gap: space.lg, paddingBottom: isGlass ? 130 : 120 }, // room for the floating tab bar / Myra button
   dayBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: space.md },
   dayBtn: { padding: space.sm },
   dayText: { fontSize: 16, fontWeight: '600', color: colors.ink, minWidth: 130, textAlign: 'center' },
   card: { backgroundColor: colors.surface, borderRadius: isGlass ? 28 : radius.lg + 4, borderWidth: isGlass ? 0 : 1, borderColor: colors.line, padding: space.lg, gap: space.md, boxShadow: shadow },
   headingRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: space.sm },
-  heading: { fontSize: 20, fontWeight: '600', color: colors.ink, flexShrink: 1 },
+  heading: { fontSize: 20, fontWeight: isGlass ? '500' : '600', color: colors.ink, flexShrink: 1 },
   note: { fontSize: 13, color: colors.muted, lineHeight: 19 },
-  label: { fontSize: 11, letterSpacing: 1, textTransform: 'uppercase', color: colors.muted, fontWeight: '700' },
-  score: { fontSize: 16, fontWeight: '800', fontVariant: ['tabular-nums'], color: colors.insight }, // scores are Happy Orange output
+  label: { fontSize: 11, letterSpacing: isGlass ? 1.6 : 1, textTransform: 'uppercase', color: colors.muted, fontWeight: '700' },
+  status: { fontSize: 12, letterSpacing: 1.6, textTransform: 'uppercase', fontWeight: '700', marginTop: 2 },
+  score: isGlass ? { fontSize: 22, fontWeight: font.light, fontVariant: ['tabular-nums'], color: colors.ink } : { fontSize: 16, fontWeight: '800', fontVariant: ['tabular-nums'], color: colors.insight }, // scores are Happy Orange output
   scoreMax: { fontSize: 12, fontWeight: '600', color: colors.muted },
   meterLabel: { fontSize: 14, color: colors.ink },
   meterRight: { fontSize: 13, color: colors.muted, fontVariant: ['tabular-nums'] },
-  track: { height: 8, borderRadius: 99, backgroundColor: colors.sunk, overflow: 'hidden' },
+  track: { height: isGlass ? 4 : 8, borderRadius: 99, backgroundColor: colors.sunk, overflow: 'hidden' },
   fill: { height: '100%', borderRadius: 99 },
   field: { gap: 4, flex: 1, minWidth: 120 },
   fieldLabel: { fontSize: 13, fontWeight: '600', color: colors.muted },
