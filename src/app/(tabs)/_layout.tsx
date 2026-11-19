@@ -4,6 +4,7 @@ import { Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MyraButton } from '../../components/MyraButton';
 import { FloatingTabBar } from '../../components/FloatingTabBar';
+import { SKY, phaseAt } from '../../components/DuskScene';
 import { TabRing } from '../../components/TabRing';
 import type { ComponentProps } from 'react';
 import type { ColorValue } from 'react-native';
@@ -74,7 +75,9 @@ export default function TabLayout() {
         tabBarInactiveTintColor: colors.muted,
       }}
     >
-      <Tabs.Screen name="index" options={{ ...tab(tr('Today'), 'sunny-outline', colors.accent), headerTitle: isGlass ? 'HAPPY ORANGE' : 'Happy Orange', headerTitleStyle: isGlass ? { color: colors.ink, fontWeight: '500', fontSize: 15, letterSpacing: 3 } : { color: colors.brand, fontWeight: '700' },
+      <Tabs.Screen name="index" options={{ ...tab(tr('Today'), 'sunny-outline', colors.accent),
+        // The header takes the top colour of Today's living scene so the two read as one sky (decision 0063).
+        ...(isGlass ? { headerStyle: { backgroundColor: SKY[phaseAt(new Date().getHours() + new Date().getMinutes() / 60)][0] } } : {}), headerTitle: isGlass ? 'HAPPY ORANGE' : 'Happy Orange', headerTitleStyle: isGlass ? { color: colors.ink, fontWeight: '500', fontSize: 15, letterSpacing: 3 } : { color: colors.brand, fontWeight: '700' },
         headerRight: () => <ProfileButton /> }} />
       {/* Each icon sits in a thin ring that fills with that pillar's score (founder, 31 Oct 2026, option B). */}
       <Tabs.Screen name="body" options={ringTab(tr('Body'), 'body', 'leaf-outline', colors.body)} />

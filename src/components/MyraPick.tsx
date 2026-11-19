@@ -25,7 +25,7 @@ const PILLAR = {
 } as const;
 
 /** One line in an instructing tone (founder, 31 Oct 2026, like option 3): a nudge, no minutes. */
-const what = (id: StepId): string => ({
+export const what = (id: StepId): string => ({
   sleep: tr("Log last night's sleep."),
   meditation: tr('Sit and breathe.'),
   nidra: tr('Lie down for Yoga Nidra.'),
@@ -41,13 +41,13 @@ const what = (id: StepId): string => ({
 }[id]);
 
 
-const start = (s: Step) => {
+export const start = (s: Step) => {
   if (s.id === 'meditation') router.push({ pathname: '/breathe', params: { practice: 'mix', minutes: String(s.minutes ?? 10) } });
   else if (s.id === 'nidra') router.push('/yoga-nidra');
   else router.navigate({ pathname: `/${s.pillar}`, params: { card: s.card, at: String(Date.now()) } });
 };
 
-const emailName = (email?: string | null): string | null => {
+export const emailName = (email?: string | null): string | null => {
   const m = (email ?? '').split('@')[0].match(/^[a-zA-Z]+/);
   return m && m[0].length > 1 ? m[0][0].toUpperCase() + m[0].slice(1).toLowerCase() : null;
 };

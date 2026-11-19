@@ -8,12 +8,14 @@ import { RecordsCard } from '../../components/RecordsCard';
 import { FromYourDay } from '../../components/FromYourDay';
 import { AirLine } from '../../components/AirLine';
 import { SpacesNudge } from '../../components/SpacesNudge';
+import { TodayHero } from '../../components/TodayHero';
+import { YourDay } from '../../components/YourDay';
 import { todayISO } from '../../lib/dates';
 import { useAuth } from '../../lib/auth';
 import { Screen } from '../../components/ui';
 import { wellBeing } from '../../lib/scoring';
 import { useHeal } from '../../lib/store';
-import { colors } from '../../theme';
+import { colors, isGlass } from '../../theme';
 import { tr } from '../../lib/i18n';
 
 export default function Today() {
@@ -25,20 +27,24 @@ export default function Today() {
     // No day row or greeting (founder, 31 Oct 2026): the page starts with the score; Myra speaks to the person by name.
     <Screen feedback="Today" fill>
       {/* AQI only on bad-air days; How I feel today moved to the Mind tab (founder, 31 Oct 2026). */}
-      {date === todayISO() ? <View style={{ alignItems: 'center' }}><AirLine /></View> : null}
+      {date === todayISO() && !isGlass ? <View style={{ alignItems: 'center' }}><AirLine /></View> : null}
 
       {/* One design with the other cards (founder, 31 Oct 2026): rings for the best part and the three biggest concerns,
           the total in the middle, Myra recommends at the bottom; the three tiles open Body, Mind and Soul. */}
-      <TodayRings w={w} />
+      {/* Oura-like redesign (decision 0063): the living scene, Body · Mind · Soul circles and one hero replace the rings cards. */}
+      {isGlass ? <TodayHero w={w} /> : <TodayRings w={w} />}
+      {date === todayISO() && isGlass ? <View style={{ alignItems: 'center' }}><AirLine /></View> : null}
 
       {/* Back under the total (founder, 1 Nov 2026: the page looked too blank): Body, Mind and Soul with their parts. The tab
           icons keep their single score rings. */}
-      <PillarRings w={w} />
+      {isGlass ? null : <PillarRings w={w} />}
 
       {/* NeoSapien (decision 0050): what Neo 1 heard today, ready to review; only when connected. */}
       {date === todayISO() ? <FromYourDay /> : null}
 
       {date === todayISO() ? <RecordsCard /> : null}
+
+      {date === todayISO() ? <YourDay /> : null}
 
       <MyraCard />
 
