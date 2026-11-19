@@ -3,7 +3,7 @@
 
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, Text, View, useWindowDimensions } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { useAuth } from '../lib/auth';
 import { todayISO } from '../lib/dates';
@@ -64,6 +64,7 @@ export function TodayHero({ w }: { w: WellBeing }) {
   const { session } = useAuth();
   const { day, date, profile } = useHeal();
   const { habits, tickHabit } = useTasks();
+  const { width } = useWindowDimensions();
   const [, tick] = useState(0);
   useEffect(() => { const t = setInterval(() => tick(x => x + 1), 60_000); return () => clearInterval(t); }, []);
   const now = new Date();
@@ -81,7 +82,7 @@ export function TodayHero({ w }: { w: WellBeing }) {
 
   return (
     <View style={{ marginHorizontal: -space.lg, marginTop: -space.md, minHeight: SCENE - 40 }}>
-      <View pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, top: 0 }}><DuskScene height={SCENE} hour={hour} /></View>
+      <View pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, top: 0 }}><DuskScene height={SCENE} hour={hour} width={width} /></View>
       <View style={{ flexDirection: 'row', paddingHorizontal: space.lg, paddingTop: space.lg + 4 }}>
         {PILLARS.map(p => <Chip key={p.tab} value={score(p.tab)} color={p.color} label={tr(p.name)} onPress={() => router.navigate(`/${p.tab}`)} />)}
       </View>

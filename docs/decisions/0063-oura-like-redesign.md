@@ -26,3 +26,8 @@ to edge (founder: "no space left on left and right side"); light status bar text
 src/components/DuskScene.tsx (the scene, by hour), TodayHero.tsx (circles, arc hero, Myra's line), YourDay.tsx (timeline).
 The hero is the My day score rather than steps: steps need Apple Health, My day always has a number. The rings cards stay
 for the Calm Teal look only.
+
+## Step 3 (shipped 19 Nov 2026)
+RingPanel/RingTop in glass: big thin score + Contributors bars (src/components/Rings.tsx); MyraLine in serif; the card's
+heading no longer repeats the score (except meditation, phone, love, which have no big score below); src/app/trend.tsx
+DetailPage. The card wash is drawn at the measured card size (a "100%" SVG left a dark strip on iPhone).

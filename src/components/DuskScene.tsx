@@ -17,14 +17,14 @@ export const SKY: Record<Phase, [string, string, string, string]> = {
 const GLOW: Record<Phase, string> = { dawn: '#FFD3A0', day: '#FFF4D6', dusk: '#FFB37A', night: '#DCE3FF' };
 
 /** The scene, absolutely placed by the caller; `top` is the page's dark it fades into. */
-export function DuskScene({ height, hour }: { height: number; hour: number }) {
+export function DuskScene({ height, hour, width }: { height: number; hour: number; width: number }) {
   const p = phaseAt(hour);
   const [a, b, c, d] = SKY[p];
   const H = 620, horizon = 470; // the horizon sits low, under Myra's line, so the words stay on open sky
   const sunX = 70 + Math.max(0, Math.min(1, (hour - 5) / 15)) * 250; // the light travels across the sky with the day
   const lamps = p === 'dusk' || p === 'night';
   return (
-    <Svg width="100%" height={height} viewBox={`0 0 390 ${H}`} preserveAspectRatio="xMidYMin slice">
+    <Svg width={width} height={height} viewBox={`0 0 390 ${H}`} preserveAspectRatio="xMidYMin slice">
       <Defs>
         <LinearGradient id="dsky" x1="0" y1="0" x2="0" y2="1">
           <Stop offset="0" stopColor={a} /><Stop offset="0.45" stopColor={b} /><Stop offset="0.66" stopColor={c} /><Stop offset="0.76" stopColor={d} />

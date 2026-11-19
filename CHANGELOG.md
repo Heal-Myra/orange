@@ -1,5 +1,11 @@
 # Changelog
 
+## 19 Nov 2026 — Redesign step 3, sleep in seven parts, no typing when a device feeds a card (decisions 0063, 0064)
+- Cards show one big thin score with "Details ›" and what made it as thin bars (coral only where it needs care); Myra's tip is a serif line. Details opens Oura's kind of page: the week's bars with your goal, the score and its word, Myra's line, what made the score, This week tiles, then trends.
+- Sleep from a ring or watch is scored on seven parts like Oura's (total sleep, efficiency, deep, REM, restfulness, falling asleep, timing); the night's heart rate, HRV, breathing rate and blood oxygen are kept and shown as Night vitals. Typed nights keep hours + quality.
+- When a device feeds a card, its typing boxes disappear (sleep, steps and minutes, weight); without a device they stay.
+- Fixed: the colour wash stopped short of the right edge on iPhone.
+
 ## 19 Nov 2026 — Oura-like redesign, step 2: the new Today (decision 0063)
 - The Ganga at the top of Today, its sky following the hour (dawn, day, dusk with floating diyas, night). Body, Mind and Soul as three thin score circles; My day as one big number under an arc, its word in serif, Myra's one line with Start now and Why, Myra?. Below, Your day: Snap a meal, Tell Myra, Add, and everything the day picked up in time order with where it came from.
 

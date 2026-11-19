@@ -162,11 +162,14 @@ export function Card({ children, style, tint }: { children: ReactNode; style?: S
   const gid = 'g' + useId().replace(/[^a-zA-Z0-9]/g, '');
   const t = tint ?? (anchor ? CARD_TINT[anchor] : undefined) ?? DEFAULT_TINT;
   const nested = useContext(InCardCtx);
+  // The wash is drawn at the card's measured size: "100%" inside an edge-to-edge card left a dark strip on iPhone (19 Nov 2026).
+  const [box, setBox] = useState<{ w: number; h: number } | null>(null);
   return (
     <InCardCtx.Provider value>
-    <View style={[s.card, isGlass && { overflow: 'hidden' }, isGlass && !nested && { marginHorizontal: -space.lg, paddingHorizontal: space.lg + 6, paddingVertical: space.lg + 6 }, style]}>
-      {isGlass ? (
-        <Svg pointerEvents="none" style={StyleSheet.absoluteFill} width="100%" height="100%">
+    <View onLayout={isGlass ? e => { const { width: w, height: h } = e.nativeEvent.layout; if (!box || Math.abs(box.w - w) > 0.5 || Math.abs(box.h - h) > 0.5) setBox({ w, h }); } : undefined}
+      style={[s.card, isGlass && { overflow: 'hidden' }, isGlass && !nested && { marginHorizontal: -space.lg, paddingHorizontal: space.lg + 6, paddingVertical: space.lg + 6 }, style]}>
+      {isGlass && box ? (
+        <Svg pointerEvents="none" style={{ position: 'absolute', left: 0, top: 0 }} width={box.w} height={box.h}>
           <Defs>
             <SvgLinearGradient id={gid} x1="0" y1="0" x2="0.35" y2="1">
               <Stop offset="0" stopColor={t} stopOpacity={0.34} />
@@ -174,7 +177,7 @@ export function Card({ children, style, tint }: { children: ReactNode; style?: S
               <Stop offset="1" stopColor={t} stopOpacity={0} />
             </SvgLinearGradient>
           </Defs>
-          <Rect x="0" y="0" width="100%" height="100%" fill={`url(#${gid})`} />
+          <Rect x="0" y="0" width={box.w} height={box.h} fill={`url(#${gid})`} />
         </Svg>
       ) : null}
       {children}
