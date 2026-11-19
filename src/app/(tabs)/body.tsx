@@ -47,6 +47,10 @@ export default function Body() {
   const auto = connected; // Apple Health fills sleep and movement; typing is only for phones without it
   const h = day.health;
   const st = h?.sleepStages;
+  // A device feeds a card → that card's typing boxes go away; its numbers show without boxes (founder, 19 Nov 2026).
+  const sleepDevice = !!day.sleep.source && day.sleep.source !== 'Typed in';
+  const moveDevice = !!day.activity.source && !day.activity.stepsTyped && !day.activity.activeTyped;
+  const weightDevice = h?.weightAt != null && !h?.weightTyped;
   const dq = date >= DEVICE_QUALITY_FROM ? deviceQuality(st, day.sleep.hours) : null; // from the ring or watch (15 Nov 2026)
 
   return (
@@ -132,20 +136,20 @@ export default function Body() {
               <Text style={{ color: colors.accent, fontWeight: '600' }}>{tr('Begin')} ›</Text>
             </Pressable>
           ) : null}
-          <Expandable key={date + 'sleepd'} icon="list-outline" title={tr('Details')} status={tr('Sleep stages, hours and quality')} defaultOpen={day.sleep.hours == null || (dq == null && !day.sleep.quality)}>
+          <Expandable key={date + 'sleepd'} icon="list-outline" title={tr('Details')} status={tr('Sleep stages, hours and quality')} defaultOpen={!sleepDevice && (day.sleep.hours == null || (dq == null && !day.sleep.quality))}>
         <Rows>
           <StatRow first label={tr('Hours slept')} value={day.sleep.hours} unit="h" decimal key={date + 'sleep'}
-            onEdit={v => update(d => { d.sleep.hours = v; d.sleep.source = v == null ? undefined : 'Typed in'; })} />
+            onEdit={sleepDevice ? undefined : v => update(d => { d.sleep.hours = v; d.sleep.source = v == null ? undefined : 'Typed in'; })} />
           {st ? <StatRow label={tr('Deep sleep')} value={st.deep} unit="h" /> : null}
           {st ? <StatRow label={tr('Core sleep')} value={st.core} unit="h" /> : null}
           {st ? <StatRow label={tr('REM sleep')} value={st.rem} unit="h" /> : null}
           {st ? <StatRow label={tr('Awake')} value={st.awake} unit="h" /> : null}
           {/* Asked only when no ring or watch recorded the night (founder, 15 Nov 2026). */}
-          {dq == null ? <StatRow label={tr('Sleep quality')} value={undefined}
+          {dq == null && !sleepDevice ? <StatRow label={tr('Sleep quality')} value={undefined}
             right={<Dots value={day.sleep.quality} onChange={q => update(d => { d.sleep.quality = q; })} />} /> : null}
           {day.sleep.source && day.sleep.source !== 'Typed in' ? <Note>{tr('From {source}. One device per night, never added together.', { source: day.sleep.source })}</Note> : null}
         </Rows>
-        <CoolRoom />
+        {sleepDevice ? null : <CoolRoom />}
         </Expandable>
         <MyraLine card="sleep" />
       </Card></Anchor>
@@ -163,9 +167,9 @@ export default function Body() {
         <Expandable key={date + 'moved'} icon="list-outline" title={tr('Details')} status={tr('Steps, minutes and workouts')} defaultOpen={day.activity.steps == null && day.activity.activeMin == null}>
         <Rows>
           <StatRow first label={tr('Steps')} value={day.activity.steps} target={profile.steps} key={date + 'steps'}
-            onEdit={v => update(d => { d.activity.steps = v; d.activity.stepsTyped = v != null; })} />
+            onEdit={moveDevice ? undefined : v => update(d => { d.activity.steps = v; d.activity.stepsTyped = v != null; })} />
           <StatRow label={tr('Active minutes')} value={day.activity.activeMin} target={profile.active} key={date + 'active'}
-            onEdit={v => update(d => { d.activity.activeMin = v; d.activity.activeTyped = v != null; })} />
+            onEdit={moveDevice ? undefined : v => update(d => { d.activity.activeMin = v; d.activity.activeTyped = v != null; })} />
           {h?.activeKcal != null ? <StatRow label={tr('Active energy')} value={h.activeKcal} unit="kcal" /> : null}
           {(h?.workouts ?? []).map((w, i) => (
             <StatRow key={'w' + i} label={tr(w.type)} value={w.kcal ? `${w.min} min · ${w.kcal} kcal` : `${w.min} min`} />
@@ -181,7 +185,7 @@ export default function Body() {
           <Heading>{tr('Body')}</Heading>
           <Rows>
             <StatRow first label={tr('Weight')} value={h?.weightKg ?? profile.me?.weightKg} unit="kg" decimal
-              onEdit={v => {
+              onEdit={weightDevice ? undefined : v => {
                 update(d => { d.health = { ...(d.health ?? {}), weightKg: v, weightTyped: v != null, weightTypedAt: v != null ? Date.now() : undefined }; });
                 if (v != null && profile.me) { const me = { ...profile.me, weightKg: v }; const pl = planFor(me); setProfile({ ...profile, kcal: pl.kcal, protein: pl.protein, steps: pl.steps, active: pl.active, me }); }
               }} />
