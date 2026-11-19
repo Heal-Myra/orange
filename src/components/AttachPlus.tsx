@@ -79,7 +79,7 @@ export function useAttach(read: (img: Picked) => Promise<string | null | void>, 
       </Pressable>
       <Modal visible={menu} transparent animationType="fade" onRequestClose={() => setMenu(false)}>
         <Pressable onPress={() => setMenu(false)} style={{ flex: 1, backgroundColor: '#0006', justifyContent: 'flex-end' }}>
-          <Pressable onPress={() => {}} style={{ backgroundColor: colors.surface, borderTopLeftRadius: 22, borderTopRightRadius: 22, paddingTop: 8, paddingBottom: 34 }}>
+          <Pressable onPress={() => {}} style={{ backgroundColor: colors.sheet, borderTopLeftRadius: 22, borderTopRightRadius: 22, paddingTop: 8, paddingBottom: 34 }}>
             <View style={{ alignSelf: 'center', width: 40, height: 4, borderRadius: 2, backgroundColor: colors.line, marginBottom: 6 }} />
             <Text style={{ paddingHorizontal: 18, paddingVertical: 8, color: colors.muted, fontSize: 13 }}>{opts?.hint ?? tr('Myra reads the photo and fills it in for you.')}</Text>
             {Platform.OS !== 'web' ? row('camera-outline', tr('Camera'), () => pick('camera')) : null}

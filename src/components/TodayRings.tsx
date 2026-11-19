@@ -6,7 +6,7 @@ import { router } from 'expo-router';
 import { Pressable, Text, View } from 'react-native';
 import { tr } from '../lib/i18n';
 import { band, POINTS, type WellBeing } from '../lib/scoring';
-import { colors , statusColor } from '../theme';
+import { CARD_TINT, colors, statusColor } from '../theme';
 import { MyraPick } from './MyraPick';
 import { PASTEL, RingStack, RingTap, fmt, type RingItem } from './Rings';
 import { Card } from './ui';
@@ -48,7 +48,7 @@ export function TodayRings({ w }: { w: WellBeing }) {
   const items: RingItem[] = P.map(p => ({ id: p.id, color: p.color, label: tr(p.label), value: v(p.id) / 100 }));
   return (
     // My day takes the spare height on Today (founder, 1 Nov 2026), its ring and Myra centred in it.
-    <Card style={{ gap: 12, flexGrow: 1 }}>
+    <Card tint={CARD_TINT.day} style={{ gap: 12, flexGrow: 1 }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
         <Text style={{ fontSize: 18, fontWeight: '700', color: colors.ink }}>{tr('My day')}</Text>
         <Text style={{ fontSize: 13, fontWeight: '600', color: w.logged ? statusColor(band(w.total)) : colors.muted }}>{w.logged ? tr(band(w.total)) : tr('Nothing logged yet')}</Text>
@@ -74,7 +74,7 @@ export function PillarRings({ w }: { w: WellBeing }) {
   ];
   return (
     // One white card with a fine line between the three (founder, 1 Nov 2026), like the line between the score and Myra.
-    <View style={{ flexDirection: 'row', backgroundColor: colors.surface, borderRadius: 22, paddingVertical: 4 }}>
+    <Card tint={CARD_TINT.pillars} style={{ flexDirection: 'row', paddingVertical: 4, paddingHorizontal: 0, gap: 0 }}>
       {pillars.map((p, i) => {
         const mine = parts.filter(x => x.tab === p.tab);
         const items: RingItem[] = mine.map(x => ({ id: x.id, color: x.color, label: tr(x.label), value: x.got / x.of }));
@@ -90,6 +90,6 @@ export function PillarRings({ w }: { w: WellBeing }) {
           </View>
         );
       })}
-    </View>
+    </Card>
   );
 }

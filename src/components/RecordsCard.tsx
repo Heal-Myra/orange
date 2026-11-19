@@ -12,7 +12,8 @@ import { runRecords } from '../lib/runRecords';
 import { nextFor } from '../lib/ladder';
 import { useRuns } from '../lib/useRuns';
 import { useHeal } from '../lib/store';
-import { colors } from '../theme';
+import { Card } from './ui';
+import { CARD_TINT, colors } from '../theme';
 
 const date = (iso: string, o: Intl.DateTimeFormatOptions) => { const [y, m, d] = iso.split('-').map(Number); return new Date(y, m - 1, d).toLocaleDateString(locale(), o); };
 
@@ -40,7 +41,7 @@ export function RecordsCard() {
   const close = useMemo(() => (r ? null : closeToRecord(days, profile, today)), [r, days, profile, today]);
   // Founder, 1 Nov 2026: a card named "Top of My Game", a gold trophy (option 2) and one line (option 8).
   return (
-    <View style={{ gap: 10, backgroundColor: colors.surface, borderRadius: 22, paddingHorizontal: 16, paddingVertical: 14 }}>
+    <Card tint={CARD_TINT.records} style={{ gap: 10, paddingHorizontal: 16, paddingVertical: 14 }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
         <Text style={{ fontSize: 18, fontWeight: '700', color: colors.ink }}>{tr('Top of My Game')}</Text>
         <Pressable onPress={() => router.push('/records')} hitSlop={10} accessibilityRole="button"><Text style={{ color: colors.accent, fontWeight: '600', fontSize: 13 }}>{tr('All')} ›</Text></Pressable>
@@ -59,7 +60,7 @@ export function RecordsCard() {
           </Text>
         </View>
       )}
-    </View>
+    </Card>
   );
 }
 

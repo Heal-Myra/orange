@@ -8,6 +8,7 @@
 const CALM_TEAL = {
   bg: '#F5F8F9',
   surface: '#FFFFFF', // cards
+  sheet: '#FFFFFF', // sheets and pop-ups (always solid)
   field: '#F7FAFB', // text boxes
   sunk: '#E8EFF1', // meter tracks
   ink: '#1F2A30',
@@ -31,15 +32,16 @@ const CALM_TEAL = {
 // screen, smoked see-through cards with a fine light edge, warm white text, amber buttons, and the signature coral
 // lifted so it reads on dark. Text stays at 4.5:1 or more on the darkest card.
 const GANGA_DUSK: typeof CALM_TEAL = {
-  bg: '#1B1E2B',
-  surface: 'rgba(24,22,32,0.66)',
+  bg: '#141519',
+  surface: 'rgba(255,255,255,0.045)',
+  sheet: '#1E2029',
   field: 'rgba(255,255,255,0.08)',
   sunk: 'rgba(255,255,255,0.14)',
   // Founder, 19 Nov 2026 (Oura as the reference): all text white; only a result word (Flourishing, Balanced, Needs
   // care…) carries a colour, from statusColor() below.
   ink: '#FFFFFF',
   muted: 'rgba(255,255,255,0.74)',
-  line: 'rgba(255,255,255,0.18)',
+  line: 'rgba(255,255,255,0.08)',
   body: '#A8D07A',
   mind: '#7FCFD6',
   soul: '#F3A37A',
@@ -59,7 +61,7 @@ export const colors = LOOK === 'ganga' ? GANGA_DUSK : CALM_TEAL;
 export const isGlass = LOOK === 'ganga';
 
 /** Soft card shadow. */
-export const shadow = LOOK === 'ganga' ? 'inset 0 1px 0 rgba(255,255,255,0.18)' : '0 2px 12px rgba(31, 42, 48, 0.07)';
+export const shadow = LOOK === 'ganga' ? 'none' : '0 2px 12px rgba(31, 42, 48, 0.07)';
 
 export const space = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24 };
 export const radius = { sm: 8, md: 12, lg: 16 };
@@ -69,3 +71,13 @@ export function statusColor(band: string): string {
   if (LOOK !== 'ganga') return CALM_TEAL.muted;
   return band === 'Flourishing' ? '#A8D07A' : band === 'Balanced' ? '#7FCFD6' : band === 'Finding your footing' ? '#F2C46B' : band === 'Needs care' ? '#F4B183' : 'rgba(255,255,255,0.74)';
 }
+
+/** Each card's own soft colour wash (founder, 19 Nov 2026, Oura's heart-rate and readiness cards as the reference):
+ *  every card a slightly different tint that fades into the same dark, text always white. Keyed by the card's anchor. */
+export const CARD_TINT: Record<string, string> = {
+  day: '#B5834C', pillars: '#6B6FA5', records: '#A88A3E',
+  food: '#7FA36B', sleep: '#5B6FB5', movement: '#5FA37A', body: '#4C9AA0',
+  tasks: '#4C8FA6', focus: '#4C8FA6', meditation: '#7C6BB5', phone: '#5E6B80',
+  gratitude: '#B5707F', love: '#B5707F', wisdom: '#B58A4C', tao: '#6E9A5C', letgo: '#8A7FB5',
+};
+export const DEFAULT_TINT = '#5E6B85';

@@ -374,7 +374,7 @@ export default function Myra() {
       {/* ＋ : Camera · Photos · Files, then Myra's shortcuts */}
       {menu ? <Modal visible transparent animationType="slide" onRequestClose={() => setMenu(false)}>
         <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.25)' }} onPress={() => setMenu(false)} />
-        <View style={{ backgroundColor: colors.surface, borderTopLeftRadius: 22, borderTopRightRadius: 22, padding: 16, paddingBottom: 16 + insets.bottom, gap: 4 }}>
+        <View style={{ backgroundColor: colors.sheet, borderTopLeftRadius: 22, borderTopRightRadius: 22, padding: 16, paddingBottom: 16 + insets.bottom, gap: 4 }}>
           <View style={{ flexDirection: 'row', gap: 8, marginBottom: 6 }}>
             {Platform.OS !== 'web' ? tile(tr('Camera'), 'camera-outline', () => pickPhoto(true)) : null}
             {tile(tr('Photos'), 'image-outline', () => pickPhoto(false))}
@@ -391,7 +391,7 @@ export default function Myra() {
       {/* ☰ : past chats */}
       {history ? <Modal visible transparent animationType="slide" onRequestClose={() => setHistory(false)}>
         <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.25)' }} onPress={() => setHistory(false)} />
-        <View style={{ maxHeight: '75%', backgroundColor: colors.surface, borderTopLeftRadius: 22, borderTopRightRadius: 22, padding: 16, paddingBottom: 16 + insets.bottom }}>
+        <View style={{ maxHeight: '75%', backgroundColor: colors.sheet, borderTopLeftRadius: 22, borderTopRightRadius: 22, padding: 16, paddingBottom: 16 + insets.bottom }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
             <Text style={{ flex: 1, color: colors.ink, fontSize: 18, fontWeight: '700' }}>{tr('Chats')}</Text>
             <Pressable onPress={() => startNew()} hitSlop={8}><Text style={{ color: colors.accent, fontWeight: '600' }}>✎ {tr('New chat')}</Text></Pressable>

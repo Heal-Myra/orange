@@ -3,7 +3,7 @@
 import { useAttach, type Picked } from './AttachPlus';
 import { readNoteText } from '../lib/ai';
 import { Ionicons } from '@expo/vector-icons';
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useId, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useLocalSearchParams } from 'expo-router';
 import { Keyboard, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View, type ScrollViewInstance, type StyleProp, type ViewStyle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -12,7 +12,8 @@ import { useHeal } from '../lib/store';
 import { FeedbackBox } from './FeedbackBox';
 import type { Pillar } from '../lib/trends';
 import { GlassBackdrop } from './GlassBackdrop';
-import { colors, isGlass, radius, shadow, space } from '../theme';
+import { CARD_TINT, DEFAULT_TINT, colors, isGlass, radius, shadow, space } from '../theme';
+import Svg, { Defs, LinearGradient as SvgLinearGradient, Rect, Stop } from 'react-native-svg';
 import { tr } from '../lib/i18n';
 
 // Jump to a card: Today's "Myra recommends" opens a tab with ?card=<id> and the screen scrolls to that card and
@@ -96,12 +97,14 @@ function PastDayBanner() {
 export const useKeepVisible = () => useContext(AnchorCtx).keepVisible;
 
 /** A card the Today screen can jump to. Must be a direct child of <Screen>. */
+const TintCtx = createContext<string | null>(null);
+
 export function Anchor({ id, children }: { id: string; children: ReactNode }) {
   const { register, lit } = useContext(AnchorCtx);
   return (
     <View onLayout={e => register(id, e.nativeEvent.layout.y)}
       style={{ borderRadius: radius.lg + 4, borderWidth: 2, borderColor: lit === id ? colors.insight : 'transparent', margin: -2 }}>
-      {children}
+      <TintCtx.Provider value={id}>{children}</TintCtx.Provider>
     </View>
   );
 }
@@ -149,8 +152,29 @@ export function Expandable({ icon, title, status, statusColor, color = colors.ac
   );
 }
 
-export function Card({ children, style }: { children: ReactNode; style?: StyleProp<ViewStyle> }) {
-  return <View style={[s.card, style]}>{children}</View>;
+/** A card. In the glass look each card carries its own soft colour wash that fades into the dark (Oura-like): the tint
+ *  comes from `tint`, else from its Anchor id (CARD_TINT), else a calm slate. */
+export function Card({ children, style, tint }: { children: ReactNode; style?: StyleProp<ViewStyle>; tint?: string }) {
+  const anchor = useContext(TintCtx);
+  const gid = 'g' + useId().replace(/[^a-zA-Z0-9]/g, '');
+  const t = tint ?? (anchor ? CARD_TINT[anchor] : undefined) ?? DEFAULT_TINT;
+  return (
+    <View style={[s.card, isGlass && { overflow: 'hidden' }, style]}>
+      {isGlass ? (
+        <Svg pointerEvents="none" style={StyleSheet.absoluteFill} width="100%" height="100%">
+          <Defs>
+            <SvgLinearGradient id={gid} x1="0" y1="0" x2="0.35" y2="1">
+              <Stop offset="0" stopColor={t} stopOpacity={0.34} />
+              <Stop offset="0.55" stopColor={t} stopOpacity={0.09} />
+              <Stop offset="1" stopColor={t} stopOpacity={0} />
+            </SvgLinearGradient>
+          </Defs>
+          <Rect x="0" y="0" width="100%" height="100%" fill={`url(#${gid})`} />
+        </Svg>
+      ) : null}
+      {children}
+    </View>
+  );
 }
 
 export function Heading({ children, right }: { children: ReactNode; right?: ReactNode }) {
@@ -287,7 +311,7 @@ export const s = StyleSheet.create({
   dayBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: space.md },
   dayBtn: { padding: space.sm },
   dayText: { fontSize: 16, fontWeight: '600', color: colors.ink, minWidth: 130, textAlign: 'center' },
-  card: { backgroundColor: colors.surface, borderRadius: radius.lg + 4, borderWidth: 1, borderColor: colors.line, padding: space.lg, gap: space.md, boxShadow: shadow },
+  card: { backgroundColor: colors.surface, borderRadius: isGlass ? 28 : radius.lg + 4, borderWidth: isGlass ? 0 : 1, borderColor: colors.line, padding: space.lg, gap: space.md, boxShadow: shadow },
   headingRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: space.sm },
   heading: { fontSize: 20, fontWeight: '600', color: colors.ink, flexShrink: 1 },
   note: { fontSize: 13, color: colors.muted, lineHeight: 19 },
