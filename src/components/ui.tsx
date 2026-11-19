@@ -98,6 +98,9 @@ export const useKeepVisible = () => useContext(AnchorCtx).keepVisible;
 
 /** A card the Today screen can jump to. Must be a direct child of <Screen>. */
 const TintCtx = createContext<string | null>(null);
+// Is this card inside another card? Top-level cards run edge to edge in the glass look (founder, 19 Nov 2026: like Oura,
+// no gap between the card and the screen's sides); cards inside cards keep their place.
+const InCardCtx = createContext(false);
 
 export function Anchor({ id, children }: { id: string; children: ReactNode }) {
   const { register, lit } = useContext(AnchorCtx);
@@ -158,8 +161,10 @@ export function Card({ children, style, tint }: { children: ReactNode; style?: S
   const anchor = useContext(TintCtx);
   const gid = 'g' + useId().replace(/[^a-zA-Z0-9]/g, '');
   const t = tint ?? (anchor ? CARD_TINT[anchor] : undefined) ?? DEFAULT_TINT;
+  const nested = useContext(InCardCtx);
   return (
-    <View style={[s.card, isGlass && { overflow: 'hidden' }, style]}>
+    <InCardCtx.Provider value>
+    <View style={[s.card, isGlass && { overflow: 'hidden' }, isGlass && !nested && { marginHorizontal: -space.lg, paddingHorizontal: space.lg + 6, paddingVertical: space.lg + 6 }, style]}>
       {isGlass ? (
         <Svg pointerEvents="none" style={StyleSheet.absoluteFill} width="100%" height="100%">
           <Defs>
@@ -174,6 +179,7 @@ export function Card({ children, style, tint }: { children: ReactNode; style?: S
       ) : null}
       {children}
     </View>
+    </InCardCtx.Provider>
   );
 }
 
