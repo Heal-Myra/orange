@@ -48,7 +48,7 @@ function ProfileButton() {
   return (
     <Link href="/account" asChild>
       <Pressable accessibilityLabel={pending ? tr('Profile, {n} requests waiting', { n: pending }) : tr('Profile')} hitSlop={10} style={{ paddingHorizontal: 16, alignItems: 'center' }}>
-        <View style={isGlass ? { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.12)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.22)', alignItems: 'center', justifyContent: 'center' } : undefined}>
+        <View style={isGlass ? { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.08)', alignItems: 'center', justifyContent: 'center' } : undefined}>
           {/* Glass look: the first letter of the name in a glass circle, like Oura's round header buttons (19 Nov 2026). */}
           {isGlass && name !== tr('Profile') ? <Text style={{ color: colors.ink, fontSize: 17, fontWeight: '500' }}>{name.charAt(0).toUpperCase()}</Text>
             : <Ionicons name={isGlass ? 'person-outline' : 'person-circle-outline'} size={isGlass ? 20 : 30} color={colors.ink} />}

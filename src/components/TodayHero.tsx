@@ -4,7 +4,7 @@
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Platform, Pressable, Text, View, useWindowDimensions } from 'react-native';
-import Svg, { Circle, Path } from 'react-native-svg';
+import Svg, { Circle, Defs, Path, RadialGradient, Stop } from 'react-native-svg';
 import { useAuth } from '../lib/auth';
 import { todayISO } from '../lib/dates';
 import { habitsDue } from '../lib/habits';
@@ -34,7 +34,18 @@ function Chip({ pillar, value, label, onPress }: { pillar: 'body' | 'mind' | 'so
   return (
     <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={`${label}: ${value == null ? '–' : Math.round(value)}/100`}
       style={({ pressed }) => ({ alignItems: 'center', gap: 10, flex: 1, opacity: pressed ? 0.8 : 1 })}>
-      <View style={{ width: D, height: D, borderRadius: D / 2, backgroundColor: 'rgba(255,255,255,0.09)', borderWidth: 0.5, borderColor: 'rgba(255,255,255,0.14)', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
+      {/* No outline: a faint glass disc whose edge melts into the sky, like Oura's (founder, 19 Nov 2026). */}
+      <View style={{ width: D, height: D, alignItems: 'center', justifyContent: 'center', gap: 1 }}>
+        <Svg width={D} height={D} style={{ position: 'absolute' }}>
+          <Defs>
+            <RadialGradient id={`chip-${pillar}`} cx="0.45" cy="0.4" r="0.55">
+              <Stop offset="0" stopColor="#FFFFFF" stopOpacity={0.035} />
+              <Stop offset="0.8" stopColor="#FFFFFF" stopOpacity={0.06} />
+              <Stop offset="1" stopColor="#FFFFFF" stopOpacity={0.075} />
+            </RadialGradient>
+          </Defs>
+          <Circle cx={D / 2} cy={D / 2} r={D / 2} fill={`url(#chip-${pillar})`} />
+        </Svg>
         <PillarIcon pillar={pillar} size={19} />
         <Text style={{ fontSize: 25, fontWeight: font.light, color: colors.ink, fontVariant: ['tabular-nums'], lineHeight: 29 }}>{value == null ? '–' : Math.round(value)}</Text>
       </View>
