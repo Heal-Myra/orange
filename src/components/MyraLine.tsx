@@ -9,7 +9,8 @@ import { tr } from '../lib/i18n';
 import { lived, mealTotals, taoStudied, wisdomStudied } from '../lib/scoring';
 import { useHeal } from '../lib/store';
 import { fibreTarget } from '../lib/targets';
-import { colors } from '../theme';
+import { colors, isGlass } from '../theme';
+import { Serif } from './ui';
 import type { DayLog, Profile } from '../lib/types';
 
 export type CardId = 'food' | 'sleep' | 'movement' | 'face' | 'tasks' | 'meditation' | 'phone' | 'gratitude' | 'wisdom' | 'tao';
@@ -83,6 +84,9 @@ export function MyraLine({ card, phone }: { card: CardId; phone?: { minutes: num
   const midFast = f && f.ongoing && f.hours < habit!.hours;
   const hers = !midFast && g && p && g.cards?.[p] === card ? g[p]?.[0] : undefined;
   const [text, vars]: [string, Record<string, string | number>?] = midFast ? ["You're {h} hours in. Water and black tea are fine.", { h: fmtHours(f!.hours) }] : hers ? [oneLine(hers)] : localTip(card, day, profile, phone);
+  const said = hers || card === 'face' && day.face?.tips?.[0] ? text : tr(text, vars);
+  // Oura-like redesign (decision 0063): the master's line in the serif voice, white, with no box (Oura's "Stay Active").
+  if (isGlass) return <View style={{ flexDirection: 'row', gap: 8, marginTop: 4 }}><Text style={{ color: colors.ink, fontSize: 16, marginTop: 4 }}>✦</Text><Serif size={24} style={{ flex: 1 }}>{said}</Serif></View>;
   return (
     <View style={{ flexDirection: 'row', gap: 6, marginTop: 6, paddingVertical: 10, paddingHorizontal: 12, borderRadius: 14, backgroundColor: colors.insight + '12' }}>
       <Text style={{ color: colors.insight, fontWeight: '700' }}>✦</Text>

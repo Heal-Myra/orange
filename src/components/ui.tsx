@@ -190,14 +190,18 @@ const CARD_ICON: Record<string, keyof typeof Ionicons.glyphMap> = {
   wisdom: 'book-outline', tao: 'leaf-outline', letgo: 'cloud-outline',
 };
 
+/** Cards with no big score of their own below the heading keep the score in the heading. */
+const OWN_SCORE_IN_HEAD = new Set(['meditation', 'phone', 'love']);
+
 export function Heading({ children, right }: { children: ReactNode; right?: ReactNode }) {
   const anchor = useContext(TintCtx);
-  // Glass look: a scored card's heading becomes the one card header (icon, name, coloured band word, thin score).
+  // Glass look: a scored card's heading becomes the one card header (icon, name, coloured band word); the score itself
+  // shows large just below (RingPanel / RingTop), so it is not repeated here.
   if (isGlass && anchor && CARD_ICON[anchor]) {
     const sc = isValidElement<{ value?: number | null; max: number }>(right) && right.type === Score ? right.props : null;
     const pct = sc && sc.value != null && sc.max ? (sc.value / sc.max) * 100 : null;
     const b = pct == null ? undefined : pct >= 80 ? 'Flourishing' : pct >= 60 ? 'Balanced' : pct >= 40 ? 'Finding your footing' : 'Needs care';
-    return <CardHead icon={CARD_ICON[anchor]} title={typeof children === 'string' ? children : String(children ?? '')} status={b ? tr(b) : sc ? tr('Not yet scored') : undefined} band={b} right={right} />;
+    return <CardHead icon={CARD_ICON[anchor]} title={typeof children === 'string' ? children : String(children ?? '')} status={b ? tr(b) : sc ? tr('Not yet scored') : undefined} band={b} right={sc && !OWN_SCORE_IN_HEAD.has(anchor) ? undefined : right} />;
   }
   return (
     <View style={s.headingRow}>

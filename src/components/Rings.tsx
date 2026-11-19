@@ -8,7 +8,7 @@ import type { ReactNode } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { tr } from '../lib/i18n';
 import Svg, { Circle, G } from 'react-native-svg';
-import { colors } from '../theme';
+import { colors, font, isGlass } from '../theme';
 
 /** The ring colours, shared by every card so the app reads as one family. */
 export const PASTEL = {
@@ -83,7 +83,46 @@ export function RingTap({ trend, children }: { trend?: string; children: ReactNo
 }
 
 /** Data cards: rings on the left, key on the right. */
+/** "What made this score" (decision 0063, Oura's Contributors): each part as a label, its value on the right and a thin
+ *  bar under it. White when going well; soft coral only where it needs care (under half, once something is logged). */
+export function Contributors({ items }: { items: RingItem[] }) {
+  return (
+    <View style={{ gap: 16 }}>
+      {items.map(k => {
+        const v = c01(k.value);
+        const care = v > 0 && v < 0.5;
+        return (
+          <View key={k.id} style={{ gap: 8 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 10 }}>
+              <Text style={{ flex: 1, color: colors.ink, fontSize: 17 }} numberOfLines={1}>{k.label}</Text>
+              <Text style={{ color: care ? '#F4B183' : colors.ink, fontSize: 16, fontVariant: ['tabular-nums'] }} numberOfLines={1}>{k.text ?? k.keyText ?? pct(k.value)}</Text>
+            </View>
+            <View style={{ height: 4, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.12)', overflow: 'hidden' }}>
+              <View style={{ width: `${v * 100}%`, height: '100%', borderRadius: 2, backgroundColor: care ? '#F4B183' : '#F3EEE8' }} />
+            </View>
+          </View>
+        );
+      })}
+    </View>
+  );
+}
+
+/** The card's score as one big thin number (glass look), tapping opens its detail page. */
+function ScoreBig({ score, max, trend }: { score: number | null | undefined; max: number; trend?: string }) {
+  const body = (
+    <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 10 }}>
+      <Text style={{ fontSize: 56, fontWeight: font.thin, color: colors.ink, lineHeight: 62, fontVariant: ['tabular-nums'] }}>{score == null ? '–' : fmt(score)}</Text>
+      <Text style={{ fontSize: 16, color: colors.muted }}>{tr('of {n}', { n: max })}</Text>
+      <View style={{ flex: 1 }} />
+      {trend ? <Text style={{ fontSize: 14, fontWeight: '600', color: colors.ink }}>{tr('Details')} ›</Text> : null}
+    </View>
+  );
+  return trend ? <Pressable onPress={() => router.push({ pathname: '/trend', params: { card: trend } })} accessibilityRole="button" accessibilityLabel={tr('Details and trends')}>{body}</Pressable> : body;
+}
+
 export function RingPanel({ items, score, max, trend, sub }: { items: RingItem[]; score: number | null | undefined; max: number; trend?: string; sub?: string }) {
+  // Oura-like redesign (decision 0063): a big thin score, then what made it, as bars; the rings stay for Calm Teal.
+  if (isGlass) return <View style={{ gap: 18, paddingVertical: 4 }}><ScoreBig score={score} max={max} trend={trend} /><Contributors items={items} /></View>;
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 4 }}>
       <RingTap trend={trend}><RingStack items={items} center={score == null ? '–' : fmt(score)} sub={sub ?? `of ${max}`} /></RingTap>
@@ -94,6 +133,7 @@ export function RingPanel({ items, score, max, trend, sub }: { items: RingItem[]
 
 /** Writing cards: the rings alone, centred on top; the boxes below carry each ring's dot and points. */
 export function RingTop({ items, score, max, trend }: { items: RingItem[]; score: number | null | undefined; max: number; trend?: string }) {
+  if (isGlass) return <View style={{ paddingVertical: 4 }}><ScoreBig score={score} max={max} trend={trend} /></View>;
   return (
     <View style={{ alignItems: 'center', paddingVertical: 4 }}>
       <RingTap trend={trend}><RingStack items={items} center={score == null ? '–' : fmt(score)} sub={`of ${max}`} size={140} /></RingTap>
