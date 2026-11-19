@@ -64,9 +64,8 @@ export const shadow = LOOK === 'ganga' ? 'inset 0 1px 0 rgba(255,255,255,0.18)' 
 export const space = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24 };
 export const radius = { sm: 8, md: 12, lg: 16 };
 
-/** The one coloured word: a result band (Ganga Dusk; in Calm Teal results stay muted as before). Red only for
- *  "Needs care", to call attention (founder, 19 Nov 2026). */
+/** The one coloured word: a result band (Ganga Dusk; in Calm Teal results stay muted as before). */
 export function statusColor(band: string): string {
   if (LOOK !== 'ganga') return CALM_TEAL.muted;
-  return band === 'Flourishing' ? '#A8D07A' : band === 'Balanced' ? '#7FCFD6' : band === 'Finding your footing' ? '#F2C46B' : band === 'Needs care' ? '#FF6B5E' : 'rgba(255,255,255,0.74)';
+  return band === 'Flourishing' ? '#A8D07A' : band === 'Balanced' ? '#7FCFD6' : band === 'Finding your footing' ? '#F2C46B' : band === 'Needs care' ? '#F4B183' : 'rgba(255,255,255,0.74)';
 }
