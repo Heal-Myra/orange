@@ -56,19 +56,51 @@ const GANGA_DUSK: typeof CALM_TEAL = {
   bad: '#FFFFFF',
 };
 
-export const LOOK: 'calm' | 'ganga' = 'ganga';
-export const colors = LOOK === 'ganga' ? GANGA_DUSK : CALM_TEAL;
-export const isGlass = LOOK === 'ganga';
+// Pastel glass (founder, 20 Nov 2026: "not impressed" with the dark; decision 0065): each part of the app has its own
+// soft pastel sky that changes with its score (src/lib/livingColour.ts); frosted white glass cards; deep ink text.
+const PASTEL_GLASS: typeof CALM_TEAL = {
+  ...GANGA_DUSK,
+  bg: '#F6EFEA',
+  surface: 'rgba(255,255,255,0.46)',
+  sheet: '#FBF8F5',
+  field: 'rgba(255,255,255,0.6)',
+  sunk: 'rgba(46,40,56,0.08)',
+  ink: '#2E2838',
+  muted: 'rgba(46,40,56,0.64)',
+  line: 'rgba(46,40,56,0.09)',
+  body: '#5E9A4A',
+  mind: '#6B5FC4',
+  soul: '#B54C7E',
+  tint: 'rgba(255,255,255,0.55)',
+  accent: '#2E2838',
+  onAccent: '#FFFFFF',
+  insight: '#2E2838',
+  onInsight: '#FFFFFF',
+  brand: '#2E2838',
+  good: '#2E2838',
+  warn: '#2E2838',
+  bad: '#2E2838',
+};
+export const LOOK = 'pastel' as 'calm' | 'ganga' | 'pastel';
+export const colors = LOOK === 'pastel' ? PASTEL_GLASS : LOOK === 'ganga' ? GANGA_DUSK : CALM_TEAL;
+export const isGlass = LOOK !== 'calm';
+/** Light glass (pastel skies, dark text) versus dark glass (Ganga Dusk, white text). */
+export const isLight = LOOK === 'pastel';
+/** Glass pieces that sit on the sky: circles, pills, tracks, the tab bar. */
+export const glass = isLight
+  ? { fill: 'rgba(255,255,255,0.45)', fillSoft: 'rgba(255,255,255,0.32)', line: 'rgba(255,255,255,0.7)', track: 'rgba(46,40,56,0.10)', trackFill: '#2E2838', nav: 'rgba(255,255,255,0.72)', shade: '0 8px 24px rgba(80,60,90,0.12)' }
+  : { fill: 'rgba(255,255,255,0.06)', fillSoft: 'rgba(18,16,22,0.38)', line: 'rgba(255,255,255,0.16)', track: 'rgba(255,255,255,0.12)', trackFill: '#F3EEE8', nav: '#1E2029', shade: '0 8px 24px rgba(0,0,0,0.35)' };
 
 /** Soft card shadow. */
-export const shadow = LOOK === 'ganga' ? 'none' : '0 2px 12px rgba(31, 42, 48, 0.07)';
+export const shadow = isGlass ? 'none' : '0 2px 12px rgba(31, 42, 48, 0.07)';
 
 export const space = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24 };
 export const radius = { sm: 8, md: 12, lg: 16 };
 
 /** The one coloured word: a result band (Ganga Dusk; in Calm Teal results stay muted as before). */
 export function statusColor(band: string): string {
-  if (LOOK !== 'ganga') return CALM_TEAL.muted;
+  if (LOOK === 'calm') return CALM_TEAL.muted;
+  if (LOOK === 'pastel') return band === 'Flourishing' ? '#3F7F35' : band === 'Balanced' ? '#2C7486' : band === 'Finding your footing' ? '#A06C14' : band === 'Needs care' ? '#BB5A44' : PASTEL_GLASS.muted;
   return band === 'Flourishing' ? '#A8D07A' : band === 'Balanced' ? '#7FCFD6' : band === 'Finding your footing' ? '#F2C46B' : band === 'Needs care' ? '#F4B183' : 'rgba(255,255,255,0.74)';
 }
 

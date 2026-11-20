@@ -11,7 +11,8 @@ import { MyraLine, type CardId } from '../components/MyraLine';
 import { dayParts } from '../components/TodayRings';
 import { Serif, Tile } from '../components/ui';
 import { band, sleepParts, wellBeing } from '../lib/scoring';
-import { colors, font, isGlass, statusColor } from '../theme';
+import { colors, font, glass, isGlass, isLight, statusColor } from '../theme';
+const BAR = isLight ? '#5D8FC8' : '#9CC7EE', BAR_SOFT = isLight ? 'rgba(93,143,200,0.45)' : 'rgba(156,199,238,0.55)';
 import { shiftISO } from '../lib/dates';
 import { PASTEL, RingKey, RingStack, type RingItem } from '../components/Rings';
 import { RangeBar, Trends } from '../components/Trends';
@@ -128,10 +129,10 @@ function DetailPage({ cardId, items }: { cardId: string; items: RingItem[] }) {
       {m ? (
         <View style={{ alignItems: 'center', gap: 6 }}>
           <Svg width="100%" height={H} viewBox={`0 0 ${W} ${H}`}>
-            {target ? <Line x1="0" x2={W} y1={H - (target / top) * H} y2={H - (target / top) * H} stroke="rgba(255,255,255,0.35)" strokeDasharray="4 5" /> : null}
+            {target ? <Line x1="0" x2={W} y1={H - (target / top) * H} y2={H - (target / top) * H} stroke={colors.muted} strokeDasharray="4 5" /> : null}
             {vals.map((v, i) => {
               const h = v ? Math.max(4, (v / top) * H) : 6;
-              return <Rect key={i} x={i * (bw + gap)} y={H - h} width={bw} height={h} rx={6} fill={v ? (i === 6 ? '#9CC7EE' : 'rgba(156,199,238,0.55)') : 'rgba(255,255,255,0.12)'} />;
+              return <Rect key={i} x={i * (bw + gap)} y={H - h} width={bw} height={h} rx={6} fill={v ? (i === 6 ? BAR : BAR_SOFT) : glass.track} />;
             })}
           </Svg>
           <View style={{ flexDirection: 'row', width: '100%', justifyContent: 'space-between' }}>

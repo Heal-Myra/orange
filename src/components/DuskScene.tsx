@@ -17,7 +17,8 @@ export const SKY: Record<Phase, [string, string, string, string]> = {
 const GLOW: Record<Phase, string> = { dawn: '#FFD3A0', day: '#FFF4D6', dusk: '#FFB37A', night: '#DCE3FF' };
 
 /** The scene, absolutely placed by the caller; `top` is the page's dark it fades into. */
-export function DuskScene({ height, hour, width }: { height: number; hour: number; width: number }) {
+export function DuskScene({ height, hour, width, pastel }: { height: number; hour: number; width: number; pastel?: boolean }) {
+  if (pastel) return <PastelBank width={width} height={height} />;
   const p = phaseAt(hour);
   const [a, b, c, d] = SKY[p];
   const H = 620, horizon = 500; // the horizon sits low, under Myra's line, so the words stay on open sky
@@ -59,6 +60,25 @@ export function DuskScene({ height, hour, width }: { height: number; hour: numbe
       )) : null}
       <Rect x="0" y="0" width="390" height={H} fill="#0E0F14" opacity={0.28} />
       <Rect x="0" y={H * 0.62} width="390" height={H * 0.38} fill="url(#dfade)" />
+    </Svg>
+  );
+}
+
+/** Pastel look (decision 0065): the sky is the living Today sky behind the screen, so only the far bank with its temple
+ *  spires and a soft river are drawn here, in peach tones that fade away below. */
+function PastelBank({ width, height }: { width: number; height: number }) {
+  const H = 620, horizon = 500;
+  return (
+    <Svg width={width} height={height} viewBox={`0 0 390 ${H}`} preserveAspectRatio="xMidYMin slice">
+      <Defs>
+        <LinearGradient id="pr" x1="0" y1="0" x2="0" y2="1">
+          <Stop offset="0" stopColor="#F4D9CF" stopOpacity="0.9" /><Stop offset="1" stopColor="#FCEEE6" stopOpacity="0" />
+        </LinearGradient>
+      </Defs>
+      <Path d={`M0 ${horizon} L0 ${horizon - 18} L22 ${horizon - 18} L28 ${horizon - 40} L32 ${horizon - 54} L36 ${horizon - 40} L42 ${horizon - 18} L58 ${horizon - 18} L63 ${horizon - 30} L66 ${horizon - 40} L69 ${horizon - 30} L74 ${horizon - 18} Q120 ${horizon - 24} 170 ${horizon - 15} T300 ${horizon - 16} L326 ${horizon - 18} L333 ${horizon - 36} L338 ${horizon - 50} L343 ${horizon - 36} L350 ${horizon - 18} L390 ${horizon - 20} L390 ${horizon} Z`}
+        fill="#D9A99A" opacity={0.5} />
+      <Rect x="0" y={horizon} width="390" height={H - horizon} fill="url(#pr)" />
+      <Path d={`M300 ${horizon + 34} q22 8 44 0 l-6 6 q-16 4 -32 0 z`} fill="#C99A8C" opacity={0.5} />
     </Svg>
   );
 }

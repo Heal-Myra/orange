@@ -10,12 +10,12 @@ import { feelingMix, FEELINGS, heavyShare, type FeelingId } from '../lib/feeling
 import { tr } from '../lib/i18n';
 import { useHeal } from '../lib/store';
 import { todayISO } from '../lib/dates';
-import { colors, isGlass } from '../theme';
+import { colors, isGlass, isLight } from '../theme';
 import { PASTEL, RingPanel, type RingItem } from './Rings';
 import { Note } from './ui';
 import { Ionicons } from '@expo/vector-icons';
 
-const SKY_INK = isGlass ? '#CFE3F5' : '#3F6E99'; // readable blue on the pastel sky
+const SKY_INK = isGlass && !isLight ? '#CFE3F5' : '#3F6E99'; // readable blue on the pastel sky
 import type { DayLog } from '../lib/types';
 
 const COLOR: Record<FeelingId, string> = {

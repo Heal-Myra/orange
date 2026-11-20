@@ -17,7 +17,7 @@ import { UpdateWatcher } from '../components/UpdateWatcher';
 import { UnicornLayer } from '../components/DoneSwitch';
 import { MealChecks } from '../lib/mealChecks';
 import { LangProvider, tr, useLang } from '../lib/i18n';
-import { colors, isGlass } from '../theme';
+import { colors, isGlass, isLight } from '../theme';
 
 /** Sends people to sign-in or the privacy screen when they need it. */
 function Gate() {
@@ -82,7 +82,7 @@ function Gate() {
       <Stack.Screen name="prakriti" options={{ headerShown: true, title: tr('Your nature'), headerBackTitle: tr('Back'), headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
       <Stack.Screen name="records" options={{ headerShown: true, title: tr('Top of My Game'), headerBackTitle: tr('Back'), headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
       <Stack.Screen name="privacy" options={{ headerShown: true, title: tr('Privacy and permissions'), headerBackTitle: tr('Back'), headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
-      <Stack.Screen name="spaces" options={{ headerShown: true, title: tr('Spaces'), headerBackTitle: tr('Back'), headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
+      <Stack.Screen name="spaces" options={{ headerShown: true, title: tr('Spaces'), headerBackTitle: tr('Back'), ...(isLight ? { headerTransparent: true, headerStyle: { backgroundColor: "transparent" } } : { headerStyle: { backgroundColor: colors.bg } }), headerTintColor: colors.ink }} />
       <Stack.Screen name="connectors" options={{ headerShown: true, title: tr('Connectors'), headerBackTitle: tr('Back'), headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
       <Stack.Screen name="from-your-day" options={{ headerShown: true, title: tr('From your day'), headerBackTitle: tr('Back'), headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
       <Stack.Screen name="trend" options={{ headerShown: true, title: tr('Trends'), headerBackTitle: tr('Back'), headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
@@ -175,7 +175,7 @@ export default function RootLayout() {
       <HealProvider>
         <HealthProvider>
         <TasksProvider>
-          <StatusBar style={isGlass ? 'light' : 'dark'} />
+          <StatusBar style={isGlass && !isLight ? 'light' : 'dark'} />
           <Gate key={iconGeneration} />
           <ReminderScheduler />
           <ShareReceiver />

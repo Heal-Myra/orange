@@ -4,21 +4,25 @@ import { useAttach, type Picked } from './AttachPlus';
 import { readNoteText } from '../lib/ai';
 import { Ionicons } from '@expo/vector-icons';
 import { createContext, isValidElement, useCallback, useContext, useEffect, useId, useMemo, useRef, useState, type ReactNode } from 'react';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, usePathname } from 'expo-router';
 import { Keyboard, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View, type ScrollViewInstance, type StyleProp, type ViewStyle } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { formatDay, todayISO } from '../lib/dates';
 import { useHeal } from '../lib/store';
 import { FeedbackBox } from './FeedbackBox';
 import type { Pillar } from '../lib/trends';
 import { GlassBackdrop } from './GlassBackdrop';
-import { CARD_TINT, DEFAULT_TINT, colors, font, isGlass, radius, shadow, space, statusColor } from '../theme';
+import { SECTION, sectionOf } from '../lib/livingColour';
+import { CARD_TINT, DEFAULT_TINT, colors, font, glass, isGlass, isLight, radius, shadow, space, statusColor } from '../theme';
 import Svg, { Defs, LinearGradient as SvgLinearGradient, Rect, Stop } from 'react-native-svg';
 import { lang, tr } from '../lib/i18n';
 
 // Jump to a card: Today's "Myra recommends" opens a tab with ?card=<id> and the screen scrolls to that card and
 // outlines it for a moment (founder, 21 Oct 2026). Cards opt in by being wrapped in <Anchor id="…">.
 const AnchorCtx = createContext<{ register: (id: string, y: number) => void; lit: string | null; keepVisible: () => void }>({ register: () => {}, lit: null, keepVisible: () => {} });
+
+/** A tab's standard header height: 44 on iPhone, 56 on Android, 64 on the web, plus the status bar. */
+export const tabHeaderHeight = (top: number) => top + (Platform.OS === 'ios' ? 44 : Platform.OS === 'android' ? 56 : 64);
 
 export function Screen({ children, showDay = false, feedback, top, dayLabel, noBanner, fill }: { children: ReactNode; showDay?: boolean; noBanner?: boolean; feedback?: string; top?: ReactNode; trends?: Pillar; dayLabel?: ReactNode; fill?: boolean }) {
   const { card, at } = useLocalSearchParams<{ card?: string; at?: string }>();
@@ -58,11 +62,15 @@ export function Screen({ children, showDay = false, feedback, top, dayLabel, noB
     return () => { show.remove(); hide.remove(); };
   }, [keepVisible]);
   const ctx = useMemo(() => ({ register, lit, keepVisible }), [register, lit, keepVisible]);
+  // Tabs have a see-through header in the glass looks: Body, Mind and Soul start below it (Today's scene handles itself).
+  const path = usePathname();
+  const insets = useSafeAreaInsets();
+  const under = isGlass && (path === '/body' || path === '/mind' || path === '/soul' || (isLight && path === '/spaces')) ? tabHeaderHeight(insets.top) : 0;
   return (
     <SafeAreaView style={s.safe} edges={['left', 'right']}>
       <GlassBackdrop />
       <AnchorCtx.Provider value={ctx}>
-        <ScrollView ref={scroll} contentContainerStyle={fill ? [s.scroll, { flexGrow: 1, gap: space.md, paddingTop: space.md, paddingBottom: space.md }] : s.scroll} keyboardShouldPersistTaps="handled"
+        <ScrollView ref={scroll} contentContainerStyle={[fill ? [s.scroll, { flexGrow: 1, gap: space.md, paddingTop: space.md, paddingBottom: space.md }] : s.scroll, under ? { paddingTop: under + space.md } : null]} keyboardShouldPersistTaps="handled"
           automaticallyAdjustKeyboardInsets keyboardDismissMode="interactive" scrollEventThrottle={32}
           onScroll={e => { offset.current = e.nativeEvent.contentOffset.y; }}>
           {/* Trends moved off the tabs (founder, 31 Oct 2026): D · W · M · Q · Y lives on each card's detail page
@@ -160,7 +168,9 @@ export function Expandable({ icon, title, status, statusColor, color = colors.ac
 export function Card({ children, style, tint }: { children: ReactNode; style?: StyleProp<ViewStyle>; tint?: string }) {
   const anchor = useContext(TintCtx);
   const gid = 'g' + useId().replace(/[^a-zA-Z0-9]/g, '');
-  const t = tint ?? (anchor ? CARD_TINT[anchor] : undefined) ?? DEFAULT_TINT;
+  const path = usePathname();
+  // Pastel look: every card on a screen takes that screen's own colour, so the page reads as one (founder, 20 Nov 2026).
+  const t = tint && !isLight ? tint : isLight ? SECTION[sectionOf(path)].tab : (anchor ? CARD_TINT[anchor] : undefined) ?? DEFAULT_TINT;
   const nested = useContext(InCardCtx);
   // The wash is drawn at the card's measured size: "100%" inside an edge-to-edge card left a dark strip on iPhone (19 Nov 2026).
   const [box, setBox] = useState<{ w: number; h: number } | null>(null);
@@ -172,8 +182,8 @@ export function Card({ children, style, tint }: { children: ReactNode; style?: S
         <Svg pointerEvents="none" style={{ position: 'absolute', left: 0, top: 0 }} width={box.w} height={box.h}>
           <Defs>
             <SvgLinearGradient id={gid} x1="0" y1="0" x2="0.35" y2="1">
-              <Stop offset="0" stopColor={t} stopOpacity={0.34} />
-              <Stop offset="0.55" stopColor={t} stopOpacity={0.09} />
+              <Stop offset="0" stopColor={t} stopOpacity={isLight ? 0.2 : 0.34} />
+              <Stop offset="0.55" stopColor={t} stopOpacity={isLight ? 0.05 : 0.09} />
               <Stop offset="1" stopColor={t} stopOpacity={0} />
             </SvgLinearGradient>
           </Defs>
@@ -405,8 +415,8 @@ export const s = StyleSheet.create({
   points: { fontSize: 14, color: colors.muted, fontVariant: ['tabular-nums'] },
   btn: { borderRadius: 99, paddingVertical: 11, paddingHorizontal: 16, alignItems: 'center' },
   // Ganga Dusk: buttons are glass pills with white words, like Oura's "View details" (founder, 19 Nov 2026).
-  btnPrimary: isGlass ? { backgroundColor: 'rgba(255,255,255,0.16)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.28)' } : { backgroundColor: colors.accent },
-  btnInsight: isGlass ? { backgroundColor: 'rgba(255,255,255,0.16)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.28)' } : { backgroundColor: colors.insight }, // suggestions and analytics
+  btnPrimary: isGlass ? { backgroundColor: isLight ? glass.fill : 'rgba(255,255,255,0.16)', borderWidth: 1, borderColor: isLight ? glass.line : 'rgba(255,255,255,0.28)' } : { backgroundColor: colors.accent },
+  btnInsight: isGlass ? { backgroundColor: isLight ? glass.fill : 'rgba(255,255,255,0.16)', borderWidth: 1, borderColor: isLight ? glass.line : 'rgba(255,255,255,0.28)' } : { backgroundColor: colors.insight }, // suggestions and analytics
   btnPlain: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.line },
   btnText: { fontSize: 15, fontWeight: '600', color: colors.ink },
   seg: { flexDirection: 'row', borderWidth: 1, borderColor: colors.line, borderRadius: radius.sm, overflow: 'hidden', alignSelf: 'flex-start' },

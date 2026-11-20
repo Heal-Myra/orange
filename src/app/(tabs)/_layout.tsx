@@ -7,7 +7,7 @@ import { FloatingTabBar } from '../../components/FloatingTabBar';
 import { TabRing } from '../../components/TabRing';
 import type { ComponentProps } from 'react';
 import type { ColorValue } from 'react-native';
-import { colors , isGlass } from '../../theme';
+import { colors, glass, isGlass } from '../../theme';
 import { tr } from '../../lib/i18n';
 import { usePendingRequests } from '../../lib/adminAlerts';
 import { useHeal } from '../../lib/store';
@@ -48,7 +48,7 @@ function ProfileButton() {
   return (
     <Link href="/account" asChild>
       <Pressable accessibilityLabel={pending ? tr('Profile, {n} requests waiting', { n: pending }) : tr('Profile')} hitSlop={10} style={{ paddingHorizontal: 16, alignItems: 'center' }}>
-        <View style={isGlass ? { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.08)', alignItems: 'center', justifyContent: 'center' } : undefined}>
+        <View style={isGlass ? { width: 40, height: 40, borderRadius: 20, backgroundColor: glass.fill, alignItems: 'center', justifyContent: 'center' } : undefined}>
           {/* Glass look: the first letter of the name in a glass circle, like Oura's round header buttons (19 Nov 2026). */}
           {isGlass && name !== tr('Profile') ? <Text style={{ color: colors.ink, fontSize: 17, fontWeight: '500' }}>{name.charAt(0).toUpperCase()}</Text>
             : <Ionicons name={isGlass ? 'person-outline' : 'person-circle-outline'} size={isGlass ? 20 : 30} color={colors.ink} />}
@@ -67,7 +67,8 @@ export default function TabLayout() {
     <Tabs
       tabBar={isGlass ? props => <FloatingTabBar {...props} /> : undefined}
       screenOptions={{
-        headerStyle: { backgroundColor: colors.bg },
+        // Glass looks: every tab's header is see-through so its sky runs to the top (decision 0065).
+        ...(isGlass ? { headerTransparent: true, headerStyle: { backgroundColor: 'transparent' } } : { headerStyle: { backgroundColor: colors.bg } }),
         headerShadowVisible: false,
         headerTitleStyle: isGlass ? { color: colors.ink, fontWeight: '500', fontSize: 17 } : { color: colors.ink, fontWeight: '600' },
         headerTitleAlign: isGlass ? 'center' : undefined,

@@ -6,7 +6,7 @@ import { router } from 'expo-router';
 import { Pressable, Text, View } from 'react-native';
 import { tr } from '../lib/i18n';
 import { useHeal } from '../lib/store';
-import { colors, isGlass } from '../theme';
+import { colors, glass, isGlass, isLight } from '../theme';
 import type { DayLog } from '../lib/types';
 
 interface Item { at?: string; icon: keyof typeof Ionicons.glyphMap; title: string; detail: string; from: string; open: () => void }
@@ -29,9 +29,9 @@ export function YourDay() {
   if (!isGlass) return null;
   const items = dayItems(day);
   const chip = (icon: keyof typeof Ionicons.glyphMap, label: string, onPress: () => void) => (
-    <Pressable onPress={onPress} accessibilityRole="button" style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#F3EEE8', borderRadius: 99, paddingVertical: 9, paddingHorizontal: 13, opacity: pressed ? 0.8 : 1 })}>
-      <Ionicons name={icon} size={17} color="#1B1A22" />
-      <Text style={{ color: '#1B1A22', fontSize: 14, fontWeight: '500' }}>{label}</Text>
+    <Pressable onPress={onPress} accessibilityRole="button" style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: isLight ? glass.fill : '#F3EEE8', borderRadius: 99, paddingVertical: 9, paddingHorizontal: 13, opacity: pressed ? 0.8 : 1 })}>
+      <Ionicons name={icon} size={17} color={isLight ? colors.ink : '#1B1A22'} />
+      <Text style={{ color: isLight ? colors.ink : '#1B1A22', fontSize: 14, fontWeight: '500' }}>{label}</Text>
     </Pressable>
   );
   return (
@@ -49,14 +49,14 @@ export function YourDay() {
           {items.map((it, i) => (
             <View key={i} style={{ flexDirection: 'row', gap: 12 }}>
               <View style={{ alignItems: 'center', width: 44 }}>
-                <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(255,255,255,0.10)', alignItems: 'center', justifyContent: 'center' }}>
+                <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: glass.fill, alignItems: 'center', justifyContent: 'center' }}>
                   <Ionicons name={it.icon} size={20} color={colors.ink} />
                 </View>
-                {i < items.length - 1 ? <View style={{ width: 1.5, flex: 1, backgroundColor: 'rgba(255,255,255,0.14)' }} /> : null}
+                {i < items.length - 1 ? <View style={{ width: 1.5, flex: 1, backgroundColor: glass.track }} /> : null}
               </View>
               <View style={{ flex: 1, gap: 6, paddingBottom: 16 }}>
                 <Text style={{ color: colors.muted, fontSize: 14, marginTop: 12 }}>{it.at ? `${hm(it.at)} · ` : ''}{it.from}</Text>
-                <Pressable onPress={it.open} accessibilityRole="button" style={({ pressed }) => ({ backgroundColor: 'rgba(255,255,255,0.07)', borderRadius: 22, padding: 16, flexDirection: 'row', alignItems: 'center', opacity: pressed ? 0.8 : 1 })}>
+                <Pressable onPress={it.open} accessibilityRole="button" style={({ pressed }) => ({ backgroundColor: isLight ? glass.fill : 'rgba(255,255,255,0.07)', borderRadius: 22, padding: 16, flexDirection: 'row', alignItems: 'center', opacity: pressed ? 0.8 : 1 })}>
                   <View style={{ flex: 1, gap: 4 }}>
                     <Text style={{ color: colors.ink, fontSize: 17, fontWeight: '600' }} numberOfLines={1}>{it.title}</Text>
                     <Text style={{ color: colors.muted, fontSize: 14 }}>{it.detail}</Text>

@@ -8,7 +8,7 @@ import type { ReactNode } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { tr } from '../lib/i18n';
 import Svg, { Circle, G } from 'react-native-svg';
-import { colors, font, isGlass } from '../theme';
+import { colors, font, glass, isGlass, statusColor } from '../theme';
 
 /** The ring colours, shared by every card so the app reads as one family. */
 export const PASTEL = {
@@ -95,10 +95,10 @@ export function Contributors({ items }: { items: RingItem[] }) {
           <View key={k.id} style={{ gap: 8 }}>
             <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 10 }}>
               <Text style={{ flex: 1, color: colors.ink, fontSize: 17 }} numberOfLines={1}>{k.label}</Text>
-              <Text style={{ color: care ? '#F4B183' : colors.ink, fontSize: 16, fontVariant: ['tabular-nums'] }} numberOfLines={1}>{k.text ?? k.keyText ?? pct(k.value)}</Text>
+              <Text style={{ color: care ? statusColor('Needs care') : colors.ink, fontSize: 16, fontVariant: ['tabular-nums'] }} numberOfLines={1}>{k.text ?? k.keyText ?? pct(k.value)}</Text>
             </View>
-            <View style={{ height: 4, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.12)', overflow: 'hidden' }}>
-              <View style={{ width: `${v * 100}%`, height: '100%', borderRadius: 2, backgroundColor: care ? '#F4B183' : '#F3EEE8' }} />
+            <View style={{ height: 4, borderRadius: 2, backgroundColor: glass.track, overflow: 'hidden' }}>
+              <View style={{ width: `${v * 100}%`, height: '100%', borderRadius: 2, backgroundColor: care ? statusColor('Needs care') : glass.trackFill }} />
             </View>
           </View>
         );
