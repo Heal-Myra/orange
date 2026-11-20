@@ -7,7 +7,7 @@ import { FloatingTabBar } from '../../components/FloatingTabBar';
 import { TabRing } from '../../components/TabRing';
 import type { ComponentProps } from 'react';
 import type { ColorValue } from 'react-native';
-import { colors, glass, isGlass } from '../../theme';
+import { colors, glass, isGlass, isLight } from '../../theme';
 import { tr } from '../../lib/i18n';
 import { usePendingRequests } from '../../lib/adminAlerts';
 import { useHeal } from '../../lib/store';
@@ -60,6 +60,9 @@ function ProfileButton() {
   );
 }
 
+// A see-through glass band, so cards scrolling under the header never collide with its words (20 Nov 2026).
+const HEADER_GLASS = isLight ? 'rgba(255,255,255,0.82)' : 'rgba(18,19,24,0.94)';
+
 export default function TabLayout() {
   const insets = useSafeAreaInsets();
   return (
@@ -68,7 +71,7 @@ export default function TabLayout() {
       tabBar={isGlass ? props => <FloatingTabBar {...props} /> : undefined}
       screenOptions={{
         // Glass looks: every tab's header is see-through so its sky runs to the top (decision 0065).
-        ...(isGlass ? { headerTransparent: true, headerStyle: { backgroundColor: 'transparent' } } : { headerStyle: { backgroundColor: colors.bg } }),
+        ...(isGlass ? { headerTransparent: true, headerStyle: { backgroundColor: HEADER_GLASS } } : { headerStyle: { backgroundColor: colors.bg } }),
         headerShadowVisible: false,
         headerTitleStyle: isGlass ? { color: colors.ink, fontWeight: '500', fontSize: 17 } : { color: colors.ink, fontWeight: '600' },
         headerTitleAlign: isGlass ? 'center' : undefined,
@@ -80,7 +83,7 @@ export default function TabLayout() {
       <Tabs.Screen name="index" options={{ ...tab(tr('Today'), 'sunny-outline', colors.accent),
         // The header takes the top colour of Today's living scene so the two read as one sky (decision 0063).
         // The living scene runs up behind a see-through header, like Oura's (founder, 19 Nov 2026).
-        ...(isGlass ? { headerTransparent: true, headerStyle: { backgroundColor: 'transparent' } } : {}), headerTitle: isGlass ? 'HAPPY ORANGE' : 'Happy Orange', headerTitleStyle: isGlass ? { color: colors.ink, fontWeight: '500', fontSize: 15, letterSpacing: 3 } : { color: colors.brand, fontWeight: '700' },
+        ...(isGlass ? { headerTransparent: true, headerStyle: { backgroundColor: HEADER_GLASS } } : {}), headerTitle: isGlass ? 'HAPPY ORANGE' : 'Happy Orange', headerTitleStyle: isGlass ? { color: colors.ink, fontWeight: '500', fontSize: 15, letterSpacing: 3 } : { color: colors.brand, fontWeight: '700' },
         headerRight: () => <ProfileButton /> }} />
       {/* Each icon sits in a thin ring that fills with that pillar's score (founder, 31 Oct 2026, option B). */}
       <Tabs.Screen name="body" options={ringTab(tr('Body'), 'body', 'leaf-outline', colors.body)} />

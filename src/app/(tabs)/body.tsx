@@ -22,6 +22,7 @@ import { CareNote } from '../../components/CareCard';
 import { FaceCard } from '../../components/FaceCard';
 import { AirRow } from '../../components/AirLine';
 import { PASTEL, RingPanel } from '../../components/Rings';
+const pctOf = (v: number, aim: number) => `${aim ? Math.round((v / aim) * 100) : 0}%`;
 const SLEEP_COLORS = [PASTEL.lavender, PASTEL.sky, PASTEL.teal, PASTEL.sand, PASTEL.rose, PASTEL.sage, PASTEL.peach];
 import { MyraLine } from '../../components/MyraLine';
 import { todayISO } from '../../lib/dates';
@@ -65,11 +66,13 @@ export default function Body() {
           const carbAim = Math.round((aim.c * profile.kcal) / 4), fatAim = Math.round((aim.f * profile.kcal) / 9);
           return [
             ...(fast && !v3 ? [fastRing(fast)] : []),
-            { id: 'kcal', color: PASTEL.peach, label: tr('Calories'), value: totals.kcal / profile.kcal, text: `${Math.round(totals.kcal)} / ${profile.kcal}` },
-            { id: 'carbs', color: PASTEL.sand, label: tr('Carbs'), value: totals.c / carbAim, text: `${Math.round(totals.c)} / ${carbAim} g` },
-            { id: 'protein', color: PASTEL.lavender, label: tr('Protein'), value: totals.p / profile.protein, text: `${Math.round(totals.p)} / ${profile.protein} g` },
-            { id: 'fat', color: PASTEL.rose, label: tr('Fat'), value: totals.f / fatAim, text: `${Math.round(totals.f)} / ${fatAim} g` },
-            { id: 'fibre', color: PASTEL.teal, label: tr('Fibre'), value: (totals.fib ?? 0) / fib, text: `${Math.round(totals.fib ?? 0)} / ${fib} g` },
+            // Each as a share of its aim (founder, 20 Nov 2026: percentage of completion, not counts); calories, carbs or fat
+            // above the aim turn red.
+            { id: 'kcal', color: PASTEL.peach, label: tr('Calories'), value: totals.kcal / profile.kcal, text: pctOf(totals.kcal, profile.kcal), over: totals.kcal > profile.kcal * 1.1 },
+            { id: 'carbs', color: PASTEL.sand, label: tr('Carbs'), value: totals.c / carbAim, text: pctOf(totals.c, carbAim), over: v3 ? !!v3.carbOver : totals.c > carbAim },
+            { id: 'protein', color: PASTEL.lavender, label: tr('Protein'), value: totals.p / profile.protein, text: pctOf(totals.p, profile.protein) },
+            { id: 'fat', color: PASTEL.rose, label: tr('Fat'), value: totals.f / fatAim, text: pctOf(totals.f, fatAim), over: v3 ? !!v3.fatOver : totals.f > fatAim },
+            { id: 'fibre', color: PASTEL.teal, label: tr('Fibre'), value: (totals.fib ?? 0) / fib, text: pctOf(totals.fib ?? 0, fib) },
           ];
         })()} />}>
         <MissedMeal onSnap={() => setAsk({ snap: String(Date.now()) })} onType={() => setAsk({ type: String(Date.now()) })} />

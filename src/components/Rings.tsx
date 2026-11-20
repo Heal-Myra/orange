@@ -8,14 +8,14 @@ import type { ReactNode } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { tr } from '../lib/i18n';
 import Svg, { Circle, G } from 'react-native-svg';
-import { colors, font, glass, isGlass, statusColor } from '../theme';
+import { colors, font, glass, isGlass, isLight, statusColor } from '../theme';
 
 /** The ring colours, shared by every card so the app reads as one family. */
 export const PASTEL = {
   peach: '#EBA987', lavender: '#9C95D0', teal: '#6FB7BD', sky: '#86B4DE', sand: '#E3B873', rose: '#D9A7BD', sage: '#9CC08E',
 } as const;
 
-export interface RingItem { id: string; color: string; label: string; value: number /* 0..1 */; text?: string; sub?: string; keyText?: string /* replaces the % in the key, e.g. '–' for nothing yet */ }
+export interface RingItem { id: string; color: string; label: string; value: number /* 0..1 */; text?: string; sub?: string; keyText?: string /* replaces the % in the key, e.g. '–' for nothing yet */; over?: boolean /* above the aim where more is not better: shown red */ }
 /** Inside cards every part shows as a percentage (founder, 4 Nov 2026); only the card's own score stays in points. */
 export const pct = (v: number) => `${Math.round((Number.isFinite(v) ? Math.max(0, v) : 0) * 100)}%`;
 
@@ -85,20 +85,24 @@ export function RingTap({ trend, children }: { trend?: string; children: ReactNo
 /** Data cards: rings on the left, key on the right. */
 /** "What made this score" (decision 0063, Oura's Contributors): each part as a label, its value on the right and a thin
  *  bar under it. White when going well; soft coral only where it needs care (under half, once something is logged). */
+const OVER_RED = isLight ? '#C8423B' : '#F07A72';
+
 export function Contributors({ items }: { items: RingItem[] }) {
   return (
     <View style={{ gap: 16 }}>
       {items.map(k => {
         const v = c01(k.value);
         const care = v > 0 && v < 0.5;
+        const red = !!k.over; // above the aim, where more is not better (calories, carbs, fat): red (founder, 20 Nov 2026)
+        const tone = red ? OVER_RED : care ? statusColor('Needs care') : null;
         return (
           <View key={k.id} style={{ gap: 8 }}>
             <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 10 }}>
               <Text style={{ flex: 1, color: colors.ink, fontSize: 17 }} numberOfLines={1}>{k.label}</Text>
-              <Text style={{ color: care ? statusColor('Needs care') : colors.ink, fontSize: 16, fontVariant: ['tabular-nums'] }} numberOfLines={1}>{k.text ?? k.keyText ?? pct(k.value)}</Text>
+              <Text style={{ color: tone ?? colors.ink, fontWeight: red ? '700' : '400', fontSize: 16, fontVariant: ['tabular-nums'] }} numberOfLines={1}>{k.text ?? k.keyText ?? pct(k.value)}</Text>
             </View>
             <View style={{ height: 4, borderRadius: 2, backgroundColor: glass.track, overflow: 'hidden' }}>
-              <View style={{ width: `${v * 100}%`, height: '100%', borderRadius: 2, backgroundColor: care ? statusColor('Needs care') : glass.trackFill }} />
+              <View style={{ width: `${v * 100}%`, height: '100%', borderRadius: 2, backgroundColor: tone ?? glass.trackFill }} />
             </View>
           </View>
         );
