@@ -1,4 +1,8 @@
-# 0065 · Pastel glass with living colour
+# 0065 · Pastel glass with living colour (reverted)
+
+**Reverted 20 Nov 2026, 18:32** (founder: "Revert to the earlier darker theme"). The app is back on Ganga Dusk (0062). The pastel
+look and living colour stay in code (`LOOK = 'pastel'` in src/theme.ts, src/lib/livingColour.ts) and can return with one line.
+Kept from this release: Food as % of aim with red when over, Face & beauty as lines, the frosted header band.
 
 Date: 20 Nov 2026 · Founder: "I am not impressed with this color gradient … more soothing vibes e.g. pastel colors";
 "5 distinctive color for Today, Body, Mind, Soul and Spaces"; "although color theme is fixed but intensity or gradient varies

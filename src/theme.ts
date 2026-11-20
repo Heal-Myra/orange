@@ -81,7 +81,7 @@ const PASTEL_GLASS: typeof CALM_TEAL = {
   warn: '#2E2838',
   bad: '#2E2838',
 };
-export const LOOK = 'pastel' as 'calm' | 'ganga' | 'pastel';
+export const LOOK = 'ganga' as 'calm' | 'ganga' | 'pastel';
 export const colors = LOOK === 'pastel' ? PASTEL_GLASS : LOOK === 'ganga' ? GANGA_DUSK : CALM_TEAL;
 export const isGlass = LOOK !== 'calm';
 /** Light glass (pastel skies, dark text) versus dark glass (Ganga Dusk, white text). */

@@ -1,5 +1,8 @@
 # Changelog
 
+## 20 Nov 2026 — Back to the dark Ganga Dusk look
+- Founder asked to revert the pastel look. The dark look returns; Food percentages with red when over, Face & beauty as lines and the frosted header band stay.
+
 ## 20 Nov 2026 — Pastel glass with living colour (decision 0065)
 - A soft colour for each part: Today peach, Body sage green, Mind lavender, Soul lotus pink, Spaces sky blue. Each screen's sky changes with its score: Today's sun rises, Body grows richer, Mind grows lighter, Soul's light spreads, Spaces' haze clears. Frosted white cards tinted with the screen's colour, dark readable text; the tab you are on lights up in its colour.
 - Food shows each part as a percentage of your aim; calories, carbs or fat above the aim turn red. Face & beauty shows its parts as lines. The tab header has a frosted band so cards slide under it cleanly.
