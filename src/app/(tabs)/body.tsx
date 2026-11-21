@@ -7,7 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Pressable, Text, View } from 'react-native';
 import { HealthLine, useHealth } from '../../components/HealthSync';
 import { Dots, Rows, StatRow } from '../../components/StatRows';
-import { MacroMix, NutritionTable, aimMix } from '../../components/MacroMix';
+import { aimMix } from '../../components/MacroMix';
 import { bmiOf, fibreTarget, planFor } from '../../lib/targets';
 import { CheckLine, MealPhoto } from '../../components/MealPhoto';
 import { MissedMeal } from '../../components/MissedMeal';
@@ -109,11 +109,8 @@ export default function Body() {
           {day.meals.some(m => m.check) ? <CheckLine kind="logged" />
             : day.meals.some(m => m.checked === 'ifct' && m.checkedAt && Date.now() - Date.parse(m.checkedAt) < 30 * 60_000) ? <CheckLine kind="ifct" /> : null}
           {details && day.meals.length ? (
-            <>
-              <NutritionTable totals={totals} kcal={profile.kcal} protein={profile.protein} fibre={fibreTarget(profile.kcal)} />
-              <MacroMix totals={totals} kcal={profile.kcal} protein={profile.protein} fibre={fibreTarget(profile.kcal)} />
-              {day.meals.map((m, i) => <MealRow key={`${i}-${m.name}`} m={m} i={i} />)}
-            </>
+            // Only the meals: the totals and the two calorie circles repeated the card's lines (founder, 21 Nov 2026).
+            <>{day.meals.map((m, i) => <MealRow key={`${i}-${m.name}`} m={m} i={i} />)}</>
           ) : null}
         </View>
         <MyraLine card="food" />

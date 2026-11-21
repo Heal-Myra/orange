@@ -1,5 +1,8 @@
 # Changelog
 
+## 21 Nov 2026 — Food details: just the meals
+- Founder: the total-calories bars and the two "Where your calories come from" circles repeated the Food card's lines; See details now lists only the meals.
+
 ## 20 Nov 2026 — Back to the dark Ganga Dusk look
 - Founder asked to revert the pastel look. The dark look returns; Food percentages with red when over, Face & beauty as lines and the frosted header band stay.
 
