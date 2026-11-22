@@ -27,6 +27,7 @@ import { tasksForAI, useTasks } from '../lib/tasks';
 import { colors } from '../theme';
 import { lang, tr } from '../lib/i18n';
 import { optional } from '../lib/native';
+import { canPaste, readCopiedPhoto, useCopiedPhoto } from '../lib/pastePhoto';
 import { supabase } from '../lib/supabase';
 import Constants from 'expo-constants';
 
@@ -68,7 +69,8 @@ async function base64Of(uri: string): Promise<string> {
 
 export default function Myra() {
   // q: a question typed in Today's Myra card, sent at once; listen: start speaking at once (31 Oct 2026).
-  const { from, q, listen, attach } = useLocalSearchParams<{ from?: string; q?: string; listen?: string; attach?: string }>();
+  const { from, q, listen, attach, paste } = useLocalSearchParams<{ from?: string; q?: string; listen?: string; attach?: string; paste?: string }>();
+  const copied = useCopiedPhoto();
   const [loaded, setLoaded] = useState(false);
   const askedRef = useRef(false);
   const speakRef = useRef<(() => void) | null>(null);
@@ -205,6 +207,18 @@ export default function Myra() {
       setFile({ kind: 'image', name: a.fileName ?? tr('Photo'), media_type: img.type, data: img.data, uri: a.uri });
     } catch (e) { setNote(e instanceof Error ? e.message : tr('Could not read that photo. Try another one.')); }
   };
+
+  // A copied photo (decision: founder, 22 Nov 2026): read from the clipboard, made small like a picked photo.
+  const pastePhoto = async () => {
+    setMenu(false); setNote(null);
+    const got = await readCopiedPhoto();
+    if ('error' in got) { setNote(got.error); return; }
+    try {
+      const img = await shrink(got.uri, got.base64, 'image/jpeg');
+      setFile({ kind: 'image', name: tr('Pasted photo'), media_type: img.type, data: img.data, uri: got.uri });
+    } catch (e) { setNote(e instanceof Error ? e.message : tr('Could not read the copied photo. Try Photos instead.')); }
+  };
+  useEffect(() => { if (paste === '1') pastePhoto(); }, [paste]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const pickDocument = async () => {
     setMenu(false); setNote(null);
@@ -343,6 +357,12 @@ export default function Myra() {
         <View style={{ paddingHorizontal: 12, paddingBottom: 6, gap: 6 }}>
           {session ? (
             <>
+              {!file && copied ? (
+                <Pressable onPress={pastePhoto} accessibilityRole="button" style={{ alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 7, paddingHorizontal: 12, borderRadius: 99, backgroundColor: colors.field }}>
+                  <Ionicons name="clipboard-outline" size={16} color={colors.ink} />
+                  <Text style={{ color: colors.ink, fontWeight: '600' }}>{tr('Paste photo')}</Text>
+                </Pressable>
+              ) : null}
               {file ? (
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, padding: 8, borderRadius: 12, backgroundColor: colors.tint }}>
                   {file.uri ? <Image source={{ uri: file.uri }} style={{ width: 40, height: 40, borderRadius: 6 }} /> : <Ionicons name="document-text-outline" size={24} color={colors.accent} />}
@@ -379,6 +399,7 @@ export default function Myra() {
             {Platform.OS !== 'web' ? tile(tr('Camera'), 'camera-outline', () => pickPhoto(true)) : null}
             {tile(tr('Photos'), 'image-outline', () => pickPhoto(false))}
             {tile(tr('Files'), 'document-outline', pickDocument)}
+            {canPaste ? tile(tr('Paste photo'), 'clipboard-outline', pastePhoto) : null}
           </View>
           {plus(tr('Snap a meal'), 'restaurant-outline', goBody)}
           {plus(tr('Handwritten to-do list'), 'list-outline', () => { setText(tr('Add these to my to-dos')); pickPhoto(true); })}

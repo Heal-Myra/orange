@@ -1,5 +1,8 @@
 # Changelog
 
+## 22 Nov 2026 — Paste a copied photo into Myra's chat
+- Founder: "Not able to paste photo in Myra chatbox." A phone's text box cannot take a pasted picture, so the app now reads the copied photo itself: a Paste photo chip appears in Today's Myra box and in Myra's chat whenever a photo is copied, and the + menu always offers Paste photo (src/lib/pastePhoto.ts).
+
 ## 21 Nov 2026 — Food details: just the meals
 - Founder: the total-calories bars and the two "Where your calories come from" circles repeated the Food card's lines; See details now lists only the meals.
 

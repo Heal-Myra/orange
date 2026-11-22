@@ -11,11 +11,13 @@ import { tr } from '../lib/i18n';
 import { useRotatingHint } from '../lib/rotatingHint';
 import { colors } from '../theme';
 import { GuidanceCard } from './AiBits';
+import { useCopiedPhoto } from '../lib/pastePhoto';
 
 export function MyraCard() {
   const { session } = useAuth();
   const [q, setQ] = useState('');
   const hint = useRotatingHint(!!q);
+  const copied = useCopiedPhoto();
   const ask = (question: string) => {
     const t = question.trim();
     router.push({ pathname: '/myra', params: t ? { from: 'today', q: t } : { from: 'today' } });
@@ -38,6 +40,14 @@ export function MyraCard() {
                 style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: colors.insight + '14', alignItems: 'center', justifyContent: 'center' }}>
                 <Ionicons name="add" size={24} color={colors.insight} />
               </Pressable>
+              {/* A copied photo: one tap pastes it into Myra's chat (founder, 22 Nov 2026). */}
+              {copied ? (
+                <Pressable onPress={() => router.push({ pathname: '/myra', params: { from: 'today', paste: '1' } })} accessibilityRole="button"
+                  style={{ flexDirection: 'row', alignItems: 'center', gap: 5, paddingVertical: 7, paddingHorizontal: 11, borderRadius: 99, backgroundColor: colors.insight + '14' }}>
+                  <Ionicons name="clipboard-outline" size={15} color={colors.insight} />
+                  <Text style={{ color: colors.insight, fontWeight: '600', fontSize: 13 }}>{tr('Paste photo')}</Text>
+                </Pressable>
+              ) : null}
               <View style={{ flex: 1 }} />
               <Pressable onPress={() => router.push({ pathname: '/myra', params: { from: 'today', listen: '1' } })} accessibilityLabel={tr('Speak')}
                 style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: colors.insight + '14', alignItems: 'center', justifyContent: 'center' }}>
