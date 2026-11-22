@@ -197,7 +197,7 @@ export function Card({ children, style, tint }: { children: ReactNode; style?: S
 }
 
 /** Each section's icon in the one card header (decision 0063), keyed by the card's anchor id. */
-const CARD_ICON: Record<string, keyof typeof Ionicons.glyphMap> = {
+export const CARD_ICON: Record<string, keyof typeof Ionicons.glyphMap> = {
   food: 'restaurant-outline', sleep: 'moon-outline', movement: 'walk-outline', body: 'body-outline', tasks: 'checkmark-done-outline',
   focus: 'eye-outline', meditation: 'flower-outline', phone: 'phone-portrait-outline', gratitude: 'heart-outline', love: 'heart-circle-outline',
   wisdom: 'book-outline', tao: 'leaf-outline', letgo: 'cloud-outline',

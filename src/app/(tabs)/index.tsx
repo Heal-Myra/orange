@@ -10,6 +10,7 @@ import { AirLine } from '../../components/AirLine';
 import { SpacesNudge } from '../../components/SpacesNudge';
 import { TodayHero } from '../../components/TodayHero';
 import { YourDay } from '../../components/YourDay';
+import { TodayFocus } from '../../components/TodayFocus';
 import { todayISO } from '../../lib/dates';
 import { useAuth } from '../../lib/auth';
 import { Screen } from '../../components/ui';
@@ -34,6 +35,8 @@ export default function Today() {
       {/* Oura-like redesign (decision 0063): the living scene, Body · Mind · Soul circles and one hero replace the rings cards. */}
       {isGlass ? <TodayHero w={w} /> : <TodayRings w={w} />}
       {date === todayISO() && isGlass ? <View style={{ alignItems: 'center' }}><AirLine /></View> : null}
+      {/* Oura's order (founder, 22 Nov 2026): the score, the habit you are building, then the three parts needing the most attention. */}
+      {date === todayISO() && isGlass ? <TodayFocus w={w} /> : null}
 
       {/* Back under the total (founder, 1 Nov 2026: the page looked too blank): Body, Mind and Soul with their parts. The tab
           icons keep their single score rings. */}
