@@ -36,6 +36,8 @@ export default function Today() {
       {isGlass ? <TodayHero w={w} /> : <TodayRings w={w} />}
       {date === todayISO() && isGlass ? <View style={{ alignItems: 'center' }}><AirLine /></View> : null}
       {/* Oura's order (founder, 22 Nov 2026): the score, the habit you are building, then the three parts needing the most attention. */}
+      {/* Founder, 22 Nov 2026: Top of My Game right after the score, then the habit and the cards needing attention. */}
+      {date === todayISO() && isGlass ? <RecordsCard /> : null}
       {date === todayISO() && isGlass ? <TodayFocus w={w} /> : null}
 
       {/* Back under the total (founder, 1 Nov 2026: the page looked too blank): Body, Mind and Soul with their parts. The tab
@@ -45,7 +47,7 @@ export default function Today() {
       {/* NeoSapien (decision 0050): what Neo 1 heard today, ready to review; only when connected. */}
       {date === todayISO() ? <FromYourDay /> : null}
 
-      {date === todayISO() ? <RecordsCard /> : null}
+      {date === todayISO() && !isGlass ? <RecordsCard /> : null}
 
       {date === todayISO() ? <YourDay /> : null}
 
