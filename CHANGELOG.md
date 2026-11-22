@@ -1,5 +1,8 @@
 # Changelog
 
+## 22 Nov 2026 — Today, the Oura way: score, Top of My Game, habit, three cards needing attention
+- Founder (inspired by Oura's Today): after the score comes Top of My Game, then the habit you are building with seven day circles (tap today's once done), then the three parts with the lowest score, each with its master's line and one thing that helps: do it now, plan for later, or learn about it, depending on the part and the hour (src/components/TodayFocus.tsx).
+
 ## 22 Nov 2026 — App icon kept as it is (for now)
 - Founder: keep the current orange; redo the logo next week. The ring options are kept in docs/design/icon-options/.
 
