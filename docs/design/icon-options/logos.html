@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Happy Orange Icon Options</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Layout: two rows of five app icons (light, then dark), each large, with a small home-screen size beside its name. */
+:root{--page:#EDE9F0;--ink:#1F1C24;--muted:#6C6672;--orange:#F08A3C;--orange2:#E8743A;--leaf:#5FA35A;color-scheme:light}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(180deg,#E9E4EE,#D9D7E6);color:var(--ink);font-family:Inter,system-ui,sans-serif;padding:32px max(16px,env(safe-area-inset-right,0px)) 64px max(16px,env(safe-area-inset-left,0px))}
+.wrap{max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:30px}
+h1{font-family:'Instrument Serif',Georgia,serif;font-weight:400;font-size:clamp(36px,6vw,54px);margin:0;line-height:1.05}
+.lead{color:var(--muted);max-width:64ch;margin:8px 0 0;line-height:1.55}
+h2{font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 12px;font-weight:600}
+.row{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:22px}
+.opt{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
+.icon{width:150px;height:150px;border-radius:34px;display:grid;place-items:center;box-shadow:0 10px 26px rgba(40,30,60,.16)}
+.icon svg{width:100%;height:100%}
+.small{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink)}
+.small .icon{width:44px;height:44px;border-radius:10px;box-shadow:0 3px 8px rgba(40,30,60,.15)}
+.n{font-family:'Instrument Serif',Georgia,serif;font-size:24px;color:var(--muted);line-height:1}
+.name{font-weight:600}
+.why{font-size:13px;color:var(--muted);line-height:1.45;max-width:24ch}
+.light{background:#FBF8F4}.dark{background:#111214}
+</style></head><body>
+<div class="wrap">
+  <header>
+    <h1>Ten icons for Happy Orange</h1>
+    <p class="lead">One simple mark on a plain square, like your other three apps. One orange, one leaf, no faces or shading, so it stays clear even at the smallest size. The small icon beside each name is roughly home-screen size.</p>
+  </header>
+  <section><h2>Your choice: orange ring and smile on dark</h2><div class="row" id="pick"></div></section>
+  <section><h2>On a light background</h2><div class="row" id="light"></div></section>
+  <section><h2>On a dark background</h2><div class="row" id="dark"></div></section>
+</div>
+<script>
+const O='#F08A3C', L='#5FA35A';
+const OPTS = {
+ light: [
+  ['Orange ring','A thick orange ring with a single leaf; reads like a ring and an orange at once.',
+   `<circle cx="50" cy="54" r="22" fill="none" stroke="${O}" stroke-width="9"/><path d="M52 31 C55 22 64 19 70 21 C67 28 60 32 52 31Z" fill="${L}"/>`],
+  ['Three segments','An orange cut across: three segments for Body, Mind and Soul.',
+   `<circle cx="50" cy="52" r="26" fill="${O}"/><g stroke="#FBF8F4" stroke-width="3.5" stroke-linecap="round"><path d="M50 52 V30"/><path d="M50 52 L69 63"/><path d="M50 52 L31 63"/></g><circle cx="50" cy="52" r="26" fill="none" stroke="#FBF8F4" stroke-width="3" stroke-dasharray="0" opacity=".0"/>`],
+  ['Quiet smile','A plain orange with a small, calm smile: the face of the current icon, simplified.',
+   `<circle cx="50" cy="54" r="25" fill="${O}"/><path d="M53 56 q5 4 10 0" fill="none" stroke="#FBF8F4" stroke-width="3.5" stroke-linecap="round"/><path d="M50 29 C53 21 61 18 67 20 C64 27 57 30 50 29Z" fill="${L}"/>`],
+  ['Orange slice','A half-moon slice with its segments; fresh and food-first.',
+   `<path d="M22 52 A28 28 0 0 0 78 52 Z" fill="${O}"/><g stroke="#FBF8F4" stroke-width="3" stroke-linecap="round"><path d="M50 53 L50 76"/><path d="M50 53 L33 71"/><path d="M50 53 L67 71"/></g><path d="M22 52 H78" stroke="#F6C08A" stroke-width="5" stroke-linecap="round"/>`],
+  ['Three dots','Body, Mind and Soul as three dots curving into a smile.',
+   `<circle cx="32" cy="50" r="8" fill="${O}"/><circle cx="50" cy="60" r="8" fill="${O}"/><circle cx="68" cy="50" r="8" fill="${O}"/><path d="M58 33 C61 26 68 24 73 26 C70 32 64 34 58 33Z" fill="${L}"/>`],
+ ],
+ dark: [
+  ['Ganga sunrise','The sun rising over a line of water: the start of a good day.',
+   `<path d="M26 58 A24 24 0 0 1 74 58" fill="${O}"/><path d="M20 64 H80" stroke="#F3EEE8" stroke-width="4" stroke-linecap="round"/><path d="M32 72 H68" stroke="#F3EEE8" stroke-width="3" stroke-linecap="round" opacity=".55"/>`],
+  ['Leaf and seed','A single leaf above an orange seed: growth, one small step at a time.',
+   `<circle cx="50" cy="64" r="11" fill="${O}"/><path d="M50 50 C44 40 46 28 58 22 C62 34 58 44 50 50Z" fill="${L}"/><path d="M50 50 V44" stroke="${L}" stroke-width="2.5" stroke-linecap="round"/>`],
+  ['Diya','A lamp’s flame inside an orange ring: the Soul at the centre.',
+   `<circle cx="50" cy="52" r="26" fill="none" stroke="${O}" stroke-width="5"/><path d="M50 34 C55 40 56 45 50 52 C44 45 45 40 50 34Z" fill="#F3EEE8"/><path d="M36 56 H64 C62 64 57 68 50 68 C43 68 38 64 36 56Z" fill="${O}"/>`],
+  ['O with a leaf','The letter O drawn as one clean stroke, a leaf where the line begins.',
+   `<circle cx="50" cy="54" r="22" fill="none" stroke="#F3EEE8" stroke-width="7"/><path d="M50 32 C53 23 62 20 68 22 C65 29 58 33 50 32Z" fill="${O}"/>`],
+  ['Rising person','A person rising like a sprout, arms as two leaves: Happy Orange’s Body mark, in orange.',
+   `<circle cx="50" cy="24" r="6" fill="none" stroke="${O}" stroke-width="4.5"/><path d="M50 33 V78" stroke="${O}" stroke-width="4.5" stroke-linecap="round"/><path d="M50 56 C38 56 30 49 29 38 C40 39 48 46 50 56Z" fill="none" stroke="${O}" stroke-width="4.5" stroke-linejoin="round"/><path d="M50 49 C62 49 70 42 71 31 C60 32 52 39 50 49Z" fill="none" stroke="${O}" stroke-width="4.5" stroke-linejoin="round"/>`],
+ ]
+};
+const PICK=[
+ ['D · Slim','A slim orange ring, smile in its place.',
+  `<circle cx="50" cy="50" r="26" fill="none" stroke="${O}" stroke-width="5.5"/><path d="M54 56 q6 5 12 0" fill="none" stroke="${O}" stroke-width="4" stroke-linecap="round"/>`],
+ ['E · Slimmer','Slimmer still, closest to Oura\u2019s line weight.',
+  `<circle cx="50" cy="50" r="26" fill="none" stroke="${O}" stroke-width="4"/><path d="M54 56 q6 5 12 0" fill="none" stroke="${O}" stroke-width="3.5" stroke-linecap="round"/>`],
+ ['F · Hairline','A fine ring; elegant, but the faintest at home-screen size.',
+  `<circle cx="50" cy="50" r="26" fill="none" stroke="${O}" stroke-width="2.8"/><path d="M54 56 q6 5 12 0" fill="none" stroke="${O}" stroke-width="3" stroke-linecap="round"/>`],
+];
+document.getElementById('pick').innerHTML = PICK.map(([name, why, art]) => { const svg=`<svg viewBox="0 0 100 100" aria-hidden="true">${art}</svg>`;
+  return `<div class="opt"><div class="icon dark" role="img" aria-label="${name}" style="width:190px;height:190px;border-radius:43px">${svg}</div>
+  <div class="small"><div class="icon dark">${svg}</div><span class="name">${name}</span></div><div class="why">${why}</div></div>`; }).join('');
+let n=0;
+for (const [row, list] of Object.entries(OPTS)) {
+  document.getElementById(row).innerHTML = list.map(([name, why, art]) => {
+    n++; const svg = `<svg viewBox="0 0 100 100" aria-hidden="true">${art}</svg>`;
+    return `<div class="opt"><div class="icon ${row}" role="img" aria-label="${name}">${svg}</div>
+      <div class="small"><div class="icon ${row}">${svg}</div><span class="n">${n}</span><span class="name">${name}</span></div>
+      <div class="why">${why}</div></div>`;
+  }).join('');
+}
+</script>
+</body></html>
