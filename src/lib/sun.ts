@@ -28,16 +28,3 @@ export function skyHour(clock: number, sun: { rise: number; set: number } | null
   return 18 + ((clock - set) / (24 - set)) * 6;
 }
 
-import { useEffect, useState } from 'react';
-import { useHeal } from './store';
-
-/** The sky's hour for where the person is, from the place last used for the air reading; the plain clock until then.
- *  Updates every minute. */
-export function useSkyHour(): number {
-  const { days } = useHeal();
-  const [now, setNow] = useState(() => new Date());
-  useEffect(() => { const t = setInterval(() => setNow(new Date()), 60_000); return () => clearInterval(t); }, []);
-  const air = Object.keys(days).sort().reverse().map(d => days[d]?.air).find(a => a?.lat != null && a?.lon != null);
-  const clock = now.getHours() + now.getMinutes() / 60;
-  return air ? skyHour(clock, sunTimes(now, air.lat!, air.lon!)) : clock;
-}

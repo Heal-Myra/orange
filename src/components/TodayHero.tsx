@@ -12,7 +12,7 @@ import { tr } from '../lib/i18n';
 import { nextStep } from '../lib/nextStep';
 import { band, type WellBeing } from '../lib/scoring';
 import { useHeal } from '../lib/store';
-import { useSkyHour } from '../lib/sun';
+import { useSkyHour } from '../lib/useSkyHour';
 import { useTasks } from '../lib/tasks';
 import { colors, font, glass, isLight, space, statusColor } from '../theme';
 import { DuskScene } from './DuskScene';

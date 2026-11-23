@@ -1,5 +1,8 @@
 # Changelog
 
+## 23 Nov 2026 — Today's top, presented the Oura way
+- Founder: keep My day as the score and Myra's one thing to do; present it like Oura. Under the number a small "MY DAY · band" label; the one thing to do is the big serif headline; below it one short line from Myra on why it helps (with the points); buttons Start now / Done and Ask Myra.
+
 ## 23 Nov 2026 — Today's sky follows your sunrise and sunset (decision 0066)
 - Founder: like Oura, the sky changes through the day, decided by the sunrise and sunset of where you are. Dawn colours start at local sunrise, Oura's morning blue follows, then midday, dusk at local sunset, then night with stars (src/lib/sun.ts, worked out on the phone from the place used for air quality; the clock until a place is known).
 - The top band now blends into the sky (it takes the sky's top colour once you scroll), and the profile button is three lines in a glass circle on the right.

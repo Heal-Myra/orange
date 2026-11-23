@@ -5,7 +5,7 @@ import { Text, View } from 'react-native';
 import { useNavigation } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { skyTop } from '../../components/DuskScene';
-import { useSkyHour } from '../../lib/sun';
+import { useSkyHour } from '../../lib/useSkyHour';
 import { PillarRings, TodayRings } from '../../components/TodayRings';
 import { MyraCard } from '../../components/MyraCard';
 import { RecordsCard } from '../../components/RecordsCard';
