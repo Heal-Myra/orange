@@ -4,8 +4,9 @@ import { Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MyraButton } from '../../components/MyraButton';
 import { FloatingTabBar } from '../../components/FloatingTabBar';
+import { skyTop } from '../../components/DuskScene';
 import { TabRing } from '../../components/TabRing';
-import type { ComponentProps } from 'react';
+import { useEffect, useState, type ComponentProps } from 'react';
 import type { ColorValue } from 'react-native';
 import { colors, glass, isGlass, isLight } from '../../theme';
 import { tr } from '../../lib/i18n';
@@ -65,6 +66,9 @@ const HEADER_GLASS = isLight ? 'rgba(255,255,255,0.82)' : 'rgba(18,19,24,0.94)';
 
 export default function TabLayout() {
   const insets = useSafeAreaInsets();
+  // Re-draw every 10 minutes so Today's header follows the sky through the day.
+  const [, tick] = useState(0);
+  useEffect(() => { const i = setInterval(() => tick(x => x + 1), 600_000); return () => clearInterval(i); }, []);
   return (
     <View style={{ flex: 1 }}>
     <Tabs
@@ -83,7 +87,8 @@ export default function TabLayout() {
       <Tabs.Screen name="index" options={{ ...tab(tr('Today'), 'sunny-outline', colors.accent),
         // The header takes the top colour of Today's living scene so the two read as one sky (decision 0063).
         // The living scene runs up behind a see-through header, like Oura's (founder, 19 Nov 2026).
-        ...(isGlass ? { headerTransparent: true, headerStyle: { backgroundColor: HEADER_GLASS } } : {}), headerTitle: isGlass ? 'HAPPY ORANGE' : 'Happy Orange', headerTitleStyle: isGlass ? { color: colors.ink, fontWeight: '500', fontSize: 15, letterSpacing: 3 } : { color: colors.brand, fontWeight: '700' },
+        // Today's header takes the top colour of its living sky, so the sky runs up unbroken (founder, 23 Nov 2026).
+        ...(isGlass ? { headerTransparent: true, headerStyle: { backgroundColor: isLight ? HEADER_GLASS : skyTop(new Date().getHours() + new Date().getMinutes() / 60) } } : {}), headerTitle: isGlass ? 'HAPPY ORANGE' : 'Happy Orange', headerTitleStyle: isGlass ? { color: colors.ink, fontWeight: '500', fontSize: 15, letterSpacing: 3 } : { color: colors.brand, fontWeight: '700' },
         headerRight: () => <ProfileButton /> }} />
       {/* Each icon sits in a thin ring that fills with that pillar's score (founder, 31 Oct 2026, option B). */}
       <Tabs.Screen name="body" options={ringTab(tr('Body'), 'body', 'leaf-outline', colors.body)} />
