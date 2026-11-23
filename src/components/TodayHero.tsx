@@ -12,6 +12,7 @@ import { tr } from '../lib/i18n';
 import { nextStep } from '../lib/nextStep';
 import { band, type WellBeing } from '../lib/scoring';
 import { useHeal } from '../lib/store';
+import { useSkyHour } from '../lib/sun';
 import { useTasks } from '../lib/tasks';
 import { colors, font, glass, isLight, space, statusColor } from '../theme';
 import { DuskScene } from './DuskScene';
@@ -76,6 +77,7 @@ export function TodayHero({ w }: { w: WellBeing }) {
   const { day, date, profile } = useHeal();
   const { habits, tickHabit } = useTasks();
   const { width } = useWindowDimensions();
+  const skyH = useSkyHour(); // the sky follows local sunrise and sunset (founder, 23 Nov 2026)
   // The header is see-through on Today (its standard height: 44 on iPhone, 56 on Android, 64 on the web).
   const headerH = useSafeAreaInsets().top + (Platform.OS === 'ios' ? 44 : Platform.OS === 'android' ? 56 : 64);
   const [, tick] = useState(0);
@@ -95,7 +97,7 @@ export function TodayHero({ w }: { w: WellBeing }) {
 
   return (
     <View style={{ marginHorizontal: -space.lg, marginTop: -space.md, minHeight: headerH + SCENE - 70 }}>
-      <View pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, top: 0 }}><DuskScene height={headerH + SCENE} hour={hour} width={width} pastel={isLight} /></View>
+      <View pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, top: 0 }}><DuskScene height={headerH + SCENE} hour={skyH} width={width} pastel={isLight} /></View>
       <View style={{ flexDirection: 'row', paddingHorizontal: space.md, paddingTop: headerH + 6 }}>
         {PILLARS.map(p => <Chip key={p.tab} pillar={p.tab} value={score(p.tab)} label={tr(p.name)} onPress={() => router.navigate(`/${p.tab}`)} />)}
       </View>

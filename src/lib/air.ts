@@ -4,7 +4,7 @@
 // Only a rounded location (about 1 km) leaves the phone, and only to fetch the air; it is not saved.
 
 export type AirCat = 'good' | 'satisfactory' | 'moderate' | 'poor' | 'veryPoor' | 'severe';
-export interface AirReading { aqi: number; cat: AirCat; pm25: number; pm10: number; place?: string; at: string }
+export interface AirReading { aqi: number; cat: AirCat; pm25: number; pm10: number; place?: string; at: string; lat?: number; lon?: number }
 
 export const AIR_CATS: { id: AirCat; label: string; upTo: number }[] = [
   { id: 'good', label: 'Good', upTo: 50 },
@@ -56,7 +56,7 @@ export async function fetchAir(lat: number, lon: number, place?: string): Promis
   const pm25 = last24(times, h.pm2_5), pm10 = last24(times, h.pm10);
   if (pm25 == null || pm10 == null) throw new Error('No air quality data for this place yet.');
   const aqi = indianAqi(pm25, pm10);
-  return { aqi, cat: airCat(aqi), pm25: Math.round(pm25), pm10: Math.round(pm10), place, at: new Date().toISOString() };
+  return { aqi, cat: airCat(aqi), pm25: Math.round(pm25), pm10: Math.round(pm10), place, at: new Date().toISOString(), lat: r2(lat), lon: r2(lon) };
 }
 
 /** What a poor-air day means for Myra's suggestions. */

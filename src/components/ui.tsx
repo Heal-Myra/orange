@@ -24,7 +24,7 @@ const AnchorCtx = createContext<{ register: (id: string, y: number) => void; lit
 /** A tab's standard header height: 44 on iPhone, 56 on Android, 64 on the web, plus the status bar. */
 export const tabHeaderHeight = (top: number) => top + (Platform.OS === 'ios' ? 44 : Platform.OS === 'android' ? 56 : 64);
 
-export function Screen({ children, showDay = false, feedback, top, dayLabel, noBanner, fill }: { children: ReactNode; showDay?: boolean; noBanner?: boolean; feedback?: string; top?: ReactNode; trends?: Pillar; dayLabel?: ReactNode; fill?: boolean }) {
+export function Screen({ children, showDay = false, feedback, top, dayLabel, noBanner, fill, onScrollY }: { children: ReactNode; showDay?: boolean; noBanner?: boolean; feedback?: string; top?: ReactNode; trends?: Pillar; dayLabel?: ReactNode; fill?: boolean; onScrollY?: (y: number) => void }) {
   const { card, at } = useLocalSearchParams<{ card?: string; at?: string }>();
   const scroll = useRef<ScrollViewInstance>(null);
   const spots = useRef<Record<string, number>>({});
@@ -72,7 +72,7 @@ export function Screen({ children, showDay = false, feedback, top, dayLabel, noB
       <AnchorCtx.Provider value={ctx}>
         <ScrollView ref={scroll} contentContainerStyle={[fill ? [s.scroll, { flexGrow: 1, gap: space.md, paddingTop: space.md, paddingBottom: space.md }] : s.scroll, under ? { paddingTop: under + space.md } : null]} keyboardShouldPersistTaps="handled"
           automaticallyAdjustKeyboardInsets keyboardDismissMode="interactive" scrollEventThrottle={32}
-          onScroll={e => { offset.current = e.nativeEvent.contentOffset.y; }}>
+          onScroll={e => { offset.current = e.nativeEvent.contentOffset.y; onScrollY?.(offset.current); }}>
           {/* Trends moved off the tabs (founder, 31 Oct 2026): D · W · M · Q · Y lives on each card's detail page
               (tap the rings; src/app/trend.tsx), so people not interested in trends never see the switch. */}
           {top}

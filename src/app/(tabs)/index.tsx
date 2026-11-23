@@ -2,6 +2,10 @@
 // The detail of each pillar lives on its own tab; tap a section of the circle to open it.
 
 import { Text, View } from 'react-native';
+import { useNavigation } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { skyTop } from '../../components/DuskScene';
+import { useSkyHour } from '../../lib/sun';
 import { PillarRings, TodayRings } from '../../components/TodayRings';
 import { MyraCard } from '../../components/MyraCard';
 import { RecordsCard } from '../../components/RecordsCard';
@@ -23,10 +27,19 @@ export default function Today() {
   const { day, date, profile } = useHeal();
   const { session } = useAuth();
   const w = wellBeing(day, profile);
+  // The header is see-through over the sky; once the page scrolls, it takes the sky's top colour so cards never run
+  // into its words (founder, 23 Nov 2026: "that band has to merge so that all seems part of one page").
+  const navigation = useNavigation();
+  const [scrolled, setScrolled] = useState(false);
+  const skyH = useSkyHour();
+  useEffect(() => {
+    if (!isGlass) return;
+    navigation.setOptions({ headerStyle: { backgroundColor: scrolled ? skyTop(skyH) : 'transparent' } });
+  }, [scrolled, navigation, skyH]);
 
   return (
     // No day row or greeting (founder, 31 Oct 2026): the page starts with the score; Myra speaks to the person by name.
-    <Screen feedback="Today" fill>
+    <Screen feedback="Today" fill onScrollY={y => setScrolled(y > 40)}>
       {/* AQI only on bad-air days; How I feel today moved to the Mind tab (founder, 31 Oct 2026). */}
       {date === todayISO() && !isGlass ? <View style={{ alignItems: 'center' }}><AirLine /></View> : null}
 

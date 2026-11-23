@@ -4,7 +4,6 @@ import { Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MyraButton } from '../../components/MyraButton';
 import { FloatingTabBar } from '../../components/FloatingTabBar';
-import { skyTop } from '../../components/DuskScene';
 import { TabRing } from '../../components/TabRing';
 import { useEffect, useState, type ComponentProps } from 'react';
 import type { ColorValue } from 'react-native';
@@ -49,10 +48,9 @@ function ProfileButton() {
   return (
     <Link href="/account" asChild>
       <Pressable accessibilityLabel={pending ? tr('Profile, {n} requests waiting', { n: pending }) : tr('Profile')} hitSlop={10} style={{ paddingHorizontal: 16, alignItems: 'center' }}>
-        <View style={isGlass ? { width: 40, height: 40, borderRadius: 20, backgroundColor: glass.fill, alignItems: 'center', justifyContent: 'center' } : undefined}>
-          {/* Glass look: the first letter of the name in a glass circle, like Oura's round header buttons (19 Nov 2026). */}
-          {isGlass && name !== tr('Profile') ? <Text style={{ color: colors.ink, fontSize: 17, fontWeight: '500' }}>{name.charAt(0).toUpperCase()}</Text>
-            : <Ionicons name={isGlass ? 'person-outline' : 'person-circle-outline'} size={isGlass ? 20 : 30} color={colors.ink} />}
+        <View style={isGlass ? { width: 44, height: 44, borderRadius: 22, backgroundColor: glass.fill, borderWidth: 1, borderColor: glass.line, alignItems: 'center', justifyContent: 'center' } : undefined}>
+          {/* Glass look: three lines in a glass circle, like Oura's menu button, on the right (founder, 23 Nov 2026). */}
+          <Ionicons name={isGlass ? 'menu-outline' : 'person-circle-outline'} size={isGlass ? 24 : 30} color={colors.ink} />
           {pending > 0 && <View style={{ position: 'absolute', top: 1, right: 0, width: 11, height: 11, borderRadius: 6, backgroundColor: colors.brand, borderWidth: 2, borderColor: colors.bg }} />}
         </View>
         {isGlass ? null : <Text style={{ fontSize: 12, fontWeight: '600', color: colors.ink, maxWidth: 80 }} numberOfLines={1}>{name}</Text>}
@@ -88,7 +86,7 @@ export default function TabLayout() {
         // The header takes the top colour of Today's living scene so the two read as one sky (decision 0063).
         // The living scene runs up behind a see-through header, like Oura's (founder, 19 Nov 2026).
         // Today's header takes the top colour of its living sky, so the sky runs up unbroken (founder, 23 Nov 2026).
-        ...(isGlass ? { headerTransparent: true, headerStyle: { backgroundColor: isLight ? HEADER_GLASS : skyTop(new Date().getHours() + new Date().getMinutes() / 60) } } : {}), headerTitle: isGlass ? 'HAPPY ORANGE' : 'Happy Orange', headerTitleStyle: isGlass ? { color: colors.ink, fontWeight: '500', fontSize: 15, letterSpacing: 3 } : { color: colors.brand, fontWeight: '700' },
+        ...(isGlass ? { headerTransparent: true, headerStyle: { backgroundColor: isLight ? HEADER_GLASS : 'transparent' } } : {}), headerTitle: isGlass ? 'HAPPY ORANGE' : 'Happy Orange', headerTitleStyle: isGlass ? { color: colors.ink, fontWeight: '500', fontSize: 15, letterSpacing: 3 } : { color: colors.brand, fontWeight: '700' },
         headerRight: () => <ProfileButton /> }} />
       {/* Each icon sits in a thin ring that fills with that pillar's score (founder, 31 Oct 2026, option B). */}
       <Tabs.Screen name="body" options={ringTab(tr('Body'), 'body', 'leaf-outline', colors.body)} />
