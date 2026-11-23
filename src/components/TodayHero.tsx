@@ -16,7 +16,7 @@ import { useSkyHour } from '../lib/sun';
 import { useTasks } from '../lib/tasks';
 import { colors, font, glass, isLight, space, statusColor } from '../theme';
 import { DuskScene } from './DuskScene';
-import { emailName, start, what } from './MyraPick';
+import { emailName, start, what, whyLine } from './MyraPick';
 import { Serif } from './ui';
 import { PillarIcon } from './PillarIcon';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -72,6 +72,8 @@ function Arc({ value }: { value: number }) {
   );
 }
 
+const lc = (t: string) => t.charAt(0).toLowerCase() + t.slice(1);
+
 export function TodayHero({ w }: { w: WellBeing }) {
   const { session } = useAuth();
   const { day, date, profile } = useHeal();
@@ -92,8 +94,13 @@ export function TodayHero({ w }: { w: WellBeing }) {
   const habit = isToday ? habitsDue(habits, day.habitsDone ?? [])[0] : undefined;
   const step = isToday && !habit ? nextStep(day, profile, w, hour) : null;
   const sentence = habit ? habit.title : step ? what(step.id) : isToday ? tr('a full day. Rest well.') : tr('A look back at this day. Tap the circles below to see each part.');
-  const line = who && isToday ? `${who}, ${sentence.charAt(0).toLowerCase()}${sentence.slice(1)}` : sentence;
   const word = w.logged ? tr(band(w.total)) : tr('Fresh start');
+  // Oura-like presentation (founder, 23 Nov 2026): the one thing to do is the big serif headline, Myra's reason below it.
+  const head = habit ? habit.title : step ? what(step.id).replace(/\.$/, '') : isToday ? tr('Rest well') : tr('A look back');
+  const named = (t: string) => (who && isToday ? `${who}, ${lc(t)}` : t);
+  const reason = habit ? named(tr('One more circle keeps your habit growing.'))
+    : step ? named(whyLine(step.id)) : isToday ? tr('A full day. Let the evening be slow.') : sentence;
+  const pts = step ? Math.max(1, Math.round(step.gain / 3)) : 0;
 
   return (
     <View style={{ marginHorizontal: -space.lg, marginTop: -space.md, minHeight: headerH + SCENE - 70 }}>
@@ -104,12 +111,14 @@ export function TodayHero({ w }: { w: WellBeing }) {
       <View style={{ alignItems: 'center', marginTop: 28, paddingHorizontal: space.xl, gap: 6 }}>
         <Pressable onPress={() => router.push({ pathname: '/trend', params: { card: 'today' } })} accessibilityRole="button" style={{ alignItems: 'center' }}>
           <Arc value={w.total} />
-          <Text style={{ fontSize: 12, letterSpacing: 2.4, fontWeight: '700', color: colors.ink, textTransform: 'uppercase' }}>{tr('My day')}</Text>
-          <Text style={{ fontSize: 76, fontWeight: font.thin, color: colors.ink, lineHeight: 84, fontVariant: ['tabular-nums'] }}>{Math.round(w.total)}</Text>
+          <Text style={{ fontSize: 88, fontWeight: font.thin, color: colors.ink, lineHeight: 96, fontVariant: ['tabular-nums'], marginTop: 8 }}>{Math.round(w.total)}</Text>
+          <Text style={{ fontSize: 13, letterSpacing: 2.6, fontWeight: '700', color: colors.ink, textTransform: 'uppercase' }}>
+            {tr('My day')}<Text style={{ color: w.logged ? statusColor(band(w.total)) : colors.ink }}>{'  ·  '}{word}</Text>
+          </Text>
         </Pressable>
-        <Serif size={52} color={w.logged ? statusColor(band(w.total)) : colors.ink} style={{ textAlign: 'center' }}>{word}</Serif>
-        <Text style={{ fontSize: 17, lineHeight: 25, color: colors.ink, textAlign: 'center', maxWidth: 320 }}>
-          {line}{step ? <Text style={{ color: colors.muted }}>{'  '}{tr('+{n} points', { n: Math.max(1, Math.round(step.gain / 3)) })}</Text> : null}
+        <Serif size={head.length > 20 ? 38 : 46} color={colors.ink} style={{ textAlign: 'center', marginTop: 14 }}>{head}</Serif>
+        <Text style={{ fontSize: 17, lineHeight: 26, color: colors.ink, textAlign: 'center', maxWidth: 330 }}>
+          {reason}{pts ? <Text style={{ color: colors.muted }}>{'  '}{tr('+{n} points', { n: pts })}</Text> : null}
         </Text>
         <View style={{ flexDirection: 'row', gap: 10, marginTop: 10 }}>
           {habit || step ? (
@@ -120,7 +129,7 @@ export function TodayHero({ w }: { w: WellBeing }) {
           ) : null}
           <Pressable onPress={() => router.push({ pathname: '/myra', params: { from: 'today', q: tr('Why this next step?') } })} accessibilityRole="button"
             style={({ pressed }) => ({ backgroundColor: glass.fillSoft, borderRadius: 99, paddingVertical: 15, paddingHorizontal: 26, opacity: pressed ? 0.8 : 1 })}>
-            <Text style={{ color: colors.ink, fontSize: 16, fontWeight: '600' }}>{tr('Why, Myra?')}</Text>
+            <Text style={{ color: colors.ink, fontSize: 16, fontWeight: '600' }}>{tr('Ask Myra')}</Text>
           </Pressable>
         </View>
       </View>

@@ -40,6 +40,21 @@ export const what = (id: StepId): string => ({
   taoLive: tr("Live today's Tao: write one line."),
 }[id]);
 
+/** Myra's short reason under the headline on Today (founder, 23 Nov 2026: Oura-like presentation, same one thing to do). */
+export const whyLine = (id: StepId): string => ({
+  sleep: tr('Last night shapes today. Log it so I can plan around it.'),
+  meditation: tr('Ten quiet minutes settle the mind before the day speeds up.'),
+  nidra: tr('A short Yoga Nidra rests you deeper than a nap.'),
+  movement: tr('Twenty brisk minutes lift your mood and your steps.'),
+  food: tr('A photo is enough; I will read what is on the plate.'),
+  tasks: tr('One small finish clears the head for the rest.'),
+  gratitude: tr('Three lines of thanks soften the whole day.'),
+  kind: tr('A kind act noticed is a kind act repeated.'),
+  wisdom: tr("Today's verse takes two minutes and stays all day."),
+  tao: tr("Today's Tao is short; carry one line with you."),
+  wisdomLive: tr('Write where the verse showed up in your day.'),
+  taoLive: tr('Write where the Tao showed up in your day.'),
+}[id]);
 
 export const start = (s: Step) => {
   if (s.id === 'meditation') router.push({ pathname: '/breathe', params: { practice: 'mix', minutes: String(s.minutes ?? 10) } });
