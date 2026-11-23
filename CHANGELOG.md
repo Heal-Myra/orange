@@ -1,5 +1,9 @@
 # Changelog
 
+## 23 Nov 2026 — Today's sky follows your sunrise and sunset (decision 0066)
+- Founder: like Oura, the sky changes through the day, decided by the sunrise and sunset of where you are. Dawn colours start at local sunrise, Oura's morning blue follows, then midday, dusk at local sunset, then night with stars (src/lib/sun.ts, worked out on the phone from the place used for air quality; the clock until a place is known).
+- The top band now blends into the sky (it takes the sky's top colour once you scroll), and the profile button is three lines in a glass circle on the right.
+
 ## 22 Nov 2026 — Today, the Oura way: score, Top of My Game, habit, three cards needing attention
 - Founder (inspired by Oura's Today): after the score comes Top of My Game, then the habit you are building with seven day circles (tap today's once done), then the three parts with the lowest score, each with its master's line and one thing that helps: do it now, plan for later, or learn about it, depending on the part and the hour (src/components/TodayFocus.tsx).
 
