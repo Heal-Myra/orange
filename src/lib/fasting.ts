@@ -124,10 +124,23 @@ export function carriedFastFrom(days: Record<string, DayLog | undefined>, date: 
   const back = (iso: string, n: number) => { const [y, m, d] = iso.split('-').map(Number); return iso_(new Date(y, m - 1, d - n)); };
   for (let k = 1; k <= 3; k++) {
     const day = days[back(date, k)];
-    if (!day || day.meals.length) return null; // a day with food (or nothing known) ends the chain
+    // A day with food, nothing known, or no photo without the fast ticked ends the chain (founder, 26 Nov 2026: a
+    // dinner he forgot to snap turned one night's fast into 79 hours). Only a day ticked "I'm fasting today" carries it.
+    if (!day || day.meals.length || !day.fasting) return null;
     if (day.fastFrom) return day.fastFrom;
   }
   return null;
+}
+/** A start kept on today that the chain no longer supports (saved before 26 Nov 2026): older than yesterday's
+ *  midnight while yesterday was not a ticked fast. Then the fast counts from the usual last meal yesterday. */
+export function staleFastFrom(days: Record<string, DayLog | undefined>, date: string): boolean {
+  const f = days[date]?.fastFrom;
+  if (!f) return false;
+  const [y, m, d] = date.split('-').map(Number);
+  const yesterday = new Date(y, m - 1, d - 1);
+  if (new Date(f).getTime() >= yesterday.getTime()) return false;
+  const yd = days[iso_(yesterday)];
+  return !(yd && yd.fasting && !yd.meals.length);
 }
 const iso_ = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 

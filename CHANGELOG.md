@@ -1,5 +1,8 @@
 # Changelog
 
+## 26 Nov 2026 — A forgotten photo is not a fast
+- Founder: his fast began after last night's dinner, but the dinner was not snapped, so "I'm fasting today" counted back across days and showed 79 h. A long fast now carries only through days ticked "I'm fasting today"; an old start saved by the earlier rule is dropped, and the fast counts from the usual last meal last night (About you, else 9 pm).
+
 ## 26 Nov 2026 — Devices plan (decision 0068)
 - Founder: devices complete the story. Plan: the guru first on devices people own, then a Happy Orange edition of a partner device, then our own clip-on camera and microphone for food and listening. Added to the investor deck as "Devices: when and how".
 
