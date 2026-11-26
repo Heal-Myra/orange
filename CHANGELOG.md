@@ -1,5 +1,8 @@
 # Changelog
 
+## 26 Nov 2026 — Devices plan (decision 0068)
+- Founder: devices complete the story. Plan: the guru first on devices people own, then a Happy Orange edition of a partner device, then our own clip-on camera and microphone for food and listening. Added to the investor deck as "Devices: when and how".
+
 ## 26 Nov 2026 — Food and your body (decision 0067)
 - Founder: map food to the body the way Oura maps movement to stress. A new page from the Food card shows the day's heart rate (from the Oura ring or a Watch via Apple Health) with each meal's photo pinned at its time, movement bars behind, what the body did in the three hours after a meal and that night's deep sleep, and patterns over four weeks (dinner time and sleep score, light or full dinners and deep sleep). Linked, never "caused"; meal thumbnails stay on the phone.
 
