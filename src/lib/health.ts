@@ -15,6 +15,10 @@ export interface HealthDay {
 }
 export interface SleepDetail { inBed?: number; latencyMin?: number; wakeUps?: number; awakeMin?: number; wakeAt?: string; lowestHr?: number; avgHr?: number; hrvNight?: number; respRate?: number; spo2?: number }
 
+/** The day in 15-minute slots from midnight (26 Nov 2026): heart rate (null = not measured) and steps. */
+export interface DaySeries { hr15: (number | null)[]; steps15: number[] }
+export async function readDaySeries(_iso: string): Promise<DaySeries | null> { return null; }
+
 export const HEALTH_READ_VERSION = 3;
 export const healthAvailable = (): boolean => false;
 export async function connectHealth(): Promise<boolean> { return false; }

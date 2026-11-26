@@ -7,7 +7,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { AppState, Platform, Text, View } from 'react-native';
 import { todayISO } from '../lib/dates';
-import { connectHealth, healthAvailable, HEALTH_READ_VERSION, readHealthDay } from '../lib/health';
+import { shiftISO } from '../lib/dates';
+import { connectHealth, healthAvailable, HEALTH_READ_VERSION, readDaySeries, readHealthDay } from '../lib/health';
 import { planFor } from '../lib/targets';
 import { syncVault } from '../lib/healthVault';
 import { tr } from '../lib/i18n';
@@ -72,6 +73,11 @@ export function HealthProvider({ children }: { children: ReactNode }) {
       const next = { ...me, weightKg: h.weightKg };
       const p = planFor(next);
       setProfile({ ...profile, kcal: p.kcal, protein: p.protein, steps: p.steps, active: p.active, me: next });
+    }
+    // The day line for "Food and your body" (26 Nov 2026): today and yesterday, so last night's dinner has its full echo.
+    for (const day of [iso, shiftISO(iso, -1)]) {
+      const sr = await readDaySeries(day).catch(() => null);
+      if (sr && sr.hr15.some(v => v != null)) updateOn(day, d => { d.health = { ...(d.health ?? {}), hr15: sr.hr15, steps15: sr.steps15 }; });
     }
     setLastSync(new Date());
     // Everything Apple Health has goes to the person's health vault too, for the learning engine (11 Nov 2026).

@@ -7,13 +7,13 @@ import {
   getMostRecentQuantitySample,
   isHealthDataAvailable,
   queryCategorySamples,
-  queryStatisticsCollectionForQuantity,
   queryStatisticsForQuantity,
+  queryStatisticsCollectionForQuantity,
   queryWorkoutSamples,
   requestAuthorization,
   WorkoutActivityType,
 } from '@kingstinct/react-native-healthkit';
-import type { HealthDay, Run, SleepDetail } from './health';
+import type { DaySeries, HealthDay, Run, SleepDetail } from './health';
 
 export type { HealthDay } from './health';
 
@@ -219,6 +219,25 @@ export async function readHealthDay(iso: string): Promise<HealthDay> {
     nightTempC: temp,
     workouts,
   };
+}
+
+/** The day in 15-minute steps (founder, 26 Nov 2026: "Food and your body"): average heart rate from any source in
+ *  Apple Health (the Oura ring or a Watch) and steps, 96 slots from midnight. Null where nothing was measured. */
+export async function readDaySeries(iso: string): Promise<DaySeries> {
+  const start = dayStart(iso), end = new Date(start.getTime() + DAY);
+  const slot = (d?: Date) => (d ? Math.floor((d.getTime() - start.getTime()) / 900_000) : -1);
+  const fill = async (id: string, kind: 'discreteAverage' | 'cumulativeSum', unit: string) => {
+    const out: (number | null)[] = Array(96).fill(null);
+    const rows = await queryStatisticsCollectionForQuantity(id as never, [kind] as never, start, { minute: 15 }, { ...range(start, end), unit } as never).catch(() => []);
+    for (const r of rows as readonly { averageQuantity?: { quantity: number }; sumQuantity?: { quantity: number }; startDate?: Date }[]) {
+      const i = slot(r.startDate ? new Date(r.startDate) : undefined);
+      const q = kind === 'discreteAverage' ? r.averageQuantity?.quantity : r.sumQuantity?.quantity;
+      if (i >= 0 && i < 96 && q != null) out[i] = Math.round(q);
+    }
+    return out;
+  };
+  const [hr, steps] = await Promise.all([fill('HKQuantityTypeIdentifierHeartRate', 'discreteAverage', 'count/min'), fill('HKQuantityTypeIdentifierStepCount', 'cumulativeSum', 'count')]);
+  return { hr15: hr, steps15: steps.map(v => v ?? 0) };
 }
 
 /** Steps between two moments (walk after dinner, 16 Nov 2026). */

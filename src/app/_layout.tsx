@@ -85,6 +85,7 @@ function Gate() {
       <Stack.Screen name="spaces" options={{ headerShown: true, title: tr('Spaces'), headerBackTitle: tr('Back'), ...(isLight ? { headerTransparent: true, headerStyle: { backgroundColor: "transparent" } } : { headerStyle: { backgroundColor: colors.bg } }), headerTintColor: colors.ink }} />
       <Stack.Screen name="connectors" options={{ headerShown: true, title: tr('Connectors'), headerBackTitle: tr('Back'), headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
       <Stack.Screen name="from-your-day" options={{ headerShown: true, title: tr('From your day'), headerBackTitle: tr('Back'), headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
+      <Stack.Screen name="food-body" options={{ headerShown: true, title: tr('Food and your body'), headerBackTitle: tr('Back'), headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
       <Stack.Screen name="trend" options={{ headerShown: true, title: tr('Trends'), headerBackTitle: tr('Back'), headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.ink }} />
     </Stack>
   );

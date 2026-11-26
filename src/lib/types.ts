@@ -103,6 +103,7 @@ export interface DayLog {
     workouts?: { type: string; min: number; kcal?: number }[];
     sleepStages?: { deep?: number; core?: number; rem?: number; awake?: number }; // hours
     sleepDetail?: import('./health').SleepDetail; // every detail of the night from the ring or Watch (decision 0064)
+    hr15?: (number | null)[]; steps15?: number[]; // the day in 15-minute slots: heart rate and steps (Food and your body, 26 Nov 2026)
   }; // the day's Tao Te Ching practice (src/lib/tao.ts)
   soul?: {
     checked?: boolean;      // answered the eight-practices check today

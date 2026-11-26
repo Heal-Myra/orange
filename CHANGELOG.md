@@ -1,5 +1,8 @@
 # Changelog
 
+## 26 Nov 2026 — Food and your body (decision 0067)
+- Founder: map food to the body the way Oura maps movement to stress. A new page from the Food card shows the day's heart rate (from the Oura ring or a Watch via Apple Health) with each meal's photo pinned at its time, movement bars behind, what the body did in the three hours after a meal and that night's deep sleep, and patterns over four weeks (dinner time and sleep score, light or full dinners and deep sleep). Linked, never "caused"; meal thumbnails stay on the phone.
+
 ## 23 Nov 2026 — Today's top, presented the Oura way
 - Founder: keep My day as the score and Myra's one thing to do; present it like Oura. Under the number a small "MY DAY · band" label; the one thing to do is the big serif headline; below it one short line from Myra on why it helps (with the points); buttons Start now / Done and Ask Myra.
 

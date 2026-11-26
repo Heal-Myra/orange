@@ -106,6 +106,15 @@ export default function Body() {
               </Pressable>
             ) : null}
           </View>
+          {/* Food and your body (founder, 26 Nov 2026; decision 0067): meals on the day's heart-rate line. */}
+          <Pressable onPress={() => router.push('/food-body')} accessibilityRole="button" style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+            <Ionicons name="pulse-outline" size={18} color={colors.ink} />
+            <View style={{ flex: 1 }}>
+              <Text style={{ color: colors.ink, fontSize: 15, fontWeight: '600' }}>{tr('Food and your body')}</Text>
+              <Text style={{ color: colors.muted, fontSize: 13 }}>{tr('What each meal did to your heart and sleep')}</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={16} color={colors.muted} />
+          </Pressable>
           {day.meals.some(m => m.check) ? <CheckLine kind="logged" />
             : day.meals.some(m => m.checked === 'ifct' && m.checkedAt && Date.now() - Date.parse(m.checkedAt) < 30 * 60_000) ? <CheckLine kind="ifct" /> : null}
           {details && day.meals.length ? (

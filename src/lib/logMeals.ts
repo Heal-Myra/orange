@@ -7,9 +7,11 @@ import type { Meal } from './types';
 
 export function useLogMeals() {
   const { update, updateOn, date } = useHeal();
-  return (meals: Meal[]) => {
+  /** Returns the time the meals were logged with (today only). */
+  return (meals: Meal[]): string | undefined => {
     const at = date === todayISO() ? new Date().toISOString() : undefined;
     update(d => { for (const m of meals) d.meals.push(at ? { ...m, at } : m); });
     if (at) updateOn(shiftISO(date, 1), n => { if (!n.fastFrom || n.fastFrom < at) n.fastFrom = at; });
+    return at;
   };
 }

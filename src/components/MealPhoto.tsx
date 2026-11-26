@@ -12,6 +12,7 @@ import { todayISO } from '../lib/dates';
 import { useAuth } from '../lib/auth';
 import { useHeal } from '../lib/store';
 import { useLogMeals } from '../lib/logMeals';
+import { saveMealThumb } from '../lib/mealThumbs';
 import { colors } from '../theme';
 import { NativeSpeech } from '../lib/nativeSpeech';
 import { IfctPicker } from './IfctPicker';
@@ -219,11 +220,12 @@ export function MealPhoto({ right, top, children, snap, typeIt }: { right?: Reac
   /** Log a reading at once (16 Nov 2026). `checkId`: the careful check still running, which replaces these numbers. */
   const addNow = (list: MealItem[], from: 'photo' | 'words', checkId: string | null) => {
     const until = new Date(Date.now() + 10 * 60_000).toISOString();
-    logMeals(list.map(it => ({
+    const at = logMeals(list.map(it => ({
       name: it.name, grams: it.grams, kcal: it.kcal, p: it.protein_g, c: it.carbs_g, f: it.fat_g, fib: it.fibre_g ?? 0,
       source: from === 'words' ? (it.basis === 'IFCT' ? 'words+ifct' : 'words') : (it.basis === 'IFCT' ? 'photo+ifct' : it.basis === 'mine' ? 'photo+mine' : 'photo'),
       ...(checkId ? { check: { id: checkId, until } } : it.basis === 'mine' ? { checked: 'usual' as const } : {}),
     })));
+    if (at && uri && from === 'photo') saveMealThumb(at, uri); // a tiny copy for the day line, on this phone only
     setItems(null); setCheck(null); setWords(''); setMode(null); setUri(null);
     setMessage(tr('Added {n} to your day. Change or remove in See details.', { n: list.map(it => it.name).join(', ') }));
   };
